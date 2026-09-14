@@ -87,6 +87,44 @@ export function setRecordStatus(
   }
   return result;
 }
+export function requiredFieldIssues(
+  record: RecordData,
+): { field: string; code: string }[] {
+  if (record.kind !== 'product') return [];
+  const fields = record.data.fields;
+  const category =
+    fields.normalizedCategory?.state === 'known'
+      ? fields.normalizedCategory.value
+      : '';
+  const required = ['sku', 'normalizedCategory'];
+  if (
+    [
+      'wall_cabinet',
+      'base_cabinet',
+      'tall_cabinet',
+      'vanity',
+      'corner_cabinet',
+      'oven_cabinet',
+      'refrigerator_cabinet',
+      'pantry',
+    ].includes(String(category))
+  )
+    required.push('widthIn', 'heightIn', 'depthIn');
+  if (category === 'panel' || category === 'filler')
+    required.push('widthIn', 'heightIn', 'thicknessIn');
+  if (category === 'molding')
+    required.push('lengthIn', 'profileWidthIn', 'profileHeightIn');
+  return required.flatMap((field) =>
+    factBlockers(fields[field], {
+      required: true,
+      valueType: ['sku', 'normalizedCategory'].includes(field)
+        ? 'string'
+        : 'number',
+      positiveDimension: !['sku', 'normalizedCategory'].includes(field),
+    }).map((code) => ({ field, code })),
+  );
+}
+
 export function deterministicRecordBlockers(record: RecordData): string[] {
   const blockers = new Set<string>();
   if (record.kind === 'registry')
@@ -102,37 +140,7 @@ export function deterministicRecordBlockers(record: RecordData): string[] {
         blockers.add(b);
   if (record.kind === 'product') {
     const fields = record.data.fields;
-    const category =
-      fields.normalizedCategory?.state === 'known'
-        ? fields.normalizedCategory.value
-        : '';
-    const required = ['sku', 'normalizedCategory'];
-    if (
-      [
-        'wall_cabinet',
-        'base_cabinet',
-        'tall_cabinet',
-        'vanity',
-        'corner_cabinet',
-        'oven_cabinet',
-        'refrigerator_cabinet',
-        'pantry',
-      ].includes(String(category))
-    )
-      required.push('widthIn', 'heightIn', 'depthIn');
-    if (category === 'panel' || category === 'filler')
-      required.push('widthIn', 'heightIn', 'thicknessIn');
-    if (category === 'molding')
-      required.push('lengthIn', 'profileWidthIn', 'profileHeightIn');
-    for (const field of required) {
-      const numeric = !['sku', 'normalizedCategory'].includes(field);
-      for (const b of factBlockers(fields[field], {
-        required: true,
-        valueType: numeric ? 'number' : 'string',
-        positiveDimension: numeric,
-      }))
-        blockers.add(b);
-    }
+    for (const issue of requiredFieldIssues(record)) blockers.add(issue.code);
     for (const fact of Object.values(fields)) {
       if (!fact.provenance.length) blockers.add('missing_provenance');
       if (fact.extractionMethod === 'vision' && !fact.provenance.length)

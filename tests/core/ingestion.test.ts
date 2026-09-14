@@ -21,3 +21,9 @@ test('missing candidate fields reduce metrics without crashing or disappearing f
 test('representative source marker check rejects a neighboring SKU diamond restriction',async()=>{
  const {sourceMarkers}=await import('../../src/catalog/cross-source');const {readFile}=await import('node:fs/promises');const text=await readFile('tests/fixtures/fabuwood-allure/pages/022.txt','utf8');assert.deepEqual(sourceMarkers(text,'W2421'),['**♦']);assert.deepEqual(sourceMarkers(text,'W3021'),['**']);
 });
+
+test('OLF330 identifies missing thickness without discarding its evidenced width and height',async()=>{
+ const {requiredFieldIssues,deterministicRecordBlockers}=await import('../../src/catalog/record-data');
+ const records=await importBenchmarkDraft('tests/fixtures/fabuwood-allure','source','18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530','candidate');const product=records.find(r=>r.data.id==='product:OLF330');assert.ok(product);assert.equal(product.kind,'product');if(product.kind!=='product')return;
+ assert.deepEqual(requiredFieldIssues(product),[{field:'thicknessIn',code:'missing_required_field'}]);assert.deepEqual(deterministicRecordBlockers(product),['missing_required_field']);assert.equal(product.data.fields.widthIn?.state,'known');assert.equal(product.data.fields.heightIn?.state,'known');assert.equal(product.data.fields.thicknessIn,undefined);
+});

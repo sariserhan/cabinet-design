@@ -2,6 +2,8 @@
 
 ## Completed
 
+- Review blockers identify the affected required fields; OLF330 explicitly shows missing thickness while retaining its evidenced width and height.
+
 - Source-pinned public Allure V.02.26.26 PDF: 139 physical pages; selected 32 representative pages and dependencies.
 - Draft fixture: 189 products, 58 footnotes, 32 rules, 8 difficult cases, 431 evidence snippets; reproducible preparation and integrity checks.
 - Strict field provenance, explicit unknown/conflicting states, rule vocabulary, three-valued execution, approval blockers and content-bound publication gates.
@@ -40,7 +42,7 @@ Not measured. Software tests, draft self-comparisons and imported annotation cou
 
 ## Benchmark Results
 
-70 core behavior tests and 10 backend/provider contract tests pass, together with lint and TypeScript. The production build succeeds. The artifact integrity check passes for all 32 selected pages and 431 evidence snippets. The real human-verified benchmark has not run and publication remains blocked.
+71 core behavior tests and 10 backend/provider contract tests pass, together with lint and TypeScript. The production build succeeds. The artifact integrity check passes for all 32 selected pages and 431 evidence snippets. The real human-verified benchmark has not run and publication remains blocked.
 
 ## Architecture Decisions
 

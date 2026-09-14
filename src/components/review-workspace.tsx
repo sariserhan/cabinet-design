@@ -13,7 +13,11 @@ import type {
   RecordDetail,
   RecordListRow,
 } from '@/lib/workspace-types';
-import { recordDataSchema, recordEvidence } from '@/catalog/record-data';
+import {
+  recordDataSchema,
+  recordEvidence,
+  requiredFieldIssues,
+} from '@/catalog/record-data';
 import type { RecordData } from '@/catalog/record-data';
 import type { SourceEvidence } from '@/catalog/evidence';
 import { VersionPicker } from './version-picker';
@@ -313,6 +317,13 @@ function RecordEditor({
       setPending(false);
     }
   }
+  const fieldIssues = requiredFieldIssues(initial);
+  const fieldLabel = (field: string) => {
+    const label = field
+      .replace(/In$/, ' (in)')
+      .replace(/([a-z])([A-Z])/g, '$1 $2');
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  };
   const changed = JSON.stringify(payload) !== JSON.stringify(initial);
   const allEvidence = useMemo(() => {
     const m = new Map(recordEvidence(payload).map((e) => [e.id, e]));
@@ -342,9 +353,31 @@ function RecordEditor({
             <Alert variant="destructive">
               <AlertTitle>Approval blocked</AlertTitle>
               <AlertDescription>
-                {record.blockers.map((b) => (
-                  <div key={b}>{b.replaceAll('_', ' ')}</div>
-                ))}
+                {record.blockers.map((code) => {
+                  const details = fieldIssues.filter(
+                    (issue) => issue.code === code,
+                  );
+                  return details.length ? (
+                    details.map((issue) => (
+                      <div key={code + ':' + issue.field}>
+                        {fieldLabel(issue.field)}:{' '}
+                        {code === 'missing_required_field'
+                          ? 'a required value is missing or unresolved.'
+                          : code.replaceAll('_', ' ')}
+                      </div>
+                    ))
+                  ) : (
+                    <div key={code}>{code.replaceAll('_', ' ')}</div>
+                  );
+                })}
+                {fieldIssues.some(
+                  (issue) => issue.code === 'missing_required_field',
+                ) ? (
+                  <p>
+                    Only add a value when the source supports it. Otherwise,
+                    leave this record unapproved.
+                  </p>
+                ) : null}
               </AlertDescription>
             </Alert>
           ) : null}
