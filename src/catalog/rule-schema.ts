@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { confidenceSchema, evidenced, idSchema, reviewStatusSchema, sourceEvidenceSchema } from './evidence.js';
+import { confidenceSchema, evidenced, idSchema, reviewStatusSchema, sourceEvidenceSchema } from './evidence';
 
 export const textFieldSchema = z.enum(['style', 'finish', 'sku', 'hostSku', 'hostConfiguration']);
 export const numberFieldSchema = z.enum(['widthIn', 'heightIn', 'depthIn', 'resultDepthIn', 'ovenOpeningWidthIn', 'ovenOpeningHeightIn', 'ovenOverallHeightIn']);

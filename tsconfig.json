@@ -1,15 +1,50 @@
 {
   "compilerOptions": {
     "target": "ES2023",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ]
   },
-  "include": ["src/**/*.ts", "tests/core/**/*.ts"]
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "convex/**/*.ts",
+    "tests/core/**/*.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "tools/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -1,4 +1,5 @@
-import { createHash } from 'node:crypto';
+import { sha256 } from '@noble/hashes/sha2.js';
+import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils.js';
 /** Arrays retain their semantic order. Callers explicitly sort unordered entity collections. */
 export function canonicalJson(value: unknown): string {
   function normalize(v: unknown): unknown {
@@ -13,5 +14,5 @@ export function canonicalJson(value: unknown): string {
   return JSON.stringify(normalize(value));
 }
 export function contentHash(value: unknown): string {
-  return createHash('sha256').update(canonicalJson(value)).digest('hex');
+  return bytesToHex(sha256(utf8ToBytes(canonicalJson(value))));
 }

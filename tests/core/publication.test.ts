@@ -152,3 +152,11 @@ test('published objects are deeply frozen in memory', () => {
   assert.throws(() => { product.reviewStatus = 'rejected'; }, TypeError);
   assert.equal(Object.isFrozen(product.fields.widthIn), true);
 });
+
+test('family scopes require a reviewed registry with source-backed membership',()=>{
+ const c=candidate();c.rules=[rule({type:'allowed_values',field:'finish',values:[operand('Frost')],outsideSet:'invalid'},{scope:{kind:'families',targets:[operand('family:test')]}})];
+ assert.ok(codes(certify(c)).includes('unresolved_family_scope'));
+ c.registries=[{id:'family:test',entityKind:'family',name:fact('family-name','Synthetic family'),attributes:{},productIds:[operand('p1')],reviewStatus:'approved'}];
+ assert.equal(evaluatePublication(certify(c)).publishable,true);
+ const family=c.registries[0];assert.ok(family);family.productIds=[operand('missing-product')];assert.ok(codes(certify(c)).includes('dangling_registry_member'));
+});

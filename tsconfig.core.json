@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
+    "incremental": false
+  },
+  "include": [
+    "src/catalog/**/*.ts",
+    "tests/core/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

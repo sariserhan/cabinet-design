@@ -1,6 +1,6 @@
-import { AUTO_APPROVE_THRESHOLD } from './approval.js';
-import { contextSchema, ruleSchema } from './rule-schema.js';
-import type { CatalogRule, EvaluationContext, RuleCondition, RuleConstraint, RuleTarget } from './rule-schema.js';
+import { AUTO_APPROVE_THRESHOLD } from './approval';
+import { contextSchema, ruleSchema } from './rule-schema';
+import type { CatalogRule, EvaluationContext, RuleCondition, RuleConstraint, RuleTarget } from './rule-schema';
 
 export type Truth = true | false | 'unknown';
 export type RuleOutcome = 'valid' | 'invalid' | 'unknown' | 'not_applicable';
@@ -90,7 +90,7 @@ function evaluateConstraint(constraint: RuleConstraint, context: EvaluationConte
     }
   }
 }
-import { ruleEvidence } from './rule-schema.js';
+import { ruleEvidence } from './rule-schema';
 function evaluateParsedRule(rule: CatalogRule, context: EvaluationContext): RuleResult {
   const evidenceIds = [...new Set(ruleEvidence(rule).map(e => e.id))].sort();
   const result = (outcome: RuleOutcome, reason: string): RuleResult => ({ ruleId: rule.id, outcome, evidenceIds, reasons: [reason] });

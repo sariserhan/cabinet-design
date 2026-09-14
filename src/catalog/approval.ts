@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { confidenceSchema, factSchema, idSchema, reviewStatusSchema, sourceEvidenceSchema } from './evidence.js';
-import type { Fact } from './evidence.js';
+import { confidenceSchema, factSchema, idSchema, reviewStatusSchema, sourceEvidenceSchema } from './evidence';
+import type { Fact } from './evidence';
 
 export const AUTO_APPROVE_THRESHOLD = 0.98;
 export const blockerCodeSchema = z.enum([
