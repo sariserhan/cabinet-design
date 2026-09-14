@@ -1,0 +1,21 @@
+# Application and worker
+
+The Next.js App Router application uses Convex Auth and owner-scoped queries/mutations. PDFs and page images live in private Convex Storage. Authenticated Next routes stream files through authenticated Convex HTTP handlers; raw public storage URLs are never returned. A separate service secret authorizes worker leases and uploads. It is not exposed through a public environment variable.
+
+Documents are identified by SHA-256. An ingestion job declares its physical page scope, provider, model, prompt version, compiler version and schema version. The worker checks the downloaded bytes against the stored hash, extracts text/words/blocks/table boundaries and rotated page geometry with PyMuPDF, and uploads independent page images. Leases and heartbeats permit interrupted jobs to be claimed again; completed pages are not duplicated. Individual page failures remain visible and block publication. Audited records are preserved when reprocessing.
+
+The production extraction path does not read benchmark answers. OpenAI and Anthropic adapters perform structured classification/segmentation, extraction, registry discovery and critic checks. Image input is used for pages classified as needing visual interpretation. Citations must refer to actual source blocks; unsupported rule semantics remain critical `UNMODELED_RULE` records. Model output cannot supply approval status or human verification. Token counts are recorded; estimated costs require explicit provider/model rates. Real API behavior and accuracy remain unverified until credentials and the human truth fixture are available.
+
+The draft-import path is separately labeled and reads the prepared annotation files. It creates unreviewed records with confidence zero. The app imports executable proposals for the eight difficult cases while retaining the original draft description. A human must check both expected values and test definitions. Missing diagram dimensions remain missing; there is no invented success value.
+
+Review mutations compare record revisions, validate identity and evidence scope, preserve blockers on edits, and record before/after payloads. Resolving ambiguity requires a source-inspection attestation and reason; deterministic missing or conflicting facts still block approval. Splits and merges audit both the original and resulting records. Automated QA uses a server-set automation profile and never increases the human-verified count.
+
+Publication materializes the declared subset, recomputes provenance, required geometry, duplicate and cross-source conflicts, registry references, review status and active jobs. Benchmark receipts are calculated server-side against a separate human-reviewed version. They bind candidate content/revision and truth revision. The publication action builds deterministic JSON; the final mutation recomputes the gate and atomically rejects concurrent changes before attaching the immutable export. Edits to published versions are rejected. New revisions copy source references and record inheritance; old page images are retained so reprocessing cannot break published evidence.
+
+Subset materialization is bounded to 40 pages and 2,000 records. These are explicit development limits, not a full-book implementation claim. Full-book scaling, confidence calibration and the final reliability audit follow a passing Milestone 1.
+
+# Browser validation
+
+Playwright Chromium exercised account creation/sign-in, private draft upload/import, source-image loading and field highlight, audited edit/restore/approval, catalog filters, direct source navigation, publication refusal, and unauthenticated file refusal. An isolated automation account was used. Mobile checks at 390 px report no horizontal overflow; desktop checks at 1536 px report no page errors.
+
+The utilitarian implementation follows the initial concept's sidebar, queue/source/detail columns, teal selection, neutral source background and compact forms. Actual PDF pages replace the concept's illustrative page; actual counts and authenticated identity replace its illustrative metadata. Mobile columns stack and navigation scrolls. Screenshots were inspected locally; they are QA artifacts, not manufacturer-data verification.
