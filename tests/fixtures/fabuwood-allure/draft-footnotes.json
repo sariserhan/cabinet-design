@@ -1,0 +1,1248 @@
+[
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W1215:doorCount",
+    "markerEvidenceIds": [
+      "e-bfc47e146bcb90f4"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W1215",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W1515:doorCount",
+    "markerEvidenceIds": [
+      "e-75555dd3ddda79b8"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W1515",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W1815:doorCount",
+    "markerEvidenceIds": [
+      "e-f25f3f6912081296"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W1815",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W2115:doorCount",
+    "markerEvidenceIds": [
+      "e-9130af5e5dcd4167"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W2115",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W1218:doorCount",
+    "markerEvidenceIds": [
+      "e-7cad6637042b5582"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W1218",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W1518:doorCount",
+    "markerEvidenceIds": [
+      "e-29290120c6ef977f"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W1518",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W1818:doorCount",
+    "markerEvidenceIds": [
+      "e-0035b196d5c4707c"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W1818",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b6454a12e8d3b5a9"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "doorCount",
+    "humanVerification": null,
+    "id": "footnote:W2118:doorCount",
+    "markerEvidenceIds": [
+      "e-9664e827979ebedb"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W2118",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-93bd8371b8638580"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W2421:shelfCount",
+    "markerEvidenceIds": [
+      "e-b308e1d8507f41f4"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W2421",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-93bd8371b8638580"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W3021:shelfCount",
+    "markerEvidenceIds": [
+      "e-1da9cc76d963fd94"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W3021",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-93bd8371b8638580"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W3321:shelfCount",
+    "markerEvidenceIds": [
+      "e-f9d237d350f4fe94"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W3321",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-93bd8371b8638580"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W3621:shelfCount",
+    "markerEvidenceIds": [
+      "e-fb6fe9d203724cec"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W3621",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-3436256fbce04b0b"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:W2421:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-b308e1d8507f41f4"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W2421",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-3436256fbce04b0b"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:W3321:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-f9d237d350f4fe94"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W3321",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-3436256fbce04b0b"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:W3621:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-fb6fe9d203724cec"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W3621",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-43e4e1eb9c19eeea"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:W302124:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-0385dd15435ff4a5"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W302124",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-43e4e1eb9c19eeea"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:W332124:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-9cf72e209eb72739"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W332124",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-43e4e1eb9c19eeea"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:W362124:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-aca03ce80ef58feb"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W362124",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-9abed944966afb1c"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:TP152493:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-645e131e148cc72e"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "TP152493",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-9abed944966afb1c"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:TP182493:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-94fd40203da5b244"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "TP182493",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-9abed944966afb1c"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:TP242493:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-ade54e3f33766f04"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "TP242493",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-9abed944966afb1c"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:TP302493:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-9fe9734611c7c075"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "TP302493",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-9abed944966afb1c"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:TP362493:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-9ebda12c8bd2c85c"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "TP362493",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-66cbc26e9b898ae4"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:OC3393S:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-734310f71a2aae54"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OC3393S",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-7a7fa30879248f8b"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:OLF339:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-75deb58d465edee7"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF339",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-7a7fa30879248f8b"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:OLF393:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-53b1347cc8147dda"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF393",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-7a7fa30879248f8b"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:OLF639:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-a1850489c8bb0dd2"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF639",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-b62b356afb02465a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": {
+        "finishes": [
+          "Frost",
+          "Dove",
+          "Indigo",
+          "Timber",
+          "Desert Oak"
+        ],
+        "style": "Galaxy"
+      }
+    },
+    "field": "allowedStyleFinish",
+    "humanVerification": null,
+    "id": "footnote:SK W39:allowedStyleFinish",
+    "markerEvidenceIds": [
+      "e-4d95b9c9ea83cdfd"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "SK W39",
+    "symbol": "♦"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-0f402fafa2667e10"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W302124:shelfCount",
+    "markerEvidenceIds": [
+      "e-0385dd15435ff4a5"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W302124",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-0f402fafa2667e10"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W302424:shelfCount",
+    "markerEvidenceIds": [
+      "e-716e57a4089a45b9"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W302424",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-0f402fafa2667e10"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W332124:shelfCount",
+    "markerEvidenceIds": [
+      "e-9cf72e209eb72739"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W332124",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-0f402fafa2667e10"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W332424:shelfCount",
+    "markerEvidenceIds": [
+      "e-e36e7054a7e20dc2"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W332424",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-0f402fafa2667e10"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W362124:shelfCount",
+    "markerEvidenceIds": [
+      "e-aca03ce80ef58feb"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W362124",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-0f402fafa2667e10"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:W362424:shelfCount",
+    "markerEvidenceIds": [
+      "e-8b7b5795edee26e5"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "W362424",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-5a485f18cd47aefe"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 0
+    },
+    "field": "shelfCount",
+    "humanVerification": null,
+    "id": "footnote:B09FD:shelfCount",
+    "markerEvidenceIds": [
+      "e-24b69db0786aa52a"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "B09FD",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-d9c274bb55b54bb2"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1.5
+    },
+    "field": "centerStileWidthIn",
+    "humanVerification": null,
+    "id": "footnote:B39FD:centerStileWidthIn",
+    "markerEvidenceIds": [
+      "e-b0cb47da1696935d"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "B39FD",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-463cf986920aef87"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 3
+    },
+    "field": "centerStileWidthIn",
+    "humanVerification": null,
+    "id": "footnote:B39:centerStileWidthIn",
+    "markerEvidenceIds": [
+      "e-e4456712e85914b8"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "B39",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-463cf986920aef87"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 3
+    },
+    "field": "centerStileWidthIn",
+    "humanVerification": null,
+    "id": "footnote:B42:centerStileWidthIn",
+    "markerEvidenceIds": [
+      "e-19dbed7e2bdb7bf0"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "B42",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-463cf986920aef87"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 3
+    },
+    "field": "centerStileWidthIn",
+    "humanVerification": null,
+    "id": "footnote:B48:centerStileWidthIn",
+    "markerEvidenceIds": [
+      "e-23f182fc3448958f"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "B48",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-653b5f8f9b6b7a3a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 3
+    },
+    "field": "centerStileWidthIn",
+    "humanVerification": null,
+    "id": "footnote:SB39:centerStileWidthIn",
+    "markerEvidenceIds": [
+      "e-d5585d7594670fac"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "SB39",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-653b5f8f9b6b7a3a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 3
+    },
+    "field": "centerStileWidthIn",
+    "humanVerification": null,
+    "id": "footnote:SB42:centerStileWidthIn",
+    "markerEvidenceIds": [
+      "e-2d436bddcc617610"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "SB42",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-e08ab2b11da6e1d1"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 1
+    },
+    "field": "topCabinetShelfCount",
+    "humanVerification": null,
+    "id": "footnote:OC3396S:topCabinetShelfCount",
+    "markerEvidenceIds": [
+      "e-271444cc99239171"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OC3396S",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF330:widthIn",
+    "markerEvidenceIds": [
+      "e-ab486c35067960dd"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF330",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF336:widthIn",
+    "markerEvidenceIds": [
+      "e-51eb304ecf840a16"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF336",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF339:widthIn",
+    "markerEvidenceIds": [
+      "e-75deb58d465edee7"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF339",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF342:widthIn",
+    "markerEvidenceIds": [
+      "e-1bd0d7547225b2e4"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF342",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF384:widthIn",
+    "markerEvidenceIds": [
+      "e-6307e4e5e046f3ec"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF384",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF390:widthIn",
+    "markerEvidenceIds": [
+      "e-ea3e5c3a373c7f45"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF390",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF393:widthIn",
+    "markerEvidenceIds": [
+      "e-53b1347cc8147dda"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF393",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-a1cec6a81e04bf1a"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 2.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF396:widthIn",
+    "markerEvidenceIds": [
+      "e-f1b6d095b936b46d"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF396",
+    "symbol": "*"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-2229c9f3cb085c41"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 5.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF630:widthIn",
+    "markerEvidenceIds": [
+      "e-8e5c3723851aaf23"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF630",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-2229c9f3cb085c41"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 5.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF636:widthIn",
+    "markerEvidenceIds": [
+      "e-178db0d4dfa2c422"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF636",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-2229c9f3cb085c41"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 5.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF639:widthIn",
+    "markerEvidenceIds": [
+      "e-a1850489c8bb0dd2"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF639",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-2229c9f3cb085c41"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 5.5
+    },
+    "field": "widthIn",
+    "humanVerification": null,
+    "id": "footnote:OLF642:widthIn",
+    "markerEvidenceIds": [
+      "e-dc53cd18ad8316f4"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF642",
+    "symbol": "**"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-6e76f263ec2f7ed8"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 79
+    },
+    "field": "heightIn",
+    "humanVerification": null,
+    "id": "footnote:OLF384:heightIn",
+    "markerEvidenceIds": [
+      "e-6307e4e5e046f3ec"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF384",
+    "symbol": "»"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-6e76f263ec2f7ed8"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 85
+    },
+    "field": "heightIn",
+    "humanVerification": null,
+    "id": "footnote:OLF390:heightIn",
+    "markerEvidenceIds": [
+      "e-ea3e5c3a373c7f45"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF390",
+    "symbol": "»"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-6e76f263ec2f7ed8"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 88
+    },
+    "field": "heightIn",
+    "humanVerification": null,
+    "id": "footnote:OLF393:heightIn",
+    "markerEvidenceIds": [
+      "e-53b1347cc8147dda"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF393",
+    "symbol": "»"
+  },
+  {
+    "expected": {
+      "confidence": null,
+      "evidenceIds": [
+        "e-6e76f263ec2f7ed8"
+      ],
+      "reviewStatus": "unreviewed",
+      "value": 91
+    },
+    "field": "heightIn",
+    "humanVerification": null,
+    "id": "footnote:OLF396:heightIn",
+    "markerEvidenceIds": [
+      "e-f1b6d095b936b46d"
+    ],
+    "reviewStatus": "unreviewed",
+    "sku": "OLF396",
+    "symbol": "»"
+  }
+]

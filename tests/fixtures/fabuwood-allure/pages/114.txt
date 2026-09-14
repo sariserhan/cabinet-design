@@ -1,0 +1,36 @@
+V.02.26.26
+A
+L
+L U
+R
+E
+ 
+S
+E
+R
+I
+E
+S
+93
+ GO TO INDEX
+ITEM
+CUT-BASE
+ITEM
+CUT-DBASE
+ITEM
+CUT-SBASE
+ITEM
+CUT-WALL
+Cut Modifications
+24”
+18”
+•	 Reduce depth of base cabinet (min. depth 12”)
+•	 Reduce depth of drawer base cabinet (min. depth 12”)
+•	 Reduce depth of wall cabinet (4" min.)
+•	 Reduce depth of sink base cabinet (4" min.)
+24”
+18”
+24”
+18”
+12”
+9”

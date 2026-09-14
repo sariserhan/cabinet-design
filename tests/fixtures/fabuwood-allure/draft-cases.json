@@ -1,0 +1,129 @@
+[
+  {
+    "expected": "No invented width/height; retain listed SKU and finish restriction.",
+    "expectedBlockers": [
+      "missing_required_field"
+    ],
+    "humanVerification": null,
+    "id": "missing-skin-dimensions",
+    "kind": "source_ambiguity",
+    "pageNumber": 104,
+    "reviewStatus": "unreviewed",
+    "sku": "SK W39"
+  },
+  {
+    "expected": "Actual footnote width wins after reviewed resolution; never treat this injected conflict as a manufacturer contradiction.",
+    "expectedBlockers": [
+      "unresolved_conflict"
+    ],
+    "expectedValue": 2.5,
+    "humanVerification": null,
+    "id": "overlay-nominal-vs-actual",
+    "injected": {
+      "widthIn": 3
+    },
+    "kind": "synthetic_candidate_corruption",
+    "pageNumber": 92,
+    "reviewStatus": "unreviewed",
+    "sku": "OLF330"
+  },
+  {
+    "expected": "The row has ** but no diamond; do not extend adjacent SKU finish restrictions.",
+    "expectedBlockers": [
+      "ambiguous_footnote_scope"
+    ],
+    "humanVerification": null,
+    "id": "wrong-footnote-scope",
+    "injected": {
+      "symbol": "♦"
+    },
+    "kind": "synthetic_candidate_corruption",
+    "pageNumber": 22,
+    "reviewStatus": "unreviewed",
+    "sku": "W3021"
+  },
+  {
+    "expected": "Removing diagram evidence blocks the dependent geometric fact.",
+    "expectedBlockers": [
+      "diagram_dependency_not_verified"
+    ],
+    "humanVerification": null,
+    "id": "missing-diagram",
+    "kind": "synthetic_evidence_removal",
+    "pageNumber": 97,
+    "reviewStatus": "unreviewed",
+    "sku": "CM-1"
+  },
+  {
+    "dependencyPages": [
+      51
+    ],
+    "expected": "Index Base Cabinets label 27 does not match body start 30; locate by actual page evidence.",
+    "humanVerification": null,
+    "id": "stale-index",
+    "kind": "source_navigation_conflict",
+    "pageNumber": 2,
+    "reviewStatus": "unreviewed"
+  },
+  {
+    "dependencyPages": [
+      51
+    ],
+    "examples": [
+      {
+        "expected": "valid_for_host_rule",
+        "hostSku": "B18FD"
+      },
+      {
+        "expected": "invalid",
+        "hostSku": "B18"
+      },
+      {
+        "expected": "unknown"
+      }
+    ],
+    "humanVerification": null,
+    "id": "cross-page-mixer",
+    "kind": "source_rule",
+    "pageNumber": 79,
+    "reviewStatus": "unreviewed",
+    "sku": "MLU-B18"
+  },
+  {
+    "dependencyPages": [
+      76,
+      114
+    ],
+    "expected": "Depth reduction with selected ROD requires CUT-ROD; absent condition inputs remain unknown.",
+    "humanVerification": null,
+    "id": "conditional-cut-rod",
+    "kind": "source_rule",
+    "pageNumber": 116,
+    "reviewStatus": "unreviewed"
+  },
+  {
+    "examples": [
+      {
+        "expected": "valid_for_restriction",
+        "finish": "Frost",
+        "style": "Galaxy"
+      },
+      {
+        "expected": "invalid",
+        "finish": "Frost",
+        "style": "Luna"
+      },
+      {
+        "expected": "invalid",
+        "finish": "Linen",
+        "style": "Galaxy"
+      }
+    ],
+    "humanVerification": null,
+    "id": "style-and-finish",
+    "kind": "source_rule",
+    "pageNumber": 22,
+    "reviewStatus": "unreviewed",
+    "sku": "W2421"
+  }
+]

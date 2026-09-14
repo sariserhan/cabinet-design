@@ -1,0 +1,32 @@
+V.02.26.26
+A
+L
+L U
+R
+E
+ 
+S
+E
+R
+I
+E
+S
+97
+ GO TO INDEX
+•	 Make chase in tall cabinet
+•	 Must supply a drawing for all chase modifications.
+•	 Make chase in wall cabinet
+•	 Must supply a drawing for all chase modifications.
+•	 Make chase in drawer base cabinet
+•	 Must supply a drawing for all chase modifications.
+•	 Make chase in base cabinet
+•	 Must supply a drawing for all chase modifications.
+Pipe Chase
+ITEM
+CHASE-TALL
+ITEM
+CHASE-WALL
+ITEM
+CHASE-DBASE
+ITEM
+CHASE-BASE

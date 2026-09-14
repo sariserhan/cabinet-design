@@ -1,0 +1,35 @@
+V.02.26.26
+A
+L
+L U
+R
+E
+ 
+S
+E
+R
+I
+E
+S
+103
+ GO TO INDEX
+•	 Increase depth on wall cabinet
+•	 Increased depth of roll-out drawers and shelves are by custom request only 
+and is not included as part of this modification. Custom quote required.
+ITEM
+INCREASE-WALL
+•	 Increase depth on base cabinet
+•	 Increased depth of roll-out drawers and shelves are by custom request only 
+and is not included as part of this modification. Custom quote required.
+•	 Create a peninsula cabinet from 2 cabinets
+•	 Peninsula side will include standard Recessed Toe Kick
+•	 Recess toe kick of base cabinet
+•	 Choose from the following options:  Left, Right, Back or a combination or all 
+three.
+Customizations
+ITEM
+INCREASE-BASE
+ITEM
+PEN-CABINET
+ITEM
+RECESS-TK

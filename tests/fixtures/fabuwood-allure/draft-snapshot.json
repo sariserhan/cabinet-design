@@ -1,0 +1,13 @@
+{
+  "files": {
+    "draft-cases.json": "72f2b71a44090d928f8d0c16dc5855e1d1b23d88e83db096f35e6f4cc56605ab",
+    "draft-evidence.json": "2362f2cab6eb79ab365482ddbd6b979f587280e13fa4dd8d28a68c7f7f141896",
+    "draft-footnotes.json": "294296a16bbeeeb992641aa25e7667cb4a7ed81972b2804fda154523776a447a",
+    "draft-products.json": "0367090c41b2a205a5d70ed0bd8215d8a4638dd33ed6694038cda085e2198f7d",
+    "draft-rules.json": "9ca6b6e0de61776744b5395b58b1e33911fc5f94ad8ce2842a77c924e814186b",
+    "draft-summary.json": "8217b55b0897ed8dc94b494c4e1fd816a2d36743c590e58e757712a2804c56f2"
+  },
+  "pageSelectionSha256": "a37e02508542e879b1eebbc7d2f0759fe7d78de40b3139ebe006ad907ee01e6a",
+  "sourceSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+  "status": "draft_only"
+}

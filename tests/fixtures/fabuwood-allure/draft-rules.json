@@ -1,0 +1,817 @@
+[
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "style",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Galaxy"
+      ]
+    },
+    "evidenceIds": [
+      "e-3436256fbce04b0b"
+    ],
+    "humanVerification": null,
+    "id": "rule:22-restricted-style",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "W2421",
+        "W3321",
+        "W3621"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "finish",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Frost",
+        "Dove",
+        "Indigo",
+        "Timber",
+        "Desert Oak"
+      ]
+    },
+    "evidenceIds": [
+      "e-3436256fbce04b0b"
+    ],
+    "humanVerification": null,
+    "id": "rule:22-restricted-finish",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "W2421",
+        "W3321",
+        "W3621"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "style",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Galaxy"
+      ]
+    },
+    "evidenceIds": [
+      "e-43e4e1eb9c19eeea"
+    ],
+    "humanVerification": null,
+    "id": "rule:23-restricted-style",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "W302124",
+        "W332124",
+        "W362124"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "finish",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Frost",
+        "Dove",
+        "Indigo",
+        "Timber",
+        "Desert Oak"
+      ]
+    },
+    "evidenceIds": [
+      "e-43e4e1eb9c19eeea"
+    ],
+    "humanVerification": null,
+    "id": "rule:23-restricted-finish",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "W302124",
+        "W332124",
+        "W362124"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "style",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Galaxy"
+      ]
+    },
+    "evidenceIds": [
+      "e-9abed944966afb1c"
+    ],
+    "humanVerification": null,
+    "id": "rule:58-restricted-style",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "TP152493",
+        "TP182493",
+        "TP242493",
+        "TP302493",
+        "TP362493"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "finish",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Frost",
+        "Dove",
+        "Indigo",
+        "Timber",
+        "Desert Oak"
+      ]
+    },
+    "evidenceIds": [
+      "e-9abed944966afb1c"
+    ],
+    "humanVerification": null,
+    "id": "rule:58-restricted-finish",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "TP152493",
+        "TP182493",
+        "TP242493",
+        "TP302493",
+        "TP362493"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "style",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Galaxy"
+      ]
+    },
+    "evidenceIds": [
+      "e-66cbc26e9b898ae4"
+    ],
+    "humanVerification": null,
+    "id": "rule:60-restricted-style",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "OC3393S"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "finish",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Frost",
+        "Dove",
+        "Indigo",
+        "Timber",
+        "Desert Oak"
+      ]
+    },
+    "evidenceIds": [
+      "e-66cbc26e9b898ae4"
+    ],
+    "humanVerification": null,
+    "id": "rule:60-restricted-finish",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "OC3393S"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "style",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Galaxy"
+      ]
+    },
+    "evidenceIds": [
+      "e-7a7fa30879248f8b"
+    ],
+    "humanVerification": null,
+    "id": "rule:92-restricted-style",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "OLF339",
+        "OLF393",
+        "OLF639"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "finish",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Frost",
+        "Dove",
+        "Indigo",
+        "Timber",
+        "Desert Oak"
+      ]
+    },
+    "evidenceIds": [
+      "e-7a7fa30879248f8b"
+    ],
+    "humanVerification": null,
+    "id": "rule:92-restricted-finish",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "OLF339",
+        "OLF393",
+        "OLF639"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "style",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Galaxy"
+      ]
+    },
+    "evidenceIds": [
+      "e-b62b356afb02465a"
+    ],
+    "humanVerification": null,
+    "id": "rule:104-restricted-style",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "SK W39"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "finish",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "Frost",
+        "Dove",
+        "Indigo",
+        "Timber",
+        "Desert Oak"
+      ]
+    },
+    "evidenceIds": [
+      "e-b62b356afb02465a"
+    ],
+    "humanVerification": null,
+    "id": "rule:104-restricted-finish",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "SK W39"
+      ]
+    },
+    "sourceText": "Available for Galaxy - Frost, Dove, Indigo, Timber, & Desert Oak Only"
+  },
+  {
+    "annotationNotes": [
+      "Do not invent an exact compatible filler SKU."
+    ],
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "accessoryRole",
+        "value": "adjacent_filler"
+      },
+      "type": "requires"
+    },
+    "evidenceIds": [
+      "e-5811a5c26722a464"
+    ],
+    "humanVerification": null,
+    "id": "rule:blind-filler-30",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "WBC2430",
+        "WBC3030",
+        "WBC3630"
+      ]
+    },
+    "sourceText": "Must use filler on adjacent side (not supplied)"
+  },
+  {
+    "annotationNotes": [
+      "Do not invent an exact compatible filler SKU."
+    ],
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "accessoryRole",
+        "value": "adjacent_filler"
+      },
+      "type": "requires"
+    },
+    "evidenceIds": [
+      "e-d2b1b595aee3ae0e"
+    ],
+    "humanVerification": null,
+    "id": "rule:blind-filler-36",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "WBC2436",
+        "WBC3036",
+        "WBC3636"
+      ]
+    },
+    "sourceText": "Must use filler on adjacent side (not supplied)"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "accessoryRole",
+        "value": "filler"
+      },
+      "type": "requires"
+    },
+    "dependencyPages": [
+      91,
+      92
+    ],
+    "evidenceIds": [
+      "e-ac774bf15d8718a9"
+    ],
+    "humanVerification": null,
+    "id": "rule:towel-filler",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "TBPO-BF3"
+      ]
+    },
+    "sourceText": "Filler & Overlay Filler are required and need to be ordered separately"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "accessoryRole",
+        "value": "overlay_filler"
+      },
+      "type": "requires"
+    },
+    "dependencyPages": [
+      91,
+      92
+    ],
+    "evidenceIds": [
+      "e-ac774bf15d8718a9"
+    ],
+    "humanVerification": null,
+    "id": "rule:towel-overlay_filler",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "TBPO-BF3"
+      ]
+    },
+    "sourceText": "Filler & Overlay Filler are required and need to be ordered separately"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "accessoryRole",
+        "value": "filler"
+      },
+      "type": "requires"
+    },
+    "dependencyPages": [
+      91,
+      92
+    ],
+    "evidenceIds": [
+      "e-ac774bf15d8718a9"
+    ],
+    "humanVerification": null,
+    "id": "rule:spice-filler",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "SPO-BF3",
+        "SPO-BF3 BLUM",
+        "SPO-BF6",
+        "SPO-BF6 BLUM"
+      ]
+    },
+    "sourceText": "Filler & Overlay Filler are required and need to be ordered separately"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "accessoryRole",
+        "value": "overlay_filler"
+      },
+      "type": "requires"
+    },
+    "dependencyPages": [
+      91,
+      92
+    ],
+    "evidenceIds": [
+      "e-ac774bf15d8718a9"
+    ],
+    "humanVerification": null,
+    "id": "rule:spice-overlay_filler",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "SPO-BF3",
+        "SPO-BF3 BLUM",
+        "SPO-BF6",
+        "SPO-BF6 BLUM"
+      ]
+    },
+    "sourceText": "Filler & Overlay Filler are required and need to be ordered separately"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "hostSku",
+      "outsideSet": "invalid",
+      "type": "allowed_values",
+      "values": [
+        "B18FD"
+      ]
+    },
+    "dependencyPages": [
+      51
+    ],
+    "evidenceIds": [
+      "e-30a61596bc9d5b66"
+    ],
+    "humanVerification": null,
+    "id": "rule:mixer-host",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "MLU-B18"
+      ]
+    },
+    "sourceText": "For B18FD Only."
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "hostConfiguration",
+      "type": "forbidden_values",
+      "values": [
+        "door_drawer"
+      ]
+    },
+    "evidenceIds": [
+      "e-73c67738f17b7de8"
+    ],
+    "humanVerification": null,
+    "id": "rule:mixer-door-drawer",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "MLU-B18"
+      ]
+    },
+    "sourceText": "Will not work in a door/drawer configuration."
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "ovenOpeningWidthIn",
+      "inclusive": true,
+      "maximum": 31,
+      "minimum": 27,
+      "type": "dimension_range",
+      "unit": "in"
+    },
+    "evidenceIds": [
+      "e-d69ab6057d43ef4d"
+    ],
+    "humanVerification": null,
+    "id": "rule:ovenOpeningWidthIn",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "OC3384S",
+        "OC3390S",
+        "OC3393S",
+        "OC3396S"
+      ]
+    },
+    "sourceText": "Minimum Width opening 27”\n•\t Maximum cut out width 31”"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "ovenOpeningHeightIn",
+      "inclusive": true,
+      "maximum": 37,
+      "minimum": 28.5,
+      "type": "dimension_range",
+      "unit": "in"
+    },
+    "evidenceIds": [
+      "e-19ffed28c0a21797"
+    ],
+    "humanVerification": null,
+    "id": "rule:ovenOpeningHeightIn",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "OC3384S",
+        "OC3390S",
+        "OC3393S",
+        "OC3396S"
+      ]
+    },
+    "sourceText": "Minimum Height opening 28 ½””\n•\t Maximum cut out height is 37”"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "ovenOverallHeightIn",
+      "inclusive": true,
+      "maximum": 37.5,
+      "minimum": null,
+      "type": "dimension_range",
+      "unit": "in"
+    },
+    "evidenceIds": [
+      "e-cff16b5923ffb05c"
+    ],
+    "humanVerification": null,
+    "id": "rule:ovenOverallHeightIn",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "skus": [
+        "OC3384S",
+        "OC3390S",
+        "OC3393S",
+        "OC3396S"
+      ]
+    },
+    "sourceText": "Maximum overall oven Height 37 ½”"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "resultDepthIn",
+      "inclusive": true,
+      "maximum": null,
+      "minimum": 12,
+      "type": "dimension_range",
+      "unit": "in"
+    },
+    "evidenceIds": [
+      "e-9dac98c5053a562c"
+    ],
+    "humanVerification": null,
+    "id": "rule:CUT-BASE",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CUT-BASE"
+    },
+    "sourceText": "Reduce depth of base cabinet (min. depth 12”)"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "resultDepthIn",
+      "inclusive": true,
+      "maximum": null,
+      "minimum": 12,
+      "type": "dimension_range",
+      "unit": "in"
+    },
+    "evidenceIds": [
+      "e-0cafd5d9b5650c7c"
+    ],
+    "humanVerification": null,
+    "id": "rule:CUT-DBASE",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CUT-DBASE"
+    },
+    "sourceText": "Reduce depth of drawer base cabinet (min. depth 12”)"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "resultDepthIn",
+      "inclusive": true,
+      "maximum": null,
+      "minimum": 4,
+      "type": "dimension_range",
+      "unit": "in"
+    },
+    "evidenceIds": [
+      "e-6b77955ea5592a11"
+    ],
+    "humanVerification": null,
+    "id": "rule:CUT-SBASE",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CUT-SBASE"
+    },
+    "sourceText": "Reduce depth of sink base cabinet (4\" min.)"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "field": "resultDepthIn",
+      "inclusive": true,
+      "maximum": null,
+      "minimum": 4,
+      "type": "dimension_range",
+      "unit": "in"
+    },
+    "evidenceIds": [
+      "e-50f945901225f6f2"
+    ],
+    "humanVerification": null,
+    "id": "rule:CUT-WALL",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CUT-WALL"
+    },
+    "sourceText": "Reduce depth of wall cabinet (4\" min.)"
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "documentRole",
+        "value": "chase_drawing"
+      },
+      "type": "requires"
+    },
+    "evidenceIds": [
+      "e-e116cad03c40bea5"
+    ],
+    "humanVerification": null,
+    "id": "rule:CHASE-TALL-drawing",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CHASE-TALL"
+    },
+    "sourceText": "Must supply a drawing for all chase modifications."
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "documentRole",
+        "value": "chase_drawing"
+      },
+      "type": "requires"
+    },
+    "evidenceIds": [
+      "e-e116cad03c40bea5"
+    ],
+    "humanVerification": null,
+    "id": "rule:CHASE-WALL-drawing",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CHASE-WALL"
+    },
+    "sourceText": "Must supply a drawing for all chase modifications."
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "documentRole",
+        "value": "chase_drawing"
+      },
+      "type": "requires"
+    },
+    "evidenceIds": [
+      "e-e116cad03c40bea5"
+    ],
+    "humanVerification": null,
+    "id": "rule:CHASE-DBASE-drawing",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CHASE-DBASE"
+    },
+    "sourceText": "Must supply a drawing for all chase modifications."
+  },
+  {
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "documentRole",
+        "value": "chase_drawing"
+      },
+      "type": "requires"
+    },
+    "evidenceIds": [
+      "e-e116cad03c40bea5"
+    ],
+    "humanVerification": null,
+    "id": "rule:CHASE-BASE-drawing",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "modification": "CHASE-BASE"
+    },
+    "sourceText": "Must supply a drawing for all chase modifications."
+  },
+  {
+    "annotationNotes": [
+      "Requires explicit typed accessory association; do not infer actual drawer dimensions from host SKU."
+    ],
+    "confidence": null,
+    "constraint": {
+      "target": {
+        "kind": "modification",
+        "value": "CUT-ROD"
+      },
+      "type": "conditional_requirement"
+    },
+    "dependencyPages": [
+      76,
+      114
+    ],
+    "evidenceIds": [
+      "e-b161b72fad0539c4"
+    ],
+    "humanVerification": null,
+    "id": "rule:cut-rod-required",
+    "reviewStatus": "unreviewed",
+    "scope": {
+      "series": "Allure"
+    },
+    "sourceText": "CUT-ROD modification will be automatically added when CUT-depth reduction\nhas been applied to a cabinet with a ROD accessory selected.",
+    "when": {
+      "all": [
+        {
+          "field": "cutDepthReductionApplied",
+          "op": "eq",
+          "value": true
+        },
+        {
+          "field": "hasRodAccessory",
+          "op": "eq",
+          "value": true
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,84 @@
+82
+V.02.26.26
+A
+L
+L U
+R
+E
+ 
+S
+E
+R
+I
+E
+S
+ GO TO INDEX
+PANEL/LOOSE PLYWOOD
+REFRIGERATOR END PANEL
+ITEM
+BEP
+**
+REP1-1/2
+REP30120 x 1-1/2
+*
+REP1296
+*
+REP2496
+**
+REP3
+REP30120 x 3
+*
+REP3096
+REP30120
+**
+REP3096 x 1 1/2
+**
+REP3096 x 3
+*	 Both long edges (34-1/2" for BEP, 96" for REP) are edge-banded
+** Sides are flush finished, (no 1/4" reveal)
+•	 120" height available for 30" depth ONLY
+*	 Finished on 1 side only; Moisture Resistant MDF will have visable green core
+** Finished on 2 sides only
+ITEM
+*
+PAN-1/4
+**
+PLY-1/2
+**
+PLY-3/4
+**
+PLY-1/2 48X120
+**
+PLY-3/4 48X120
+IN PLY 1/2-2 SIDE
+IN PLY 3/4-2 SIDE
+Panels
+BEP
+REP1296
+REP2496
+REP3096
+REP30120
+REP1-1/2
+REP3096 X 1 1/2
+REP3
+REP3096 X 3
+12", 24”, 30”
+24”
+96”
+120"
+34½”
+¾”
+¾”
+96"
+30"
+1½"
+96"
+30"
+3"
+48”
+96”
+120"
+48”
+96”
+IN PLY
+PAN/PLY

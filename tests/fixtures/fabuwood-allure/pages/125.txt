@@ -1,0 +1,33 @@
+104
+V.02.26.26
+A
+L
+L U
+R
+E
+ 
+S
+E
+R
+I
+E
+S
+ GO TO INDEX
+•	 Finish full interior of cabinet to match exterior
+•	 Finished ends must still be specified
+•	 Increase depth on tall cabinet
+•	 Increased depth of roll-out drawers and shelves are by custom request only 
+and is not included as part of this modification. Custom quote required.
+ITEM
+CHOOSE-INTERIOR
+ITEM
+INCREASE-TALL
+Customizations
+ITEM
+MATCH-INTERIOR
+•	 Finish full interior of cabinet to selected finish color or stain 
+•	 Finished ends must still be specified
+•	 Not available for NDW, WOS, WR/WC/WO cabinets, Vanities, and TP's.
+ITEM
+INCREASE-PANEL
+•	 Increase depth of DWR in 1/4" increments

@@ -1,0 +1,12 @@
+{
+  "manufacturer": "Fabuwood",
+  "series": "Allure",
+  "documentVersion": "V.02.26.26",
+  "sourceUrl": "https://downloads.ctfassets.net/h0sz29d5jfiq/hMD9fgIvMzJcwmYgi7Oj0/6dc8130d4cec78aaee7533b4318c468d/Allure_Spec_Book_02-26-26.pdf",
+  "localPath": "sources/fabuwood-allure/Allure_Spec_Book_02-26-26.pdf",
+  "sha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+  "acquiredOn": "2026-09-14",
+  "pageSelectionStatus": "selected_for_annotation",
+  "groundTruthStatus": "draft_annotations_only",
+  "pageCount": 139
+}
