@@ -1,0 +1,119 @@
+[
+  {
+    "sku": "IN PLY 1/2-2 SIDE",
+    "fieldsRecovered": {
+      "thicknessIn": 0.5,
+      "thicknessBasis": "Nominal material thickness in the item designation; actual manufacturing tolerance is not specified."
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "IN PLY 3/4-2 SIDE",
+    "fieldsRecovered": {
+      "thicknessIn": 0.75,
+      "thicknessBasis": "Nominal material thickness in the item designation; actual manufacturing tolerance is not specified."
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "PAN-1/4",
+    "fieldsRecovered": {
+      "thicknessIn": 0.25,
+      "thicknessBasis": "Nominal material thickness in the item designation; actual manufacturing tolerance is not specified.",
+      "widthIn": 48
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "PLY-1/2",
+    "fieldsRecovered": {
+      "thicknessIn": 0.5,
+      "thicknessBasis": "Nominal material thickness in the item designation; actual manufacturing tolerance is not specified.",
+      "widthIn": 48
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "PLY-1/2 48X120",
+    "fieldsRecovered": {
+      "thicknessIn": 0.5,
+      "thicknessBasis": "Nominal material thickness in the item designation; actual manufacturing tolerance is not specified.",
+      "widthIn": 48,
+      "heightIn": 120
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "PLY-3/4",
+    "fieldsRecovered": {
+      "thicknessIn": 0.75,
+      "thicknessBasis": "Nominal material thickness in the item designation; actual manufacturing tolerance is not specified.",
+      "widthIn": 48
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "PLY-3/4 48X120",
+    "fieldsRecovered": {
+      "thicknessIn": 0.75,
+      "thicknessBasis": "Nominal material thickness in the item designation; actual manufacturing tolerance is not specified.",
+      "widthIn": 48,
+      "heightIn": 120
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "REP1-1/2",
+    "fieldsRecovered": {
+      "widthIn": 30,
+      "heightIn": 96,
+      "returnFaceWidthIn": 1.5
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "REP3",
+    "fieldsRecovered": {
+      "widthIn": 30,
+      "heightIn": 96,
+      "returnFaceWidthIn": 3
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "REP30120 x 1-1/2",
+    "fieldsRecovered": {
+      "widthIn": 30,
+      "heightIn": 120,
+      "returnFaceWidthIn": 1.5
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "REP30120 x 3",
+    "fieldsRecovered": {
+      "widthIn": 30,
+      "heightIn": 120,
+      "returnFaceWidthIn": 3
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "REP3096 x 1 1/2",
+    "fieldsRecovered": {
+      "widthIn": 30,
+      "heightIn": 96,
+      "returnFaceWidthIn": 1.5
+    },
+    "source": "PDF 103 / printed 82"
+  },
+  {
+    "sku": "REP3096 x 3",
+    "fieldsRecovered": {
+      "widthIn": 30,
+      "heightIn": 96,
+      "returnFaceWidthIn": 3
+    },
+    "source": "PDF 103 / printed 82"
+  }
+]

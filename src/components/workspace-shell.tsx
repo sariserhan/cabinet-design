@@ -19,8 +19,8 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 const navigation = [
-  ['/documents', 'Documents', FileText],
   ['/catalog', 'Catalog', Library],
+  ['/documents', 'Documents', FileText],
   ['/review', 'Review', CheckSquare],
   ['/rules', 'Rules', ListChecks],
   ['/versions', 'Versions', History],
@@ -42,7 +42,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
   return (
     <div className="workspace">
       <aside className="sidebar">
-        <Link href="/documents" className="brand">
+        <Link href="/catalog" className="brand">
           Catalog Compiler
         </Link>
         <nav aria-label="Main navigation">
@@ -69,7 +69,13 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
           </Button>
         </div>
       </aside>
-      <main className="workspace-main">{children}</main>
+      <main className="workspace-main">
+        <div className="demo-banner">
+          <strong>Demo — AI-reviewed draft</strong>
+          <span>Explore the existing catalog and its PDF sources. Unknown values remain visible.</span>
+        </div>
+        {children}
+      </main>
     </div>
   );
 }

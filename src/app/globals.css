@@ -458,3 +458,25 @@ h3 {
     overflow-wrap: anywhere;
   }
 }
+
+.demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 12px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+  font-size: 13px;
+}
+.demo-banner span { color: var(--muted-foreground); }
+.demo-guide { display: grid; gap: 12px; }
+.demo-guide p { color: var(--muted-foreground); max-width: 78ch; }
+.demo-example {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.demo-example:hover { background: var(--muted); }
+.demo-example:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }

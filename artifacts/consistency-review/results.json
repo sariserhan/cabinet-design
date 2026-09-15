@@ -1,0 +1,3850 @@
+{
+  "versionId": "ks7a3dvg5mw8z2vvh7398bw5e18edtr1",
+  "revision": 64,
+  "records": 464,
+  "rules": 46,
+  "footnotes": 90,
+  "uniqueEvidenceIds": 659,
+  "sourceReferenceErrors": [],
+  "conflictingEvidenceIds": [],
+  "danglingProductScopes": [],
+  "crossSourceConflicts": [],
+  "logicOnlyScenarioCount": 140,
+  "logicOnlyFailures": [],
+  "scenarios": [
+    {
+      "ruleId": "rule:104-restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:104-restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:104-restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:104-restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:104-restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:104-restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:22-restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:22-restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:22-restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:22-restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:22-restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:22-restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:23-restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:23-restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:23-restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:23-restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:23-restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:23-restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:58-restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:58-restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:58-restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:58-restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:58-restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:58-restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:60-restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:60-restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:60-restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:60-restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:60-restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:60-restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:92-restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:92-restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:92-restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:92-restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:92-restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:92-restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-BASE-drawing",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-BASE-drawing",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-BASE-drawing",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-DBASE-drawing",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-DBASE-drawing",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-DBASE-drawing",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-TALL-drawing",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-TALL-drawing",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-TALL-drawing",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-WALL-drawing",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-WALL-drawing",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CHASE-WALL-drawing",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-BASE",
+      "scenario": "inclusive endpoint",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-BASE",
+      "scenario": "below minimum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-BASE",
+      "scenario": "missing dimension",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-DBASE",
+      "scenario": "inclusive endpoint",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-DBASE",
+      "scenario": "below minimum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-DBASE",
+      "scenario": "missing dimension",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-SBASE",
+      "scenario": "inclusive endpoint",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-SBASE",
+      "scenario": "below minimum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-SBASE",
+      "scenario": "missing dimension",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-WALL",
+      "scenario": "inclusive endpoint",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-WALL",
+      "scenario": "below minimum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:CUT-WALL",
+      "scenario": "missing dimension",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:adjacent-filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:adjacent-filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:adjacent-filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:29:restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:31:adjacent-filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:31:adjacent-filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:31:adjacent-filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:33:restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:33:restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:33:restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:33:restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:33:restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:33:restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:35:restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:35:restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:35:restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:35:restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:35:restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:35:restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:overlay_filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:overlay_filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:overlay_filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:81:restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:91:restricted-finish",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:91:restricted-finish",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:91:restricted-finish",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:91:restricted-style",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:91:restricted-style",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ai-add:91:restricted-style",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:blind-filler-30",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:blind-filler-30",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:blind-filler-30",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:blind-filler-36",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:blind-filler-36",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:blind-filler-36",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:cut-rod-required",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:cut-rod-required",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:cut-rod-required",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:mixer-door-drawer",
+      "scenario": "listed value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:mixer-door-drawer",
+      "scenario": "outside value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:mixer-door-drawer",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:mixer-host",
+      "scenario": "listed value",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:mixer-host",
+      "scenario": "outside value",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:mixer-host",
+      "scenario": "missing value",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningHeightIn",
+      "scenario": "inclusive endpoint",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningHeightIn",
+      "scenario": "below minimum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningHeightIn",
+      "scenario": "above maximum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningHeightIn",
+      "scenario": "missing dimension",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningWidthIn",
+      "scenario": "inclusive endpoint",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningWidthIn",
+      "scenario": "below minimum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningWidthIn",
+      "scenario": "above maximum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOpeningWidthIn",
+      "scenario": "missing dimension",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOverallHeightIn",
+      "scenario": "inclusive endpoint",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOverallHeightIn",
+      "scenario": "above maximum",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:ovenOverallHeightIn",
+      "scenario": "missing dimension",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:spice-filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:spice-filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:spice-filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:spice-overlay_filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:spice-overlay_filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:spice-overlay_filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:towel-filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:towel-filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:towel-filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:towel-overlay_filler",
+      "scenario": "required selection present",
+      "expected": "valid",
+      "actual": "valid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:towel-overlay_filler",
+      "scenario": "required selection absent",
+      "expected": "invalid",
+      "actual": "invalid",
+      "passed": true
+    },
+    {
+      "ruleId": "rule:towel-overlay_filler",
+      "scenario": "selection unspecified",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "case:conditional-cut-rod",
+      "live": {
+        "passed": false,
+        "reason": "[{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]}],\\\"conflicts\\\":[]}\"}]"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "[{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"valid\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"valid\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"invalid\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"invalid\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"condition_unknown\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"not_applicable\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:cut-rod-required\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b161b72fad0539c4\\\"],\\\"reasons\\\":[\\\"condition_false\\\"]}],\\\"conflicts\\\":[]}\"}]"
+      }
+    },
+    {
+      "id": "case:cross-page-mixer",
+      "live": {
+        "passed": false,
+        "reason": "[{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:mixer-host\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-30a61596bc9d5b66\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:mixer-host\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-30a61596bc9d5b66\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:mixer-host\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-30a61596bc9d5b66\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]}],\\\"conflicts\\\":[]}\"}]"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "[{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"valid\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:mixer-host\\\",\\\"outcome\\\":\\\"valid\\\",\\\"evidenceIds\\\":[\\\"e-30a61596bc9d5b66\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"invalid\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:mixer-host\\\",\\\"outcome\\\":\\\"invalid\\\",\\\"evidenceIds\\\":[\\\"e-30a61596bc9d5b66\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:mixer-host\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-30a61596bc9d5b66\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]}],\\\"conflicts\\\":[]}\"}]"
+      }
+    },
+    {
+      "id": "case:missing-diagram",
+      "live": {
+        "passed": true,
+        "reason": "[\"diagram_dependency_not_verified\",\"missing_provenance\"]"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "[\"diagram_dependency_not_verified\",\"missing_provenance\"]"
+      }
+    },
+    {
+      "id": "case:missing-skin-dimensions",
+      "live": {
+        "passed": true,
+        "reason": "{\"blockers\":[\"missing_required_field\"],\"approval\":{\"confidence\":1,\"blockers\":[\"missing_required_field\"],\"eligibleForAutoApproval\":false}}"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "{\"blockers\":[\"missing_required_field\"],\"approval\":{\"confidence\":1,\"blockers\":[\"missing_required_field\"],\"eligibleForAutoApproval\":false}}"
+      }
+    },
+    {
+      "id": "case:overlay-nominal-vs-actual",
+      "live": {
+        "passed": true,
+        "reason": "[{\"entityId\":\"product:OLF330\",\"code\":\"unresolved_conflict\",\"detail\":\"Product field conflicts with a source-linked footnote: OLF330:widthIn\"}]"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "[{\"entityId\":\"product:OLF330\",\"code\":\"unresolved_conflict\",\"detail\":\"Product field conflicts with a source-linked footnote: OLF330:widthIn\"}]"
+      }
+    },
+    {
+      "id": "case:stale-index",
+      "live": {
+        "passed": true,
+        "reason": "Physical page / printed label and index text checked independently"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "Physical page / printed label and index text checked independently"
+      }
+    },
+    {
+      "id": "case:style-and-finish",
+      "live": {
+        "passed": false,
+        "reason": "[{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:104-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:104-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-finish\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-style\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:104-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:104-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-finish\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-style\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":false,\"reason\":\"{\\\"outcome\\\":\\\"unknown\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:104-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:104-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-finish\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-style\\\",\\\"outcome\\\":\\\"unknown\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"rule_not_approved\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]}],\\\"conflicts\\\":[]}\"}]"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "[{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"valid\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:104-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:104-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-finish\\\",\\\"outcome\\\":\\\"valid\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-style\\\",\\\"outcome\\\":\\\"valid\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"invalid\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:104-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:104-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-finish\\\",\\\"outcome\\\":\\\"valid\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-style\\\",\\\"outcome\\\":\\\"invalid\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]}],\\\"conflicts\\\":[]}\"},{\"passed\":true,\"reason\":\"{\\\"outcome\\\":\\\"invalid\\\",\\\"results\\\":[{\\\"ruleId\\\":\\\"rule:104-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:104-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-b62b356afb02465a\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-finish\\\",\\\"outcome\\\":\\\"invalid\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]},{\\\"ruleId\\\":\\\"rule:22-restricted-style\\\",\\\"outcome\\\":\\\"valid\\\",\\\"evidenceIds\\\":[\\\"e-3436256fbce04b0b\\\"],\\\"reasons\\\":[\\\"constraint_evaluated\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:23-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-43e4e1eb9c19eeea\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:58-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-9abed944966afb1c\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:60-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-66cbc26e9b898ae4\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:92-restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"e-7a7fa30879248f8b\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:29:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:29:03313432716ae965\\\",\\\"ai-add:29:097aed8eee5e9a42\\\",\\\"ai-add:29:0b4f20b0bbfd970b\\\",\\\"ai-add:29:11d9af6544f0d072\\\",\\\"ai-add:29:3dadf5166a1a3b91\\\",\\\"ai-add:29:512615350aa0ca6a\\\",\\\"ai-add:29:54b15d5fe2132f5e\\\",\\\"ai-add:29:687e8bf614158d70\\\",\\\"ai-add:29:7d849a5882032b2d\\\",\\\"ai-add:29:85c01cfb5fb1769a\\\",\\\"ai-add:29:b38ce1f71b5f4a4b\\\",\\\"ai-add:29:bf11dc03955f7495\\\",\\\"ai-add:29:c3408268c65a8365\\\",\\\"ai-add:29:cb300d353112b2d5\\\",\\\"ai-add:29:e0d6a4becb81bc81\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:33:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:33:170684786286e2f2\\\",\\\"ai-add:33:687e8bf614158d70\\\",\\\"ai-add:33:a1b2af014300d633\\\",\\\"ai-add:33:a824c423e86ac1ce\\\",\\\"ai-add:33:bf8964e9bd29f0cd\\\",\\\"ai-add:33:c5fcf6903b223b3b\\\",\\\"ai-add:33:f08f246cbb1fb312\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:35:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:35:4572239a53f5463e\\\",\\\"ai-add:35:612616a468e0a2db\\\",\\\"ai-add:35:687e8bf614158d70\\\",\\\"ai-add:35:ccdba5584b256601\\\",\\\"ai-add:35:cfae09d28714df9f\\\",\\\"ai-add:35:e8c5f690db2e61cc\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:81:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:81:50d2516c08b27745\\\",\\\"ai-add:81:687e8bf614158d70\\\",\\\"ai-add:81:e9b1ddc679b2c687\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-finish\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]},{\\\"ruleId\\\":\\\"rule:ai-add:91:restricted-style\\\",\\\"outcome\\\":\\\"not_applicable\\\",\\\"evidenceIds\\\":[\\\"ai-add:91:5035e351eb8830d5\\\",\\\"ai-add:91:54859420cda0b587\\\",\\\"ai-add:91:687e8bf614158d70\\\"],\\\"reasons\\\":[\\\"outside_scope\\\"]}],\\\"conflicts\\\":[]}\"}]"
+      }
+    },
+    {
+      "id": "case:wrong-footnote-scope",
+      "live": {
+        "passed": true,
+        "reason": "{\"markers\":[\"**\"],\"eligible\":false}"
+      },
+      "logicOnly": {
+        "passed": true,
+        "reason": "{\"markers\":[\"**\"],\"eligible\":false}"
+      }
+    }
+  ],
+  "publication": {
+    "publishable": false,
+    "issueCounts": {
+      "page_processing_warning_affecting_record": 98,
+      "missing_required_field": 765,
+      "review_required": 2586,
+      "unresolved_field": 303,
+      "invalid_derivation": 549,
+      "benchmark_gate_failed": 1,
+      "validation_gate_failed": 1
+    },
+    "structuralIssues": [
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B09FD:sku",
+        "entityId": "product:B09FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B09FD:sku",
+        "entityId": "product:B09FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B12:sku",
+        "entityId": "product:B12:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B12:sku",
+        "entityId": "product:B12:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B12FD:sku",
+        "entityId": "product:B12FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B12FD:sku",
+        "entityId": "product:B12FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B15:sku",
+        "entityId": "product:B15:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B15:sku",
+        "entityId": "product:B15:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B15FD:sku",
+        "entityId": "product:B15FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B15FD:sku",
+        "entityId": "product:B15FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B18:sku",
+        "entityId": "product:B18:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B18:sku",
+        "entityId": "product:B18:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B18FD:sku",
+        "entityId": "product:B18FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B18FD:sku",
+        "entityId": "product:B18FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B21:sku",
+        "entityId": "product:B21:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B21:sku",
+        "entityId": "product:B21:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B21FD:sku",
+        "entityId": "product:B21FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B21FD:sku",
+        "entityId": "product:B21FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B24:sku",
+        "entityId": "product:B24:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B24:sku",
+        "entityId": "product:B24:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B24FD:sku",
+        "entityId": "product:B24FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B24FD:sku",
+        "entityId": "product:B24FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B27:sku",
+        "entityId": "product:B27:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B27:sku",
+        "entityId": "product:B27:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B27FD:sku",
+        "entityId": "product:B27FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B27FD:sku",
+        "entityId": "product:B27FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B30:sku",
+        "entityId": "product:B30:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B30:sku",
+        "entityId": "product:B30:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B30FD:sku",
+        "entityId": "product:B30FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B30FD:sku",
+        "entityId": "product:B30FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B33:sku",
+        "entityId": "product:B33:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B33:sku",
+        "entityId": "product:B33:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B33FD:sku",
+        "entityId": "product:B33FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B33FD:sku",
+        "entityId": "product:B33FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B33SDF:sku",
+        "entityId": "product:B33SDF:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B33SDF:sku",
+        "entityId": "product:B33SDF:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B36:sku",
+        "entityId": "product:B36:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B36:sku",
+        "entityId": "product:B36:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B36FD:sku",
+        "entityId": "product:B36FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B36FD:sku",
+        "entityId": "product:B36FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B36SDF:sku",
+        "entityId": "product:B36SDF:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B36SDF:sku",
+        "entityId": "product:B36SDF:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B39:sku",
+        "entityId": "product:B39:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B39:sku",
+        "entityId": "product:B39:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B39FD:sku",
+        "entityId": "product:B39FD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B39FD:sku",
+        "entityId": "product:B39FD:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B42:sku",
+        "entityId": "product:B42:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B42:sku",
+        "entityId": "product:B42:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B48:sku",
+        "entityId": "product:B48:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:B48:sku",
+        "entityId": "product:B48:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:BEP:manufacturerCategory",
+        "entityId": "product:BEP:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:BF3:manufacturerCategory",
+        "entityId": "product:BF3:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:BF6:manufacturerCategory",
+        "entityId": "product:BF6:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:CM-1:sku",
+        "entityId": "product:CM-1:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:CM-3:sku",
+        "entityId": "product:CM-3:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:CM-4:sku",
+        "entityId": "product:CM-4:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:CM-6:sku",
+        "entityId": "product:CM-6:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB12:sku",
+        "entityId": "product:DB12:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB12:sku",
+        "entityId": "product:DB12:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB15:sku",
+        "entityId": "product:DB15:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB15:sku",
+        "entityId": "product:DB15:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB18:sku",
+        "entityId": "product:DB18:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB18:sku",
+        "entityId": "product:DB18:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB21:sku",
+        "entityId": "product:DB21:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB21:sku",
+        "entityId": "product:DB21:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB24:sku",
+        "entityId": "product:DB24:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB24:sku",
+        "entityId": "product:DB24:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB27:sku",
+        "entityId": "product:DB27:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB27:sku",
+        "entityId": "product:DB27:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB30:sku",
+        "entityId": "product:DB30:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB30:sku",
+        "entityId": "product:DB30:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB33:sku",
+        "entityId": "product:DB33:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB33:sku",
+        "entityId": "product:DB33:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB36:sku",
+        "entityId": "product:DB36:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DB36:sku",
+        "entityId": "product:DB36:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1530:manufacturerCategory",
+        "entityId": "product:DS GDW1530:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1536:manufacturerCategory",
+        "entityId": "product:DS GDW1536:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1539:manufacturerCategory",
+        "entityId": "product:DS GDW1539:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1542:manufacturerCategory",
+        "entityId": "product:DS GDW1542:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1830:manufacturerCategory",
+        "entityId": "product:DS GDW1830:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1836:manufacturerCategory",
+        "entityId": "product:DS GDW1836:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1839:manufacturerCategory",
+        "entityId": "product:DS GDW1839:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW1842:manufacturerCategory",
+        "entityId": "product:DS GDW1842:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW2430:manufacturerCategory",
+        "entityId": "product:DS GDW2430:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW2436:manufacturerCategory",
+        "entityId": "product:DS GDW2436:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW2439:manufacturerCategory",
+        "entityId": "product:DS GDW2439:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW2442:manufacturerCategory",
+        "entityId": "product:DS GDW2442:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3030:manufacturerCategory",
+        "entityId": "product:DS GDW3030:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3036:manufacturerCategory",
+        "entityId": "product:DS GDW3036:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3039:manufacturerCategory",
+        "entityId": "product:DS GDW3039:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3042:manufacturerCategory",
+        "entityId": "product:DS GDW3042:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3630:manufacturerCategory",
+        "entityId": "product:DS GDW3630:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3636:manufacturerCategory",
+        "entityId": "product:DS GDW3636:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3639:manufacturerCategory",
+        "entityId": "product:DS GDW3639:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDW3642:manufacturerCategory",
+        "entityId": "product:DS GDW3642:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDWD1857:manufacturerCategory",
+        "entityId": "product:DS GDWD1857:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDWD1860:manufacturerCategory",
+        "entityId": "product:DS GDWD1860:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDWDC2430:manufacturerCategory",
+        "entityId": "product:DS GDWDC2430:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDWDC2436:manufacturerCategory",
+        "entityId": "product:DS GDWDC2436:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDWDC2439:manufacturerCategory",
+        "entityId": "product:DS GDWDC2439:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:DS GDWDC2442:manufacturerCategory",
+        "entityId": "product:DS GDWDC2442:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:IN PLY 1/2-2 SIDE:manufacturerCategory",
+        "entityId": "product:IN PLY 1/2-2 SIDE:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:IN PLY 3/4-2 SIDE:manufacturerCategory",
+        "entityId": "product:IN PLY 3/4-2 SIDE:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:LSP24 30:manufacturerCategory",
+        "entityId": "product:LSP24 30:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:LSP24 36/42:manufacturerCategory",
+        "entityId": "product:LSP24 36/42:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:LSW24 30:manufacturerCategory",
+        "entityId": "product:LSW24 30:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:LSW24 36/42:manufacturerCategory",
+        "entityId": "product:LSW24 36/42:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:LSW27 30:manufacturerCategory",
+        "entityId": "product:LSW27 30:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:LSW27 36/42:manufacturerCategory",
+        "entityId": "product:LSW27 36/42:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:MLU-B18:sku",
+        "entityId": "product:MLU-B18:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1230:manufacturerCategory",
+        "entityId": "product:NDW1230:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1236:manufacturerCategory",
+        "entityId": "product:NDW1236:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1242:manufacturerCategory",
+        "entityId": "product:NDW1242:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1530:manufacturerCategory",
+        "entityId": "product:NDW1530:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1536:manufacturerCategory",
+        "entityId": "product:NDW1536:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1539:manufacturerCategory",
+        "entityId": "product:NDW1539:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1542:manufacturerCategory",
+        "entityId": "product:NDW1542:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1830:manufacturerCategory",
+        "entityId": "product:NDW1830:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1836:manufacturerCategory",
+        "entityId": "product:NDW1836:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1839:manufacturerCategory",
+        "entityId": "product:NDW1839:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW1842:manufacturerCategory",
+        "entityId": "product:NDW1842:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW2430:manufacturerCategory",
+        "entityId": "product:NDW2430:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW2436:manufacturerCategory",
+        "entityId": "product:NDW2436:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW2439:manufacturerCategory",
+        "entityId": "product:NDW2439:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW2442:manufacturerCategory",
+        "entityId": "product:NDW2442:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3030:manufacturerCategory",
+        "entityId": "product:NDW3030:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3036:manufacturerCategory",
+        "entityId": "product:NDW3036:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3039:manufacturerCategory",
+        "entityId": "product:NDW3039:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3042:manufacturerCategory",
+        "entityId": "product:NDW3042:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3630:manufacturerCategory",
+        "entityId": "product:NDW3630:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3636:manufacturerCategory",
+        "entityId": "product:NDW3636:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3639:manufacturerCategory",
+        "entityId": "product:NDW3639:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:NDW3642:manufacturerCategory",
+        "entityId": "product:NDW3642:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3384S:sku",
+        "entityId": "product:OC3384S:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3384S:sku",
+        "entityId": "product:OC3384S:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3384S:sku",
+        "entityId": "product:OC3384S:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3390S:sku",
+        "entityId": "product:OC3390S:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3390S:sku",
+        "entityId": "product:OC3390S:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3390S:sku",
+        "entityId": "product:OC3390S:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3393S:sku",
+        "entityId": "product:OC3393S:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3393S:sku",
+        "entityId": "product:OC3393S:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3393S:sku",
+        "entityId": "product:OC3393S:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3396S:sku",
+        "entityId": "product:OC3396S:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3396S:sku",
+        "entityId": "product:OC3396S:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OC3396S:sku",
+        "entityId": "product:OC3396S:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF330:sku",
+        "entityId": "product:OLF330:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF336:sku",
+        "entityId": "product:OLF336:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF339:sku",
+        "entityId": "product:OLF339:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF342:sku",
+        "entityId": "product:OLF342:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF384:sku",
+        "entityId": "product:OLF384:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF384:sku",
+        "entityId": "product:OLF384:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF390:sku",
+        "entityId": "product:OLF390:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF390:sku",
+        "entityId": "product:OLF390:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF393:sku",
+        "entityId": "product:OLF393:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF393:sku",
+        "entityId": "product:OLF393:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF396:sku",
+        "entityId": "product:OLF396:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF396:sku",
+        "entityId": "product:OLF396:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF630:sku",
+        "entityId": "product:OLF630:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF636:sku",
+        "entityId": "product:OLF636:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF639:sku",
+        "entityId": "product:OLF639:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:OLF642:sku",
+        "entityId": "product:OLF642:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:PAN-1/4:manufacturerCategory",
+        "entityId": "product:PAN-1/4:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:PLY-1/2:manufacturerCategory",
+        "entityId": "product:PLY-1/2:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:PLY-1/2 48X120:manufacturerCategory",
+        "entityId": "product:PLY-1/2 48X120:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:PLY-3/4:manufacturerCategory",
+        "entityId": "product:PLY-3/4:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:PLY-3/4 48X120:manufacturerCategory",
+        "entityId": "product:PLY-3/4 48X120:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP1-1/2:manufacturerCategory",
+        "entityId": "product:REP1-1/2:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP1296:manufacturerCategory",
+        "entityId": "product:REP1296:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP2496:manufacturerCategory",
+        "entityId": "product:REP2496:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP3:manufacturerCategory",
+        "entityId": "product:REP3:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP30120:manufacturerCategory",
+        "entityId": "product:REP30120:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP30120 x 1-1/2:manufacturerCategory",
+        "entityId": "product:REP30120 x 1-1/2:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP30120 x 3:manufacturerCategory",
+        "entityId": "product:REP30120 x 3:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP3096:manufacturerCategory",
+        "entityId": "product:REP3096:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP3096 x 1 1/2:manufacturerCategory",
+        "entityId": "product:REP3096 x 1 1/2:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:REP3096 x 3:manufacturerCategory",
+        "entityId": "product:REP3096 x 3:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B15 BLUM E:sku",
+        "entityId": "product:ROD-B15 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B15 BLUM H:sku",
+        "entityId": "product:ROD-B15 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B18 BLUM E:sku",
+        "entityId": "product:ROD-B18 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B18 BLUM H:sku",
+        "entityId": "product:ROD-B18 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B21 BLUM E:sku",
+        "entityId": "product:ROD-B21 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B21 BLUM H:sku",
+        "entityId": "product:ROD-B21 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B24 BLUM E:sku",
+        "entityId": "product:ROD-B24 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B24 BLUM H:sku",
+        "entityId": "product:ROD-B24 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B27 BLUM E:sku",
+        "entityId": "product:ROD-B27 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B27 BLUM H:sku",
+        "entityId": "product:ROD-B27 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B30 BLUM E:sku",
+        "entityId": "product:ROD-B30 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B30 BLUM H:sku",
+        "entityId": "product:ROD-B30 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B33 BLUM E:sku",
+        "entityId": "product:ROD-B33 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B33 BLUM H:sku",
+        "entityId": "product:ROD-B33 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B36 BLUM E:sku",
+        "entityId": "product:ROD-B36 BLUM E:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:ROD-B36 BLUM H:sku",
+        "entityId": "product:ROD-B36 BLUM H:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB21:sku",
+        "entityId": "product:SB21:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB21:sku",
+        "entityId": "product:SB21:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB24:sku",
+        "entityId": "product:SB24:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB24:sku",
+        "entityId": "product:SB24:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB27:sku",
+        "entityId": "product:SB27:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB27:sku",
+        "entityId": "product:SB27:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB30:sku",
+        "entityId": "product:SB30:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB30:sku",
+        "entityId": "product:SB30:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB33:sku",
+        "entityId": "product:SB33:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB33:sku",
+        "entityId": "product:SB33:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB33SDF:sku",
+        "entityId": "product:SB33SDF:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB33SDF:sku",
+        "entityId": "product:SB33SDF:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB36:sku",
+        "entityId": "product:SB36:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB36:sku",
+        "entityId": "product:SB36:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB36SDF:sku",
+        "entityId": "product:SB36SDF:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB36SDF:sku",
+        "entityId": "product:SB36SDF:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB39:sku",
+        "entityId": "product:SB39:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB39:sku",
+        "entityId": "product:SB39:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB42:sku",
+        "entityId": "product:SB42:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SB42:sku",
+        "entityId": "product:SB42:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK BASE:sku",
+        "entityId": "product:SK BASE:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK MC:sku",
+        "entityId": "product:SK MC:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK T12D:sku",
+        "entityId": "product:SK T12D:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK TALL:sku",
+        "entityId": "product:SK TALL:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK W30:sku",
+        "entityId": "product:SK W30:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK W36:sku",
+        "entityId": "product:SK W36:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK W39:sku",
+        "entityId": "product:SK W39:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK W42:sku",
+        "entityId": "product:SK W42:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SK WD:sku",
+        "entityId": "product:SK WD:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-BF3:sku",
+        "entityId": "product:SPO-BF3:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-BF3 BLUM:sku",
+        "entityId": "product:SPO-BF3 BLUM:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-BF6:sku",
+        "entityId": "product:SPO-BF6:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-BF6 BLUM:sku",
+        "entityId": "product:SPO-BF6 BLUM:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF330:manufacturerCategory",
+        "entityId": "product:SPO-WF330:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF336:manufacturerCategory",
+        "entityId": "product:SPO-WF336:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF339:manufacturerCategory",
+        "entityId": "product:SPO-WF339:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF342:manufacturerCategory",
+        "entityId": "product:SPO-WF342:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF630:manufacturerCategory",
+        "entityId": "product:SPO-WF630:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF636:manufacturerCategory",
+        "entityId": "product:SPO-WF636:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF639:manufacturerCategory",
+        "entityId": "product:SPO-WF639:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:SPO-WF642:manufacturerCategory",
+        "entityId": "product:SPO-WF642:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TBPO-BF3:sku",
+        "entityId": "product:TBPO-BF3:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TF3120:manufacturerCategory",
+        "entityId": "product:TF3120:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TF396:manufacturerCategory",
+        "entityId": "product:TF396:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TF696:manufacturerCategory",
+        "entityId": "product:TF696:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152484:sku",
+        "entityId": "product:TP152484:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152484:sku",
+        "entityId": "product:TP152484:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152484:sku",
+        "entityId": "product:TP152484:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152490:sku",
+        "entityId": "product:TP152490:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152490:sku",
+        "entityId": "product:TP152490:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152490:sku",
+        "entityId": "product:TP152490:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152493:sku",
+        "entityId": "product:TP152493:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152493:sku",
+        "entityId": "product:TP152493:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152493:sku",
+        "entityId": "product:TP152493:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152496:sku",
+        "entityId": "product:TP152496:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152496:sku",
+        "entityId": "product:TP152496:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP152496:sku",
+        "entityId": "product:TP152496:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182484:sku",
+        "entityId": "product:TP182484:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182484:sku",
+        "entityId": "product:TP182484:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182484:sku",
+        "entityId": "product:TP182484:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182490:sku",
+        "entityId": "product:TP182490:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182490:sku",
+        "entityId": "product:TP182490:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182490:sku",
+        "entityId": "product:TP182490:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182493:sku",
+        "entityId": "product:TP182493:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182493:sku",
+        "entityId": "product:TP182493:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182493:sku",
+        "entityId": "product:TP182493:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182496:sku",
+        "entityId": "product:TP182496:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182496:sku",
+        "entityId": "product:TP182496:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP182496:sku",
+        "entityId": "product:TP182496:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242484:sku",
+        "entityId": "product:TP242484:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242484:sku",
+        "entityId": "product:TP242484:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242484:sku",
+        "entityId": "product:TP242484:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242490:sku",
+        "entityId": "product:TP242490:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242490:sku",
+        "entityId": "product:TP242490:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242490:sku",
+        "entityId": "product:TP242490:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242493:sku",
+        "entityId": "product:TP242493:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242493:sku",
+        "entityId": "product:TP242493:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242493:sku",
+        "entityId": "product:TP242493:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242496:sku",
+        "entityId": "product:TP242496:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242496:sku",
+        "entityId": "product:TP242496:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP242496:sku",
+        "entityId": "product:TP242496:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302484:sku",
+        "entityId": "product:TP302484:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302484:sku",
+        "entityId": "product:TP302484:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302484:sku",
+        "entityId": "product:TP302484:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302490:sku",
+        "entityId": "product:TP302490:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302490:sku",
+        "entityId": "product:TP302490:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302490:sku",
+        "entityId": "product:TP302490:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302493:sku",
+        "entityId": "product:TP302493:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302493:sku",
+        "entityId": "product:TP302493:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302493:sku",
+        "entityId": "product:TP302493:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302496:sku",
+        "entityId": "product:TP302496:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302496:sku",
+        "entityId": "product:TP302496:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP302496:sku",
+        "entityId": "product:TP302496:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362484:sku",
+        "entityId": "product:TP362484:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362484:sku",
+        "entityId": "product:TP362484:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362484:sku",
+        "entityId": "product:TP362484:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362490:sku",
+        "entityId": "product:TP362490:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362490:sku",
+        "entityId": "product:TP362490:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362490:sku",
+        "entityId": "product:TP362490:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362493:sku",
+        "entityId": "product:TP362493:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362493:sku",
+        "entityId": "product:TP362493:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362493:sku",
+        "entityId": "product:TP362493:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362496:sku",
+        "entityId": "product:TP362496:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362496:sku",
+        "entityId": "product:TP362496:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:TP362496:sku",
+        "entityId": "product:TP362496:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0930:sku",
+        "entityId": "product:W0930:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0930:sku",
+        "entityId": "product:W0930:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0930:sku",
+        "entityId": "product:W0930:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0936:sku",
+        "entityId": "product:W0936:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0936:sku",
+        "entityId": "product:W0936:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0936:sku",
+        "entityId": "product:W0936:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0939:manufacturerCategory",
+        "entityId": "product:W0939:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W0942:manufacturerCategory",
+        "entityId": "product:W0942:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1215:sku",
+        "entityId": "product:W1215:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1215:sku",
+        "entityId": "product:W1215:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1215:sku",
+        "entityId": "product:W1215:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1218:sku",
+        "entityId": "product:W1218:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1218:sku",
+        "entityId": "product:W1218:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1218:sku",
+        "entityId": "product:W1218:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1230:sku",
+        "entityId": "product:W1230:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1230:sku",
+        "entityId": "product:W1230:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1230:sku",
+        "entityId": "product:W1230:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1236:sku",
+        "entityId": "product:W1236:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1236:sku",
+        "entityId": "product:W1236:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1236:sku",
+        "entityId": "product:W1236:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1239:manufacturerCategory",
+        "entityId": "product:W1239:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1242:manufacturerCategory",
+        "entityId": "product:W1242:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1515:sku",
+        "entityId": "product:W1515:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1515:sku",
+        "entityId": "product:W1515:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1515:sku",
+        "entityId": "product:W1515:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1518:sku",
+        "entityId": "product:W1518:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1518:sku",
+        "entityId": "product:W1518:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1518:sku",
+        "entityId": "product:W1518:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1530:sku",
+        "entityId": "product:W1530:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1530:sku",
+        "entityId": "product:W1530:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1530:sku",
+        "entityId": "product:W1530:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1536:sku",
+        "entityId": "product:W1536:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1536:sku",
+        "entityId": "product:W1536:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1536:sku",
+        "entityId": "product:W1536:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1539:manufacturerCategory",
+        "entityId": "product:W1539:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1542:manufacturerCategory",
+        "entityId": "product:W1542:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1815:sku",
+        "entityId": "product:W1815:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1815:sku",
+        "entityId": "product:W1815:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1815:sku",
+        "entityId": "product:W1815:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1818:sku",
+        "entityId": "product:W1818:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1818:sku",
+        "entityId": "product:W1818:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1818:sku",
+        "entityId": "product:W1818:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1830:sku",
+        "entityId": "product:W1830:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1830:sku",
+        "entityId": "product:W1830:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1830:sku",
+        "entityId": "product:W1830:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1836:sku",
+        "entityId": "product:W1836:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1836:sku",
+        "entityId": "product:W1836:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1836:sku",
+        "entityId": "product:W1836:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1839:manufacturerCategory",
+        "entityId": "product:W1839:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W1842:manufacturerCategory",
+        "entityId": "product:W1842:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2115:sku",
+        "entityId": "product:W2115:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2115:sku",
+        "entityId": "product:W2115:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2115:sku",
+        "entityId": "product:W2115:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2118:sku",
+        "entityId": "product:W2118:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2118:sku",
+        "entityId": "product:W2118:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2118:sku",
+        "entityId": "product:W2118:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2130:sku",
+        "entityId": "product:W2130:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2130:sku",
+        "entityId": "product:W2130:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2130:sku",
+        "entityId": "product:W2130:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2136:sku",
+        "entityId": "product:W2136:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2136:sku",
+        "entityId": "product:W2136:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2136:sku",
+        "entityId": "product:W2136:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2139:manufacturerCategory",
+        "entityId": "product:W2139:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2142:manufacturerCategory",
+        "entityId": "product:W2142:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2412:sku",
+        "entityId": "product:W2412:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2412:sku",
+        "entityId": "product:W2412:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2412:sku",
+        "entityId": "product:W2412:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2415:sku",
+        "entityId": "product:W2415:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2415:sku",
+        "entityId": "product:W2415:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2415:sku",
+        "entityId": "product:W2415:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2418:sku",
+        "entityId": "product:W2418:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2418:sku",
+        "entityId": "product:W2418:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2418:sku",
+        "entityId": "product:W2418:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2421:sku",
+        "entityId": "product:W2421:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2421:sku",
+        "entityId": "product:W2421:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2421:sku",
+        "entityId": "product:W2421:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2424:sku",
+        "entityId": "product:W2424:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2424:sku",
+        "entityId": "product:W2424:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2424:sku",
+        "entityId": "product:W2424:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2430:sku",
+        "entityId": "product:W2430:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2430:sku",
+        "entityId": "product:W2430:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2430:sku",
+        "entityId": "product:W2430:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2436:sku",
+        "entityId": "product:W2436:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2436:sku",
+        "entityId": "product:W2436:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2436:sku",
+        "entityId": "product:W2436:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2439:manufacturerCategory",
+        "entityId": "product:W2439:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2442:manufacturerCategory",
+        "entityId": "product:W2442:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2715:sku",
+        "entityId": "product:W2715:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2715:sku",
+        "entityId": "product:W2715:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2715:sku",
+        "entityId": "product:W2715:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2718:sku",
+        "entityId": "product:W2718:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2718:sku",
+        "entityId": "product:W2718:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2718:sku",
+        "entityId": "product:W2718:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2730:sku",
+        "entityId": "product:W2730:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2730:sku",
+        "entityId": "product:W2730:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2730:sku",
+        "entityId": "product:W2730:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2736:sku",
+        "entityId": "product:W2736:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2736:sku",
+        "entityId": "product:W2736:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2736:sku",
+        "entityId": "product:W2736:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2739:manufacturerCategory",
+        "entityId": "product:W2739:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W2742:manufacturerCategory",
+        "entityId": "product:W2742:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3012:sku",
+        "entityId": "product:W3012:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3012:sku",
+        "entityId": "product:W3012:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3012:sku",
+        "entityId": "product:W3012:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3015:sku",
+        "entityId": "product:W3015:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3015:sku",
+        "entityId": "product:W3015:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3015:sku",
+        "entityId": "product:W3015:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W301524:sku",
+        "entityId": "product:W301524:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W301524:sku",
+        "entityId": "product:W301524:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W301524:sku",
+        "entityId": "product:W301524:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3018:sku",
+        "entityId": "product:W3018:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3018:sku",
+        "entityId": "product:W3018:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3018:sku",
+        "entityId": "product:W3018:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W301824:sku",
+        "entityId": "product:W301824:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W301824:sku",
+        "entityId": "product:W301824:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W301824:sku",
+        "entityId": "product:W301824:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3021:sku",
+        "entityId": "product:W3021:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3021:sku",
+        "entityId": "product:W3021:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3021:sku",
+        "entityId": "product:W3021:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W302124:sku",
+        "entityId": "product:W302124:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W302124:sku",
+        "entityId": "product:W302124:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W302124:sku",
+        "entityId": "product:W302124:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3024:sku",
+        "entityId": "product:W3024:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3024:sku",
+        "entityId": "product:W3024:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3024:sku",
+        "entityId": "product:W3024:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W302424:sku",
+        "entityId": "product:W302424:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W302424:sku",
+        "entityId": "product:W302424:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W302424:sku",
+        "entityId": "product:W302424:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3030:sku",
+        "entityId": "product:W3030:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3030:sku",
+        "entityId": "product:W3030:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3030:sku",
+        "entityId": "product:W3030:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3036:sku",
+        "entityId": "product:W3036:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3036:sku",
+        "entityId": "product:W3036:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3036:sku",
+        "entityId": "product:W3036:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3039:manufacturerCategory",
+        "entityId": "product:W3039:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3042:manufacturerCategory",
+        "entityId": "product:W3042:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3312:sku",
+        "entityId": "product:W3312:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3312:sku",
+        "entityId": "product:W3312:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3312:sku",
+        "entityId": "product:W3312:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331224:sku",
+        "entityId": "product:W331224:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331224:sku",
+        "entityId": "product:W331224:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331224:sku",
+        "entityId": "product:W331224:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3315:sku",
+        "entityId": "product:W3315:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3315:sku",
+        "entityId": "product:W3315:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3315:sku",
+        "entityId": "product:W3315:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331524:sku",
+        "entityId": "product:W331524:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331524:sku",
+        "entityId": "product:W331524:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331524:sku",
+        "entityId": "product:W331524:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3318:sku",
+        "entityId": "product:W3318:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3318:sku",
+        "entityId": "product:W3318:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3318:sku",
+        "entityId": "product:W3318:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331824:sku",
+        "entityId": "product:W331824:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331824:sku",
+        "entityId": "product:W331824:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W331824:sku",
+        "entityId": "product:W331824:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3321:sku",
+        "entityId": "product:W3321:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3321:sku",
+        "entityId": "product:W3321:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3321:sku",
+        "entityId": "product:W3321:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W332124:sku",
+        "entityId": "product:W332124:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W332124:sku",
+        "entityId": "product:W332124:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W332124:sku",
+        "entityId": "product:W332124:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3324:sku",
+        "entityId": "product:W3324:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3324:sku",
+        "entityId": "product:W3324:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3324:sku",
+        "entityId": "product:W3324:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W332424:sku",
+        "entityId": "product:W332424:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W332424:sku",
+        "entityId": "product:W332424:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W332424:sku",
+        "entityId": "product:W332424:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3330:sku",
+        "entityId": "product:W3330:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3330:sku",
+        "entityId": "product:W3330:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3330:sku",
+        "entityId": "product:W3330:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3336:sku",
+        "entityId": "product:W3336:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3336:sku",
+        "entityId": "product:W3336:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3336:sku",
+        "entityId": "product:W3336:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3339:manufacturerCategory",
+        "entityId": "product:W3339:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3342:manufacturerCategory",
+        "entityId": "product:W3342:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3612:sku",
+        "entityId": "product:W3612:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3612:sku",
+        "entityId": "product:W3612:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3612:sku",
+        "entityId": "product:W3612:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361224:sku",
+        "entityId": "product:W361224:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361224:sku",
+        "entityId": "product:W361224:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361224:sku",
+        "entityId": "product:W361224:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3615:sku",
+        "entityId": "product:W3615:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3615:sku",
+        "entityId": "product:W3615:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3615:sku",
+        "entityId": "product:W3615:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361524:sku",
+        "entityId": "product:W361524:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361524:sku",
+        "entityId": "product:W361524:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361524:sku",
+        "entityId": "product:W361524:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3618:sku",
+        "entityId": "product:W3618:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3618:sku",
+        "entityId": "product:W3618:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3618:sku",
+        "entityId": "product:W3618:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361824:sku",
+        "entityId": "product:W361824:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361824:sku",
+        "entityId": "product:W361824:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W361824:sku",
+        "entityId": "product:W361824:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3621:sku",
+        "entityId": "product:W3621:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3621:sku",
+        "entityId": "product:W3621:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3621:sku",
+        "entityId": "product:W3621:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W362124:sku",
+        "entityId": "product:W362124:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W362124:sku",
+        "entityId": "product:W362124:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W362124:sku",
+        "entityId": "product:W362124:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3624:sku",
+        "entityId": "product:W3624:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3624:sku",
+        "entityId": "product:W3624:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3624:sku",
+        "entityId": "product:W3624:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W362424:sku",
+        "entityId": "product:W362424:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W362424:sku",
+        "entityId": "product:W362424:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W362424:sku",
+        "entityId": "product:W362424:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3630:sku",
+        "entityId": "product:W3630:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3630:sku",
+        "entityId": "product:W3630:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3630:sku",
+        "entityId": "product:W3630:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3636:sku",
+        "entityId": "product:W3636:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3636:sku",
+        "entityId": "product:W3636:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3636:sku",
+        "entityId": "product:W3636:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3639:manufacturerCategory",
+        "entityId": "product:W3639:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3642:manufacturerCategory",
+        "entityId": "product:W3642:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3930:sku",
+        "entityId": "product:W3930:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3930:sku",
+        "entityId": "product:W3930:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3930:sku",
+        "entityId": "product:W3930:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3936:sku",
+        "entityId": "product:W3936:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3936:sku",
+        "entityId": "product:W3936:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3936:sku",
+        "entityId": "product:W3936:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3939:manufacturerCategory",
+        "entityId": "product:W3939:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W3942:manufacturerCategory",
+        "entityId": "product:W3942:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W421224LU:sku",
+        "entityId": "product:W421224LU:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W421224LU:sku",
+        "entityId": "product:W421224LU:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W421224LU:sku",
+        "entityId": "product:W421224LU:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W481224LU:sku",
+        "entityId": "product:W481224LU:heightIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W481224LU:sku",
+        "entityId": "product:W481224LU:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:W481224LU:sku",
+        "entityId": "product:W481224LU:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC2430:sku",
+        "entityId": "product:WBC2430:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC2430:sku",
+        "entityId": "product:WBC2430:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC2436:sku",
+        "entityId": "product:WBC2436:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC2436:sku",
+        "entityId": "product:WBC2436:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC2439:manufacturerCategory",
+        "entityId": "product:WBC2439:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC2442:manufacturerCategory",
+        "entityId": "product:WBC2442:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3030:sku",
+        "entityId": "product:WBC3030:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3030:sku",
+        "entityId": "product:WBC3030:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3036:sku",
+        "entityId": "product:WBC3036:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3036:sku",
+        "entityId": "product:WBC3036:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3039:manufacturerCategory",
+        "entityId": "product:WBC3039:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3042:manufacturerCategory",
+        "entityId": "product:WBC3042:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3630:sku",
+        "entityId": "product:WBC3630:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3630:sku",
+        "entityId": "product:WBC3630:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3636:sku",
+        "entityId": "product:WBC3636:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3636:sku",
+        "entityId": "product:WBC3636:widthIn"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3639:manufacturerCategory",
+        "entityId": "product:WBC3639:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WBC3642:manufacturerCategory",
+        "entityId": "product:WBC3642:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF330:manufacturerCategory",
+        "entityId": "product:WF330:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF336:manufacturerCategory",
+        "entityId": "product:WF336:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF339:manufacturerCategory",
+        "entityId": "product:WF339:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF342:manufacturerCategory",
+        "entityId": "product:WF342:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF630:manufacturerCategory",
+        "entityId": "product:WF630:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF636:manufacturerCategory",
+        "entityId": "product:WF636:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF639:manufacturerCategory",
+        "entityId": "product:WF639:normalizedCategory"
+      },
+      {
+        "code": "invalid_derivation",
+        "detail": "Unresolved derivation input product:WF642:manufacturerCategory",
+        "entityId": "product:WF642:normalizedCategory"
+      }
+    ]
+  },
+  "limitations": [
+    "Logic-only checks temporarily approve copies in memory; no live approval or human verification was changed.",
+    "Reference checks validate document hash/page identity and evidence-ID consistency, not factual correctness of every cited measurement.",
+    "Consult current publication issue counts for remaining blockers; no gate is waived by this audit."
+  ]
+}

@@ -1,0 +1,146 @@
+SKU,PDF page,Printed page,Unresolved fields
+BF3,91,70,thicknessIn; widthIn
+BF6,91,70,thicknessIn; widthIn
+DS GDW1530,33,12,depthIn; heightIn; widthIn
+DS GDW1536,33,12,depthIn; heightIn; widthIn
+DS GDW1539,33,12,depthIn; heightIn; widthIn
+DS GDW1542,33,12,depthIn; heightIn; widthIn
+DS GDW1830,33,12,depthIn; heightIn; widthIn
+DS GDW1836,33,12,depthIn; heightIn; widthIn
+DS GDW1839,33,12,depthIn; heightIn; widthIn
+DS GDW1842,33,12,depthIn; heightIn; widthIn
+DS GDW2430,33,12,depthIn; heightIn; widthIn
+DS GDW2436,33,12,depthIn; heightIn; widthIn
+DS GDW2439,33,12,depthIn; heightIn; widthIn
+DS GDW2442,33,12,depthIn; heightIn; widthIn
+DS GDW3030,33,12,depthIn; heightIn; widthIn
+DS GDW3036,33,12,depthIn; heightIn; widthIn
+DS GDW3039,33,12,depthIn; heightIn; widthIn
+DS GDW3042,33,12,depthIn; heightIn; widthIn
+DS GDW3630,33,12,depthIn; heightIn; widthIn
+DS GDW3636,33,12,depthIn; heightIn; widthIn
+DS GDW3639,33,12,depthIn; heightIn; widthIn
+DS GDW3642,33,12,depthIn; heightIn; widthIn
+DS GDWD1857,33,12,depthIn; heightIn; widthIn
+DS GDWD1860,33,12,depthIn; heightIn; widthIn
+DS GDWDC2430,33,12,depthIn; heightIn; widthIn
+DS GDWDC2436,33,12,depthIn; heightIn; widthIn
+DS GDWDC2439,33,12,depthIn; heightIn; widthIn
+DS GDWDC2442,33,12,depthIn; heightIn; widthIn
+LSP24 30,81,60,depthIn; heightIn; widthIn
+LSP24 36/42,81,60,depthIn; heightIn; widthIn
+LSW24 30,81,60,depthIn; heightIn; widthIn
+LSW24 36/42,81,60,depthIn; heightIn; widthIn
+LSW27 30,81,60,depthIn; heightIn; widthIn
+LSW27 36/42,81,60,depthIn; heightIn; widthIn
+MLU-B18,79,58,depthIn; heightIn; widthIn
+NDW1230,35,14,heightIn; widthIn
+NDW1236,35,14,heightIn; widthIn
+NDW1242,35,14,heightIn; widthIn
+NDW1530,35,14,heightIn; widthIn
+NDW1536,35,14,heightIn; widthIn
+NDW1539,35,14,heightIn; widthIn
+NDW1542,35,14,heightIn; widthIn
+NDW1830,35,14,heightIn; widthIn
+NDW1836,35,14,heightIn; widthIn
+NDW1839,35,14,heightIn; widthIn
+NDW1842,35,14,heightIn; widthIn
+NDW2430,35,14,heightIn; widthIn
+NDW2436,35,14,heightIn; widthIn
+NDW2439,35,14,heightIn; widthIn
+NDW2442,35,14,heightIn; widthIn
+NDW3030,35,14,heightIn; widthIn
+NDW3036,35,14,heightIn; widthIn
+NDW3039,35,14,heightIn; widthIn
+NDW3042,35,14,heightIn; widthIn
+NDW3630,35,14,heightIn; widthIn
+NDW3636,35,14,heightIn; widthIn
+NDW3639,35,14,heightIn; widthIn
+NDW3642,35,14,heightIn; widthIn
+OLF330,92,71,thicknessIn
+OLF336,92,71,thicknessIn
+OLF339,92,71,thicknessIn
+OLF342,92,71,thicknessIn
+OLF384,92,71,thicknessIn
+OLF390,92,71,thicknessIn
+OLF393,92,71,thicknessIn
+OLF396,92,71,thicknessIn
+OLF630,92,71,thicknessIn
+OLF636,92,71,thicknessIn
+OLF639,92,71,thicknessIn
+OLF642,92,71,thicknessIn
+PAN-1/4,103,82,heightIn
+PLY-1/2,103,82,heightIn
+PLY-3/4,103,82,heightIn
+REP1-1/2,103,82,thicknessIn
+REP3,103,82,thicknessIn
+REP30120 x 1-1/2,103,82,thicknessIn
+REP30120 x 3,103,82,thicknessIn
+REP3096 x 1 1/2,103,82,thicknessIn
+REP3096 x 3,103,82,thicknessIn
+ROD-B15 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B15 BLUM H,76,55,depthIn; heightIn; widthIn
+ROD-B18 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B18 BLUM H,76,55,depthIn; heightIn; widthIn
+ROD-B21 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B21 BLUM H,76,55,depthIn; heightIn; widthIn
+ROD-B24 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B24 BLUM H,76,55,depthIn; heightIn; widthIn
+ROD-B27 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B27 BLUM H,76,55,depthIn; heightIn; widthIn
+ROD-B30 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B30 BLUM H,76,55,depthIn; heightIn; widthIn
+ROD-B33 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B33 BLUM H,76,55,depthIn; heightIn; widthIn
+ROD-B36 BLUM E,76,55,depthIn; heightIn; widthIn
+ROD-B36 BLUM H,76,55,depthIn; heightIn; widthIn
+SK W39,104,83,heightIn; widthIn
+SPO-BF3,79,58,depthIn; heightIn; widthIn
+SPO-BF3 BLUM,79,58,depthIn; heightIn; widthIn
+SPO-BF6,79,58,depthIn; heightIn; widthIn
+SPO-BF6 BLUM,79,58,depthIn; heightIn; widthIn
+SPO-WF330,81,60,depthIn; heightIn; widthIn
+SPO-WF336,81,60,depthIn; heightIn; widthIn
+SPO-WF339,81,60,depthIn; heightIn; widthIn
+SPO-WF342,81,60,depthIn; heightIn; widthIn
+SPO-WF630,81,60,depthIn; heightIn; widthIn
+SPO-WF636,81,60,depthIn; heightIn; widthIn
+SPO-WF639,81,60,depthIn; heightIn; widthIn
+SPO-WF642,81,60,depthIn; heightIn; widthIn
+TBPO-BF3,79,58,depthIn; heightIn; widthIn
+TF3120,91,70,heightIn; thicknessIn; widthIn
+TF396,91,70,heightIn; thicknessIn; widthIn
+TF696,91,70,heightIn; thicknessIn; widthIn
+W0939,29,8,widthIn
+W0942,31,10,widthIn
+W1239,29,8,widthIn
+W1242,31,10,widthIn
+W1539,29,8,widthIn
+W1542,31,10,widthIn
+W1839,29,8,widthIn
+W1842,31,10,widthIn
+W2139,29,8,widthIn
+W2142,31,10,widthIn
+W2439,29,8,widthIn
+W2442,31,10,widthIn
+W2739,29,8,widthIn
+W2742,31,10,widthIn
+W3039,29,8,widthIn
+W3042,31,10,widthIn
+W3339,29,8,widthIn
+W3342,31,10,widthIn
+W3639,29,8,widthIn
+W3642,31,10,widthIn
+W3939,29,8,widthIn
+W3942,31,10,widthIn
+WBC2439,29,8,widthIn
+WBC3039,29,8,widthIn
+WBC3639,29,8,widthIn
+WF330,91,70,heightIn; thicknessIn; widthIn
+WF336,91,70,heightIn; thicknessIn; widthIn
+WF339,91,70,heightIn; thicknessIn; widthIn
+WF342,91,70,heightIn; thicknessIn; widthIn
+WF630,91,70,heightIn; thicknessIn; widthIn
+WF636,91,70,heightIn; thicknessIn; widthIn
+WF639,91,70,heightIn; thicknessIn; widthIn
+WF642,91,70,heightIn; thicknessIn; widthIn

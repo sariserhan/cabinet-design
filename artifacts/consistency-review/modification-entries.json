@@ -1,0 +1,545 @@
+[
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CHASE-BASE",
+      "entityKind": "modification",
+      "name": {
+        "id": "CHASE-BASE:name",
+        "state": "known",
+        "value": "CHASE-BASE",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-e116cad03c40bea5",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 118,
+            "printedPageLabel": "97",
+            "sourceText": "Must supply a drawing for all chase modifications.",
+            "location": {
+              "kind": "full_page",
+              "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CHASE-BASE:sourceDescription",
+          "state": "known",
+          "value": "Must supply a drawing for all chase modifications.",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-e116cad03c40bea5",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 118,
+              "printedPageLabel": "97",
+              "sourceText": "Must supply a drawing for all chase modifications.",
+              "location": {
+                "kind": "full_page",
+                "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CHASE-DBASE",
+      "entityKind": "modification",
+      "name": {
+        "id": "CHASE-DBASE:name",
+        "state": "known",
+        "value": "CHASE-DBASE",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-e116cad03c40bea5",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 118,
+            "printedPageLabel": "97",
+            "sourceText": "Must supply a drawing for all chase modifications.",
+            "location": {
+              "kind": "full_page",
+              "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CHASE-DBASE:sourceDescription",
+          "state": "known",
+          "value": "Must supply a drawing for all chase modifications.",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-e116cad03c40bea5",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 118,
+              "printedPageLabel": "97",
+              "sourceText": "Must supply a drawing for all chase modifications.",
+              "location": {
+                "kind": "full_page",
+                "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CHASE-TALL",
+      "entityKind": "modification",
+      "name": {
+        "id": "CHASE-TALL:name",
+        "state": "known",
+        "value": "CHASE-TALL",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-e116cad03c40bea5",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 118,
+            "printedPageLabel": "97",
+            "sourceText": "Must supply a drawing for all chase modifications.",
+            "location": {
+              "kind": "full_page",
+              "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CHASE-TALL:sourceDescription",
+          "state": "known",
+          "value": "Must supply a drawing for all chase modifications.",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-e116cad03c40bea5",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 118,
+              "printedPageLabel": "97",
+              "sourceText": "Must supply a drawing for all chase modifications.",
+              "location": {
+                "kind": "full_page",
+                "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CHASE-WALL",
+      "entityKind": "modification",
+      "name": {
+        "id": "CHASE-WALL:name",
+        "state": "known",
+        "value": "CHASE-WALL",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-e116cad03c40bea5",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 118,
+            "printedPageLabel": "97",
+            "sourceText": "Must supply a drawing for all chase modifications.",
+            "location": {
+              "kind": "full_page",
+              "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CHASE-WALL:sourceDescription",
+          "state": "known",
+          "value": "Must supply a drawing for all chase modifications.",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-e116cad03c40bea5",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 118,
+              "printedPageLabel": "97",
+              "sourceText": "Must supply a drawing for all chase modifications.",
+              "location": {
+                "kind": "full_page",
+                "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CUT-BASE",
+      "entityKind": "modification",
+      "name": {
+        "id": "CUT-BASE:name",
+        "state": "known",
+        "value": "CUT-BASE",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-9dac98c5053a562c",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 114,
+            "printedPageLabel": "93",
+            "sourceText": "Reduce depth of base cabinet (min. depth 12\u201d)",
+            "location": {
+              "kind": "region",
+              "regionId": "e-9dac98c5053a562c",
+              "boundingBox": {
+                "x": 0.1257890564164305,
+                "y": 0.23026310313831677,
+                "width": 0.21059735616048178,
+                "height": 0.012131315289121685
+              }
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CUT-BASE:sourceDescription",
+          "state": "known",
+          "value": "Reduce depth of base cabinet (min. depth 12\u201d)",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-9dac98c5053a562c",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 114,
+              "printedPageLabel": "93",
+              "sourceText": "Reduce depth of base cabinet (min. depth 12\u201d)",
+              "location": {
+                "kind": "region",
+                "regionId": "e-9dac98c5053a562c",
+                "boundingBox": {
+                  "x": 0.1257890564164305,
+                  "y": 0.23026310313831677,
+                  "width": 0.21059735616048178,
+                  "height": 0.012131315289121685
+                }
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CUT-DBASE",
+      "entityKind": "modification",
+      "name": {
+        "id": "CUT-DBASE:name",
+        "state": "known",
+        "value": "CUT-DBASE",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-0cafd5d9b5650c7c",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 114,
+            "printedPageLabel": "93",
+            "sourceText": "Reduce depth of drawer base cabinet (min. depth 12\u201d)",
+            "location": {
+              "kind": "region",
+              "regionId": "e-0cafd5d9b5650c7c",
+              "boundingBox": {
+                "x": 0.1257890564164305,
+                "y": 0.6130206946170691,
+                "width": 0.2440221823898016,
+                "height": 0.012131315289121685
+              }
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CUT-DBASE:sourceDescription",
+          "state": "known",
+          "value": "Reduce depth of drawer base cabinet (min. depth 12\u201d)",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-0cafd5d9b5650c7c",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 114,
+              "printedPageLabel": "93",
+              "sourceText": "Reduce depth of drawer base cabinet (min. depth 12\u201d)",
+              "location": {
+                "kind": "region",
+                "regionId": "e-0cafd5d9b5650c7c",
+                "boundingBox": {
+                  "x": 0.1257890564164305,
+                  "y": 0.6130206946170691,
+                  "width": 0.2440221823898016,
+                  "height": 0.012131315289121685
+                }
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CUT-SBASE",
+      "entityKind": "modification",
+      "name": {
+        "id": "CUT-SBASE:name",
+        "state": "known",
+        "value": "CUT-SBASE",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-6b77955ea5592a11",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 114,
+            "printedPageLabel": "93",
+            "sourceText": "Reduce depth of sink base cabinet (4\" min.)",
+            "location": {
+              "kind": "region",
+              "regionId": "e-6b77955ea5592a11",
+              "boundingBox": {
+                "x": 0.5463119706297233,
+                "y": 0.23026310313831677,
+                "width": 0.19688764584609886,
+                "height": 0.012131315289121685
+              }
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CUT-SBASE:sourceDescription",
+          "state": "known",
+          "value": "Reduce depth of sink base cabinet (4\" min.)",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-6b77955ea5592a11",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 114,
+              "printedPageLabel": "93",
+              "sourceText": "Reduce depth of sink base cabinet (4\" min.)",
+              "location": {
+                "kind": "region",
+                "regionId": "e-6b77955ea5592a11",
+                "boundingBox": {
+                  "x": 0.5463119706297233,
+                  "y": 0.23026310313831677,
+                  "width": 0.19688764584609886,
+                  "height": 0.012131315289121685
+                }
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CUT-WALL",
+      "entityKind": "modification",
+      "name": {
+        "id": "CUT-WALL:name",
+        "state": "known",
+        "value": "CUT-WALL",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-50f945901225f6f2",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 114,
+            "printedPageLabel": "93",
+            "sourceText": "Reduce depth of wall cabinet (4\" min.)",
+            "location": {
+              "kind": "region",
+              "regionId": "e-50f945901225f6f2",
+              "boundingBox": {
+                "x": 0.5468871172736672,
+                "y": 0.6130206946170691,
+                "width": 0.1731883030311734,
+                "height": 0.012131315289121685
+              }
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CUT-WALL:sourceDescription",
+          "state": "known",
+          "value": "Reduce depth of wall cabinet (4\" min.)",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-50f945901225f6f2",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 114,
+              "printedPageLabel": "93",
+              "sourceText": "Reduce depth of wall cabinet (4\" min.)",
+              "location": {
+                "kind": "region",
+                "regionId": "e-50f945901225f6f2",
+                "boundingBox": {
+                  "x": 0.5468871172736672,
+                  "y": 0.6130206946170691,
+                  "width": 0.1731883030311734,
+                  "height": 0.012131315289121685
+                }
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  },
+  {
+    "kind": "registry",
+    "data": {
+      "id": "CUT-ROD",
+      "entityKind": "modification",
+      "name": {
+        "id": "CUT-ROD:name",
+        "state": "known",
+        "value": "CUT-ROD",
+        "confidence": 0.9,
+        "provenance": [
+          {
+            "id": "e-b161b72fad0539c4",
+            "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+            "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+            "pageNumber": 116,
+            "printedPageLabel": "95",
+            "sourceText": "CUT-ROD modification will be automatically added when CUT-depth reduction\nhas been applied to a cabinet with a ROD accessory selected.",
+            "location": {
+              "kind": "full_page",
+              "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+            }
+          }
+        ],
+        "extractionMethod": "text",
+        "reviewStatus": "unreviewed"
+      },
+      "attributes": {
+        "sourceDescription": {
+          "id": "CUT-ROD:sourceDescription",
+          "state": "known",
+          "value": "CUT-ROD modification will be automatically added when CUT-depth reduction\nhas been applied to a cabinet with a ROD accessory selected.",
+          "confidence": 0.9,
+          "provenance": [
+            {
+              "id": "e-b161b72fad0539c4",
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "pageNumber": 116,
+              "printedPageLabel": "95",
+              "sourceText": "CUT-ROD modification will be automatically added when CUT-depth reduction\nhas been applied to a cabinet with a ROD accessory selected.",
+              "location": {
+                "kind": "full_page",
+                "reason": "Draft has repeated or multiline matches; reviewer must verify exact scope"
+              }
+            }
+          ],
+          "extractionMethod": "text",
+          "reviewStatus": "unreviewed"
+        }
+      },
+      "productIds": [],
+      "reviewStatus": "unreviewed"
+    }
+  }
+]

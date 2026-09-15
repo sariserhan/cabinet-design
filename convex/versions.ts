@@ -463,6 +463,7 @@ export const setProfiles = ownedMutation({
     versionId: v.id('versions'),
     profilesJson: v.string(),
     reason: v.string(),
+    automation: v.optional(v.boolean()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -494,7 +495,9 @@ export const setProfiles = ownedMutation({
       ownerId: ctx.userId,
       versionId: version._id,
       actorId: ctx.userId,
-      actorKind: await actorKind(ctx, ctx.userId),
+      actorKind: args.automation
+        ? 'automation'
+        : await actorKind(ctx, ctx.userId),
       action: 'geometry_policy',
       beforeJson: version.profilesJson ?? '[]',
       afterJson: profilesJson,

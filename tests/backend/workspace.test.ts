@@ -201,3 +201,258 @@ test('split/merge cannot smuggle foreign-document evidence into an owned catalog
   const existing = await s.t.run((ctx) => ctx.db.get(s.recordId));
   expect(existing?.reviewStatus).toBe('unreviewed');
 });
+
+test('delegated bulk approval preserves blockers and never verifies human truth', async () => {
+  const s = await setup();
+  const args = {
+    versionId: s.versionId,
+    expectedRevision: 0,
+    reason: 'User requested provisional approval',
+  };
+  await expect(
+    s.otherClient.mutation(api.bulkReview.approveUnverified, args),
+  ).rejects.toThrow('not found');
+  await s.t.run((ctx) =>
+    ctx.db.patch(s.recordId, { blockers: ['unresolved_conflict'] }),
+  );
+  expect(
+    await s.ownerClient.mutation(api.bulkReview.approveUnverified, args),
+  ).toMatchObject({ approved: 0, blocked: 1 });
+  await s.t.run((ctx) => ctx.db.patch(s.recordId, { blockers: [] }));
+  expect(
+    await s.ownerClient.mutation(api.bulkReview.approveUnverified, args),
+  ).toMatchObject({ approved: 1, revision: 1 });
+  const result = JSON.parse(
+    await s.ownerClient.query(api.workspace.record, { recordId: s.recordId }),
+  );
+  expect(result.record.truthVerified).toBe(false);
+  expect(result.audit[0].action).toBe('bulk_approve_unverified');
+  expect(result.audit[0].actorKind).toBe('automation');
+  await expect(
+    s.ownerClient.mutation(api.bulkReview.approveUnverified, args),
+  ).rejects.toThrow('changed');
+  await s.t.run((ctx) => ctx.db.patch(s.recordId, { truthVerified: true }));
+  expect(
+    await s.ownerClient.mutation(api.bulkReview.approveUnverified, {
+      ...args,
+      expectedRevision: 1,
+    }),
+  ).toMatchObject({ approved: 0, unchanged: 1 });
+  expect((await s.t.run((ctx) => ctx.db.get(s.recordId)))?.truthVerified).toBe(
+    true,
+  );
+  await s.t.run((ctx) => ctx.db.patch(s.versionId, { status: 'published' }));
+  await expect(
+    s.ownerClient.mutation(api.bulkReview.approveUnverified, {
+      ...args,
+      expectedRevision: 1,
+    }),
+  ).rejects.toThrow('immutable');
+});
+
+test('AI source edits enforce ownership and provenance without human attestation', async () => {
+  const s = await setup();
+  const change = {
+    recordId: s.recordId,
+    expectedRevision: 0,
+    payloadJson: JSON.stringify(s.payload),
+  };
+  const args = { changes: [change], reason: 'Direct AI source review' };
+  await expect(
+    s.otherClient.mutation(api.aiReview.apply, args),
+  ).rejects.toThrow('not found');
+  const foreign = structuredClone(s.payload);
+  if (foreign.kind === 'product')
+    for (const f of Object.values(foreign.data.fields))
+      for (const e of f.provenance) e.documentId = 'foreign';
+  await expect(
+    s.ownerClient.mutation(api.aiReview.apply, {
+      ...args,
+      changes: [{ ...change, payloadJson: JSON.stringify(foreign) }],
+    }),
+  ).rejects.toThrow('Evidence');
+  await s.t.run((ctx) =>
+    ctx.db.patch(s.recordId, { blockers: ['unresolved_conflict'] }),
+  );
+  expect(await s.ownerClient.mutation(api.aiReview.apply, args)).toBe(1);
+  const result = JSON.parse(
+    await s.ownerClient.query(api.workspace.record, { recordId: s.recordId }),
+  );
+  expect(result.record.truthVerified).toBe(false);
+  expect(result.record.blockers).toContain('unresolved_conflict');
+  expect(result.audit[0].actorKind).toBe('automation');
+  expect(result.audit[0].action).toBe('ai_source_review');
+  await expect(
+    s.ownerClient.mutation(api.aiReview.apply, args),
+  ).rejects.toThrow('changed');
+  await s.t.run((ctx) => ctx.db.patch(s.recordId, { truthVerified: true }));
+  await expect(
+    s.ownerClient.mutation(api.aiReview.apply, {
+      ...args,
+      changes: [{ ...change, expectedRevision: 1 }],
+    }),
+  ).rejects.toThrow('human-verified');
+});
+
+test('working catalog expansion preserves source and resets inherited verification', async () => {
+  const s = await setup();
+  const addition = structuredClone(s.payload);
+  addition.data.id = 'product:extra';
+  if (
+    addition.kind === 'product' &&
+    addition.data.fields.sku?.state === 'known'
+  )
+    addition.data.fields.sku.value = 'extra';
+  const args = {
+    sourceVersionId: s.versionId,
+    expectedRevision: 0,
+    label: 'Working catalog',
+    additionsJson: JSON.stringify([addition]),
+  };
+  await expect(
+    s.otherClient.mutation(api.workingCatalog.create, args),
+  ).rejects.toThrow('not found');
+  await expect(
+    s.ownerClient.mutation(api.workingCatalog.create, {
+      ...args,
+      expectedRevision: 2,
+    }),
+  ).rejects.toThrow('changed');
+  await expect(
+    s.ownerClient.mutation(api.workingCatalog.create, {
+      ...args,
+      additionsJson: JSON.stringify([s.payload]),
+    }),
+  ).rejects.toThrow('Duplicate');
+  const foreign = structuredClone(addition);
+  if (foreign.kind === 'product')
+    for (const f of Object.values(foreign.data.fields))
+      for (const e of f.provenance) e.documentId = 'foreign';
+  await expect(
+    s.ownerClient.mutation(api.workingCatalog.create, {
+      ...args,
+      additionsJson: JSON.stringify([foreign]),
+    }),
+  ).rejects.toThrow('Evidence');
+  await s.t.run((ctx) => ctx.db.patch(s.recordId, { truthVerified: true }));
+  const newId = await s.ownerClient.mutation(api.workingCatalog.create, args);
+  const result = await s.t.run(async (ctx) => ({
+    parent: await ctx.db.get(s.versionId),
+    original: await ctx.db.get(s.recordId),
+    version: await ctx.db.get(newId),
+    rows: await ctx.db
+      .query('records')
+      .withIndex('by_versionId_and_entityKey', (q) => q.eq('versionId', newId))
+      .take(10),
+  }));
+  expect(result.parent?.revision).toBe(0);
+  expect(result.original?.truthVerified).toBe(true);
+  expect(result.version?.stats.products).toBe(2);
+  expect(result.version?.parentVersionId).toBe(s.versionId);
+  expect(
+    result.rows.every(
+      (r) => !r.truthVerified && r.reviewStatus === 'unreviewed',
+    ),
+  ).toBe(true);
+});
+
+test('registry imports preserve ownership, uniqueness and unverified status', async () => {
+  const s = await setup();
+  if (s.payload.kind !== 'product' || !s.payload.data.fields.sku)
+    throw new Error('Fixture missing');
+  const name = {
+    ...structuredClone(s.payload.data.fields.sku),
+    id: 'TEST-MOD:name',
+    state: 'known',
+    value: 'TEST-MOD',
+  };
+  const record = {
+    kind: 'registry',
+    data: {
+      id: 'TEST-MOD',
+      entityKind: 'modification',
+      name,
+      attributes: {},
+      productIds: [],
+      reviewStatus: 'approved',
+    },
+  };
+  const args = {
+    versionId: s.versionId,
+    expectedRevision: 0,
+    recordsJson: JSON.stringify([record]),
+    reason: 'Synthetic registry test',
+  };
+  await expect(
+    s.otherClient.mutation(api.aiReview.addRegistries, args),
+  ).rejects.toThrow('not found');
+  await expect(
+    s.ownerClient.mutation(api.aiReview.addRegistries, {
+      ...args,
+      expectedRevision: 1,
+    }),
+  ).rejects.toThrow('changed');
+  expect(await s.ownerClient.mutation(api.aiReview.addRegistries, args)).toBe(
+    1,
+  );
+  const rows = await s.t.run((ctx) =>
+    ctx.db
+      .query('records')
+      .withIndex('by_versionId_and_entityKey', (q) =>
+        q.eq('versionId', s.versionId).eq('entityKey', 'TEST-MOD'),
+      )
+      .take(2),
+  );
+  expect(rows[0]?.truthVerified).toBe(false);
+  expect(rows[0]?.reviewStatus).toBe('unreviewed');
+  await expect(
+    s.ownerClient.mutation(api.aiReview.addRegistries, {
+      ...args,
+      expectedRevision: 1,
+    }),
+  ).rejects.toThrow('already exists');
+});
+
+test('AI geometry policy is audited as automation and invalidates benchmark', async () => {
+  const s = await setup();
+  await s.ownerClient.mutation(api.versions.setProfiles, {
+    versionId: s.versionId,
+    automation: true,
+    reason: 'AI conservative installation geometry: require width height depth',
+    profilesJson: JSON.stringify([
+      {
+        category: 'accessory',
+        requirements: {
+          widthIn: {
+            required: true,
+            valueType: 'number',
+            positiveDimension: true,
+          },
+          heightIn: {
+            required: true,
+            valueType: 'number',
+            positiveDimension: true,
+          },
+          depthIn: {
+            required: true,
+            valueType: 'number',
+            positiveDimension: true,
+          },
+        },
+      },
+    ]),
+  });
+  const result = await s.t.run(async (ctx) => ({
+    version: await ctx.db.get(s.versionId),
+    audit: await ctx.db
+      .query('audit')
+      .withIndex('by_versionId', (q) => q.eq('versionId', s.versionId))
+      .first(),
+  }));
+  expect(result.audit?.actorKind).toBe('automation');
+  expect(result.version?.revision).toBe(1);
+  expect(
+    JSON.parse(result.version?.profilesJson ?? '[]')[0].requirements.depthIn
+      .required,
+  ).toBe(true);
+});

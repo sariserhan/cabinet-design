@@ -1,0 +1,43 @@
+{
+  "reviewKind": "direct_ai_source_review",
+  "humanVerified": false,
+  "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+  "corrections": [
+    {
+      "sku": "CM-1",
+      "profileWidthIn": 2.875,
+      "profileHeightIn": 2.125,
+      "lengthIn": 96,
+      "pageNumber": 97,
+      "printedPageLabel": "76",
+      "axisConvention": "width is horizontal projection; height is vertical projection as drawn"
+    },
+    {
+      "sku": "CM-3",
+      "profileWidthIn": 2.125,
+      "profileHeightIn": 2.125,
+      "lengthIn": 96,
+      "pageNumber": 97,
+      "printedPageLabel": "76",
+      "axisConvention": "width is horizontal projection; height is vertical projection as drawn"
+    },
+    {
+      "sku": "CM-4",
+      "profileWidthIn": 2.625,
+      "profileHeightIn": 2.625,
+      "lengthIn": 96,
+      "pageNumber": 97,
+      "printedPageLabel": "76",
+      "axisConvention": "width is horizontal projection; height is vertical projection as drawn"
+    },
+    {
+      "sku": "CM-6",
+      "profileWidthIn": 2.5,
+      "profileHeightIn": 3.375,
+      "lengthIn": 96,
+      "pageNumber": 97,
+      "printedPageLabel": "76",
+      "axisConvention": "width is horizontal projection; height is vertical projection as drawn"
+    }
+  ]
+}

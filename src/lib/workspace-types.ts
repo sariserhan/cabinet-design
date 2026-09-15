@@ -36,3 +36,8 @@ export function parsePages(text: string): number[] {
     );
   return [...result].sort((a, b) => a - b);
 }
+
+/** Prefer the expanded working catalog without overriding an explicit selection. */
+export function defaultCatalog(versions: Doc<'versions'>[] | undefined) {
+  return versions?.find((version) => version.compilerVersion === 'direct-ai-review-v1') ?? versions?.[0];
+}

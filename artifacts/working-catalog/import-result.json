@@ -1,0 +1,34 @@
+{
+  "audits": 455,
+  "blockedProducts": 127,
+  "humanVerified": 0,
+  "images": 32,
+  "label": "Allure — expanded AI working catalog (311 products)",
+  "pages": 32,
+  "parentRevision": 336,
+  "parentStats": {
+    "approved": 274,
+    "autoApproved": 0,
+    "cases": 8,
+    "footnotes": 58,
+    "products": 189,
+    "rejected": 0,
+    "rules": 32,
+    "unreviewed": 13
+  },
+  "records": 455,
+  "rulesWrongVersion": 0,
+  "stats": {
+    "approved": 0,
+    "autoApproved": 0,
+    "cases": 8,
+    "footnotes": 90,
+    "products": 311,
+    "registries": 0,
+    "rejected": 0,
+    "rules": 46,
+    "unreviewed": 455
+  },
+  "uniqueKeys": 455,
+  "versionId": "ks7a3dvg5mw8z2vvh7398bw5e18edtr1"
+}

@@ -9,7 +9,9 @@
  */
 
 import type * as access from "../access.js";
+import type * as aiReview from "../aiReview.js";
 import type * as auth from "../auth.js";
+import type * as bulkReview from "../bulkReview.js";
 import type * as documents from "../documents.js";
 import type * as http from "../http.js";
 import type * as recordHelpers from "../recordHelpers.js";
@@ -17,6 +19,7 @@ import type * as review from "../review.js";
 import type * as testing from "../testing.js";
 import type * as versions from "../versions.js";
 import type * as worker from "../worker.js";
+import type * as workingCatalog from "../workingCatalog.js";
 import type * as workspace from "../workspace.js";
 
 import type {
@@ -27,7 +30,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   access: typeof access;
+  aiReview: typeof aiReview;
   auth: typeof auth;
+  bulkReview: typeof bulkReview;
   documents: typeof documents;
   http: typeof http;
   recordHelpers: typeof recordHelpers;
@@ -35,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   testing: typeof testing;
   versions: typeof versions;
   worker: typeof worker;
+  workingCatalog: typeof workingCatalog;
   workspace: typeof workspace;
 }>;
 

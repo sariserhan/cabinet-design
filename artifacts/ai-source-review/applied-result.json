@@ -1,0 +1,748 @@
+{
+  "humanVerified": 4,
+  "moldings": [
+    {
+      "blockers": [],
+      "fields": {
+        "lengthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-1:lengthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-1:lengthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.14
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-1:lengthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-1 drawing: horizontal profile 2.875 in; vertical profile 2.125 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 96
+        },
+        "manufacturerCategory": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-1:manufacturerCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-5fd80fbb5ec22c8e",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-5fd80fbb5ec22c8e"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "Moldings (8')"
+        },
+        "normalizedCategory": {
+          "confidence": 0,
+          "derivation": {
+            "inputFactIds": [
+              "product:CM-1:sku"
+            ],
+            "ruleId": "benchmark-draft-sku-or-heading",
+            "ruleVersion": "1"
+          },
+          "extractionMethod": "derived",
+          "id": "product:CM-1:normalizedCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-e46bdc94fe52ae75",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-e46bdc94fe52ae75"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "molding"
+        },
+        "profileHeightIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-1:profileHeightIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-1:profileHeightIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.14
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-1:profileHeightIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-1 drawing: horizontal profile 2.875 in; vertical profile 2.125 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 2.125
+        },
+        "profileWidthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-1:profileWidthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-1:profileWidthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.14
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-1:profileWidthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-1 drawing: horizontal profile 2.875 in; vertical profile 2.125 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 2.875
+        },
+        "sku": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-1:sku",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-11300ff52a7a916a",
+              "location": {
+                "boundingBox": {
+                  "height": 0.012070703988123422,
+                  "width": 0.032758226581648286,
+                  "x": 0.46643904143688725,
+                  "y": 0.19714840975674716
+                },
+                "kind": "region",
+                "regionId": "e-11300ff52a7a916a"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-1"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "CM-1"
+        }
+      },
+      "sku": "CM-1",
+      "status": "approved",
+      "truthVerified": false
+    },
+    {
+      "blockers": [],
+      "fields": {
+        "lengthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-3:lengthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-3:lengthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.36
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-3:lengthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-3 drawing: horizontal profile 2.125 in; vertical profile 2.125 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 96
+        },
+        "manufacturerCategory": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-3:manufacturerCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-5fd80fbb5ec22c8e",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-5fd80fbb5ec22c8e"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "Moldings (8')"
+        },
+        "normalizedCategory": {
+          "confidence": 0,
+          "derivation": {
+            "inputFactIds": [
+              "product:CM-3:sku"
+            ],
+            "ruleId": "benchmark-draft-sku-or-heading",
+            "ruleVersion": "1"
+          },
+          "extractionMethod": "derived",
+          "id": "product:CM-3:normalizedCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-e46bdc94fe52ae75",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-e46bdc94fe52ae75"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "molding"
+        },
+        "profileHeightIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-3:profileHeightIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-3:profileHeightIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.36
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-3:profileHeightIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-3 drawing: horizontal profile 2.125 in; vertical profile 2.125 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 2.125
+        },
+        "profileWidthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-3:profileWidthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-3:profileWidthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.36
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-3:profileWidthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-3 drawing: horizontal profile 2.125 in; vertical profile 2.125 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 2.125
+        },
+        "sku": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-3:sku",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-2c28ec31ae4a8416",
+              "location": {
+                "boundingBox": {
+                  "height": 0.012070703988123422,
+                  "width": 0.032758226581648286,
+                  "x": 0.46643904143688725,
+                  "y": 0.40649949661409013
+                },
+                "kind": "region",
+                "regionId": "e-2c28ec31ae4a8416"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-3"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "CM-3"
+        }
+      },
+      "sku": "CM-3",
+      "status": "approved",
+      "truthVerified": false
+    },
+    {
+      "blockers": [],
+      "fields": {
+        "lengthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-4:lengthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-4:lengthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.56
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-4:lengthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-4 drawing: horizontal profile 2.625 in; vertical profile 2.625 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 96
+        },
+        "manufacturerCategory": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-4:manufacturerCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-5fd80fbb5ec22c8e",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-5fd80fbb5ec22c8e"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "Moldings (8')"
+        },
+        "normalizedCategory": {
+          "confidence": 0,
+          "derivation": {
+            "inputFactIds": [
+              "product:CM-4:sku"
+            ],
+            "ruleId": "benchmark-draft-sku-or-heading",
+            "ruleVersion": "1"
+          },
+          "extractionMethod": "derived",
+          "id": "product:CM-4:normalizedCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-e46bdc94fe52ae75",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-e46bdc94fe52ae75"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "molding"
+        },
+        "profileHeightIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-4:profileHeightIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-4:profileHeightIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.56
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-4:profileHeightIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-4 drawing: horizontal profile 2.625 in; vertical profile 2.625 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 2.625
+        },
+        "profileWidthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-4:profileWidthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-4:profileWidthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.56
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-4:profileWidthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-4 drawing: horizontal profile 2.625 in; vertical profile 2.625 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 2.625
+        },
+        "sku": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-4:sku",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-ce7e9f0dc83f19d2",
+              "location": {
+                "boundingBox": {
+                  "height": 0.012070703988123422,
+                  "width": 0.032758226581648286,
+                  "x": 0.46643904143688725,
+                  "y": 0.6158505064068418
+                },
+                "kind": "region",
+                "regionId": "e-ce7e9f0dc83f19d2"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-4"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "CM-4"
+        }
+      },
+      "sku": "CM-4",
+      "status": "approved",
+      "truthVerified": false
+    },
+    {
+      "blockers": [],
+      "fields": {
+        "lengthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-6:lengthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-6:lengthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.76
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-6:lengthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-6 drawing: horizontal profile 2.5 in; vertical profile 3.375 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 96
+        },
+        "manufacturerCategory": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-6:manufacturerCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-5fd80fbb5ec22c8e",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-5fd80fbb5ec22c8e"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "Moldings (8')"
+        },
+        "normalizedCategory": {
+          "confidence": 0,
+          "derivation": {
+            "inputFactIds": [
+              "product:CM-6:sku"
+            ],
+            "ruleId": "benchmark-draft-sku-or-heading",
+            "ruleVersion": "1"
+          },
+          "extractionMethod": "derived",
+          "id": "product:CM-6:normalizedCategory",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-e46bdc94fe52ae75",
+              "location": {
+                "boundingBox": {
+                  "height": 0.024141417609320745,
+                  "width": 0.1564182954676011,
+                  "x": 0.7553492028728809,
+                  "y": 0.11061195412067452
+                },
+                "kind": "region",
+                "regionId": "e-e46bdc94fe52ae75"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "Moldings (8')"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "molding"
+        },
+        "profileHeightIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-6:profileHeightIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-6:profileHeightIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.76
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-6:profileHeightIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-6 drawing: horizontal profile 2.5 in; vertical profile 3.375 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 3.375
+        },
+        "profileWidthIn": {
+          "confidence": 0.95,
+          "extractionMethod": "vision",
+          "id": "product:CM-6:profileWidthIn",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "ai-source-review:CM-6:profileWidthIn",
+              "location": {
+                "boundingBox": {
+                  "height": 0.13,
+                  "width": 0.24,
+                  "x": 0.1,
+                  "y": 0.76
+                },
+                "kind": "region",
+                "regionId": "ai-source-review:CM-6:profileWidthIn"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-6 drawing: horizontal profile 2.5 in; vertical profile 3.375 in; length 96 in."
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": 2.5
+        },
+        "sku": {
+          "confidence": 0,
+          "extractionMethod": "text",
+          "id": "product:CM-6:sku",
+          "provenance": [
+            {
+              "documentId": "k174bpr9byf2vqp7ncswpq2j318ed0xq",
+              "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+              "id": "e-8f3b78f60c95321a",
+              "location": {
+                "boundingBox": {
+                  "height": 0.012070703988123422,
+                  "width": 0.032758226581648286,
+                  "x": 0.46643904143688725,
+                  "y": 0.8252015547318892
+                },
+                "kind": "region",
+                "regionId": "e-8f3b78f60c95321a"
+              },
+              "pageNumber": 97,
+              "printedPageLabel": "76",
+              "sourceText": "CM-6"
+            }
+          ],
+          "reviewStatus": "approved",
+          "state": "known",
+          "value": "CM-6"
+        }
+      },
+      "sku": "CM-6",
+      "status": "approved",
+      "truthVerified": false
+    }
+  ],
+  "revision": 336,
+  "stats": {
+    "approved": 274,
+    "autoApproved": 0,
+    "cases": 8,
+    "footnotes": 58,
+    "products": 189,
+    "rejected": 0,
+    "rules": 32,
+    "unreviewed": 13
+  }
+}

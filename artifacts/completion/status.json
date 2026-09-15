@@ -1,0 +1,23 @@
+{
+  "versionId": "ks7a3dvg5mw8z2vvh7398bw5e18edtr1",
+  "revision": 64,
+  "products": 311,
+  "rules": 46,
+  "footnotes": 90,
+  "registries": 9,
+  "cases": 8,
+  "blockedProducts": 145,
+  "categoryProfileErrors": 0,
+  "registryReferenceErrors": 0,
+  "sourceReferenceErrors": 0,
+  "ruleLogicChecks": 140,
+  "ruleLogicFailures": 0,
+  "publishable": false,
+  "tests": {
+    "core": 71,
+    "backend": 15,
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed"
+  }
+}

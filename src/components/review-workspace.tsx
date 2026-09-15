@@ -42,6 +42,7 @@ import {
   EmptyDescription,
 } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
+import { defaultCatalog } from '@/lib/workspace-types';
 
 export function ReviewWorkspace({
   kind = 'product',
@@ -56,7 +57,7 @@ export function ReviewWorkspace({
     router = useRouter();
   const requested = search.get('version');
   const version =
-    data?.versions.find((v) => v._id === requested) ?? data?.versions[0];
+    data?.versions.find((v) => v._id === requested) ?? defaultCatalog(data?.versions);
   return (
     <>
       <header className="page-header">

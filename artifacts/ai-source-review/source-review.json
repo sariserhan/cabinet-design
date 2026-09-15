@@ -1,0 +1,1816 @@
+{
+  "method": "Direct AI text and visual review; no external model API; comparison with existing draft, not an independent extraction accuracy benchmark.",
+  "humanVerified": false,
+  "documentSha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+  "pageReview": [
+    {
+      "pageNumber": 2,
+      "printedPageLabel": "II",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Index navigation is stale: Base Cabinets points to printed 27, but the selected body starts at printed 30/PDF 51. Retain physical and printed labels separately. This PDF itself says some updates are absent; this review applies to the fixed PDF only."
+    },
+    {
+      "pageNumber": 4,
+      "printedPageLabel": "IV",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Construction: base shelf depth 18 in; drawer interior height 3 in; side/back plywood 1/2 in; face frame 3/4 x 1-1/2 in; toe kick 3/4 x 4-1/2 in. Separate 1/4-in toe-kick cover and exposed-side panel are not overlay filler thickness evidence."
+    },
+    {
+      "pageNumber": 8,
+      "printedPageLabel": "VIII",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Galaxy finish table: Dove, Frost, Indigo, Linen, Nickel, Pitch Black, Pistachio Green paints; Cobblestone, Horizon, Mocha, Timber, Desert Oak stains. Restricted diamond SKUs use the narrower five-finish set. Door rails/stiles 3/4 in thick, 2-1/2 in wide; reduced rails 1-1/2 in."
+    },
+    {
+      "pageNumber": 9,
+      "printedPageLabel": "IX",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Visual association resolves text extraction order: Luna has Dove, Indigo, Kona, Timber, Desert Oak. Fusion has Dove, Nickel, Oyster, Stone, Kona, Timber. Do not interchange these tables. Luna rails/stiles are stated 3/4 in WIDE; Fusion 3/4 in thick and 3 in wide."
+    },
+    {
+      "pageNumber": 22,
+      "printedPageLabel": "1",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "30 listed SKUs. Depth 12 in shown. Single-door stars only W1215/W1515/W1815/W2115 and corresponding 18-high rows. Four 21-high rows have one shelf; only W2421/W3321/W3621 have diamond restriction. W3021 has no diamond. Widths are not dimensioned per row; existing SKU-derived widths remain provisional."
+    },
+    {
+      "pageNumber": 23,
+      "printedPageLabel": "2",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "16 listed SKUs including two lift-ups. Depth 24 in shown; lift-up height 12 in. Shelf star on 21-high and 24-high rows; diamond only the three 21-high rows. Do not invent W301224, which is absent from this page."
+    },
+    {
+      "pageNumber": 25,
+      "printedPageLabel": "4",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "14 SKUs. Height 30/depth 12 explicit. Blind Act. widths 24/30/36; Max. widths 27/33/39 are installation values, not body widths. W3930 has 1-1/2-in center stile. Adjacent filler required for blinds; exact filler SKU not specified."
+    },
+    {
+      "pageNumber": 27,
+      "printedPageLabel": "6",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "14 SKUs. Height 36/depth 12 explicit. Blind table same Act./Max. distinction as page 25. W3936 center stile 1-1/2 in. Filler required; widths rounded to nearest 1/8 in."
+    },
+    {
+      "pageNumber": 29,
+      "printedPageLabel": "8",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "14 omitted 39-high wall SKUs. All three groups restricted to Galaxy with Frost/Dove/Indigo/Timber/Desert Oak. Height 39/depth 12 explicit. W3939 center stile 1-1/2 in. Blind filler required; no blind dimension table on this page."
+    },
+    {
+      "pageNumber": 31,
+      "printedPageLabel": "10",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "14 omitted 42-high wall SKUs. Height 42/depth 12 explicit; W3942 center stile 1-1/2 in. Blind table distinguishes actual from maximum width, with adjacent filler required."
+    },
+    {
+      "pageNumber": 33,
+      "printedPageLabel": "12",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "26 omitted glass door-set SKUs. Clear glass pre-installed; each set includes the required number of doors. Diamond on six 39-height host variants. Drawing labels include 29-1/2, 35-1/2, 41-1/2, 47-1/2 in but do not uniquely map every listed SKU; do not decode host dimensions as actual door dimensions."
+    },
+    {
+      "pageNumber": 35,
+      "printedPageLabel": "14",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "23 omitted NDW SKUs. No door supplied, hinges installed, matching finished interior, adjustable 1/4-in tempered glass shelves. Depth changes substitute matching wood shelves. Three-shelf star excludes NDW1236/NDW1242; only five 39-high rows carry diamond. Height options and depth 12 explicit."
+    },
+    {
+      "pageNumber": 51,
+      "printedPageLabel": "30",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "15 SKUs. Base height 34-1/2/depth 24 explicit. Full-height groups have two 18-in shelves except B09FD has none; single-door drawer group has one. B39FD center stile 1-1/2 in. B18FD is the named mixer host; B18 is not."
+    },
+    {
+      "pageNumber": 52,
+      "printedPageLabel": "31",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "19 SKUs. Base height 34-1/2/depth 24 explicit. B39/B42/B48 center stile 3 in. Drawer-base interior depth 19-5/8, top height 3, bottom drawer heights 7 in. Do not confuse 6-3/4 and 11-1/4 front heights with interior heights."
+    },
+    {
+      "pageNumber": 55,
+      "printedPageLabel": "34",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "10 sink-base SKUs. Height 34-1/2/depth 24. SB39/SB42 center stile 3 in. SDF group differs from double-door-and-drawer group; illustrations do not establish usable drawers behind false fronts."
+    },
+    {
+      "pageNumber": 58,
+      "printedPageLabel": "37",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "20 pantry SKUs. Depth 24, heights 84/90/93/96. 84-high has five shelves; other heights six. Shelf depth 21. Shelves/clips ship loose. Five 93-high variants carry diamond. 49-1/4 and 29-1/2 etc are door dimensions, not cabinet heights."
+    },
+    {
+      "pageNumber": 60,
+      "printedPageLabel": "39",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Four OC33 single-oven SKUs. Depth 24; heights 84/90/93/96. Cutout width 27–31, height 28-1/2–37, maximum overall oven height 37-1/2. Three drawers; top-cabinet shelf star only OC3396S; diamond only OC3393S. Trim on site; do not equate the opening to cabinet width."
+    },
+    {
+      "pageNumber": 76,
+      "printedPageLabel": "55",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "16 ROD SKUs: E partial-extension, H full-extension Blum. Price covers one drawer; cabinet excluded; pantries allowed. Custom depth/height placement requires custom request, with stated $100 surcharge in this fixed PDF. Host-number suffix is not actual drawer width."
+    },
+    {
+      "pageNumber": 79,
+      "printedPageLabel": "58",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Six accessory SKUs. Towel and spice pullouts require separately ordered filler and overlay filler. Spice models not for ADA; non-BLUM stars mean full-extension without soft close. MLU-B18 only B18FD, not door/drawer; load 60 lb; shelf 20 x 11-3/4 x 1-3/8 in. These are shelf dimensions, not overall lift dimensions."
+    },
+    {
+      "pageNumber": 81,
+      "printedPageLabel": "60",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "14 omitted accessories. Wall spice fillers require filler/overlay separately; full-extension ball-bearing, BLUM soft close unavailable. SPO-WF339/639 diamond. Lazy-susan LSW27 stars mean 20-in trays; 42-high has three trays and poles may be cut for 36 high. 36/42 is a shared SKU label, not two products."
+    },
+    {
+      "pageNumber": 91,
+      "printedPageLabel": "70",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "13 omitted filler SKUs. Wall/tall finished front and all four edges; base long edges/front. Base height 29-7/8. Width options 3/6; wall/tall heights 30/36/39/42/96/120. TF3120 may have grooved back. WF339/639 diamond. Thickness not given."
+    },
+    {
+      "pageNumber": 92,
+      "printedPageLabel": "71",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "12 overlay fillers. Actual widths 2-1/2 or 5-1/2, not nominal 3/6. Wall heights 29-1/2/35-1/2/38-1/2/41-1/2; tall variants 79/85/88/91 (five below nominal host height). Three diamond rows OLF339/393/639. Thickness absent. Back filler separate."
+    },
+    {
+      "pageNumber": 97,
+      "printedPageLabel": "76",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Four profiles resolved visually: CM-1 horizontal 2-7/8, vertical 2-1/8; CM-3 2-1/8 x 2-1/8; CM-4 2-5/8 x 2-5/8; CM-6 horizontal 2-1/2, vertical 3-3/8. All length 96 in. Horizontal projection/vertical projection are preserved in correction provenance."
+    },
+    {
+      "pageNumber": 103,
+      "printedPageLabel": "82",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "18 omitted panel/plywood SKUs. BEP 24 x 34-1/2 x 3/4. Standard REP panels heights 96/120 with widths 12/24/30; 120-high available only 30 deep. Applied-return variants 1-1/2 or 3 are not ordinary sheet thickness. PAN/PLY nominal 48-wide, IN PLY 48 x 96. Star legends differ between upper and lower sections; never merge scope."
+    },
+    {
+      "pageNumber": 104,
+      "printedPageLabel": "83",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Nine skin SKUs. Eight explicit width/height pairs match draft; thickness 1/4 applies to skins. SK W39 is listed and restricted, but its width/height are omitted. Do not interpolate 39-1/8 from neighboring rows."
+    },
+    {
+      "pageNumber": 114,
+      "printedPageLabel": "93",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Four CUT codes; minimum resultant depths 12 base/drawer-base and 4 wall/sink-base. 24-to-18 and 12-to-9 drawings are examples, not only allowable values. Maximum/result-step constraints are not supplied."
+    },
+    {
+      "pageNumber": 116,
+      "printedPageLabel": "95",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Four codes. CUT-ROD automatically required when a cabinet depth cut and a selected ROD coincide; loose ROD needs customer service. Back trimmed and no longer dovetailed. CUT-TK requires total cabinet height and ships toe kick loose if fully removed. CUT-PANEL cut edges not banded; custom request or separate edge-banding option. CUT-KD30 requires cabinet depth."
+    },
+    {
+      "pageNumber": 118,
+      "printedPageLabel": "97",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Four CHASE codes: BASE/WALL/DBASE/TALL. Every section requires a drawing. No numeric chase geometry defaults are supplied."
+    },
+    {
+      "pageNumber": 124,
+      "printedPageLabel": "103",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Four codes. RECESS-TK Left/Right/Back combinations; PEN-CABINET uses two cabinets with standard recessed toe kick on peninsula side. INCREASE-WALL/BASE do not include deeper rollouts/shelves; custom quote required."
+    },
+    {
+      "pageNumber": 125,
+      "printedPageLabel": "104",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Four codes. INCREASE-TALL excludes deeper rollouts/shelves without custom quote. INCREASE-PANEL says DWR depth in 1/4-in increments; glossary DWR is dishwasher return, not drawer. CHOOSE-INTERIOR unavailable for NDW/WOS/WR/WC/WO/vanities/TP. Both interior finishes still require specifying finished ends."
+    },
+    {
+      "pageNumber": 134,
+      "printedPageLabel": "113",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "84-in alignment diagram is an assembly/context guide. Dimension leaders must remain tied to the shown door, drawer, opening, or assembly. Do not turn range labels or wildcard identifiers into SKU rows or universal cabinet dimensions. OC3384 label omits S; do not silently equate it with a current product."
+    },
+    {
+      "pageNumber": 137,
+      "printedPageLabel": "116",
+      "textRead": true,
+      "layoutVisuallyRead": true,
+      "notes": "Glossary resolves product families, including DWR=dishwasher return, ROD=rollout drawer, OLF=overlay filler. It does not define a universal numeric SKU dimension decoder."
+    }
+  ],
+  "missingProducts": [
+    {
+      "pageNumber": 29,
+      "skus": [
+        "W0939",
+        "W1239",
+        "W1539",
+        "W1839",
+        "W2139",
+        "W2439",
+        "W2739",
+        "W3039",
+        "W3339",
+        "W3639",
+        "W3939",
+        "WBC2439",
+        "WBC3039",
+        "WBC3639"
+      ]
+    },
+    {
+      "pageNumber": 31,
+      "skus": [
+        "W0942",
+        "W1242",
+        "W1542",
+        "W1842",
+        "W2142",
+        "W2442",
+        "W2742",
+        "W3042",
+        "W3342",
+        "W3642",
+        "W3942",
+        "WBC2442",
+        "WBC3042",
+        "WBC3642"
+      ]
+    },
+    {
+      "pageNumber": 33,
+      "skus": [
+        "DS GDW1530",
+        "DS GDW1536",
+        "DS GDW1539",
+        "DS GDW1542",
+        "DS GDW1830",
+        "DS GDW1836",
+        "DS GDW1839",
+        "DS GDW1842",
+        "DS GDW2430",
+        "DS GDW2436",
+        "DS GDW2439",
+        "DS GDW2442",
+        "DS GDW3030",
+        "DS GDW3036",
+        "DS GDW3039",
+        "DS GDW3042",
+        "DS GDW3630",
+        "DS GDW3636",
+        "DS GDW3639",
+        "DS GDW3642",
+        "DS GDWD1857",
+        "DS GDWD1860",
+        "DS GDWDC2430",
+        "DS GDWDC2436",
+        "DS GDWDC2439",
+        "DS GDWDC2442"
+      ]
+    },
+    {
+      "pageNumber": 35,
+      "skus": [
+        "NDW1230",
+        "NDW1530",
+        "NDW1830",
+        "NDW2430",
+        "NDW3030",
+        "NDW3630",
+        "NDW1236",
+        "NDW1536",
+        "NDW1836",
+        "NDW2436",
+        "NDW3036",
+        "NDW3636",
+        "NDW1539",
+        "NDW1839",
+        "NDW2439",
+        "NDW3039",
+        "NDW3639",
+        "NDW1242",
+        "NDW1542",
+        "NDW1842",
+        "NDW2442",
+        "NDW3042",
+        "NDW3642"
+      ]
+    },
+    {
+      "pageNumber": 81,
+      "skus": [
+        "SPO-WF330",
+        "SPO-WF336",
+        "SPO-WF339",
+        "SPO-WF342",
+        "SPO-WF630",
+        "SPO-WF636",
+        "SPO-WF639",
+        "SPO-WF642",
+        "LSP24 30",
+        "LSP24 36/42",
+        "LSW24 30",
+        "LSW24 36/42",
+        "LSW27 30",
+        "LSW27 36/42"
+      ]
+    },
+    {
+      "pageNumber": 91,
+      "skus": [
+        "WF330",
+        "WF336",
+        "WF339",
+        "WF342",
+        "WF630",
+        "WF636",
+        "WF639",
+        "WF642",
+        "TF396",
+        "TF696",
+        "TF3120",
+        "BF3",
+        "BF6"
+      ]
+    },
+    {
+      "pageNumber": 103,
+      "skus": [
+        "BEP",
+        "REP1-1/2",
+        "REP30120 x 1-1/2",
+        "REP1296",
+        "REP2496",
+        "REP3",
+        "REP30120 x 3",
+        "REP3096",
+        "REP30120",
+        "REP3096 x 1 1/2",
+        "REP3096 x 3",
+        "PAN-1/4",
+        "PLY-1/2",
+        "PLY-3/4",
+        "PLY-1/2 48X120",
+        "PLY-3/4 48X120",
+        "IN PLY 1/2-2 SIDE",
+        "IN PLY 3/4-2 SIDE"
+      ]
+    }
+  ],
+  "modificationCodes": [
+    {
+      "pageNumber": 114,
+      "codes": [
+        "CUT-BASE",
+        "CUT-DBASE",
+        "CUT-SBASE",
+        "CUT-WALL"
+      ]
+    },
+    {
+      "pageNumber": 116,
+      "codes": [
+        "CUT-KD30",
+        "CUT-ROD",
+        "CUT-PANEL",
+        "CUT-TK"
+      ]
+    },
+    {
+      "pageNumber": 118,
+      "codes": [
+        "CHASE-TALL",
+        "CHASE-WALL",
+        "CHASE-DBASE",
+        "CHASE-BASE"
+      ]
+    },
+    {
+      "pageNumber": 124,
+      "codes": [
+        "INCREASE-WALL",
+        "INCREASE-BASE",
+        "PEN-CABINET",
+        "RECESS-TK"
+      ]
+    },
+    {
+      "pageNumber": 125,
+      "codes": [
+        "CHOOSE-INTERIOR",
+        "INCREASE-TALL",
+        "MATCH-INTERIOR",
+        "INCREASE-PANEL"
+      ]
+    }
+  ],
+  "unresolvedFields": [
+    {
+      "sku": "OLF330",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF336",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF339",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF342",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF384",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF390",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF393",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF396",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF630",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF636",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF639",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "OLF642",
+      "pageNumber": 92,
+      "fields": [
+        "thicknessIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    },
+    {
+      "sku": "SK W39",
+      "pageNumber": 104,
+      "fields": [
+        "widthIn",
+        "heightIn"
+      ],
+      "reason": "Not supplied by the reviewed source page; no interpolation or transfer from other materials."
+    }
+  ],
+  "provisionalDimensionDerivations": [
+    {
+      "sku": "B09FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B12",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B12FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B15",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B15FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B18",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B18FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B21",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B21FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B24",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B24FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B27",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B27FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B30",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B30FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B33",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B33FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B33SDF",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B36",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B36FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B36SDF",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B39",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B39FD",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 51,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B42",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "B48",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB12",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB15",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB18",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB21",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB24",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB27",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB30",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB33",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "DB36",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 52,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OC3384S",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 60,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OC3390S",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 60,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OC3393S",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 60,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OC3396S",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 60,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OLF384",
+      "fields": [
+        "heightIn"
+      ],
+      "pageNumber": 92,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OLF390",
+      "fields": [
+        "heightIn"
+      ],
+      "pageNumber": 92,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OLF393",
+      "fields": [
+        "heightIn"
+      ],
+      "pageNumber": 92,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "OLF396",
+      "fields": [
+        "heightIn"
+      ],
+      "pageNumber": 92,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB21",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB24",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB27",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB30",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB33",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB33SDF",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB36",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB36SDF",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB39",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "SB42",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 55,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP152484",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP152490",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP152493",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP152496",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP182484",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP182490",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP182493",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP182496",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP242484",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP242490",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP242493",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP242496",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP302484",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP302490",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP302493",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP302496",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP362484",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP362490",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP362493",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "TP362496",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 58,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W0930",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W0936",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1215",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1218",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1230",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1236",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1515",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1518",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1530",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1536",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1815",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1818",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1830",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W1836",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2115",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2118",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2130",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2136",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2412",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2415",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2418",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2421",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2424",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2430",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2436",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2715",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2718",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2730",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W2736",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3012",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3015",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W301524",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3018",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W301824",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3021",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W302124",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3024",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W302424",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3030",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3036",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3312",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W331224",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3315",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W331524",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3318",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W331824",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3321",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W332124",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3324",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W332424",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3330",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3336",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3612",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W361224",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3615",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W361524",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3618",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W361824",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3621",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W362124",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3624",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 22,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W362424",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3630",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3636",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3930",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W3936",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W421224LU",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "W481224LU",
+      "fields": [
+        "heightIn",
+        "widthIn"
+      ],
+      "pageNumber": 23,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "WBC2430",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "WBC2436",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "WBC3030",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "WBC3036",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "WBC3630",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 25,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    },
+    {
+      "sku": "WBC3636",
+      "fields": [
+        "widthIn"
+      ],
+      "pageNumber": 27,
+      "status": "Existing draft derivation retained; not independently validated by numeric SKU grammar in selected PDF."
+    }
+  ],
+  "existingFootnotesCompared": 58,
+  "existingRulesCompared": 32,
+  "existingCasesCompared": 8,
+  "findings": [
+    "Existing 58 footnote values and symbol scopes agree with reviewed pages.",
+    "Existing 32 rule constraints agree with quoted source, but are not exhaustive for selected pages.",
+    "Eight cases retain their distinction between source ambiguity, rules and synthetic corruption.",
+    "189 products form a sample, not all products on the selected pages. Missing-product inventory is source-transcribed but not added to the benchmark draft.",
+    "Width/height inferred from SKU identifiers must not be described as independently dimension-verified."
+  ]
+}

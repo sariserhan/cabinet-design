@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
+import { defaultCatalog } from '@/lib/workspace-types';
 import type { Overview, RecordListRow } from '@/lib/workspace-types';
 import type { Doc } from '../../../../convex/_generated/dataModel';
 import { VersionPicker } from '@/components/version-picker';
@@ -21,7 +22,7 @@ export default function Catalog() {
   const data = raw ? (JSON.parse(raw) as Overview) : undefined;
   const [choice, setChoice] = useState('');
   const version =
-    data?.versions.find((v) => v._id === choice) ?? data?.versions[0];
+    data?.versions.find((v) => v._id === choice) ?? defaultCatalog(data?.versions);
   return (
     <>
       <header className="page-header">
@@ -84,6 +85,24 @@ function Browser({ version }: { version: Doc<'versions'> }) {
     : undefined;
   return (
     <>
+      <section className="demo-guide" aria-label="Demo walkthrough">
+        <h2>Explore the catalog</h2>
+        <p>Choose an example, then select Inspect PDF to compare its fields with the source page. Open Rules to explore availability and compatibility constraints.</p>
+        <div className="toolbar">
+          {[
+            ['WBC2442', 'Cabinet dimensions'],
+            ['CM-1', 'Molding profile'],
+            ['OLF330', 'An unresolved dimension'],
+            ['', 'All products'],
+          ].map(([sku, label]) => (
+            <button key={label} className="demo-example" type="button" onClick={() => {
+              setFilters({ query: sku ?? '', category: '', family: '', width: '', height: '', depth: '', minConfidence: '' });
+              setStatus('all');
+              setOffset(0);
+            }}>{label}{sku ? ` · ${sku}` : ''}</button>
+          ))}
+        </div>
+      </section>
       <div className="toolbar">
         {Object.entries(filters).map(([key, value]) => (
           <Field key={key} className="max-w-40">
@@ -144,7 +163,7 @@ function Browser({ version }: { version: Doc<'versions'> }) {
         {data ? `${data.total} matching products` : 'Loading products…'} ·{' '}
         {version.status === 'published'
           ? 'Published immutable catalog'
-          : 'Draft catalog; publication checks have not passed'}
+          : 'Demo draft · — means an unknown or inapplicable dimension'}
       </p>
       <div className="table-wrap">
         <table className="w-full text-sm">
