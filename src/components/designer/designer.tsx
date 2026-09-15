@@ -789,7 +789,7 @@ function Editor({ ownerId }: { ownerId: string }) {
       <DesignerKeyboardSupport />
       {showroom && (
         <Showroom
-          key={design.id}
+          key={`showroom:${design.id}`}
           design={design}
           before={before?.id === design.id ? before : null}
           onChange={(next) => commit(() => next)}
@@ -1043,7 +1043,7 @@ function Editor({ ownerId }: { ownerId: string }) {
           setSelected(id);
           setMode('2d');
         }}
-        key={design.id}
+        key={`cloud:${design.id}`}
         design={design}
         ownerId={ownerId}
         onOpen={(next) => {
