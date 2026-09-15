@@ -1206,3 +1206,28 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
     break-inside: avoid;
   }
 }
+
+.project-workflow { margin: 12px 0; padding: 20px; border: 1px solid #9eb5a7; border-radius: 14px; background: #f7faf5; color: #203d30; }
+.project-workflow > header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 18px; }
+.project-workflow header p { font-size: 11px; letter-spacing: .12em; margin: 0 0 5px; }
+.project-workflow h2 { font-size: 23px; margin: 0; }
+.workflow-stages { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 8px; }
+.workflow-stages button { display: grid; gap: 5px; padding: 12px; text-align: left; background: white; border: 1px solid #98b0a1; }
+.workflow-stages button[aria-pressed="true"] { background: #225c47; color: white; }
+.workflow-stages button span { font-size: 12px; }.workflow-stages button small { font-size: 11px; }
+.workflow-current { padding: 14px 0; }.workflow-current button { margin-right: 8px; }
+.project-workflow details { border-top: 1px solid #b9cbbf; padding: 14px 0; }
+.project-workflow summary { cursor: pointer; font-weight: 650; }
+.project-workflow label { display: grid; gap: 6px; margin-block: 8px; }
+.project-workflow input, .project-workflow textarea, .project-workflow select { max-width: 100%; min-width: 0; border: 1px solid #8fa798; background: white; color: #233b35; border-radius: 6px; padding: 9px; }
+.readiness-list { padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,250px),1fr)); gap: 12px; }
+.readiness-list li { padding: 12px; border: 1px solid #b0c4b6; background: white; border-radius: 8px; }
+.material-swatches { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin: 12px 0; }
+.material-swatches span { display: block; height: 36px; border: 1px solid #809586; border-radius: 6px; }
+.material-swatches small { font-size: 11px; display: block; margin-top: 4px; }
+.selection-card > div:has(svg) { min-width: 0; }.selection-card .preview-svg { max-height: 240px; width: 100%; }
+.project-workflow svg { width: 100%; max-height: 300px; }
+@media(max-width:700px) { .project-workflow { padding: 14px; } .project-workflow > header { display: block; } .workflow-stages { grid-template-columns: repeat(3,minmax(0,1fr)); } .workflow-stages button { padding: 9px; } .project-workflow .business-grid { grid-template-columns: 1fr; } }
+.installer-page input[type="checkbox"] { width: auto; }
+.client-review .selection-card { padding: 16px; }
+.selection-card .preview-stage { height: 340px; min-height: 340px; }

@@ -29,6 +29,7 @@ import { placementBlock } from '@/designer/refinements';
 import { money } from '@/designer/quote';
 import { proposalDocument } from '@/designer/proposal-document';
 import { MiniPlan } from './workflow-tools';
+import { ClientSelectionBoard } from './selection-board';
 import { InstallerTools } from './installer-tools';
 import { downloadJson } from './business-tools';
 
@@ -198,6 +199,7 @@ function DecisionWorkspace({
           ['impact', 'Preview a change'],
           ['storage', 'Storage planning'],
           ['site', 'Installer handoff'],
+          ['selections', 'Client selections'],
         ].map(([key, label]) => (
           <button
             role="tab"
@@ -688,6 +690,13 @@ function DecisionWorkspace({
             design={design}
             onChange={onChange}
             onLocate={onLocate}
+          />
+        )}
+        {tab === 'selections' && (
+          <ClientSelectionBoard
+            design={design}
+            onChange={onChange}
+            onPreview={stage}
           />
         )}
         {tab === 'site' && (

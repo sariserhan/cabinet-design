@@ -7,6 +7,7 @@ import {
   SurfaceEditor,
   ReadinessCheck,
 } from './studio-panels';
+import { ProjectWorkflow } from './project-workflow';
 import { DesignDecisions } from './design-decisions';
 import { MeasurementWizard } from './measurement-wizard';
 import { CloudProjects } from './cloud-projects';
@@ -908,6 +909,63 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         </div>
       </header>
+      <ProjectWorkflow
+        key={`workflow:${design.id}`}
+        design={design}
+        ownerId={ownerId}
+        onLocate={(id) => {
+          setSelected(id);
+          setMode('2d');
+          document
+            .querySelector('.canvas-panel-controls')
+            ?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        onNavigate={(stage, target) => {
+          if (stage === 'Design') {
+            setMode('2d');
+            document
+              .querySelector('.canvas-panel-controls')
+              ?.scrollIntoView({ behavior: 'smooth' });
+            return;
+          }
+          const label =
+            target === 'selections'
+              ? 'Design decisions · budget, checks & site handoff'
+              : stage === 'Measure'
+                ? 'Guided room measurements'
+                : stage === 'Price'
+                  ? 'Supplier quotes'
+                  : stage === 'Present'
+                    ? 'Cloud projects & client reviews'
+                    : 'Design decisions · budget, checks & site handoff';
+          const section = Array.from(document.querySelectorAll('details')).find(
+            (d) => d.querySelector(':scope > summary')?.textContent === label,
+          );
+          if (section) {
+            section.open = true;
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          if (
+            target === 'selections' ||
+            stage === 'Install' ||
+            stage === 'Check'
+          )
+            setTimeout(() => {
+              const name =
+                target === 'selections'
+                  ? 'Client selections'
+                  : stage === 'Install'
+                    ? 'Installer handoff'
+                    : 'Explain checks';
+              Array.from(
+                section?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ??
+                  [],
+              )
+                .find((b) => b.textContent === name)
+                ?.click();
+            }, 100);
+        }}
+      />
       <CloudProjects
         onLocate={(id) => {
           setSelected(id);

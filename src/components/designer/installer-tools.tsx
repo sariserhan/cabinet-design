@@ -1,9 +1,13 @@
 'use client';
+import { SiteReportMerge } from './site-report-merge';
 import { useState, useRef } from 'react';
 import { itemPolygon, type Design } from '@/designer/model';
 import { siteTasksSchema, type SiteTask } from '@/designer/decision-schema';
 import { roomEdges, roomOutline } from '@/designer/room';
-import { handoffPackage, mergeSiteReport } from '@/designer/installer-handoff';
+import {
+  handoffPackage,
+  inspectSiteReport,
+} from '@/designer/installer-handoff';
 import { downloadJson } from './business-tools';
 
 export function SiteTasks({
@@ -269,13 +273,14 @@ export function InstallerTools({
   onChange: (d: Design) => void;
 }) {
   const [message, setMessage] = useState('');
+  const [reportText, setReportText] = useState<string | null>(null);
   return (
     <>
       <p>
         Send the handoff file to your installer. They can open it in the mobile
         handoff workspace, record findings and return a site report. Import
-        merges site notes only after checking the original room and items still
-        match.
+        compares the original, current and returned findings so you can resolve
+        changes individually.
       </p>
       <div className="designer-row">
         <button
@@ -304,9 +309,11 @@ export function InstallerTools({
               try {
                 if (file.size > 600000)
                   throw Error('Report must be smaller than 600 KB.');
-                onChange(mergeSiteReport(design, await file.text()));
+                const text = await file.text();
+                inspectSiteReport(design, text);
+                setReportText(text);
                 setMessage(
-                  'Site report merged. Room and item geometry preserved.',
+                  'Report loaded. Review each finding before merging.',
                 );
               } catch (error) {
                 setMessage((error as Error).message);
@@ -316,6 +323,18 @@ export function InstallerTools({
         </label>
       </div>
       <p role="status">{message}</p>
+      {reportText && (
+        <SiteReportMerge
+          key={reportText}
+          design={design}
+          text={reportText}
+          onChange={(next) => {
+            onChange(next);
+            setMessage('Selected findings merged. Geometry preserved.');
+          }}
+          onClose={() => setReportText(null)}
+        />
+      )}
       <SiteTasks design={design} onChange={onChange} />
     </>
   );

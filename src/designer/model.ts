@@ -1,3 +1,4 @@
+import { selectionBoardSchema } from './selection-schema';
 import { storageProfileSchema, siteTasksSchema } from './decision-schema';
 import { surveySchema } from './measurement-schema';
 import { installationIssues, profileFor } from './installation';
@@ -137,6 +138,7 @@ export const designSchema = z
     format: z.literal('kitchen-studio-v1'),
     measurements: surveySchema.optional(),
     storageProfile: storageProfileSchema.optional(),
+    selectionBoard: selectionBoardSchema.optional(),
     siteTasks: siteTasksSchema.optional(),
     supplierBookId: z.string().max(100).optional(),
     sampleKey: z.enum(['apartment', 'family', 'premium']).optional(),

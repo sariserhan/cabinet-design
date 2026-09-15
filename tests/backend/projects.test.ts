@@ -482,6 +482,21 @@ test('cloud snapshots preserve household preferences and installer tasks through
   const s = await setup();
   const design = {
     ...newDesign(),
+    selectionBoard: {
+      clientName: 'QA client',
+      cards: [
+        {
+          id: 'look',
+          name: 'Warm',
+          cabinet: 'oak',
+          countertop: 'quartz',
+          flooring: 'tile',
+          hardware: 'brass',
+          favorite: true,
+          reason: 'Warm finish',
+        },
+      ],
+    },
     storageProfile: {
       household: 4,
       cookware: 'extensive',
@@ -511,4 +526,5 @@ test('cloud snapshots preserve household preferences and installer tasks through
   );
   expect(restored.storageProfile).toEqual(design.storageProfile);
   expect(restored.siteTasks).toEqual(design.siteTasks);
+  expect(restored.selectionBoard).toEqual(design.selectionBoard);
 });
