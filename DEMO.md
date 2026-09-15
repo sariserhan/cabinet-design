@@ -127,3 +127,14 @@ Validation: 104 core + 15 backend tests; desktop/mobile browser flow for sample 
 - Nesting separates materials and thicknesses, preserves part orientation unless rotation is enabled, and lists oversized parts. It is a simple packing estimate, not an optimal cutting solver. Generic drilling templates require shop/hardware review; hinge mounting screws, handle holes, drawer-slide patterns and machine toolpaths are not generated.
 
 Validation for this update: 111 core and 15 backend tests passed, along with lint, TypeScript, benchmark artifact integrity and the production build. Automated geometry, assembly alignment, drop payload, clearance, alternative-copy, machining and nesting tests; browser checks for all four inspector tabs, saved cameras, presentation, a verified 3840-pixel PNG, library drop, live drag dimensions and placement, clearance overlays, comparison, manufacturing downloads, reload persistence and mobile layout. Independent DXF parsing verified millimeter units and 918 bore circles matching the sample manufacturing report.
+
+## Client demo and presentation flow
+
+- **Start here** offers a furnished sample or a room-dimension form. New users see this guide automatically; existing drafts are retained. Starting another room is undoable.
+- **Materials → Coordinated styles** applies Warm oak, Soft white or Dark modern to cabinet finish, countertop pattern and lighting together. These are illustrative combinations using the existing material library, not manufacturer finish codes.
+- **Compare options → Compare rendered views** shows both alternatives with linked camera position and target. Orbit either view and both match when the gesture ends. Each design retains its own materials and lighting.
+- **Client presentation / PDF** lets you orbit the current design, capture up to three actual rendered views, and print a client package with a floor plan, material selections, itemized demo estimate and totals. Select Save as PDF in the browser print dialog. Captures are temporary and clear when you leave the presentation or change the design, so old images are not reused with changed specifications.
+- The **Objects** library supports search, result counts and an empty-state reset. **Controls & keyboard help** explains selection, movement, pan and recovery from placement problems.
+- **Reset demo** restores the polished sample, camera and editing controls, clears object search and leaves named saves intact. Undo restores the previous working design.
+
+QA: desktop and mobile browser checks cover the guided room dimensions, object filtering, style changes, linked rendered comparison, captured client PDF, reset and undo. PDF output is a concept proposal with demo pricing, not an order or construction approval.

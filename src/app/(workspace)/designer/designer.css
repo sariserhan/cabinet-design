@@ -778,3 +778,37 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .machining-tools details { margin:12px 0; }
 @media(max-width:700px) { .comparison-grid { grid-template-columns:1fr; } .is-presenting .render-stage { height:calc(100dvh - 250px);min-height:260px; } .presentation-bar strong { font-size:12px; } }
 @media print { .presentation-bar { display:none!important; } }
+
+.start-guide { padding:24px; margin:16px; border:1px solid #bed1ce; border-radius:12px; background:#f0f7f3; }
+.start-guide h2 { margin-top:0; }
+.start-guide form { margin:18px 0; }
+.start-guide label { display:grid; gap:5px; }
+.start-guide input { width:130px; }
+.shortcut-help { margin:12px 20px; max-width:900px; font-size:13px; }
+.client-presentation { padding:20px; min-width:0; }
+.client-package { background:white; color:#243f4c; padding:24px; margin-top:20px; }
+.client-package h1 { font-size:28px; }
+.client-package figure { margin:16px 0; break-inside:avoid; }
+.client-package img { display:block; width:100%; max-height:440px; object-fit:contain; }
+.client-package svg { display:block; width:100%; max-height:350px; }
+.client-package table { width:100%; border-collapse:collapse; font-size:12px; }
+.client-package td { border-bottom:1px solid #dce4e7; padding:6px; }
+.client-package dl > div { display:flex; justify-content:space-between; padding:4px; text-transform:capitalize; }
+.client-package dl > div:last-child { font-weight:bold; border-top:1px solid; }
+.comparison-grid .designer-render { min-width:0; }
+.comparison-grid .render-stage { height:320px; min-height:250px; }
+.comparison-grid .camera-controls { display:none; }
+@media(max-width:700px) { .client-presentation,.client-package { padding:10px; } .start-guide { margin:8px; padding:16px; } }
+@media print {
+  .has-client-presentation > .print-package { display:none!important; }
+  .designer-app.has-client-presentation > .designer-grid { display:block!important; }
+  .has-client-presentation .designer-library-column,.has-client-presentation .designer-inspector,.has-client-presentation .designer-tools,.has-client-presentation .designer-canvas-footer,.has-client-presentation .designer-bill,.has-client-presentation .client-editor { display:none!important; }
+  .has-client-presentation .designer-center { display:block!important; width:100%!important; border:0; }
+  .client-presentation,.client-package { padding:0; margin:0; }
+  .client-sheet + .client-sheet { break-before:page; }
+  .client-package img { max-height:140mm; }
+  .client-package tr { break-inside:avoid; }
+}
+
+.client-editor .camera-controls { display:none; }
+@media print { .has-client-presentation .designer-grid,.has-client-presentation .designer-center { min-height:0!important; height:auto!important; overflow:visible!important; } }

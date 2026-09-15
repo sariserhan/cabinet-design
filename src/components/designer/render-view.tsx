@@ -20,20 +20,35 @@ import {
   ceilingRegions,
 } from '@/designer/room';
 
+export type CameraView = {
+  position: [number, number, number];
+  target: [number, number, number];
+};
+
 export default function RenderView({
   design,
   onChange,
+  cameraView,
+  onCamera,
+  onCapture,
 }: {
+  cameraView?: CameraView;
+  onCamera?: (view: CameraView) => void;
+  onCapture?: (url: string) => void;
   design: Design;
   onChange: (design: Design) => void;
 }) {
+  const callbacks = useRef({ onCamera, onCapture });
+  callbacks.current = { onCamera, onCapture };
+  const externalCamera = useRef(cameraView);
+  externalCamera.current = cameraView;
   const host = useRef<HTMLDivElement>(null);
   type View = NonNullable<Design['views']>[number];
   const actions = useRef<{
     fit: () => void;
-    save: (width: number) => void;
+    save: (width: number, captureOnly?: boolean) => void;
     capture: () => Pick<View, 'position' | 'target'>;
-    load: (view: View) => void;
+    load: (view: CameraView) => void;
   } | null>(null);
   const [viewName, setViewName] = useState('Camera view'),
     [exportWidth, setExportWidth] = useState(1920),
@@ -46,6 +61,9 @@ export default function RenderView({
   const [cutaway, setCutaway] = useState(true);
   const [interiors, setInteriors] = useState(false);
   const [showCeiling, setShowCeiling] = useState(false);
+  useEffect(() => {
+    if (cameraView) actions.current?.load(cameraView);
+  }, [cameraView]);
   useEffect(() => {
     const container = host.current;
     if (!container) return;
@@ -100,7 +118,11 @@ export default function RenderView({
         .add(new THREE.Vector3(size * 1.1, size, size * 1.3));
       controls.update();
     };
-    if (cameraState.current) {
+    if (externalCamera.current) {
+      camera.position.set(...externalCamera.current.position);
+      controls.target.set(...externalCamera.current.target);
+      controls.update();
+    } else if (cameraState.current) {
       camera.position.copy(cameraState.current.position);
       controls.target.copy(cameraState.current.target);
       controls.update();
@@ -608,6 +630,12 @@ export default function RenderView({
       );
     };
     renderer.domElement.addEventListener('webglcontextlost', lost);
+    controls.addEventListener('end', () =>
+      callbacks.current.onCamera?.({
+        position: [camera.position.x, camera.position.y, camera.position.z],
+        target: [controls.target.x, controls.target.y, controls.target.z],
+      }),
+    );
     actions.current = {
       fit,
       capture: () => ({
@@ -620,7 +648,7 @@ export default function RenderView({
         controls.update();
         render();
       },
-      save: (width) => {
+      save: (width, captureOnly = false) => {
         const oldSize = renderer.getSize(new THREE.Vector2()),
           oldRatio = renderer.getPixelRatio();
         try {
@@ -630,7 +658,8 @@ export default function RenderView({
           const link = document.createElement('a');
           link.download = `${design.name.replace(/[^a-z0-9-]/gi, '-').slice(0, 80) || 'kitchen'}-render.png`;
           link.href = renderer.domElement.toDataURL('image/png');
-          link.click();
+          if (captureOnly) callbacks.current.onCapture?.(link.href);
+          else link.click();
         } catch {
           setError('Image export failed. Try reopening Render.');
         } finally {
@@ -679,7 +708,23 @@ export default function RenderView({
           />{' '}
           Show ceiling
         </label>
-        <button onClick={() => actions.current?.fit()}>Reset camera</button>
+        <button
+          onClick={() => {
+            actions.current?.fit();
+            const view = actions.current?.capture();
+            if (view) onCamera?.(view);
+          }}
+        >
+          Reset camera
+        </button>
+        {onCapture && (
+          <button
+            disabled={!!error}
+            onClick={() => actions.current?.save(1920, true)}
+          >
+            Capture presentation view
+          </button>
+        )}
         <label>
           PNG width
           <select

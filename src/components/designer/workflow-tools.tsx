@@ -1,5 +1,8 @@
 'use client';
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import type { CameraView } from './render-view';
+const RenderView = dynamic(() => import('./render-view'), { ssr: false });
 import type { Design } from '@/designer/model';
 import { itemPolygon } from '@/designer/model';
 import { roomOutline } from '@/designer/room';
@@ -69,7 +72,7 @@ export function SelectionTools({
     </details>
   );
 }
-function MiniPlan({ design }: { design: Design }) {
+export function MiniPlan({ design }: { design: Design }) {
   return (
     <svg
       aria-label={`${design.name} comparison plan`}
@@ -108,6 +111,25 @@ export function CompareOptions({
   onDuplicate: (name: string) => void;
   onOpen: (design: Design) => void;
 }) {
+  const [rendered, setRendered] = useState(false);
+  const size = Math.max(
+    design.room.width,
+    design.room.depth,
+    design.room.height,
+  );
+  const target: [number, number, number] = [
+    design.room.width / 2,
+    design.room.height * 0.22,
+    design.room.depth / 2,
+  ];
+  const [camera, setCamera] = useState<CameraView>({
+    target,
+    position: [
+      target[0] + size * 1.1,
+      target[1] + size,
+      target[2] + size * 1.3,
+    ],
+  });
   const [choice, setChoice] = useState(''),
     [name, setName] = useState('Option B');
   const options = saved.filter((d) => d.id !== design.id),
@@ -148,6 +170,19 @@ export function CompareOptions({
           ))}
         </select>
       </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={rendered}
+          onChange={(e) => setRendered(e.target.checked)}
+        />{' '}
+        Compare rendered views · linked cameras
+      </label>
+      {rendered && (
+        <p>
+          Orbit either view; both cameras match when you release the pointer.
+        </p>
+      )}
       <div className="comparison-grid">
         {[design, reference].map((d, i) =>
           d ? (
@@ -156,7 +191,16 @@ export function CompareOptions({
                 {i === 0 ? 'Current: ' : ''}
                 {d.name}
               </h3>
-              <MiniPlan design={d} />
+              {rendered ? (
+                <RenderView
+                  design={d}
+                  onChange={() => {}}
+                  cameraView={camera}
+                  onCamera={setCamera}
+                />
+              ) : (
+                <MiniPlan design={d} />
+              )}
               <p>
                 {d.items.length} items · {d.room.width} × {d.room.depth}″ ·{' '}
                 {d.finish}

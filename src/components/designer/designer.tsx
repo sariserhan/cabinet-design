@@ -63,6 +63,12 @@ import { DesignOptions, ItemOptions, QuotePanel } from './demo-options';
 import { SelectionTools, CompareOptions } from './workflow-tools';
 import { snapPlacement, duplicateOption } from '@/designer/editing';
 import { MachiningTools } from './machining-tools';
+import {
+  StartGuide,
+  MaterialPresets,
+  ShortcutHelp,
+  ClientPresentation,
+} from './demo-tools';
 import { polishedSample } from '@/designer/sample';
 import { normalizeOpenings, worldToLocal } from '@/designer/model';
 import {
@@ -144,6 +150,7 @@ function Editor({ ownerId }: { ownerId: string }) {
   const overview = overviewRaw
     ? (JSON.parse(overviewRaw) as Overview)
     : undefined;
+  const [showStart, setShowStart] = useState(false);
   const [inspectorTab, setInspectorTab] = useState('design'),
     [presenting, setPresenting] = useState(false),
     [selection, setSelection] = useState<string[]>([]),
@@ -181,9 +188,9 @@ function Editor({ ownerId }: { ownerId: string }) {
     [saved, setSaved] = useState<Design[]>([]),
     [openId, setOpenId] = useState('');
   const [selected, setSelected] = useState<string | null>(null),
-    [mode, setMode] = useState<'2d' | '3d' | 'render' | 'quote' | 'compare'>(
-      '2d',
-    ),
+    [mode, setMode] = useState<
+      '2d' | '3d' | 'render' | 'quote' | 'compare' | 'client'
+    >('2d'),
     [snap, setSnap] = useState(true),
     [zoom, setZoom] = useState(1),
     [panMode, setPanMode] = useState(false),
@@ -197,6 +204,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     try {
       const draft = localStorage.getItem(storageKey + ':draft');
       if (draft) initial = parseDesign(draft);
+      else setShowStart(true);
       const raw = localStorage.getItem(storageKey + ':saved');
       if (raw) {
         const list: unknown = JSON.parse(raw);
@@ -304,7 +312,13 @@ function Editor({ ownerId }: { ownerId: string }) {
     versionId: string,
     drop?: { x: number; y: number },
   ) {
-    if (!design || !canPlace(product)) return;
+    if (!design) return;
+    if (!canPlace(product)) {
+      setStatus(
+        'This catalog item lacks usable dimensions. Choose another item or add a custom cabinet.',
+      );
+      return;
+    }
     if (design.items.length >= 100) {
       setStatus('This demo supports up to 100 cabinets per design.');
       return;
@@ -346,6 +360,10 @@ function Editor({ ownerId }: { ownerId: string }) {
       );
       commit((d) => ({ ...d, items: [...d.items, { ...next, ...position }] }));
       setSelected(next.id);
+      setStatus(
+        next.sku +
+          ' placed. Check red outlines and Layout checks for conflicts.',
+      );
       return;
     }
     if (drop && isOpening(next)) {
@@ -593,8 +611,31 @@ function Editor({ ownerId }: { ownerId: string }) {
       ...snapPosition(rotated, design.room, item.x, item.y, snap),
     });
   }
+  function startDesign(next: Design) {
+    commit(() => next);
+    setShowStart(false);
+    setSelected(null);
+    setSelection([]);
+    setMode(next.items.length ? 'render' : '2d');
+    setLibraryTab('objects');
+    setInspectorTab('design');
+    setZoom(1);
+    setPanMode(false);
+    setShowClearance(false);
+    setMoveTogether(true);
+    setSnap(true);
+    setFitRevision((r) => r + 1);
+    setPresenting(false);
+    setStatus(
+      next.items.length
+        ? 'Demo kitchen restored. Undo restores your previous design; named saves are retained.'
+        : 'Room ready. Search Objects and add cabinets, doors or appliances. Undo restores your previous design.',
+    );
+  }
   return (
-    <div className={`designer-app ${presenting ? 'is-presenting' : ''}`}>
+    <div
+      className={`designer-app ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''}`}
+    >
       {presenting && (
         <div className="presentation-bar">
           <strong>{design.name}</strong>
@@ -603,10 +644,25 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         </div>
       )}
+      {showStart && (
+        <StartGuide onStart={startDesign} onClose={() => setShowStart(false)} />
+      )}
       <PrintPackage design={design} />
       <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
+        <button onClick={() => setShowStart((v) => !v)}>Start here</button>
+        <button
+          onClick={() => {
+            setShowStart(false);
+            setMode('client');
+          }}
+        >
+          Client presentation / PDF
+        </button>
+        <button onClick={() => startDesign(polishedSample())}>
+          Reset demo
+        </button>
         <button
           onClick={() => {
             setMode('render');
@@ -642,6 +698,7 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         </div>
       </header>
+      <ShortcutHelp />
       <div className="designer-projectbar">
         <span>Draft saves automatically in this browser</span>
         <div className="designer-row">
@@ -756,7 +813,7 @@ function Editor({ ownerId }: { ownerId: string }) {
           {libraryTab === 'cabinets' ? (
             <Library version={version} onAdd={add} />
           ) : (
-            <ObjectsLibrary onAdd={addObject} />
+            <ObjectsLibrary key={design.id} onAdd={addObject} />
           )}
         </div>
         <section className="designer-center" aria-label="Design workspace">
@@ -931,6 +988,8 @@ function Editor({ ownerId }: { ownerId: string }) {
                 else add(payload.product, payload.versionId, point);
               }}
             />
+          ) : mode === 'client' ? (
+            <ClientPresentation key={JSON.stringify(design)} design={design} />
           ) : mode === 'render' ? (
             <RenderView
               key={design.id}
@@ -1343,6 +1402,10 @@ function Editor({ ownerId }: { ownerId: string }) {
             )}
           </section>
           <section hidden={inspectorTab !== 'materials'}>
+            <MaterialPresets
+              design={design}
+              onChange={(next) => commit(() => next)}
+            />
             <h3>Preview finish</h3>
             <div className="designer-finishes">
               {(['linen', 'oak', 'slate'] as const).map((finish) => (

@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import {
   DoorOpen,
   AppWindow,
@@ -37,14 +38,34 @@ export function ObjectsLibrary({
 }: {
   onAdd: (kind: ObjectKind) => void;
 }) {
+  const [query, setQuery] = useState('');
+  const matches = objectPresets.filter((p) =>
+    (p.name + ' ' + p.kind.replaceAll('_', ' '))
+      .toLowerCase()
+      .includes(query.trim().toLowerCase()),
+  );
   return (
     <section className="designer-library">
       <h2>Objects library</h2>
       <p className="designer-muted">
         Drag into the 2D plan or use Add · editable demo dimensions
       </p>
+      <input
+        type="search"
+        aria-label="Search objects"
+        placeholder="Search sinks, islands, doors…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <p role="status">{matches.length} objects found</p>
+      {!matches.length && (
+        <p>
+          No matching objects. Try a shorter name or{' '}
+          <button onClick={() => setQuery('')}>Clear search</button>.
+        </p>
+      )}
       <div className="library-results">
-        {objectPresets.map((p) => {
+        {matches.map((p) => {
           const Icon = icons[p.kind];
           return (
             <article
