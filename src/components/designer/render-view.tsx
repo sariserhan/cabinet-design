@@ -436,7 +436,7 @@ export default function RenderView({
     }
     const movingFronts: { id: string; apply: (amount: number) => void }[] = [];
     const itemGroups: THREE.Group[] = [];
-    for (const item of design.items) {
+    for (const item of design.items.filter((i) => !i.hidden)) {
       const { finish, inset } = finishFor(item.finish ?? design.finish);
       const stone = stoneFor(
         item.countertop ?? design.appearance?.countertop ?? 'quartz',
@@ -476,6 +476,9 @@ export default function RenderView({
       };
       if (item.kind === 'countertop') {
         surface(h / 2, h);
+        if (item.surface?.waterfall)
+          for (const x of [-w / 2 + 0.75, w / 2 - 0.75])
+            b(1.5, item.elevation, d, x, -item.elevation / 2, 0, stone);
         continue;
       }
       if (item.kind === 'sink') {
@@ -484,8 +487,14 @@ export default function RenderView({
         b(1, h, d, w / 2 - 0.5, h / 2, 0, steel);
         b(w, h, 1, 0, h / 2, -d / 2 + 0.5, steel);
         b(w, h, 1, 0, h / 2, d / 2 - 0.5, steel);
-        b(1, 9, 1, 0, h + 4, -d / 2 + 2, steel);
-        b(1, 1, 7, 0, h + 8, -d / 2 + 5, steel);
+        const faucet =
+          design.appearance?.faucet === 'brass'
+            ? material('#b99a48', 0.85, 0.25)
+            : design.appearance?.faucet === 'black'
+              ? material('#242b2b', 0.5, 0.3)
+              : steel;
+        b(1, 9, 1, 0, h + 4, -d / 2 + 2, faucet);
+        b(1, 1, 7, 0, h + 8, -d / 2 + 5, faucet);
         continue;
       }
       if (item.kind === 'window' || item.kind === 'door') {
@@ -726,15 +735,23 @@ export default function RenderView({
                   : columns === 2
                     ? x + (col === 0 ? 1 : -1) * (pw / 2 - 2)
                     : x + (item.mirrored ? -1 : 1) * (pw / 2 - 2);
-              metalPull(
-                group,
-                hx,
-                y + ph / 2 - 5,
-                d / 2 + 1.5,
-                5,
-                style === 'drawers',
-                hardware,
-              );
+              if (design.appearance?.handleStyle === 'knob') {
+                const knob = new THREE.Mesh(
+                  new THREE.SphereGeometry(0.75, 12, 8),
+                  hardware,
+                );
+                knob.position.set(hx, y + ph / 2 - 5, d / 2 + 1);
+                group.add(knob);
+              } else if (design.appearance?.handleStyle !== 'none')
+                metalPull(
+                  group,
+                  hx,
+                  y + ph / 2 - 5,
+                  d / 2 + 1.5,
+                  5,
+                  style === 'drawers',
+                  hardware,
+                );
               if (style === 'drawers') {
                 b(
                   Math.max(0.2, pw - 2),
@@ -814,8 +831,21 @@ export default function RenderView({
           );
           b(0.5, 5, 1, sign * (w / 2 - 3), h - 6, d / 2 + 1, steel);
         }
-        if (item.kind === 'island') surface(h - 0.75, 1.5);
-        else if (
+        if (item.kind === 'island') {
+          surface(h - 0.75, 1.5);
+          if (item.surface?.waterfall)
+            for (const x of [-w / 2 + 0.75, w / 2 - 0.75])
+              b(1.5, h, d, x, h / 2, 0, stone);
+        }
+        if (item.elevation >= 40 && design.appearance?.underCabinet) {
+          const strip = material('#fff3cd');
+          strip.emissive.set('#ffd995');
+          strip.emissiveIntensity = 2;
+          b(Math.max(1, w - 2), 0.3, 1, 0, -0.2, d / 2 - 2, strip);
+          const light = new THREE.PointLight('#ffe0a5', 110, 70, 2);
+          light.position.set(0, -2, d / 2 - 2);
+          group.add(light);
+        } else if (
           !diagonal &&
           !design.items.some(
             (s) =>
@@ -864,7 +894,7 @@ export default function RenderView({
             0.18,
             tile,
           );
-        if (design.appearance.staging) {
+        if (design.appearance.outlets ?? design.appearance.staging) {
           const p = panels.find((p) => p.width >= 14 && p.height >= 12);
           if (p) {
             const x = p.x + p.width * 0.6,
@@ -882,6 +912,7 @@ export default function RenderView({
       const island = design.items
         .filter(
           (i) =>
+            !i.hidden &&
             (i.kind === 'countertop' || i.kind === 'island') &&
             i.y > 30 &&
             i.width >= 48,
@@ -918,14 +949,20 @@ export default function RenderView({
           scene.add(shade);
           const bulb = material('#fff7e0');
           bulb.emissive.set('#ffe2ac');
-          bulb.emissiveIntensity = 2;
+          bulb.emissiveIntensity =
+            (2 * (design.appearance?.pendantLevel ?? 100)) / 100;
           const globe = new THREE.Mesh(
             new THREE.SphereGeometry(1.2, 16, 12),
             bulb,
           );
           globe.position.set(x, y - 2, midZ);
           scene.add(globe);
-          const lamp = new THREE.PointLight('#ffe0ad', 200, 100, 2);
+          const lamp = new THREE.PointLight(
+            '#ffe0ad',
+            (200 * (design.appearance?.pendantLevel ?? 100)) / 100,
+            100,
+            2,
+          );
           lamp.position.set(x, y - 4, midZ);
           scene.add(lamp);
         }
@@ -955,17 +992,31 @@ export default function RenderView({
       const island = design.items
         .filter(
           (i) =>
+            !i.hidden &&
             (i.kind === 'countertop' || i.kind === 'island') &&
             i.y > 30 &&
             i.width >= 48,
         )
         .sort((a, b) => b.width - a.width)[0];
-      if (island) {
+      if (island && island.surface?.seating !== 'none') {
         const f = footprint(island),
-          z = island.y + f.depth + 3,
+          side = island.surface?.seating ?? 'south',
           seat = material('#c3ad8b', 0, 0.9);
-        for (const fraction of [0.25, 0.75]) {
-          const x = island.x + f.width * fraction;
+        const seatingLength =
+          side === 'east' || side === 'west' ? f.depth : f.width;
+        for (const fraction of seatingLength < 48 ? [0.5] : [0.25, 0.75]) {
+          const x =
+            side === 'east'
+              ? island.x + f.width + 12
+              : side === 'west'
+                ? island.x - 12
+                : island.x + f.width * fraction;
+          const z =
+            side === 'north'
+              ? island.y - 12
+              : side === 'south'
+                ? island.y + f.depth + 3
+                : island.y + f.depth * fraction;
           const blocked = design.items.some((i) => {
             const b = footprint(i);
             return (
@@ -979,6 +1030,14 @@ export default function RenderView({
           if (!blocked && rectangleInside(design.room, x - 8, z - 8, 16, 16)) {
             const stool = new THREE.Group();
             stool.position.set(x, 0, z);
+            stool.rotation.y =
+              side === 'north'
+                ? Math.PI
+                : side === 'east'
+                  ? Math.PI / 2
+                  : side === 'west'
+                    ? -Math.PI / 2
+                    : 0;
             scene.add(stool);
             box(stool, 14, 2, 14, 0, 25, 0, seat);
             for (const xx of [-5, 5])

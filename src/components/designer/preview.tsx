@@ -151,6 +151,7 @@ export function Preview({
   }
 
   const faces = design.items
+    .filter((i) => !i.hidden)
     .flatMap((item) => {
       const palette = finishes[item.finish ?? design.finish];
       const { v, local } = cabinetPoints(item);

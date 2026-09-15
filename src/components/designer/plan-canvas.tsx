@@ -7,8 +7,10 @@ import {
   snapPosition,
   updateAssembly,
   resolvedFront,
+  localToWorld,
 } from '@/designer/model';
 import { roomOutline, roomEdges } from '@/designer/room';
+import { resizeFromPoint } from '@/designer/studio-tools';
 import { snapPlacement, clearanceZones } from '@/designer/editing';
 import type { DropItem } from '@/designer/editing';
 import {
@@ -23,7 +25,12 @@ import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
 
 type Props = {
-  onResize: (id: string | null, width: number, depth: number) => void;
+  onResize: (
+    id: string | null,
+    width: number,
+    depth: number,
+    position?: { x: number; y: number },
+  ) => void;
   design: Design;
   selected: string | null;
   onSelect: (id: string | null) => void;
@@ -56,6 +63,10 @@ export function PlanCanvas({
   onDropItem,
   onResize,
 }: Props) {
+  const [resize, setResize] = useState<{
+    item: Cabinet;
+    patch: ReturnType<typeof resizeFromPoint>;
+  } | null>(null);
   const [dimension, setDimension] = useState<{
     id: string | null;
     width: number;
@@ -63,6 +74,10 @@ export function PlanCanvas({
   } | null>(null);
   function editDimension(id: string | null) {
     const item = design.items.find((i) => i.id === id);
+    if (item?.locked) {
+      setDropError('Unlock this object before resizing it.');
+      return;
+    }
     if (item?.kind === 'cabinet') {
       setDropError(
         'Catalog dimensions are fixed. Choose a custom cabinet to resize it.',
@@ -109,6 +124,7 @@ export function PlanCanvas({
       setSpace(false);
       panning.current = null;
       setIsPanning(false);
+      setResize(null);
       setDrag(null);
       setGhost(null);
     };
@@ -154,6 +170,7 @@ export function PlanCanvas({
       return;
     }
     onSelect(item.id);
+    if (item.locked) return;
     event.currentTarget.focus();
     const p = coordinates(event);
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -192,6 +209,14 @@ export function PlanCanvas({
       return;
     }
 
+    if (resize) {
+      const point = coordinates(event);
+      setResize({
+        ...resize,
+        patch: resizeFromPoint(resize.item, point.x, point.y),
+      });
+      return;
+    }
     if (!drag) return;
     const item = design.items.find((i) => i.id === drag.id);
     if (!item) return;
@@ -206,6 +231,13 @@ export function PlanCanvas({
     setDrag({ ...drag, ...position });
   }
   function end() {
+    if (resize) {
+      onResize(resize.item.id, resize.patch.width, resize.patch.depth, {
+        x: resize.patch.x,
+        y: resize.patch.y,
+      });
+      setResize(null);
+    }
     panning.current = null;
     setIsPanning(false);
     if (drag) {
@@ -221,7 +253,7 @@ export function PlanCanvas({
       ArrowDown: [0, 1],
     };
     const dir = directions[event.key];
-    if (dir) {
+    if (dir && !item.locked) {
       event.preventDefault();
       const step = event.shiftKey ? 6 : 1;
       const p = snapPosition(
@@ -293,6 +325,7 @@ export function PlanCanvas({
         onPointerUp={end}
         onPointerCancel={() => {
           setDrag(null);
+          setResize(null);
           panning.current = null;
           setIsPanning(false);
         }}
@@ -429,12 +462,19 @@ export function PlanCanvas({
             ? updateAssembly(design, drag.id, { x: drag.x, y: drag.y }).items
             : design.items),
         ]
-          .sort((a, b) => a.elevation - b.elevation)
+          .filter((i) => !i.hidden)
+          .sort(
+            (a, b) =>
+              Number(a.id === selected) - Number(b.id === selected) ||
+              a.elevation - b.elevation,
+          )
           .map((original) => {
             const item =
-              drag?.id === original.id
-                ? { ...original, x: drag.x, y: drag.y }
-                : original;
+              resize?.item.id === original.id
+                ? { ...original, ...resize.patch }
+                : drag?.id === original.id
+                  ? { ...original, x: drag.x, y: drag.y }
+                  : original;
             const b = footprint(item),
               active = selected === item.id || selectedIds.includes(item.id),
               warning = warningIds.has(item.id);
@@ -512,6 +552,61 @@ export function PlanCanvas({
                     />
                   </g>
                 )}
+                {item.note && (
+                  <g aria-label={`Note: ${item.note}`}>
+                    <circle cx={3} cy={3} r={2.3} fill="#dc963f" />
+                    <text
+                      x={3}
+                      y={4}
+                      textAnchor="middle"
+                      fontSize="3"
+                      fill="white"
+                    >
+                      !
+                    </text>
+                    <title>{item.note}</title>
+                  </g>
+                )}
+                {active &&
+                  !item.locked &&
+                  ['custom_cabinet', 'countertop'].includes(item.kind) &&
+                  (() => {
+                    const point = localToWorld(item, item.width, item.depth);
+                    return (
+                      <rect
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Resize selected object"
+                        x={point.x - item.x - 2.5}
+                        y={point.y - item.y - 2.5}
+                        width={5}
+                        height={5}
+                        fill="#087984"
+                        stroke="white"
+                        strokeWidth=".8"
+                        style={{ cursor: 'nwse-resize' }}
+                        onPointerDown={(e) => {
+                          e.stopPropagation();
+                          e.currentTarget.setPointerCapture(e.pointerId);
+                          setResize({
+                            item,
+                            patch: {
+                              width: item.width,
+                              depth: item.depth,
+                              x: item.x,
+                              y: item.y,
+                            },
+                          });
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.stopPropagation();
+                            editDimension(item.id);
+                          }
+                        }}
+                      />
+                    );
+                  })()}
                 {active && (
                   <text
                     role="button"

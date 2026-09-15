@@ -1,4 +1,5 @@
 'use client';
+import { BudgetComparison } from './studio-panels';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { CameraView } from './render-view';
@@ -85,18 +86,20 @@ export function MiniPlan({ design }: { design: Design }) {
         fill="#f5f6f2"
         stroke="#526b75"
       />
-      {design.items.map((item) => (
-        <polygon
-          key={item.id}
-          points={itemPolygon(item)
-            .map((p) => `${p.x},${p.y}`)
-            .join(' ')}
-          fill={item.elevation > 40 ? '#b7d6e0' : '#c9ad83'}
-          fillOpacity=".7"
-          stroke="#5a707a"
-          strokeWidth=".5"
-        />
-      ))}
+      {design.items
+        .filter((i) => !i.hidden)
+        .map((item) => (
+          <polygon
+            key={item.id}
+            points={itemPolygon(item)
+              .map((p) => `${p.x},${p.y}`)
+              .join(' ')}
+            fill={item.elevation > 40 ? '#b7d6e0' : '#c9ad83'}
+            fillOpacity=".7"
+            stroke="#5a707a"
+            strokeWidth=".5"
+          />
+        ))}
     </svg>
   );
 }
@@ -216,6 +219,7 @@ export function CompareOptions({
           Orbit either view; both cameras match when you release the pointer.
         </p>
       )}
+      {reference && <BudgetComparison before={reference} design={design} />}
       <div className="comparison-grid">
         {[design, reference].map((d, i) =>
           d ? (

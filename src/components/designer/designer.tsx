@@ -1,4 +1,14 @@
 'use client';
+import {
+  SampleGallery,
+  SampleStory,
+  ObjectManager,
+  RoomPhoto,
+  SurfaceEditor,
+  ReadinessCheck,
+} from './studio-panels';
+import { ElevationView } from './elevation-view';
+import { lockViolation } from '@/designer/studio-tools';
 import { KitchenActions } from './kitchen-actions';
 import { PresentationTour } from './presentation-tour';
 import type { CameraView } from './render-view';
@@ -168,6 +178,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     CameraView | undefined
   >();
   const [showStart, setShowStart] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const [inspectorTab, setInspectorTab] = useState('design'),
     [presenting, setPresenting] = useState(false),
     [selection, setSelection] = useState<string[]>([]),
@@ -206,7 +217,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     [openId, setOpenId] = useState('');
   const [selected, setSelected] = useState<string | null>(null),
     [mode, setMode] = useState<
-      '2d' | '3d' | 'render' | 'quote' | 'compare' | 'client'
+      '2d' | '3d' | 'render' | 'quote' | 'compare' | 'client' | 'elevation'
     >('2d'),
     [snap, setSnap] = useState(true),
     [zoom, setZoom] = useState(1),
@@ -320,6 +331,12 @@ function Editor({ ownerId }: { ownerId: string }) {
               y: (p.y * next.room.depth) / h.current.room.depth,
             })),
           },
+        };
+      const locked = lockViolation(h.current, next);
+      if (locked)
+        return {
+          ...h,
+          error: `Unlock ${locked} before changing its geometry or deleting it.`,
         };
       next = normalizeOpenings(next);
       const validation = designSchema.safeParse(next);
@@ -698,6 +715,16 @@ function Editor({ ownerId }: { ownerId: string }) {
           onExit={() => setPresenting(false)}
         />
       )}
+      {showGallery && (
+        <SampleGallery
+          onLoad={(next) => {
+            startDesign(next);
+            setShowGallery(false);
+            setMode('render');
+          }}
+          onClose={() => setShowGallery(false)}
+        />
+      )}
       {showStart && (
         <StartGuide
           onStart={(next, mode) => {
@@ -739,6 +766,9 @@ function Editor({ ownerId }: { ownerId: string }) {
           Compare options
         </button>
         <button onClick={() => setShowStart((v) => !v)}>Start here</button>
+        <button onClick={() => setShowGallery((v) => !v)}>
+          Choose a sample kitchen
+        </button>
         <button
           onClick={() => {
             setShowStart(false);
@@ -886,6 +916,22 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         )}
       </div>
+      <SampleStory design={design} onChange={(next) => commit(() => next)} />
+      <ObjectManager
+        design={design}
+        onChange={(next) => commit(() => next)}
+        onSelect={(id) => {
+          setSelected(id);
+          setInspectorCollapsed(false);
+        }}
+      />
+      <ReadinessCheck
+        design={design}
+        onSelect={(id) => {
+          setSelected(id);
+          setMode('2d');
+        }}
+      />
       {(status || storageError || history.error) && (
         <div
           role="status"
@@ -977,6 +1023,12 @@ function Editor({ ownerId }: { ownerId: string }) {
                 onClick={() => setMode('render')}
               >
                 Render
+              </button>
+              <button
+                aria-pressed={mode === 'elevation'}
+                onClick={() => setMode('elevation')}
+              >
+                Wall elevations
               </button>
               <button
                 aria-pressed={mode === 'quote'}
@@ -1116,6 +1168,8 @@ function Editor({ ownerId }: { ownerId: string }) {
                 }
               }}
             />
+          ) : mode === 'elevation' ? (
+            <ElevationView design={design} onSelect={setSelected} />
           ) : mode === 'quote' ? (
             <QuotePanel
               design={design}
@@ -1130,14 +1184,14 @@ function Editor({ ownerId }: { ownerId: string }) {
               selected={selected}
               onSelect={setSelected}
               onMove={(id, x, y) => updateItem(id, { x, y })}
-              onResize={(id, width, depth) =>
+              onResize={(id, width, depth, position) =>
                 commit((d) =>
                   id
                     ? {
                         ...d,
                         items: d.items.map((i) =>
                           i.id === id && i.kind !== 'cabinet'
-                            ? { ...i, width, depth }
+                            ? { ...i, width, depth, ...position }
                             : i,
                         ),
                       }
@@ -1266,6 +1320,16 @@ function Editor({ ownerId }: { ownerId: string }) {
         </section>
         <aside className="designer-inspector">
           <h2>Properties</h2>
+          <RoomPhoto
+            key={design.id}
+            storageKey={`kitchen-photo:${ownerId}:${design.id}`}
+          />
+          <SurfaceEditor
+            design={design}
+            selected={selected}
+            ids={selection}
+            onChange={(next) => commit(() => next)}
+          />
           <div
             role="tablist"
             aria-label="Inspector sections"

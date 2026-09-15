@@ -1,8 +1,9 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { type Design } from '@/designer/model';
 import { RoomSetup } from './room-setup';
+import { isPreparedSample } from '@/designer/demo-gallery';
 import { zipFiles } from '@/designer/presentation-bundle';
 import { money, quoteTotals } from '@/designer/quote';
 import { MiniPlan } from './workflow-tools';
@@ -29,9 +30,101 @@ export function MaterialPresets({
   design: Design;
   onChange: (d: Design) => void;
 }) {
+  const appearance = (patch: Partial<NonNullable<Design['appearance']>>) =>
+    onChange({
+      ...design,
+      appearance: {
+        countertop: 'quartz',
+        lighting: 'daylight',
+        ...design.appearance,
+        ...patch,
+      },
+    });
   return (
     <section>
       <h3>Render styling</h3>
+      <label>
+        Pendant brightness {design.appearance?.pendantLevel ?? 100}%
+        <input
+          aria-label="Pendant brightness"
+          type="range"
+          min="0"
+          max="100"
+          step="10"
+          value={design.appearance?.pendantLevel ?? 100}
+          onChange={(e) => appearance({ pendantLevel: Number(e.target.value) })}
+        />
+      </label>
+      <label>
+        <input
+          aria-label="Under-cabinet lights"
+          type="checkbox"
+          checked={!!design.appearance?.underCabinet}
+          onChange={(e) => appearance({ underCabinet: e.target.checked })}
+        />
+        Under-cabinet lights
+      </label>
+      <label>
+        <input
+          aria-label="Show outlets"
+          type="checkbox"
+          checked={
+            design.appearance?.outlets ?? design.appearance?.staging ?? false
+          }
+          onChange={(e) => appearance({ outlets: e.target.checked })}
+        />
+        Show decorative outlets
+      </label>
+      <label>
+        Faucet finish
+        <select
+          aria-label="Faucet finish"
+          value={design.appearance?.faucet ?? 'steel'}
+          onChange={(e) =>
+            appearance({
+              faucet: e.target.value as 'steel' | 'brass' | 'black',
+            })
+          }
+        >
+          <option value="steel">Brushed steel</option>
+          <option value="brass">Satin brass</option>
+          <option value="black">Matte black</option>
+        </select>
+      </label>
+      <div
+        className={`accessory-preview faucet-${design.appearance?.faucet ?? 'steel'}`}
+        aria-label="Faucet finish preview"
+      >
+        <svg viewBox="0 0 120 50" role="img" aria-label="Faucet silhouette">
+          <path
+            d="M45 45V17Q45 5 60 5T75 17V24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="5"
+          />
+          <path d="M35 46H60" stroke="currentColor" strokeWidth="4" />
+        </svg>
+      </div>
+      <label>
+        Handle style
+        <select
+          aria-label="Handle style"
+          value={design.appearance?.handleStyle ?? 'bar'}
+          onChange={(e) =>
+            appearance({
+              handleStyle: e.target.value as 'bar' | 'knob' | 'none',
+            })
+          }
+        >
+          <option value="bar">Bar pulls</option>
+          <option value="knob">Round knobs</option>
+          <option value="none">Handle-free</option>
+        </select>
+      </label>
+      <p>
+        Preview choices in Render. Daylight and warm lighting provide
+        day/evening comparisons.
+      </p>
       <label>
         Wall-run backsplash
         <select
@@ -198,6 +291,31 @@ export function ShortcutHelp() {
 }
 export function ClientPresentation({ design }: { design: Design }) {
   const [captures, setCaptures] = useState<{ url: string; name: string }[]>([]);
+  useEffect(() => {
+    if (!isPreparedSample(design)) return;
+    let active = true;
+    fetch(`/demo/${design.sampleKey}.png`)
+      .then((r) => {
+        if (!r.ok) throw Error('Preview missing');
+        return r.blob();
+      })
+      .then(
+        (blob) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }),
+      )
+      .then((url) => {
+        if (active) setCaptures([{ url, name: `${design.name} overview` }]);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [design]);
   const [viewName, setViewName] = useState('Kitchen overview'),
     [client, setClient] = useState(design.quote?.customer ?? ''),
     [notes, setNotes] = useState(''),
@@ -269,7 +387,8 @@ export function ClientPresentation({ design }: { design: Design }) {
       <div className={`client-editor ${preview ? 'previewing' : ''}`}>
         <h2>Client presentation</h2>
         <p>
-          Orbit to a useful view and capture it. Add up to three views, then
+          Unchanged gallery samples include a prepared overview. After editing,
+          orbit to a useful view and capture it. Add up to three views, then
           choose Save as PDF in the print dialog. Captures are kept only while
           this presentation is open.
         </p>

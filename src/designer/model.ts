@@ -12,6 +12,15 @@ import {
 
 const dimension = z.number().finite().positive().max(600);
 export const itemSchema = z.object({
+  hidden: z.boolean().optional(),
+  locked: z.boolean().optional(),
+  note: z.string().max(1000).optional(),
+  surface: z
+    .object({
+      waterfall: z.boolean().optional(),
+      seating: z.enum(['none', 'north', 'south', 'east', 'west']).optional(),
+    })
+    .optional(),
   finish: z.enum(['linen', 'oak', 'slate']).optional(),
   countertop: z.enum(['quartz', 'marble', 'granite']).optional(),
   id: z.string().min(1).max(100),
@@ -105,6 +114,7 @@ export const itemSchema = z.object({
 export const designSchema = z
   .object({
     format: z.literal('kitchen-studio-v1'),
+    sampleKey: z.enum(['apartment', 'family', 'premium']).optional(),
     id: z.string().min(1).max(100),
     name: z.string().trim().min(1).max(100),
     room: z.object({
@@ -185,6 +195,11 @@ export const designSchema = z
         backsplash: z.enum(['none', 'subway', 'slab']).optional(),
         hardware: z.enum(['steel', 'brass', 'black']).optional(),
         pendants: z.boolean().optional(),
+        pendantLevel: z.number().min(0).max(100).optional(),
+        underCabinet: z.boolean().optional(),
+        outlets: z.boolean().optional(),
+        faucet: z.enum(['steel', 'brass', 'black']).optional(),
+        handleStyle: z.enum(['bar', 'knob', 'none']).optional(),
         staging: z.boolean().optional(),
         countertop: z.enum(['quartz', 'marble', 'granite']),
         lighting: z.enum(['daylight', 'warm', 'studio']),

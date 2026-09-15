@@ -40,6 +40,27 @@ export function demoUnitPrice(item: Cabinet) {
           : 0),
   );
 }
+export function materialPrice(item: Cabinet, design: Design) {
+  if (item.demoPrice !== undefined) return item.demoPrice;
+  const finish = item.finish ?? design.finish,
+    stone = item.countertop ?? design.appearance?.countertop ?? 'quartz';
+  let price = demoUnitPrice(item);
+  if (
+    ['cabinet', 'custom_cabinet', 'corner', 'island', 'trim'].includes(
+      item.kind,
+    )
+  )
+    price *= finish === 'oak' ? 1.08 : finish === 'slate' ? 1.12 : 1;
+  if (item.kind === 'countertop')
+    price =
+      ((item.width * item.depth) / 144) *
+      (stone === 'marble' ? 85 : stone === 'granite' ? 75 : 65);
+  if (item.surface?.waterfall)
+    price +=
+      ((2 * (item.elevation || item.height) * item.depth) / 144) *
+      (stone === 'marble' ? 85 : stone === 'granite' ? 75 : 65);
+  return Math.round(price);
+}
 export function quoteTotals(design: Design) {
   const settings = { ...quoteDefaults, ...design.quote };
   const cents = (n: number) => Math.round(n * 100);
@@ -47,7 +68,7 @@ export function quoteTotals(design: Design) {
     id: item.id,
     sku: item.sku,
     description: `${item.width} × ${item.depth} × ${item.height} in`,
-    unitCents: cents(demoUnitPrice(item)),
+    unitCents: cents(materialPrice(item, design)),
   }));
   const subtotal = lines.reduce((sum, l) => sum + l.unitCents, 0),
     discount = Math.round((subtotal * settings.discount) / 100),

@@ -209,3 +209,26 @@ Open **2D plan → Build your kitchen faster**:
 **Present** and **Show this kitchen** open an audience welcome screen. **Begin kitchen tour** steps through saved viewpoints (or built-in viewpoints when none are saved). Use Previous/Next, the saved-viewpoint selector, or **Explore freely**. Escape exits presentation. The mobile welcome title wraps, and render editing controls are hidden while the welcome or tour is shown.
 
 Validation: 127 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build. Browser checks cover layout replacement, run completion, appliance insertion, corner placement, snapshot persistence after reload, nonblank linked comparison renders, tour navigation and mobile layout. All additions remain within the demo scope.
+
+## Complete studio demo: examples, editing and presentation
+
+**Choose a sample kitchen** opens three rendered previews:
+
+- **Small apartment:** a compact light L-shaped kitchen with appliances, a sink, upper storage and under-cabinet lighting.
+- **Family kitchen:** oak perimeter cabinets, contrasting island seating, pendants and a vaulted room.
+- **Premium kitchen:** dark cabinetry, tall pantry storage, marble waterfall ends and warm lighting.
+
+Each example includes four saved viewpoints, two finish alternatives, an illustrative estimate and a three-minute demonstration outline. Unchanged examples automatically load their prepared overview in **Client presentation / PDF**, so a ZIP presentation can be downloaded immediately. After design changes, capture a new render; prepared images are deliberately not reused for changed designs. Gallery PNGs are generated from the actual editable scenes.
+
+Editing and review:
+
+- Select a custom cabinet or countertop in **2D plan** and drag its teal corner handle. The opposite local corner stays fixed, including for rotated objects. Width/depth update live. Press Enter on the handle for numeric entry. Catalog dimensions remain fixed.
+- **Objects & design notes** searches names, types and notes. Hide removes an object from plan/preview/render/elevation displays; it remains in pricing and physical checks. Lock protects movement, resizing and deletion, including changes through other controls. Unlock to edit its geometry. Notes appear as plan markers and readiness reminders.
+- **Existing room photo** in Properties accepts JPEG, PNG or WebP up to 5 MB. A resized reference is stored locally for that browser/account/design. It is not uploaded or included in presentation packages. The photo is visible beside the design when the Properties panel is open.
+- **Wall elevations** provides straight-on dimensioned views for straight walls, with SVG downloads. It shows visible objects within 36 inches of the selected wall. Use the existing installation documents for construction and complex roof geometry.
+- **Countertops & island options** connects adjoining straight sections with matching depth, elevation and thickness, retaining sink cutouts. Linked countertop overhangs can be set relative to base cabinet footprints. Island seating side, waterfall ends and storage front configuration are editable. Waterfall ends and stools are illustrative, not structural/support or seating-clearance validation.
+- **Materials** includes pendant dimming, under-cabinet lights, decorative outlet visibility, faucet finishes, handle styles and backsplash choices. Use daylight and warm lighting to compare day/evening appearance.
+- **Compare options → Budget comparison** separates cabinet, countertop, appliance and other changes. Demo allowances use +8% for oak and +12% for slate cabinetry, and $65/$75/$85 per square foot for quartz/granite/marble tops. Waterfall ends add a stone-area allowance. Explicit item prices override these defaults. These are not manufacturer prices; lighting and decorative accessories are not independently priced unless included in an explicit item price.
+- **Demo readiness** lists missing appliances, missing countertop coverage, pinned notes and existing layout/installation flags. It helps prepare a demonstration and does not certify installation readiness.
+
+Validation: 134 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build pass. Browser checks cover all three prepared downloads and offline presentations, photo persistence, object search/hide/lock/notes, drag resizing, island overhang/seating/waterfall/storage, lighting and accessories, elevation SVG export, budget snapshots, material alternatives, stale-render invalidation and mobile gallery layout.

@@ -889,3 +889,34 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 
 .designer-app .presentation-welcome h1 { white-space:normal;overflow-wrap:anywhere; }
 .is-presenting:has(.presentation-welcome) .render-controls,.is-presenting:has(.presentation-tour-note) .render-controls { display:none; }
+.sample-gallery { padding:24px;background:#f3f6f2;border:1px solid #d6e0d8;margin:16px;border-radius:12px; }
+.sample-cards { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:18px 0; }
+.sample-cards article { background:white;border:1px solid #d2ded7;border-radius:10px;padding:14px;min-width:0; }
+.sample-cards img { width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:6px;background:#e7ece8; }
+.sample-cards p { font-size:13px;line-height:1.5; }
+.studio-panel { padding:10px 16px;background:#f8faf8;border-bottom:1px solid #dbe4df; }
+.studio-panel summary,.room-photo summary { font-weight:600;cursor:pointer; }
+.studio-panel p,.studio-panel li,.room-photo p { font-size:12px; }
+.studio-panel input,.studio-panel select,.room-photo input { max-width:100%; }
+.object-manager { max-height:360px;overflow:auto;margin-top:10px; }
+.object-manager article { display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #dde4df; }
+.object-manager textarea { flex:1;min-width:160px;min-height:44px;border:1px solid #b9ccca;padding:6px; }
+.object-manager label { display:flex;align-items:center;gap:4px; }
+.room-photo { padding:12px 0;border-bottom:1px solid #dbe3df; }
+.room-photo img { width:100%;max-height:300px;object-fit:contain; }
+.elevation-view { padding:20px; }
+.elevation-view svg { width:100%;max-height:600px;display:block;margin-top:16px; }
+.elevation-view p { font-size:13px; }
+.accessory-preview { background:#eeeae0;border-radius:6px;margin:8px 0; }
+.accessory-preview svg { width:100%;height:65px; }
+.faucet-steel { color:#909a9e; }.faucet-brass { color:#b39245; }.faucet-black { color:#263234; }
+.studio-panel table { width:100%;font-size:12px;border-collapse:collapse; }
+.studio-panel td,.studio-panel th { padding:6px;text-align:left;border-bottom:1px solid #dce4df;overflow-wrap:anywhere; }
+.is-presenting > .studio-panel,.is-presenting > .sample-gallery { display:none; }
+@media(max-width:800px) { .sample-cards { grid-template-columns:1fr; }.sample-gallery {padding:14px;margin:8px;}.object-manager textarea {flex-basis:100%;} }
+@media print { .sample-gallery,.studio-panel,.room-photo {display:none!important;} }
+
+.studio-panel button { max-width:100%;white-space:normal; }
+.studio-panel:has(> summary:first-child) > label { display:block;margin:10px 0; }
+.elevation-view table { width:100%;border-collapse:collapse;font-size:12px; }
+.elevation-view td,.elevation-view th { padding:6px;text-align:left;border-bottom:1px solid #dce4df; }
