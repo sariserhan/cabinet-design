@@ -24,6 +24,12 @@ The public library has 1,190 Allure, 605 Illume and 602 Ovela reference entries,
 
 These source books warn of missing updates. Verify current specifications, finish choices and prices with the supplier. Public-catalog price requests include series/version identity in the configuration field; retain it when returning prices.
 
+## Flooring, painting, countertops and tile
+
+Open **Trade workspaces · countertops, flooring, painting & tile** below the main kitchen steps. Each workspace calculates quantities and a separate estimate with your own rates. Flooring/tile round to boxes, painting calculates coats and gallons, and countertops provide rectangular slab packing and proposed splits with a cut-list export. Save each estimate before exporting; design or settings changes flag it for recalculation. Complete backups include these browser-local settings.
+
+See [TRADE_WORKSPACES.md](TRADE_WORKSPACES.md) for formulas, scope, exports and field-validation limits.
+
 ## Connect from your laptop
 
 The demo runs on the remote machine at `127.0.0.1:3000`.

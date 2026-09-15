@@ -85,3 +85,12 @@ Automated tests use synthetic specifications and QR decoding. Real manufacturer 
 - Create a task chain tied to delivered items and site resolutions. Verify pending/damaged items block completion, received items release it, and invalidating an earlier completed task blocks later work. Reconcile expected/planned dates with the installer.
 - Run one real kitchen from measured survey through installation. Record actual work and rework separately, quote revisions, installation issues and the three most useful improvements. Keep synthetic rehearsals clearly labeled. An estimated baseline is not proof of time saved.
 - After approved backend deployment, use separate owner/editor/viewer accounts and two devices to verify shared load/publish, simultaneous-edit rejection, membership revocation, source/approval re-verification, backup recovery, and storage/quota errors. Local backend tests and live synthetic browser checks now cover permissions, revisions, owner/editor transfers, mobile reload and revocation. The expected-conflict-message follow-up awaits deployment approval; actual field-device acceptance remains pilot work.
+
+## Trade estimating acceptance
+
+- Flooring: reconcile polygon area, excluded cabinet footprints, non-overlapping zones, waste and whole-box quantities against a measured job and actual packaging. Confirm transition and preparation costs.
+- Painting: confirm selected interior wall/ceiling area, slope/vault geometry, opening deductions, coat scope and the selected product's actual coverage. Reconcile finish and primer gallons separately.
+- Tile: measure backsplash rectangles, deduct applicable openings, reconcile tile face size, pieces per box, grout/adhesive coverage and waste for the intended pattern.
+- Countertops: have a fabricator review every piece, slab dimension, proposed split, cutout, exposed edge, vein direction and support requirement. Rectangular packing is a planning preview and must not be sent directly to cutting equipment.
+- Change a room dimension after saving all trades: each included estimate must become stale and the combined total must remain unavailable until recalculated and saved. Export/restore a complete backup and confirm the restored project requires new saved estimates.
+- Verify user-entered prices and taxes separately. Trade settings currently transfer through files/complete backups, not ordinary cloud saves or shared-record publishing.

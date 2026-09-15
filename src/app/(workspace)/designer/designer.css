@@ -1317,3 +1317,26 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .public-catalog-notice summary { cursor:pointer; margin:8px 0; }
 .catalog-placeable-filter { display:flex; gap:6px; align-items:center; font-size:12px; margin:10px 0; }
 .catalog-placeable-filter input { width:auto; }
+
+/* Trade workspaces */
+.trade-content { padding:16px; }
+.trade-tabs { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0; }
+.designer-app .trade-tabs button[aria-pressed="true"] { background:#245955; color:white; }
+.trade-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:14px 0; }
+.trade-content label { font-size:13px; }
+.trade-fields label,.trade-notes { display:grid; gap:6px; }
+.trade-content input,.trade-content select,.trade-content textarea { max-width:100%; min-width:0; }
+.trade-check { display:flex; gap:8px; align-items:center; margin:10px 0; }
+.trade-check input { width:auto; }
+.trade-zone { display:flex; gap:10px; align-items:end; flex-wrap:wrap; padding:12px 0; border-bottom:1px solid var(--studio-line); }
+.trade-zone label { display:grid; gap:6px; flex:1 1 130px; }
+.trade-piece { display:flex; justify-content:space-between; gap:12px; padding:10px 0; }
+.trade-piece input { width:70px; margin-left:8px; }
+.trade-slabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:14px 0; }
+.trade-slabs figure { margin:0; }.trade-slabs svg { width:100%; max-height:300px; }
+.trade-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:16px 0; }
+.trade-metrics p { padding:12px; border:1px solid var(--studio-line); background:#f2f7f4; }
+.trade-metrics strong { display:block; margin-top:8px; }
+.trade-table { overflow:auto; }.trade-table table { width:100%; border-collapse:collapse; }.trade-table td,.trade-table th { padding:8px; text-align:left; border-bottom:1px solid var(--studio-line); }
+.trade-content .designer-row { margin:14px 0; }.trade-status { padding:10px; background:#f4f1e6; overflow-wrap:anywhere; }.trade-notes textarea { min-height:80px; }
+@media(max-width:700px){.trade-fields,.trade-slabs{grid-template-columns:1fr}.trade-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.trade-content{padding:12px}.trade-piece{display:block}.trade-piece span{display:block;margin-top:8px}.trade-tabs button{flex:1 1 40%}}

@@ -1,4 +1,5 @@
 'use client';
+import { TradeWorkspaces } from './trade-workspaces';
 import { sourceLink } from '@/designer/design-decisions';
 import {
   SampleGallery,
@@ -1050,6 +1051,11 @@ function Editor({ ownerId }: { ownerId: string }) {
           ownerId={ownerId}
         />
       </section>
+      <TradeWorkspaces
+        key={`trades:${design.id}`}
+        design={design}
+        ownerId={ownerId}
+      />
       <nav className="designer-skip-links" aria-label="Designer shortcuts">
         <a
           href="#project-dashboard"

@@ -9,7 +9,11 @@ import {
 } from '@/designer/project-backup';
 import { canonical } from '@/designer/installer-handoff';
 import { downloadJson } from './business-tools';
-const content = (b: ProjectBackup) => canonical({ ...b, createdAt: '' });
+const content = (b: ProjectBackup) => {
+  const shared = { ...b, createdAt: '' };
+  delete shared.trades;
+  return canonical(shared);
+};
 type Row = {
   id: Id<'sharedProjects'>;
   name: string;
@@ -84,7 +88,8 @@ export function SharedProjectRecords({
   }
   async function publish(create: boolean) {
     if (!create && !binding) throw Error('Load a shared revision first.');
-    const current = latest.current();
+    const current = { ...latest.current() };
+    delete current.trades;
     const oldRaw = localStorage.getItem(key);
     if (
       !create &&
@@ -125,7 +130,8 @@ export function SharedProjectRecords({
         records and operations. Load a revision, edit locally, then publish.
         Revision conflicts are rejected; newer remote data never overwrites
         local work automatically. Source-review, approval and completion claims
-        must be reverified after transfer.
+        must be reverified after transfer. Trade estimates remain local;
+        transfer them with a complete backup or trade-settings export.
       </p>
       <p>
         Your account ID: <code>{ownerId}</code>. Give this to the project owner

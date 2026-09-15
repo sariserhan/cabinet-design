@@ -212,6 +212,11 @@ export function ProjectHub({
           `kitchen-operations:${ownerId}:${id}`,
           JSON.stringify(b.operations),
         ]);
+      if (b.trades)
+        entries.push([
+          `kitchen-trades:${ownerId}:${id}`,
+          JSON.stringify(b.trades),
+        ]);
       if (b.support)
         entries.push([
           `kitchen-product-support:${ownerId}:${id}`,
@@ -280,9 +285,9 @@ export function ProjectHub({
           One file includes the current design, selections, site photos, local
           revision history, purchasing and supplier records, closeout,
           organization, product checks, aftercare, project assembly templates,
-          installation sequences, catalog comparisons, pilot observations and a
-          supplier price reference. Cloud-only revisions and catalog source
-          documents are not included.
+          installation sequences, catalog comparisons, pilot observations, trade
+          estimates and a supplier price reference. Cloud-only revisions and
+          catalog source documents are not included.
         </p>
         <div className="designer-row">
           <button

@@ -1,3 +1,4 @@
+import { tradesSchema, parseTrades, emptyTrades } from './trade-estimates';
 import { z } from 'zod';
 import {
   operationsSchema,
@@ -40,6 +41,7 @@ export const projectBackupSchema = z.object({
   priceBook: priceBookSchema.optional(),
   support: productSupportSchema.optional(),
   operations: operationsSchema.optional(),
+  trades: tradesSchema.optional(),
 });
 export type ProjectBackup = z.infer<typeof projectBackupSchema>;
 export function parseProjectBackup(
@@ -70,6 +72,9 @@ export function parseProjectBackup(
   b.operations = b.operations
     ? parseOperations(JSON.stringify(b.operations), id)
     : emptyOperations(id);
+  b.trades = b.trades
+    ? parseTrades(JSON.stringify(b.trades), id)
+    : emptyTrades(id);
   return b;
 }
 export function collectProjectBackup(
@@ -121,6 +126,11 @@ export function collectProjectBackup(
       closeout,
       organization,
       support,
+      trades: parseTrades(
+        storage.getItem(`kitchen-trades:${ownerId}:${design.id}`) ??
+          JSON.stringify(emptyTrades(design.id)),
+        design.id,
+      ),
       operations: parseOperations(
         storage.getItem(`kitchen-operations:${ownerId}:${design.id}`) ??
           JSON.stringify(emptyOperations(design.id)),
@@ -172,6 +182,10 @@ export function restoreProjectCopy(
   b.closeout = { ...b.closeout, designId: newId };
   if (b.support) b.support = { ...b.support, designId: newId };
   if (b.operations) b.operations = { ...b.operations, designId: newId };
+  if (b.trades) {
+    b.trades = { ...b.trades, designId: newId };
+    for (const state of Object.values(b.trades.trades)) delete state.saved;
+  }
   b.organization = { ...b.organization, archived: false, status: 'draft' };
   delete b.organization.indexedRevision;
   return parseProjectBackup(JSON.stringify(b));
