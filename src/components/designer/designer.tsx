@@ -7,6 +7,8 @@ import {
   SurfaceEditor,
   ReadinessCheck,
 } from './studio-panels';
+import { PurchasingWorkspace } from './purchasing-workspace';
+import { FirstUseGuide } from './first-use-guide';
 import { ProjectWorkflow } from './project-workflow';
 import { DesignDecisions } from './design-decisions';
 import { MeasurementWizard } from './measurement-wizard';
@@ -909,6 +911,23 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         </div>
       </header>
+      <FirstUseGuide
+        ownerId={ownerId}
+        design={design}
+        onDemo={() => walkthroughStep(0)}
+      />
+      <PurchasingWorkspace
+        key={`purchasing:${design.id}`}
+        ownerId={ownerId}
+        design={design}
+        onLocate={(id) => {
+          setSelected(id);
+          setMode('2d');
+          document
+            .querySelector('.canvas-panel-controls')
+            ?.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
       <ProjectWorkflow
         key={`workflow:${design.id}`}
         design={design}

@@ -1231,3 +1231,22 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .installer-page input[type="checkbox"] { width: auto; }
 .client-review .selection-card { padding: 16px; }
 .selection-card .preview-stage { height: 340px; min-height: 340px; }
+
+/* Purchasing and project organization */
+.first-use-guide { margin: 16px 0; padding: 20px; border: 1px solid #ced9ce; border-radius: 16px; background: #f0f5ee; }
+.first-use-guide h2 { margin: 8px 0; font-size: 22px; }
+.first-use-guide p { max-width: 850px; }
+.purchasing-panel fieldset, .project-directory fieldset { min-width: 0; border: 1px solid #d8ded6; border-radius: 12px; padding: 16px; margin-top: 16px; }
+.purchasing-panel label, .project-directory label { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; min-width: 0; }
+.purchasing-panel input, .purchasing-panel select, .purchasing-panel textarea, .project-directory input, .project-directory select { width: 100%; min-width: 0; max-width: 100%; }
+.purchase-card { margin: 16px 0; padding: 16px; border: 1px solid #d8ded6; border-radius: 12px; background: #fff; overflow-wrap: anywhere; }
+.purchase-card pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.purchase-card small, .purchase-table small { display: block; }
+.purchase-plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.purchase-plan-grid svg { max-width: 100%; max-height: 260px; }
+.purchase-table { overflow-x: auto; }
+.purchase-table table { border-collapse: collapse; width: 100%; min-width: 460px; }
+.purchase-table td, .purchase-table th { padding: 10px; text-align: left; border-bottom: 1px solid #d8ded6; }
+.purchase-table td:first-child { max-width: 350px; overflow-wrap: anywhere; }
+.project-directory { width: 100%; min-width: 0; }
+@media(max-width:600px) { .purchase-plan-grid { grid-template-columns: 1fr; } .purchasing-panel fieldset, .purchase-card { padding: 10px; } }

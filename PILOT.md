@@ -43,3 +43,15 @@ No real room or supplier list was supplied with the feature request. Real-projec
 ## Deployment prerequisite
 
 The development backend must use the updated shared design schema to retain storage preferences, site notes and selection boards in cloud saves. This deployment remains subject to the previously requested approval. Local drafts and portable files can be piloted now. Keep downloaded reports and histories as backups; the unsigned client workspaces retain unsaved changes only in the current tab.
+
+## Purchasing pilot extension
+
+With the pilot client and actual supplier list, also verify:
+
+- Capture approval of the baseline, change one cabinet, and confirm the old review link fails revised-scope verification. Obtain a new review approval and capture it against the change order.
+- Export a purchase draft and reconcile SKU, exact configuration, dimensions, quantities and product subtotal with the supplier. Confirm lead time, availability, taxes, shipping and payment terms separately; no supplier order is sent by this app.
+- Simulate one received, one missing and one damaged item; attach a photo and export the delivery report. Verify tracking retains original item references after design edits.
+- Export/import the purchasing backup and reverify approvals. Check persistence after reload and the rejection of edits from a stale second tab.
+- Add client, room and tags; refresh SKU search; archive and restore a completed project. Export organization metadata separately.
+
+Automated fixtures remain synthetic. These steps do not establish real-world supplier accuracy or constitute a completed field pilot.

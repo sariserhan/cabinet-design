@@ -347,3 +347,20 @@ The new selection board is included in the shared design schema and cloud readba
 See [PILOT.md](PILOT.md) for a real-project pilot worksheet and acceptance criteria. The implementation walkthrough used a synthetic room survey and supplier prices, with real review/approval activity only in the isolated QA account. No real room or actual supplier list was provided for a field pilot.
 
 Validation for the guided workflow: lint, TypeScript, 178 core tests, 25 backend tests, benchmark integrity and production build pass. Playwright Chromium at `http://localhost:3000`, desktop 1440 × 1000 and mobile 390 × 844, verified stage navigation, captured milestone prices, live QA approval capture, changes-since-approval readiness, visual diffs, unsigned client favorites/reasons and return-file import, material preview/apply, per-finding installer conflicts with wall remapping, and reload persistence. Page identity, meaningful content, framework-overlay absence, console health and responsive layout passed. Browser plugin was unavailable; the existing local Playwright setup was used. A mobile checkbox overflow was reproduced, fixed and retested.
+
+## Ordering and delivery workspace
+
+Open **Orders, changes & deliveries** in the designer:
+
+1. In **Change orders**, paste an active client review link and verify the current design as the approved baseline. The link must contain an approval for this exact project and physical design. Names are self-reported.
+2. Edit the design, enter the reason, and record a change order. Before/after plans, product specifications and price differences use immutable snapshots and the captured supplier list. Missing or expired prices suppress totals. Use a new client review link to verify approval of the revised snapshot. An approved change can become the next baseline.
+3. In **Purchase drafts**, enter a purchase number and supplier instructions. Create a snapshot and export a printable HTML draft (open it and use Print / save PDF), or JSON. Identical SKU, material, configuration and dimensions are grouped into quantities. Room door/window openings are excluded. Purchase documents show the product subtotal; customer discounts, installation, supplier shipping and supplier taxes are excluded. Drafts show unresolved layout/site/price/approval checks and are never submitted automatically. Confirm manufacturer specifications, availability and commercial terms with the supplier.
+4. In **Deliveries**, choose a purchase draft and mark each physical item pending, received, missing or damaged. Add notes and up to four compact JPEG photos per draft. The original item snapshot is retained when the current design changes. Export a delivery report or the complete purchasing backup.
+
+Purchasing records live in this browser under the account and design ID, separate from design JSON/cloud sync. Export **purchasing-backup.json** for backup; importing replaces the project's purchasing records and removes approval claims until verified again through active review links. Limits: ten changes, ten drafts, 3.5 MB total. Concurrent edits from another browser tab are rejected until the panel is reopened. Captured design approval is historical evidence, not approval of supplier prices or a continuously checked review-link status.
+
+### Project organization and first use
+
+The cloud-project panel includes a directory for the latest 50 account projects. Search name, client, room, tags, workflow status and indexed SKU. **Refresh SKU search index** reads the current cloud snapshots; refresh after cloud edits to update SKU results. Archive/restore changes visibility without deleting cloud data. Organization metadata and archive choices are browser-local and have a separate export/import backup. Workflow labels are user-entered labels, not verified approvals.
+
+The three-step getting-started guide opens the sample walkthrough, room measurements and ordering workspace. It distinguishes illustrative sample data from confirmed surveys and supplier offers, suggests the next project action, and remembers completion in this browser. Reopen it with **Show getting-started guide**.

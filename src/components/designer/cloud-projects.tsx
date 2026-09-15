@@ -4,6 +4,7 @@ import { useConvex, useMutation, useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
 import { parseDesign, type Design } from '@/designer/model';
+import { ProjectDirectory } from './project-directory';
 import { downloadJson } from './business-tools';
 
 type Binding = { projectId: Id<'projects'>; revision: number };
@@ -32,8 +33,7 @@ export function CloudProjects({
   const [paused, setPaused] = useState(false),
     [message, setMessage] = useState(''),
     [tick, setTick] = useState(0);
-  const [openId, setOpenId] = useState(''),
-    [shareUrl, setShareUrl] = useState('');
+  const [shareUrl, setShareUrl] = useState('');
   const [feedbackId, setFeedbackId] = useState<Id<'projectReviews'> | null>(
     null,
   );
@@ -186,24 +186,12 @@ export function CloudProjects({
         </button>
       </div>
       <div className="designer-row">
-        <select
-          aria-label="Cloud project"
-          value={openId}
-          onChange={(e) => setOpenId(e.target.value)}
-        >
-          <option value="">Choose a cloud project</option>
-          {projects?.map((p) => (
-            <option key={p._id} value={p._id}>
-              {p.name} · revision {p.revision}
-            </option>
-          ))}
-        </select>
-        <button
-          disabled={!openId || busy}
-          onClick={() => void openProject(openId)}
-        >
-          Open cloud project
-        </button>
+        <ProjectDirectory
+          projects={projects}
+          ownerId={ownerId}
+          busy={busy}
+          onOpen={(id) => void openProject(id)}
+        />
         {binding && (
           <button
             disabled={busy}
