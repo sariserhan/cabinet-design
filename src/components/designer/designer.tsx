@@ -60,6 +60,15 @@ import { ObjectsLibrary } from './objects';
 import { PrintPackage } from './print-package';
 import { AssemblyEditor } from './assembly-editor';
 import { DesignOptions, ItemOptions, QuotePanel } from './demo-options';
+import { polishedSample } from '@/designer/sample';
+import { normalizeOpenings, worldToLocal } from '@/designer/model';
+import {
+  ArchitectureOptions,
+  InstallationOptions,
+  PartitionOptions,
+  DrawingTools,
+  InstallationSheets,
+} from './advanced-options';
 import { RoomEditor } from './room-editor';
 import { roomEdges, rectangleInside } from '@/designer/room';
 
@@ -219,14 +228,7 @@ function Editor({ ownerId }: { ownerId: string }) {
             })),
           },
         };
-      next = {
-        ...next,
-        items: next.items.map((i) =>
-          isOpening(i)
-            ? { ...i, ...attachToWall(i, next.room, i.wall ?? 'north') }
-            : i,
-        ),
-      };
+      next = normalizeOpenings(next);
       const validation = designSchema.safeParse(next);
       if (!validation.success)
         return {
@@ -248,14 +250,37 @@ function Editor({ ownerId }: { ownerId: string }) {
     setStatus('');
   }
   function updateItem(id: string, patch: Partial<Cabinet>) {
-    commit((d) =>
-      moveTogether
-        ? updateAssembly(d, id, patch)
+    commit((d) => {
+      const current = d.items.find((i) => i.id === id);
+      let applied = patch;
+      if (
+        current?.opening &&
+        (patch.x !== undefined || patch.y !== undefined)
+      ) {
+        const host = d.items.find((h) => h.id === current.opening?.hostId);
+        if (host) {
+          const f = footprint(current),
+            point = worldToLocal(
+              host,
+              (patch.x ?? current.x) + f.width / 2,
+              (patch.y ?? current.y) + f.depth / 2,
+            );
+          applied = {
+            ...patch,
+            opening: {
+              ...current.opening,
+              offset: Math.max(0, point.x - current.width / 2),
+            },
+          };
+        }
+      }
+      return moveTogether
+        ? updateAssembly(d, id, applied)
         : {
             ...d,
-            items: d.items.map((i) => (i.id === id ? { ...i, ...patch } : i)),
-          },
-    );
+            items: d.items.map((i) => (i.id === id ? { ...i, ...applied } : i)),
+          };
+    });
   }
   function add(product: Product, versionId: string) {
     if (!design || !canPlace(product)) return;
@@ -497,6 +522,7 @@ function Editor({ ownerId }: { ownerId: string }) {
   return (
     <div className="designer-app">
       <PrintPackage design={design} />
+      <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
         <label className="project-name">
@@ -553,6 +579,18 @@ function Editor({ ownerId }: { ownerId: string }) {
             }}
           >
             New room
+          </button>
+          <button
+            onClick={() => {
+              commit(() => polishedSample());
+              setSelected(null);
+              setMode('render');
+              setStatus(
+                'Presentation kitchen loaded. Undo restores your previous design.',
+              );
+            }}
+          >
+            Load presentation kitchen
           </button>
           <button disabled={!templateRaw} onClick={example}>
             Load example kitchen
@@ -864,6 +902,14 @@ function Editor({ ownerId }: { ownerId: string }) {
                 commit((d) => ({ ...d, room: { ...d.room, height: n } }))
               }
             />
+            <ArchitectureOptions
+              design={design}
+              onChange={(next) => commit(() => next)}
+            />
+            <DrawingTools
+              design={design}
+              onChange={(next) => commit(() => next)}
+            />
             <DesignOptions
               design={design}
               onChange={(next) => commit(() => next)}
@@ -871,7 +917,10 @@ function Editor({ ownerId }: { ownerId: string }) {
             <RoomEditor
               room={design.room}
               onChange={(outline) =>
-                commit((d) => ({ ...d, room: { ...d.room, outline } }))
+                commit((d) => ({
+                  ...d,
+                  room: { ...d.room, outline, curves: [] },
+                }))
               }
             />
             <div className="designer-walls">
@@ -927,7 +976,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                       value={item.height}
                       onChange={(height) => updateItem(item.id, { height })}
                     />
-                    {isOpening(item) && (
+                    {isOpening(item) && !item.opening && (
                       <label className="designer-numeric">
                         <span>Attach to wall</span>
                         <select
@@ -958,7 +1007,9 @@ function Editor({ ownerId }: { ownerId: string }) {
                             <option
                               key={edge.index}
                               value={edge.index}
-                              disabled={!design.room.walls[edge.side]}
+                              disabled={
+                                !design.room.walls[edge.side] || edge.curved
+                              }
                             >
                               Wall {edge.index + 1} · {edge.side} ·{' '}
                               {Number(edge.length.toFixed(1))}″
@@ -1016,6 +1067,15 @@ function Editor({ ownerId }: { ownerId: string }) {
                     </select>
                   </label>
                 )}
+                <PartitionOptions
+                  design={design}
+                  item={item}
+                  onChange={(patch) => updateItem(item.id, patch)}
+                />
+                <InstallationOptions
+                  item={item}
+                  onChange={(patch) => updateItem(item.id, patch)}
+                />
                 <ItemOptions
                   item={item}
                   onChange={(patch) => updateItem(item.id, patch)}

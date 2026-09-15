@@ -1,6 +1,11 @@
 export type Point = { x: number; y: number };
-export type RoomShape = { width: number; depth: number; outline: Point[] };
-export function roomOutline(room: RoomShape): Point[] {
+export type RoomShape = {
+  width: number;
+  depth: number;
+  outline: Point[];
+  curves?: { wall: number; bow: number }[] | undefined;
+};
+export function baseOutline(room: RoomShape): Point[] {
   return room.outline.length
     ? room.outline
     : [
@@ -9,6 +14,26 @@ export function roomOutline(room: RoomShape): Point[] {
         { x: room.width, y: room.depth },
         { x: 0, y: room.depth },
       ];
+}
+export function curvePoints(a: Point, b: Point, bow: number) {
+  const length = Math.hypot(b.x - a.x, b.y - a.y),
+    nx = -(b.y - a.y) / length,
+    ny = (b.x - a.x) / length;
+  return Array.from({ length: 33 }, (_, i) => {
+    const t = i / 32;
+    return {
+      x: a.x + (b.x - a.x) * t + 4 * t * (1 - t) * nx * bow,
+      y: a.y + (b.y - a.y) * t + 4 * t * (1 - t) * ny * bow,
+    };
+  });
+}
+export function roomOutline(room: RoomShape): Point[] {
+  const base = clockwise(baseOutline(room));
+  return base.flatMap((a, i) => {
+    const b = base[(i + 1) % base.length] ?? a,
+      c = room.curves?.find((c) => c.wall === i);
+    return c && c.bow ? curvePoints(a, b, c.bow).slice(0, -1) : [a];
+  });
 }
 export function area(points: Point[]) {
   return (
@@ -22,9 +47,11 @@ export function outlineIssue(
   points: Point[],
   width: number,
   depth: number,
+  maxCorners = 24,
 ): string | null {
   if (!points.length) return null;
-  if (points.length < 4 || points.length > 24) return 'Use 4–24 corners.';
+  if (points.length < 4 || points.length > maxCorners)
+    return 'Use 4–24 corners.';
   if (
     points.some(
       (p) =>
@@ -87,7 +114,7 @@ export function rectangleInside(
     y + depth > room.depth + 0.01
   )
     return false;
-  if (!room.outline.length) return true;
+  if (!room.outline.length && !room.curves?.length) return true;
   return polygonInside(
     [
       { x, y },
@@ -99,9 +126,9 @@ export function rectangleInside(
   );
 }
 export function roomEdges(room: RoomShape) {
-  const points = clockwise(roomOutline(room));
-  return points.map((a, index) => {
-    const b = points[(index + 1) % points.length] ?? a;
+  const base = clockwise(baseOutline(room));
+  return base.map((a, index) => {
+    const b = base[(index + 1) % base.length] ?? a;
     const side: 'north' | 'east' | 'south' | 'west' =
       a.y === b.y
         ? b.x > a.x
@@ -110,12 +137,26 @@ export function roomEdges(room: RoomShape) {
         : b.y > a.y
           ? 'east'
           : 'west';
+    const curve = room.curves?.find((c) => c.wall === index),
+      points = curve?.bow ? curvePoints(a, b, curve.bow) : [a, b];
     return {
       a,
       b,
+      points,
+      curved: !!curve?.bow,
       index,
       side,
-      length: Math.hypot(b.x - a.x, b.y - a.y),
+      length: points
+        .slice(1)
+        .reduce(
+          (sum, p, i) =>
+            sum +
+            Math.hypot(
+              p.x - (points[i]?.x ?? p.x),
+              p.y - (points[i]?.y ?? p.y),
+            ),
+          0,
+        ),
     };
   });
 }
@@ -209,7 +250,14 @@ export function polygonInside(subject: Point[], boundary: Point[]) {
 export function ceilingAt(
   room: RoomShape & {
     height: number;
-    ceiling?: { axis: 'x' | 'y'; endHeight: number } | undefined;
+    ceiling?:
+      | {
+          axis: 'x' | 'y';
+          endHeight: number;
+          kind?: 'slope' | 'vault' | undefined;
+          ridge?: number | undefined;
+        }
+      | undefined;
   },
   x: number,
   y: number,
@@ -217,7 +265,52 @@ export function ceilingAt(
   const slope = room.ceiling;
   if (!slope) return room.height;
   const t = slope.axis === 'x' ? x / room.width : y / room.depth;
+  const ridge = slope.ridge ?? 0.5,
+    amount =
+      slope.kind === 'vault'
+        ? t <= ridge
+          ? t / ridge
+          : (1 - t) / (1 - ridge)
+        : t;
   return (
-    room.height + (slope.endHeight - room.height) * Math.max(0, Math.min(1, t))
+    room.height +
+    (slope.endHeight - room.height) * Math.max(0, Math.min(1, amount))
   );
+}
+
+export function wallSegments(room: RoomShape) {
+  return roomEdges(room).flatMap((edge) =>
+    edge.points.slice(1).map((b, j) => {
+      const a = edge.points[j] ?? edge.a;
+      return {
+        ...edge,
+        a,
+        b,
+        length: Math.hypot(b.x - a.x, b.y - a.y),
+        segment: `${edge.index}:${j}`,
+      };
+    }),
+  );
+}
+export function ceilingRegions(room: Parameters<typeof ceilingAt>[0]) {
+  const points = roomOutline(room),
+    c = room.ceiling;
+  if (c?.kind !== 'vault') return [points];
+  const at = (c.axis === 'x' ? room.width : room.depth) * (c.ridge ?? 0.5);
+  return [-1, 1]
+    .map((sign) => {
+      const out: Point[] = [];
+      points.forEach((a, i) => {
+        const b = points[(i + 1) % points.length] ?? a,
+          fa = (a[c.axis] - at) * sign,
+          fb = (b[c.axis] - at) * sign;
+        if (fa <= 0) out.push(a);
+        if (fa * fb < 0) {
+          const t = fa / (fa - fb);
+          out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+        }
+      });
+      return out;
+    })
+    .filter((p) => p.length >= 3);
 }

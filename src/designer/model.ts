@@ -1,3 +1,4 @@
+import { installationIssues, profileFor } from './installation';
 import { z } from 'zod';
 import {
   outlineIssue,
@@ -19,6 +20,7 @@ export const itemSchema = z.object({
   kind: z
     .enum([
       'cabinet',
+      'custom_cabinet',
       'door',
       'window',
       'sink',
@@ -26,6 +28,7 @@ export const itemSchema = z.object({
       'dishwasher',
       'washing_machine',
       'range',
+      'hood',
       'island',
       'countertop',
       'corner',
@@ -69,6 +72,31 @@ export const itemSchema = z.object({
       above: z.number().min(0).max(120),
     })
     .optional(),
+  opening: z
+    .object({
+      hostId: z.string().min(1).max(100),
+      offset: z.number().min(0).max(600),
+      sill: z.number().min(0).max(600),
+    })
+    .optional(),
+  installation: z
+    .object({
+      profile: z.string().max(80),
+      voltage: z.number().min(0).max(500),
+      circuitAmps: z.number().min(0).max(100),
+      water: z.enum(['unknown', 'hot', 'cold', 'none']),
+      drain: z.boolean(),
+      vent: z.enum(['unknown', 'outside', 'recirculating', 'none']),
+      ductDiameter: z.number().min(0).max(24),
+      waterPressure: z.number().min(0).max(300).optional(),
+      drainRise: z.number().min(0).max(120).optional(),
+      serviceX: z.number().min(0).max(600).optional(),
+      serviceY: z.number().min(0).max(600).optional(),
+      serviceZ: z.number().min(0).max(600).optional(),
+      ventCfm: z.number().min(0).max(3000).optional(),
+      notes: z.string().max(1000),
+    })
+    .optional(),
   demoPrice: z.number().finite().min(0).max(1000000).optional(),
   pageNumber: z.number().int().positive(),
 });
@@ -82,7 +110,21 @@ export const designSchema = z
       depth: dimension.min(36),
       height: dimension.min(36),
       ceiling: z
-        .object({ axis: z.enum(['x', 'y']), endHeight: dimension.min(36) })
+        .object({
+          axis: z.enum(['x', 'y']),
+          endHeight: dimension.min(36),
+          kind: z.enum(['slope', 'vault']).optional(),
+          ridge: z.number().min(0.1).max(0.9).optional(),
+        })
+        .optional(),
+      curves: z
+        .array(
+          z.object({
+            wall: z.number().int().min(0).max(23),
+            bow: z.number().min(-120).max(120),
+          }),
+        )
+        .max(24)
         .optional(),
       outline: z
         .array(z.object({ x: z.number().finite(), y: z.number().finite() }))
@@ -95,6 +137,13 @@ export const designSchema = z
         west: z.boolean(),
       }),
     }),
+    fabrication: z
+      .object({
+        thickness: z.number().min(0.25).max(1.5),
+        back: z.number().min(0.125).max(0.75),
+        gap: z.number().min(0.03125).max(0.25),
+      })
+      .optional(),
     finish: z.enum(['linen', 'oak', 'slate']),
     appearance: z
       .object({
@@ -154,6 +203,39 @@ export const designSchema = z
         code: 'custom',
         path: ['room', 'outline'],
         message: issue,
+      });
+    if (design.room.curves?.length) {
+      const curvedIssue = outlineIssue(
+        roomOutline(design.room),
+        design.room.width,
+        design.room.depth,
+        800,
+      );
+      if (curvedIssue)
+        ctx.addIssue({
+          code: 'custom',
+          message: `Curved wall: ${curvedIssue}`,
+        });
+      if (
+        new Set(design.room.curves.map((c) => c.wall)).size !==
+        design.room.curves.length
+      )
+        ctx.addIssue({ code: 'custom', message: 'Only one curve per wall.' });
+    }
+    if (
+      design.items.some(
+        (i) =>
+          isOpening(i) &&
+          !i.opening &&
+          roomEdges(design.room).some(
+            (e) => e.index === i.wallSegment && e.curved,
+          ),
+      )
+    )
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'Move perimeter openings to a straight wall before curving that wall.',
       });
     if (new Set(design.items.map((i) => i.id)).size !== design.items.length)
       ctx.addIssue({
@@ -253,7 +335,11 @@ export function warnings(
 ): { id: string; message: string; itemIds: string[] }[] {
   const result: ReturnType<typeof warnings> = [];
   design.items.forEach((item, index) => {
-    if (isOpening(item) && (!item.wall || !design.room.walls[item.wall]))
+    if (
+      isOpening(item) &&
+      !item.opening &&
+      (!item.wall || !design.room.walls[item.wall])
+    )
       result.push({
         id: `wall-${item.id}`,
         message: `${item.sku} needs an enabled wall.`,
@@ -335,7 +421,11 @@ export function warnings(
         });
     });
   });
-  return [...result, ...clearanceWarnings(design)];
+  return [
+    ...result,
+    ...clearanceWarnings(design),
+    ...installationIssues(design),
+  ];
 }
 export function canPlace(
   product: Product,
@@ -356,6 +446,7 @@ export function snapPosition(
   y: number,
   snap: boolean,
 ) {
+  if (item.opening) return { x, y };
   if (isOpening(item))
     return attachToWall(item, room, item.wall ?? 'north', x, y);
   const box = footprint(item);
@@ -363,7 +454,7 @@ export function snapPosition(
     ny = Math.round(y * 2) / 2;
   if (snap) {
     for (const edge of roomEdges(room)) {
-      if (!room.walls[edge.side]) continue;
+      if (!room.walls[edge.side] || edge.curved) continue;
       if (
         edge.a.y === edge.b.y &&
         nx >= Math.min(edge.a.x, edge.b.x) - 0.5 &&
@@ -503,6 +594,8 @@ export const objectPresets: {
 }[] = [
   ...(
     [
+      ['hood', 'Range hood', 30, 20, 12, 66],
+      ['custom_cabinet', 'Custom cabinet', 24, 24, 34.5, 0],
       ['corner', 'Corner cabinet', 36, 36, 34.5, 0],
       ['filler', 'Filler', 3, 24, 34.5, 0],
       ['trim', 'Trim panel', 0.75, 24, 84, 0],
@@ -651,6 +744,7 @@ export function containsFootprint(host: Cabinet, item: Cabinet) {
 }
 
 export function placementCollision(a: Cabinet, b: Cabinet) {
+  if (a.opening?.hostId === b.id || b.opening?.hostId === a.id) return false;
   if (!overlaps(a, b)) return false;
   const sink = a.kind === 'sink' ? a : b.kind === 'sink' ? b : null,
     host = sink === a ? b : a;
@@ -659,7 +753,8 @@ export function placementCollision(a: Cabinet, b: Cabinet) {
     containsFootprint(host, sink) &&
     (host.kind === 'countertop' ||
       host.kind === 'island' ||
-      (host.kind === 'cabinet' && host.sku.startsWith('SB')))
+      ((host.kind === 'cabinet' || host.kind === 'custom_cabinet') &&
+        host.sku.includes('SB')))
   )
     return false;
   return true;
@@ -836,7 +931,7 @@ export function clearanceDefaults(item: Cabinet) {
   return {
     front: appliance
       ? 36
-      : ['cabinet', 'corner', 'island'].includes(item.kind)
+      : ['cabinet', 'custom_cabinet', 'corner', 'island'].includes(item.kind)
         ? resolvedFront(item) === 'drawers'
           ? 24
           : Math.min(
@@ -852,7 +947,16 @@ export function clearanceDefaults(item: Cabinet) {
 export function clearanceWarnings(design: Design): ReturnType<typeof warnings> {
   const result: ReturnType<typeof warnings> = [];
   for (const item of design.items) {
-    const c = item.clearance ?? clearanceDefaults(item),
+    const selected = item.clearance ?? clearanceDefaults(item),
+      profile = profileFor(item),
+      c = profile
+        ? {
+            front: Math.max(selected.front, profile.clearance.front),
+            rear: Math.max(selected.rear, profile.clearance.rear),
+            side: Math.max(selected.side, profile.clearance.side),
+            above: Math.max(selected.above, profile.clearance.above),
+          }
+        : selected,
       w = item.width,
       d = item.depth;
     const envelopes = [
@@ -921,6 +1025,8 @@ export function wallPanels(
     .filter(
       (i) =>
         isOpening(i) &&
+        !i.opening &&
+        !edge.curved &&
         (i.wallSegment === edge.index ||
           (i.wallSegment === null && i.wall === edge.side)),
     )
@@ -936,7 +1042,23 @@ export function wallPanels(
     });
   const height = (x: number) =>
       ceilingAt(design.room, edge.a.x + dx * x, edge.a.y + dy * x),
-    max = Math.max(height(0), height(edge.length));
+    max = Math.max(
+      height(0),
+      height(edge.length),
+      design.room.ceiling?.endHeight ?? 0,
+    );
+  if (design.room.ceiling?.kind === 'vault') {
+    const c = design.room.ceiling,
+      ridge =
+        (c.axis === 'x' ? design.room.width : design.room.depth) *
+        (c.ridge ?? 0.5),
+      delta = c.axis === 'x' ? dx : dy;
+    if (Math.abs(delta) > 1e-8) {
+      const t = (ridge - edge.a[c.axis]) / delta;
+      if (t > 0 && t < edge.length)
+        openings.push({ x: t, y: 0, width: 0, height: 0 });
+    }
+  }
   return cutPanels(edge.length, max, openings)
     .map((r) => {
       const points = [
@@ -959,4 +1081,60 @@ export function wallPanels(
       return out;
     })
     .filter((p) => p.length >= 3);
+}
+
+export function attachToPartition(item: Cabinet, host: Cabinet) {
+  const opening = item.opening ?? {
+      hostId: host.id,
+      offset: 0,
+      sill: item.kind === 'window' ? 36 : 0,
+    },
+    offset = Math.max(
+      0,
+      Math.min(opening.offset, Math.max(0, host.width - item.width)),
+    );
+  const rotation = host.rotation,
+    depth = host.depth,
+    f = footprint({ ...item, rotation, depth }),
+    center = localToWorld(host, offset + item.width / 2, depth / 2);
+  return {
+    ...item,
+    opening: { ...opening, offset },
+    wall: null,
+    wallSegment: null,
+    rotation,
+    depth,
+    x: center.x - f.width / 2,
+    y: center.y - f.depth / 2,
+    elevation: host.elevation + opening.sill,
+  };
+}
+export function normalizeOpenings(design: Design) {
+  return {
+    ...design,
+    items: design.items.map((i) => {
+      if (!isOpening(i)) return i;
+      if (i.opening) {
+        const host = design.items.find(
+          (h) => h.id === i.opening?.hostId && h.kind === 'partition',
+        );
+        return host ? attachToPartition(i, host) : i;
+      }
+      return { ...i, ...attachToWall(i, design.room, i.wall ?? 'north') };
+    }),
+  };
+}
+export function partitionPanels(host: Cabinet, items: Cabinet[]) {
+  return cutPanels(
+    host.width,
+    host.height,
+    items
+      .filter((i) => i.opening?.hostId === host.id)
+      .map((i) => ({
+        x: i.opening?.offset ?? 0,
+        y: i.elevation - host.elevation,
+        width: i.width,
+        height: i.height,
+      })),
+  );
 }

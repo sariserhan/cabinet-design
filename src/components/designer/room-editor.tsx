@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import type { Room } from '@/designer/model';
 import {
   roomOutline,
+  baseOutline,
   roomPreset,
   outlineIssue,
   clockwise,
@@ -17,10 +18,10 @@ export function RoomEditor({
 }) {
   const format = (points: Room['outline']) =>
     points.map((p) => `${p.x}, ${p.y}`).join('\n');
-  const [text, setText] = useState(format(roomOutline(room))),
+  const [text, setText] = useState(format(baseOutline(room))),
     [error, setError] = useState(''),
     [drawing, setDrawing] = useState(false);
-  useEffect(() => setText(format(roomOutline(room))), [room]);
+  useEffect(() => setText(format(baseOutline(room))), [room]);
   const points = text
     .split('\n')
     .filter((s) => s.trim())

@@ -27,7 +27,7 @@ Open http://localhost:4001/designer. Keep the SSH terminal open. If you already 
 
 Edits automatically save a draft in this browser, separately for each signed-in account. Save design keeps named copies (up to 20). JSON export is the portable backup; browser storage does not sync to other devices and can be removed by clearing site data. Designs support up to 100 items and polygonal rooms with outer dimensions from 36 to 600 inches.
 
-This is the agreed kitchen-planning demo, not full 2020 Design parity. The 3D view shows dimensionally sized cabinet boxes with illustrative fronts and finishes. It does not provide photorealistic manufacturer models, curved walls, manufacturer-specific appliance models, live manufacturer pricing, or automated code/clearance/compatibility certification. Layout checks cover geometry; catalog review remains available in the existing screens. Catalog dimensions are not silently resized or invented. No new AI API credits are required to use the designer.
+This is the agreed kitchen-planning demo, not full 2020 Design parity. The 3D view shows dimensionally sized cabinet boxes with illustrative fronts and finishes. It does not provide photorealistic manufacturer models, manufacturer-specific appliance meshes, live manufacturer pricing, or automated code/clearance/compatibility certification. Layout checks cover geometry; catalog review remains available in the existing screens. Catalog dimensions are not silently resized or invented. No new AI API credits are required to use the designer.
 
 ## Run on the server
 
@@ -37,7 +37,7 @@ npm run dev -- --port 3000
 
 ## Validation
 
-- `npm run check`: lint, TypeScript, 98 core tests, 15 backend tests, and benchmark artifact integrity.
+- `npm run check`: lint, TypeScript, 104 core tests, 15 backend tests, and benchmark artifact integrity.
 - `npm run build`: production build.
 - Playwright Chromium, desktop 1536×1024 and mobile 390×844: example loading, cabinet addition, pointer dragging, keyboard movement, rotation, duplication/deletion, undo/redo, zoom/fit, room resizing, overlap/boundary warnings, 3D view rotation, finish selection, saving/opening, reload restoration, JSON export/import, and invalid import rejection. No browser runtime errors or horizontal page overflow.
 - Browser plugin was unavailable, so local Playwright was used. Tests used the isolated QA account's own catalog; no real-user review status was changed.
@@ -63,7 +63,7 @@ Choose the **Objects** tab in the left library. Add Door, Window, Sink, Refriger
 
 All object types support save/reload and JSON import/export. Layout checks cover object intersections, disabled attachment walls, sink support, and conservative door-swing clearance. They do not certify installation clearances or plumbing/electrical requirements.
 
-Object QA: all nine types, resizing, door swing, wall attachment and sill elevation, island sink, countertop cutouts, save/reload, JSON export/import, and 2D/3D desktop/mobile views passed. The complete suite now contains 113 automated tests.
+Object QA: all nine types, resizing, door swing, wall attachment and sill elevation, island sink, countertop cutouts, save/reload, JSON export/import, and 2D/3D desktop/mobile views passed. The complete suite now contains 119 automated tests.
 
 ## Custom rooms, assemblies, and print packages
 
@@ -73,7 +73,7 @@ Object QA: all nine types, resizing, door swing, wall attachment and sill elevat
 - **Cabinet fronts:** selected catalog cabinets offer Auto, Single, Double, Drawers, and Glass preview styles. Auto uses a simple SKU/width heuristic. These are illustrative fronts, not manufacturer geometry or availability guarantees.
 - **Print / PDF:** opens the browser print dialog. Choose Save as PDF to export a floor plan, wall elevations, numbered placement schedule, quantities, source references, and current layout warnings. These drawings support design discussion and are not approved installation documents.
 
-Validation also covers custom outline entry/drawing, invalid outline rejection, concave-room boundary checks, internal-wall openings, assembly translation/rotation, individual adjustments, legacy saves, and PDF generation. Cloud synchronization, curved walls, photorealistic manufacturer assets, live manufacturer pricing/ordering, and construction certification remain outside this demo.
+Validation also covers custom outline entry/drawing, invalid outline rejection, concave-room boundary checks, internal-wall openings, assembly translation/rotation, individual adjustments, legacy saves, and PDF generation. Cloud synchronization, photorealistic manufacturer assets, live manufacturer pricing/ordering, and construction certification remain outside this demo.
 
 ### Render a design
 
@@ -86,7 +86,7 @@ Rendering runs locally in the browser with no API key or paid service. WebGL2 is
 
 - **Architecture & materials** in Properties selects a flat ceiling or a slope along room width/depth. The main ceiling height is the near end; far-end ceiling height sets the other end. Render, wall elevations, and ceiling checks use that plane. **Show ceiling** in Render makes the plane visible.
 - Wood cabinetry and flooring have locally generated grain maps. Choose quartz, marble, or granite countertops, and daylight, warm, or studio lighting. Reflections and detailed appliance fronts improve the render without a paid rendering service. These remain illustrative procedural materials and generic models.
-- Objects now includes corner cabinets, fillers, trim panels, crown molding, toe kicks, columns, beams, and partition walls. Their dimensions/elevations are editable. Doors and windows attach to angled perimeter segments; partitions are separate solid objects, not hosts for openings.
+- Objects now includes corner cabinets, fillers, trim panels, crown molding, toe kicks, columns, beams, and partition walls. Their dimensions/elevations are editable. Doors and windows attach to angled perimeter segments; door/window openings can also attach to interior partitions through Opening host.
 - Select a cabinet/island/corner, then open **Detailing, clearances & price**. Set shelf/tray count, shelves/pull-outs/Lazy Susan, toe kick height, and crown molding. Corner presets offer diagonal, blind-left, or blind-right fronts. **Show interiors** in Render removes fronts to inspect storage. Corner collision checks conservatively reserve their full rectangular envelope. Catalog cabinet dimensions stay fixed.
 - Non-opening objects accept arbitrary **Rotation (degrees)**. Openings inherit their wall angle. Existing quarter-turn buttons remain available. Automatic wall snapping is for axis-aligned segments; use position/rotation controls beside angled walls.
 - Layout checks include front operating envelopes, appliance side/rear gaps, range overhead clearance, sloped-ceiling conflicts, oversized wall openings, and a dishwasher-to-sink service-distance reminder. Clearances are editable per item; zero disables a check. Defaults are explicitly demo assumptions, not installation manuals or code certification. Checks do not verify utility connections, ventilation, or appliance-specific combustible clearances.
@@ -96,3 +96,21 @@ Rendering runs locally in the browser with no API key or paid service. WebGL2 is
 Expanded validation: angled polygon containment and SAT object collisions; sloped wall clipping and ceiling checks; editable clearance envelopes; integer-cent quote arithmetic; invalid-price/order rejection. Browser flow covered 14 placed objects, angled window attachment, custom interiors, material/lighting changes, ceiling visibility, PNG export, quote and order export, retained order snapshots after reload, PDF output, and mobile layout without console errors.
 
 Pricing source note: Fabuwood describes live pricing and order management through its [EZ Pricing dealer portal](https://www.fabuwood.com/become-a-dealer). This demo has no dealer-account integration or verified configured quote, so all displayed prices use the explicit demo schedule rather than claiming to be manufacturer prices.
+
+
+## Presentation kitchen, advanced architecture, and shop coordination
+
+**Load presentation kitchen** opens The Oak House: 24 objects with wood cabinetry, marble counters, a working island layout, window, range/hood, source-profile appliances, a curved perimeter, vaulted ceiling, and an interior partition doorway. It uses explicitly named custom/demo cabinets; it does not invent manufacturer catalog records. Loading is undoable and never overwrites a named saved design.
+
+- **Curved walls & vault ridge:** set a midpoint bow per perimeter wall. Curves are quadratic Bézier spans sampled into 32 chords for geometry and DXF. Positive bow bends into the room. Out-of-bounds and intersecting outlines are rejected. Doors/windows on curved perimeter spans are not supported; move them to straight walls first. Editing base room corners resets curves. Wall numbers stay stable.
+- **Architecture & materials:** choose Vaulted, set the peak height, and use Vault slope axis / Ridge position to adjust the two roof planes. Render's Show ceiling reveals the ridge; wall clipping, sections and clearance checks use its heights.
+- **Opening host:** select a placed door/window and choose a partition. Offset and sill are local to the partition. Host movement, rotation and resizing update its openings. Deleting a host creates a missing-host warning; oversize openings are flagged. Partition cutouts appear in both 3D views and in the drawing supplement.
+- **Installation & utilities:** source-backed profiles are currently limited to Bosch SHP65CM5N and GE GTS22KGNRWW. Selecting a profile does not silently resize an appliance; Apply model dimensions & gaps does. Record supply voltage, circuit capacity, water/drain data, ventilation, service coordinates and notes. Missing data produces unresolved checks. Verified profile gaps cannot be reduced by setting demo clearances to zero. The app compares recorded values, not actual physical wiring or pipework, and does not certify installation.
+- **Drawings & fabrication exports:** Print/PDF includes setting-out coordinates, a utility schedule with source links, partition opening elevations, a ceiling section, and custom panel schedule. Installation JSON retains coordinates, configurations and recorded utility information. Layout DXF uses millimeters and separates object kinds into layers.
+- **Custom cabinet panel exports:** add Custom cabinet objects, then choose carcass stock, applied-back thickness, and door/shelf gaps. CSV and panel DXF generate full-size rectangular blanks for a butt-joint case with full-height sides, applied back and full-overlay slab doors. They include only explicitly defined custom cabinets. Manufacturer cabinet internals are not inferred. Drawer boxes/fronts, purchased storage hardware, hinge/shelf boring, decorative molding, toe-platform framing, edge-banding allowance, tool compensation and CNC toolpaths remain excluded. Review the construction assumptions, material and machine requirements with the fabricator before cutting. These are shop-coordination exports, not a claim of universal fabrication readiness.
+
+Source profiles checked September 15, 2026:
+- [Bosch SHP65CM5N specification sheet, April 2025](https://media3.bosch-home.com/Documents/20595186_SHP65CM5N%20Spec%20Sheet.pdf), pp. 1–3: model/niche dimensions, electrical rating, water pressure and drain high-loop limits. The 24-inch front operating envelope is explicitly a demo assumption.
+- [GE GTS22KGNRWW specifications](https://products.geappliances.com/appliance/gea-compare/%26sku%3DGTS22KGNRWW): model dimensions, air gaps, open-door dimensions and electrical rating. Lateral door-swing geometry, optional ice-maker plumbing and installation-manual details still require review.
+
+Validation: 104 core + 15 backend tests; desktop/mobile browser flow for sample loading, host movement, opening offsets, curves, ridge changes, electrical mismatch warnings, reload persistence, PNG and PDF exports. The 13-page PDF supplement was generated. Independent DXF parsing confirmed millimeter units, 25 closed layout outlines and 88 closed custom-panel outlines in the sample export. No actual fabrication or physical installation has been validated.

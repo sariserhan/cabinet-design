@@ -100,6 +100,43 @@ export function PrintPackage({ design }: { design: Design }) {
           {edges
             .filter((edge) => design.room.walls[edge.side])
             .map((edge) => {
+              if (edge.curved) {
+                const maxHeight = Math.max(
+                  design.room.height,
+                  design.room.ceiling?.endHeight ?? 0,
+                );
+                let length = 0;
+                const developed = edge.points.map((p, i) => {
+                  if (i) {
+                    const prev = edge.points[i - 1] ?? p;
+                    length += Math.hypot(p.x - prev.x, p.y - prev.y);
+                  }
+                  return `${length},${maxHeight - ceilingAt(design.room, p.x, p.y)}`;
+                });
+                return (
+                  <section key={edge.index}>
+                    <h3>
+                      Wall {edge.index + 1} · curved · developed length{' '}
+                      {edge.length.toFixed(2)}″
+                    </h3>
+                    <svg
+                      viewBox={`-5 -8 ${edge.length + 10} ${maxHeight + 16}`}
+                    >
+                      <polygon
+                        points={`0,${maxHeight} ${developed.join(' ')} ${edge.length},${maxHeight}`}
+                        fill="#f3f3f3"
+                        stroke="#50636b"
+                        strokeWidth=".6"
+                      />
+                    </svg>
+                    <p>
+                      Developed elevation along sampled curve. Radius is not
+                      constant; see coordinate export.
+                    </p>
+                  </section>
+                );
+              }
+
               const dx = (edge.b.x - edge.a.x) / edge.length,
                 dy = (edge.b.y - edge.a.y) / edge.length;
               const project = (i: Cabinet) => {

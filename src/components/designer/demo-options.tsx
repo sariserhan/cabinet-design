@@ -63,7 +63,11 @@ export function DesignOptions({
         <span>Ceiling shape</span>
         <select
           aria-label="Ceiling shape"
-          value={design.room.ceiling?.axis ?? 'flat'}
+          value={
+            design.room.ceiling?.kind === 'vault'
+              ? 'vault'
+              : (design.room.ceiling?.axis ?? 'flat')
+          }
           onChange={(e) =>
             onChange({
               ...design,
@@ -73,7 +77,11 @@ export function DesignOptions({
                   e.target.value === 'flat'
                     ? undefined
                     : {
-                        axis: e.target.value as 'x' | 'y',
+                        axis:
+                          e.target.value === 'vault'
+                            ? 'x'
+                            : (e.target.value as 'x' | 'y'),
+                        kind: e.target.value === 'vault' ? 'vault' : 'slope',
                         endHeight:
                           design.room.ceiling?.endHeight ??
                           design.room.height + 24,
@@ -83,13 +91,18 @@ export function DesignOptions({
           }
         >
           <option value="flat">Flat</option>
+          <option value="vault">Vaulted (ridge along depth)</option>
           <option value="x">Slope along width</option>
           <option value="y">Slope along depth</option>
         </select>
       </label>
       {design.room.ceiling && (
         <OptionNumber
-          label="Far-end ceiling height (in)"
+          label={
+            design.room.ceiling.kind === 'vault'
+              ? 'Vault peak height (in)'
+              : 'Far-end ceiling height (in)'
+          }
           min={36}
           value={design.room.ceiling.endHeight}
           onChange={(endHeight) =>
@@ -97,7 +110,11 @@ export function DesignOptions({
               ...design,
               room: {
                 ...design.room,
-                ceiling: { axis: design.room.ceiling?.axis ?? 'x', endHeight },
+                ceiling: {
+                  ...design.room.ceiling,
+                  axis: design.room.ceiling?.axis ?? 'x',
+                  endHeight,
+                },
               },
             })
           }
@@ -175,7 +192,9 @@ export function ItemOptions({
           onChange={(rotation) => onChange({ rotation })}
         />
       )}
-      {['cabinet', 'island', 'corner'].includes(item.kind) && (
+      {['cabinet', 'custom_cabinet', 'island', 'corner'].includes(
+        item.kind,
+      ) && (
         <>
           {item.kind === 'corner' && (
             <label className="designer-numeric">

@@ -231,11 +231,9 @@ export function PlanCanvas({
           .filter((edge) => room.walls[edge.side])
           .map((edge) => (
             <g key={edge.index}>
-              <line
-                x1={edge.a.x}
-                y1={edge.a.y}
-                x2={edge.b.x}
-                y2={edge.b.y}
+              <polyline
+                points={edge.points.map((p) => `${p.x},${p.y}`).join(' ')}
+                fill="none"
                 stroke="#667780"
                 strokeWidth="3"
               />

@@ -22,6 +22,8 @@ const icons = {
   island: LayoutPanelTop,
   countertop: LayoutPanelTop,
   corner: LayoutPanelTop,
+  custom_cabinet: LayoutPanelTop,
+  hood: CookingPot,
   filler: LayoutPanelTop,
   trim: LayoutPanelTop,
   molding: LayoutPanelTop,

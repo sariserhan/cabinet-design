@@ -1,6 +1,10 @@
 'use client';
 import { ceilingAt } from '@/designer/room';
-import { localToWorld, wallPanels as buildWallPanels } from '@/designer/model';
+import {
+  localToWorld,
+  partitionPanels,
+  wallPanels as buildWallPanels,
+} from '@/designer/model';
 import { useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import { RotateCcw, RotateCw, Hand, Plus, Minus, Maximize } from 'lucide-react';
@@ -10,7 +14,7 @@ import {
   cutPanels,
   sinkHoles,
 } from '@/designer/model';
-import { roomOutline, roomEdges } from '@/designer/room';
+import { roomOutline, wallSegments } from '@/designer/room';
 import type { Cabinet, Design } from '@/designer/model';
 type Vec = [number, number, number];
 export function Preview({
@@ -106,7 +110,7 @@ export function Preview({
     top = Math.min(...ys) - 10,
     w = Math.max(...xs) - left + 20,
     h = Math.max(...ys) - top + 20;
-  const walls = roomEdges(room)
+  const walls = wallSegments(room)
     .filter((edge) => {
       const normalX = -(edge.b.y - edge.a.y),
         normalY = edge.b.x - edge.a.x;
@@ -118,7 +122,7 @@ export function Preview({
     })
     .map((edge) => ({
       ...edge,
-      key: edge.index,
+      key: edge.segment,
       vertices: [
         [edge.a.x, edge.a.y, 0],
         [edge.b.x, edge.b.y, 0],
@@ -151,6 +155,7 @@ export function Preview({
       const { v, local } = cabinetPoints(item);
       const wood =
         item.kind === 'cabinet' ||
+        item.kind === 'custom_cabinet' ||
         item.kind === 'island' ||
         item.kind === 'door';
       const side = wood ? palette.side : '#a5b3bc',
@@ -358,6 +363,36 @@ export function Preview({
           details: topDetails,
         })),
       ];
+      if (item.kind === 'partition') {
+        surfaces.splice(
+          0,
+          surfaces.length,
+          ...partitionPanels(item, design.items).flatMap((p) => {
+            const v = [
+              local(p.x, 0, p.y),
+              local(p.x + p.width, 0, p.y),
+              local(p.x + p.width, item.depth, p.y),
+              local(p.x, item.depth, p.y),
+              local(p.x, 0, p.y + p.height),
+              local(p.x + p.width, 0, p.y + p.height),
+              local(p.x + p.width, item.depth, p.y + p.height),
+              local(p.x, item.depth, p.y + p.height),
+            ];
+            return [
+              [0, 1, 5, 4],
+              [1, 2, 6, 5],
+              [2, 3, 7, 6],
+              [3, 0, 4, 7],
+              [4, 5, 6, 7],
+            ].map((indices) => ({
+              vertices: indices.map((i) => v[i] ?? ([0, 0, 0] as Vec)),
+              color: '#e5e1d8',
+              front: false,
+              details: [] as Decoration[],
+            }));
+          }),
+        );
+      }
       return surfaces.map((face, index) => ({
         item,
         index,

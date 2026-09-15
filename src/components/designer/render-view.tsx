@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { materialTexture } from './render-textures';
-import { wallPanels } from '@/designer/model';
+import { wallPanels, partitionPanels } from '@/designer/model';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Design } from '@/designer/model';
 import {
@@ -13,7 +13,12 @@ import {
   resolvedFront,
   sinkHoles,
 } from '@/designer/model';
-import { roomEdges, roomOutline, ceilingAt } from '@/designer/room';
+import {
+  wallSegments,
+  roomOutline,
+  ceilingAt,
+  ceilingRegions,
+} from '@/designer/room';
 
 export default function RenderView({ design }: { design: Design }) {
   const host = useRef<HTMLDivElement>(null);
@@ -187,21 +192,24 @@ export default function RenderView({ design }: { design: Design }) {
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
-    if (showCeiling) {
-      const geometry = new THREE.ShapeGeometry(shape),
-        position = geometry.getAttribute('position');
-      for (let i = 0; i < position.count; i++) {
-        const x = position.getX(i),
-          z = -position.getY(i);
-        position.setXYZ(i, x, ceilingAt(design.room, x, z), z);
+    if (showCeiling)
+      for (const region of ceilingRegions(design.room)) {
+        const geometry = new THREE.ShapeGeometry(
+            new THREE.Shape(region.map((p) => new THREE.Vector2(p.x, -p.y))),
+          ),
+          position = geometry.getAttribute('position');
+        for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i),
+            z = -position.getY(i);
+          position.setXYZ(i, x, ceilingAt(design.room, x, z), z);
+        }
+        geometry.computeVertexNormals();
+        const cm = material('#f5f2ec');
+        cm.side = THREE.DoubleSide;
+        const ceiling = new THREE.Mesh(geometry, cm);
+        ceiling.receiveShadow = true;
+        scene.add(ceiling);
       }
-      geometry.computeVertexNormals();
-      const cm = material('#f5f2ec');
-      cm.side = THREE.DoubleSide;
-      const ceiling = new THREE.Mesh(geometry, cm);
-      ceiling.receiveShadow = true;
-      scene.add(ceiling);
-    }
 
     const walls: {
       group: THREE.Group;
@@ -210,7 +218,7 @@ export default function RenderView({ design }: { design: Design }) {
       nx: number;
       nz: number;
     }[] = [];
-    for (const edge of roomEdges(design.room)) {
+    for (const edge of wallSegments(design.room)) {
       if (!design.room.walls[edge.side]) continue;
       const group = new THREE.Group();
       scene.add(group);
@@ -307,8 +315,28 @@ export default function RenderView({ design }: { design: Design }) {
       }
       const cabinet =
         item.kind === 'cabinet' ||
+        item.kind === 'custom_cabinet' ||
         item.kind === 'island' ||
         item.kind === 'corner';
+      if (item.kind === 'partition') {
+        for (const panel of partitionPanels(item, design.items))
+          b(
+            panel.width,
+            panel.height,
+            d,
+            panel.x + panel.width / 2 - w / 2,
+            panel.y + panel.height / 2,
+            0,
+            wall,
+          );
+        continue;
+      }
+      if (item.kind === 'hood') {
+        b(w, 3, d, 0, 1.5, 0, steel);
+        b(w * 0.45, h - 3, d * 0.6, 0, (h + 3) / 2, -d * 0.2, steel);
+        b(w - 2, 0.3, d - 2, 0, 0.1, 0, dark);
+        continue;
+      }
       if (
         [
           'filler',

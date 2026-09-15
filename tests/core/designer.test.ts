@@ -156,7 +156,7 @@ test('all object presets round-trip without pretending to be catalog products', 
   const d = newDesign();
   d.items = objectPresets.map((p) => fromObject(p.kind));
   const restored = parseDesign(JSON.stringify(d));
-  assert.equal(restored.items.length, 17);
+  assert.equal(restored.items.length, 19);
   assert.ok(restored.items.every((i) => i.versionId === 'demo-objects'));
   assert.ok(csvBill(d).includes('Demo object'));
 });
