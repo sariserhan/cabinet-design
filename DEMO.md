@@ -475,3 +475,9 @@ Shared snapshots include the design and project side records; they are separate 
 Live browser QA verified viewer restrictions, editor publishing, stale-save rejection without local overwrite, owner/editor record transfer, purchasing-panel refresh, mobile reload persistence and membership revocation. The teammate test account's access was revoked after testing. The production-mode frontend was tested locally at `http://localhost:3002` against the approved development backend. No public frontend was deployed.
 
 The deployed backend rejects unauthorized and stale writes correctly. Its expected mutation rejections are logged as server errors by the Convex client, which can trigger Next.js's development overlay. A tested follow-up changes these expected publishing rejections to structured responses shown inside the shared-records panel; unexpected failures still throw. This follow-up is committed locally and awaits separate deployment approval.
+
+### Material realism and exposure
+
+Render now uses separate linear surface-detail maps for paint, wood, stone and brushed metal, satin cabinet coatings, polished nonmetallic stone and subtle floorboard color variation. Lighting & scene includes an Exposure slider and Reset exposure. Exposure is a session presentation control and applies to PNG exports; it does not change the saved design's finishes. High quality shadows adds softer shadows and contact shading, with the shading buffer preserving the viewport/export aspect ratio. Keep that option off for faster editing on slower devices.
+
+These are real-time material approximations, not measured manufacturer finishes or a path-traced lighting simulation.

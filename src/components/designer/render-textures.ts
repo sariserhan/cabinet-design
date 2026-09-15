@@ -85,6 +85,16 @@ export function materialTexture(
         ctx.strokeRect(x + 5, y + 5, 246, 118);
       }
   } else if (kind === 'wood' || kind === 'floor' || kind === 'walnut') {
+    // Subtle board-to-board variation under the grain, aligned with the joints.
+    if (kind !== 'wood') {
+      for (let x = 0; x < 512; x += 64) {
+        const offset = (x % 128) * 3;
+        for (let y = offset - 256; y < 512; y += 256) {
+          ctx.fillStyle = `rgba(${random() > 0.5 ? '255,240,211' : '57,35,20'},${0.025 + random() * 0.07})`;
+          ctx.fillRect(x, y, 64, 256);
+        }
+      }
+    }
     for (let i = 0; i < 1100; i++) {
       const x = random() * 512;
       ctx.strokeStyle = `rgba(${random() > 0.5 ? '86,49,19' : '244,218,174'},${0.012 + random() * 0.045})`;
@@ -154,6 +164,44 @@ export function materialTexture(
   }
   const map = new THREE.CanvasTexture(canvas);
   map.colorSpace = THREE.SRGBColorSpace;
+  map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  map.anisotropy = 4;
+  return map;
+}
+
+/** Linear data, separate from the pigment: polished stone veins are not grooves. */
+export function surfaceDetail(kind: 'paint' | 'wood' | 'stone' | 'metal') {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas textures unavailable');
+  const pixels = ctx.createImageData(256, 256);
+  let seed = 1931;
+  for (let y = 0; y < 256; y++) {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    const brush = seed / 4294967296;
+    for (let x = 0; x < 256; x++) {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      const noise = seed / 4294967296;
+      const grain = Math.sin(
+        (x / 256) * Math.PI * 64 + Math.sin((y / 256) * Math.PI * 2),
+      );
+      const value =
+        kind === 'metal'
+          ? 190 + brush * 45
+          : kind === 'wood'
+            ? 190 + grain * 20 + noise * 20
+            : kind === 'paint'
+              ? 215 + noise * 25
+              : 230 + noise * 15;
+      const i = (y * 256 + x) * 4;
+      pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = value;
+      pixels.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(pixels, 0, 0);
+  const map = new THREE.CanvasTexture(canvas);
+  map.colorSpace = THREE.NoColorSpace;
   map.wrapS = map.wrapT = THREE.RepeatWrapping;
   map.anisotropy = 4;
   return map;

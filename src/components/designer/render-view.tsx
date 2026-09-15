@@ -20,7 +20,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { applianceDetails, metalPull } from './render-details';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { apronHeight, closeupViews } from '@/designer/refinements';
-import { materialTexture } from './render-textures';
+import { materialTexture, surfaceDetail } from './render-textures';
 import { wallPanels, partitionPanels } from '@/designer/model';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Design } from '@/designer/model';
@@ -88,6 +88,7 @@ export default function RenderView({
   const host = useRef<HTMLDivElement>(null);
   type View = NonNullable<Design['views']>[number];
   const actions = useRef<{
+    expose: (value: number) => void;
     walk: (forward: number, side: number, turn?: number) => void;
     open: (amount: number) => void;
     fit: () => void;
@@ -103,6 +104,12 @@ export default function RenderView({
     target: THREE.Vector3;
     walking: boolean;
   } | null>(null);
+  const [exposure, setExposure] = useState(1);
+  const exposureRef = useRef(exposure);
+  exposureRef.current = exposure;
+  useEffect(() => {
+    actions.current?.expose(exposure);
+  }, [exposure]);
   const [quality, setQuality] = useState(false),
     [walking, setWalking] = useState(false),
     [opening, setOpening] = useState(0);
@@ -139,7 +146,8 @@ export default function RenderView({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = quality ? THREE.VSMShadowMap : THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.95;
+    renderer.toneMappingExposure = exposureRef.current;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.setAttribute('aria-label', 'Rendered kitchen');
     container.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
@@ -147,11 +155,14 @@ export default function RenderView({
       environmentScene = new RoomEnvironment(),
       environment = pmrem.fromScene(environmentScene, 0.04);
     scene.environment = environment.texture;
-    scene.environmentIntensity = 0.32;
+    scene.environmentIntensity =
+      design.appearance?.lightingProfile === 'task' ? 0.2 : 0.55;
     environmentScene.dispose();
     pmrem.dispose();
     const lighting = design.appearance?.lighting ?? 'daylight';
-    scene.background = new THREE.Color('#e9edf0');
+    scene.background = new THREE.Color(
+      lighting === 'warm' ? '#e8dfd3' : '#e8e9e7',
+    );
     const size = Math.max(
       design.room.width,
       design.room.depth,
@@ -250,9 +261,10 @@ export default function RenderView({
     sun.position.set(-size * 0.4, size * 2, size * 0.8);
     sun.target.position.set(design.room.width / 2, 0, design.room.depth / 2);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(4096, 4096);
+    sun.shadow.mapSize.set(2048, 2048);
     sun.shadow.bias = -0.00005;
-    sun.shadow.radius = 2;
+    sun.shadow.radius = quality ? 4 : 2;
+    sun.shadow.blurSamples = 8;
     Object.assign(sun.shadow.camera, {
       left: -size,
       right: size,
@@ -289,9 +301,16 @@ export default function RenderView({
       ),
     ];
 
+    const detailMaps = {
+      paint: surfaceDetail('paint'),
+      wood: surfaceDetail('wood'),
+      stone: surfaceDetail('stone'),
+      metal: surfaceDetail('metal'),
+    };
+    textures.push(...Object.values(detailMaps));
     const materials: THREE.Material[] = [];
     const material = (color: string, metalness = 0, roughness = 0.65) => {
-      const m = new THREE.MeshStandardMaterial({ color, metalness, roughness });
+      const m = new THREE.MeshPhysicalMaterial({ color, metalness, roughness });
       materials.push(m);
       return m;
     };
@@ -308,11 +327,17 @@ export default function RenderView({
       const inset = material(
         { linen: '#d9d3c6', oak: '#ead5b5', slate: '#34404a' }[name],
       );
+      for (const surface of [finish, inset]) {
+        surface.roughness = name === 'oak' ? 0.48 : 0.36;
+        surface.clearcoat = name === 'oak' ? 0.18 : 0.3;
+        surface.clearcoatRoughness = 0.32;
+        surface.roughnessMap = detailMaps[name === 'oak' ? 'wood' : 'paint'];
+        surface.bumpMap = surface.roughnessMap;
+        surface.bumpScale = name === 'oak' ? 0.025 : 0.006;
+      }
       if (name === 'oak') {
         finish.map = textures[0] ?? null;
         inset.map = textures[0] ?? null;
-        finish.bumpMap = textures[0] ?? null;
-        finish.bumpScale = 0.08;
       }
       const pair = { finish, inset };
       finishMaterials.set(name, pair);
@@ -322,11 +347,14 @@ export default function RenderView({
     const stoneFor = (name: 'quartz' | 'marble' | 'granite') => {
       const cached = stoneMaterials.get(name);
       if (cached) return cached;
-      const m = material('#ffffff', 0.05, 0.23);
+      const m = material('#ffffff', 0, 0.23);
+      m.clearcoat = 0.45;
+      m.clearcoatRoughness = 0.16;
       const texture = materialTexture(name);
       textures.push(texture);
       m.map = texture;
-      m.bumpMap = texture;
+      m.bumpMap = detailMaps.stone;
+      m.roughnessMap = detailMaps.stone;
       m.bumpScale = name === 'granite' ? 0.035 : 0.012;
       m.roughness = name === 'granite' ? 0.32 : 0.2;
       stoneMaterials.set(name, m);
@@ -358,9 +386,20 @@ export default function RenderView({
     textures.push(brushed);
     steel.color.set('#ffffff');
     steel.map = brushed;
-    steel.bumpMap = brushed;
+    steel.bumpMap = detailMaps.metal;
+    steel.roughnessMap = detailMaps.metal;
+    steel.metalness = 0.95;
+    steel.roughness = 0.32;
     steel.bumpScale = 0.008;
-    const floorMaterial = material('#ffffff', 0, 0.7);
+    const floorMaterial = material('#ffffff', 0, 0.52);
+    const woodFloor = !['tile', 'slate'].includes(
+      design.appearance?.flooring ?? 'oak',
+    );
+    floorMaterial.roughnessMap = woodFloor ? detailMaps.wood : detailMaps.stone;
+    floorMaterial.bumpMap = floorMaterial.roughnessMap;
+    floorMaterial.bumpScale = 0.035;
+    floorMaterial.clearcoat = woodFloor ? 0.15 : 0.05;
+    floorMaterial.clearcoatRoughness = 0.4;
     floorMaterial.map = textures[2] ?? null;
 
     const box = (
@@ -1489,7 +1528,11 @@ export default function RenderView({
           postHeight = size.y;
           composer.setPixelRatio(1);
           composer.setSize(size.x, size.y);
-          ao.setSize(Math.min(1280, size.x), Math.min(1280, size.y));
+          const scale = Math.min(1, 1280 / Math.max(size.x, size.y));
+          ao.setSize(
+            Math.max(1, Math.round(size.x * scale)),
+            Math.max(1, Math.round(size.y * scale)),
+          );
         }
         composer.render();
       } else renderer.render(scene, camera);
@@ -1522,6 +1565,10 @@ export default function RenderView({
       }),
     );
     actions.current = {
+      expose: (value) => {
+        renderer.toneMappingExposure = value;
+        render();
+      },
       walk: step,
       open: (amount) => {
         targetOpening = amount;
@@ -1737,6 +1784,21 @@ export default function RenderView({
                 <option value="studio">Studio</option>
               </select>
             </label>{' '}
+            <label>
+              Exposure · {exposure.toFixed(2)}
+              <input
+                aria-label="Render exposure"
+                type="range"
+                min="0.5"
+                max="1.8"
+                step="0.05"
+                value={exposure}
+                onChange={(e) => setExposure(Number(e.target.value))}
+              />
+            </label>
+            <button type="button" onClick={() => setExposure(1)}>
+              Reset exposure
+            </button>
             <label>
               <input
                 type="checkbox"
