@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  materialProfileSchema,
+  materialMatches,
+} from './trade-material-catalog';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import type { Design } from './model';
@@ -22,6 +26,8 @@ const money = z.number().finite().min(0).max(1000000);
 export const tradeInputSchema = z
   .object({
     included: z.boolean(),
+    materialCatalog: materialProfileSchema.optional(),
+    tileApplication: z.enum(['wall', 'floor']).optional(),
     product: z.string().max(160),
     supplier: z.string().max(160),
     reference: z.string().max(500),
@@ -387,6 +393,26 @@ export function estimateTrade(
     room = roomTakeoff(d);
   const issues: string[] = [],
     assumptions: string[] = [];
+  if (s.materialCatalog) {
+    const m = s.materialCatalog;
+    assumptions.push(
+      `Material catalog: ${m.manufacturer} · ${m.name}. Source checked ${m.checkedAt}: ${m.source}`,
+      m.note,
+      materialMatches(s)
+        ? 'Product and estimating specifications match the selected profile.'
+        : 'Customized product or specifications; confirm changes with your supplier.',
+    );
+    if (m.trade !== trade)
+      issues.push('Selected material belongs to a different trade.');
+    if (
+      trade === 'tile' &&
+      m.wallOnly &&
+      (s.areaSource === 'room' || s.tileApplication === 'floor')
+    )
+      issues.push(
+        'This catalog tile is wall-only. Select a floor-rated product for floor areas.',
+      );
+  }
   const lines: EstimateLine[] = [];
   let grossArea = 0,
     purchaseQuantity = 0,
@@ -578,6 +604,10 @@ export function tradeCsv(d: Design, t: Trade, s: TradeInput) {
       'Unit',
       'Rate USD',
       'Amount USD',
+      'Product',
+      'Material source',
+      'Source checked',
+      'Catalog status',
     ],
     ...r.lines.map((l) => [
       tradeNames[t],
@@ -588,6 +618,14 @@ export function tradeCsv(d: Design, t: Trade, s: TradeInput) {
       l.unit,
       l.rate,
       l.cents === null ? '' : (l.cents / 100).toFixed(2),
+      s.product,
+      s.materialCatalog?.source ?? '',
+      s.materialCatalog?.checkedAt ?? '',
+      s.materialCatalog
+        ? materialMatches(s)
+          ? 'Profile specifications'
+          : 'Customized'
+        : 'Custom material',
     ]),
   ]
     .map((row) => row.map(safe).join(','))
@@ -623,7 +661,7 @@ export function tradeHtml(d: Design, t: Trade, s: TradeInput) {
               .join('')}</svg></figure>`,
         ).join('')}`
       : '';
-  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(tradeNames[t])} estimate</title><style>body{font:14px/1.5 Arial;color:#203d3b;max-width:1000px;margin:30px auto;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #bcccca;text-align:left}p{white-space:pre-wrap;overflow-wrap:anywhere}@media print{button{display:none}@page{margin:15mm}tr{break-inside:avoid}}</style></head><body><button onclick="print()">Print / save PDF</button><h1>${esc(tradeNames[t])} · ${esc(d.name)}</h1><p>ESTIMATE DRAFT · USD · taxes excluded<br>Generated ${new Date().toISOString().slice(0, 10)}<br>Design ${tradeFingerprint(d)} · Settings ${tradeFingerprint(s)}</p><p>Product: ${esc(s.product || 'Not specified')}<br>Supplier: ${esc(s.supplier || 'Not specified')}<br>Price reference: ${esc(s.reference || 'Not specified')}</p><p>Gross ${r.grossArea.toFixed(2)} sq ft · Net ${r.netArea.toFixed(2)} sq ft · Purchase ${r.purchaseQuantity} ${r.purchaseUnit}</p><table><thead><tr><th>Description</th><th>Quantity</th><th>Rate USD</th><th>Amount</th></tr></thead><tbody>${r.lines.map((l) => `<tr><td>${esc(l.label)}</td><td>${l.quantity.toFixed(2)} ${esc(l.unit)}</td><td>${l.rate === null ? '—' : l.rate.toFixed(2)}</td><td>${price(l.cents)}</td></tr>`).join('')}</tbody></table><h2>${price(r.totalCents)}</h2>${r.issues.map((x) => `<p>${esc(x)}</p>`).join('')}<h2>Assumptions & scope</h2><ul>${r.assumptions.map((x) => `<li>${esc(x)}</li>`).join('')}</ul><p>${esc(s.notes)}</p>${slabDrawings}${s.areaSource === 'zones' && (t === 'tile' || t === 'flooring') ? `<h2>Measured areas</h2><table><thead><tr><th>Area</th><th>Length (in)</th><th>Width / height (in)</th><th>Gross sq ft</th></tr></thead><tbody>${s.zones.map((z) => `<tr><td>${esc(z.name)}</td><td>${z.length}</td><td>${z.width}</td><td>${((z.length * z.width) / 144).toFixed(2)}</td></tr>`).join('')}</tbody></table>` : ''}</body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(tradeNames[t])} estimate</title><style>body{font:14px/1.5 Arial;color:#203d3b;max-width:1000px;margin:30px auto;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #bcccca;text-align:left}p{white-space:pre-wrap;overflow-wrap:anywhere}li{overflow-wrap:anywhere}@media print{button{display:none}@page{margin:15mm}tr{break-inside:avoid}}</style></head><body><button onclick="print()">Print / save PDF</button><h1>${esc(tradeNames[t])} · ${esc(d.name)}</h1><p>ESTIMATE DRAFT · USD · taxes excluded<br>Generated ${new Date().toISOString().slice(0, 10)}<br>Design ${tradeFingerprint(d)} · Settings ${tradeFingerprint(s)}</p><p>Product: ${esc(s.product || 'Not specified')}<br>Supplier: ${esc(s.supplier || 'Not specified')}<br>Price reference: ${esc(s.reference || 'Not specified')}</p><p>Gross ${r.grossArea.toFixed(2)} sq ft · Net ${r.netArea.toFixed(2)} sq ft · Purchase ${r.purchaseQuantity} ${r.purchaseUnit}</p><table><thead><tr><th>Description</th><th>Quantity</th><th>Rate USD</th><th>Amount</th></tr></thead><tbody>${r.lines.map((l) => `<tr><td>${esc(l.label)}</td><td>${l.quantity.toFixed(2)} ${esc(l.unit)}</td><td>${l.rate === null ? '—' : l.rate.toFixed(2)}</td><td>${price(l.cents)}</td></tr>`).join('')}</tbody></table><h2>${price(r.totalCents)}</h2>${r.issues.map((x) => `<p>${esc(x)}</p>`).join('')}<h2>Assumptions & scope</h2><ul>${r.assumptions.map((x) => `<li>${esc(x)}</li>`).join('')}</ul><p>${esc(s.notes)}</p>${slabDrawings}${s.areaSource === 'zones' && (t === 'tile' || t === 'flooring') ? `<h2>Measured areas</h2><table><thead><tr><th>Area</th><th>Length (in)</th><th>Width / height (in)</th><th>Gross sq ft</th></tr></thead><tbody>${s.zones.map((z) => `<tr><td>${esc(z.name)}</td><td>${z.length}</td><td>${z.width}</td><td>${((z.length * z.width) / 144).toFixed(2)}</td></tr>`).join('')}</tbody></table>` : ''}</body></html>`;
 }
 
 export function slabCutCsv(d: Design, s: TradeInput) {

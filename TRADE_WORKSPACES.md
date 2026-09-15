@@ -49,3 +49,22 @@ The HTML export opens independently and has a **Print / save PDF** button. CSV e
 ## Field acceptance still required
 
 Reconcile one real job per trade against an independent takeoff, supplier packaging/coverage and installer/fabricator quote. Confirm physical slab layout and cutting feasibility, selected wall deductions, overlapping zones, preparation scope and labor rates. Automated tests establish the implemented calculations and state handling; they do not certify those real-world inputs.
+
+## Manufacturer material catalog
+
+Each trade has a searchable starter catalog above the manual product fields:
+
+| Trade | Profiles | Applied estimating data |
+| --- | --- | --- |
+| Countertops | Cambria Carrick, Brittanicca | Nominal 132 × 65.5 in slab |
+| Flooring | COREtec Butterscotch Oak CR504_04069, Calypso Oak VV012_00761 | 17.8 and 23.64 sq ft per carton respectively |
+| Painting | Benjamin Moore Regal Select Interior Matte N548 | 400 sq ft / gallon / coat (lower end of published 400–450 range) |
+| Tile & backsplash | Daltile Rittenhouse Square plain 3 × 6 wall tile | 100 pieces / box; nominal 12.5 sq ft / box |
+
+These six profiles are a starter selection, not complete manufacturer catalogs or live availability feeds. Primary manufacturer URLs and source-check dates (2026-09-15) are recorded in `src/designer/trade-material-catalog.ts` and shown in the picker. Daltile's linked sheet is dated 2019: confirm current availability and packaging. No manufacturer artwork is copied, and no dealer pricing is supplied.
+
+Selecting a material applies only its listed measurement fields, records a source snapshot, and clears the previous material price and price reference. Job measurements, labor, supplier, waste and fabrication assumptions remain editable. Color/base, finish, thickness and order availability require supplier confirmation. These selections feed estimates; they do not change the 3D materials.
+
+Edits to the selected product name or applied measurements are labeled customized. Wall-only tile blocks priced estimates for room floors or measured zones marked Floor. Use as custom material explicitly removes the catalog association while preserving entered measurements. Selecting any new product invalidates the previously saved estimate.
+
+Source snapshots survive local saves, trade settings imports/exports and complete project backups. Printable estimates include source details and caveats; quantity CSV includes product, source, source date and customization status. Shared cloud publishing continues to exclude local trade settings.

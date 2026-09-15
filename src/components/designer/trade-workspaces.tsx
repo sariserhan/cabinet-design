@@ -20,6 +20,7 @@ import {
 } from '@/designer/trade-estimates';
 import { projectDataChanged } from '@/designer/local-project-events';
 import { downloadJson } from './business-tools';
+import { TradeMaterialPicker } from './trade-material-picker';
 export function TradeWorkspaces({
   design,
   ownerId,
@@ -255,6 +256,26 @@ export function TradeWorkspaces({
           />{' '}
           Include {tradeNames[active]} in combined estimate
         </label>
+        <TradeMaterialPicker
+          key={active}
+          trade={active}
+          input={input}
+          onChange={patch}
+        />
+        {active === 'tile' && input.areaSource === 'zones' && (
+          <label>
+            Tile application
+            <select
+              value={input.tileApplication ?? 'wall'}
+              onChange={(e) =>
+                patch({ tileApplication: e.target.value as 'wall' | 'floor' })
+              }
+            >
+              <option value="wall">Wall / backsplash</option>
+              <option value="floor">Floor</option>
+            </select>
+          </label>
+        )}
         <div className="trade-fields">
           {text('product', 'Material / product')}
           {text('supplier', 'Trade supplier')}

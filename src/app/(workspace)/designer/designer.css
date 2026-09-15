@@ -1340,3 +1340,53 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .trade-table { overflow:auto; }.trade-table table { width:100%; border-collapse:collapse; }.trade-table td,.trade-table th { padding:8px; text-align:left; border-bottom:1px solid var(--studio-line); }
 .trade-content .designer-row { margin:14px 0; }.trade-status { padding:10px; background:#f4f1e6; overflow-wrap:anywhere; }.trade-notes textarea { min-height:80px; }
 @media(max-width:700px){.trade-fields,.trade-slabs{grid-template-columns:1fr}.trade-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.trade-content{padding:12px}.trade-piece{display:block}.trade-piece span{display:block;margin-top:8px}.trade-tabs button{flex:1 1 40%}}
+
+
+.trade-material-picker {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--border, #cbd5d1);
+  border-radius: 12px;
+  min-width: 0;
+}
+.trade-material-picker legend {
+  font-weight: 700;
+  padding: 0 6px;
+}
+.trade-material-picker label {
+  display: grid;
+  gap: 6px;
+}
+.trade-material-picker input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.trade-material-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+.trade-material-list article {
+  padding: 14px;
+  border: 1px solid var(--border, #cbd5d1);
+  border-radius: 8px;
+  min-width: 0;
+}
+.trade-material-list h4 {
+  margin: 0 0 8px;
+}
+.trade-material-list p {
+  font-size: 13px;
+}
+.trade-material-list small {
+  display: block;
+  margin: 6px 0 12px;
+}
+.trade-material-picker button {
+  white-space: normal;
+}
+.trade-material-picker a,
+.trade-material-picker p {
+  overflow-wrap: anywhere;
+}
