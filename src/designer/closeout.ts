@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Purchasing } from './purchasing';
 import { type Design, parseDesign } from './model';
 import { canonical } from './installer-handoff';
 import { reviewContent } from './project-workflow';
@@ -107,13 +108,38 @@ export function starterCloseout(designId: string, room: string): Closeout {
     })),
   };
 }
-export function fieldPackage(d: Design, c: Closeout) {
-  return {
+export function fieldPackage(d: Design, c: Closeout, purchasing?: Purchasing) {
+  const result = {
     format: 'kitchen-field-v1' as const,
     exportedAt: new Date().toISOString(),
     designJson: JSON.stringify(d),
     source: c,
+    ...(purchasing
+      ? {
+          purchases: purchasing.purchases.map((p) => ({
+            id: p.id,
+            number: p.number,
+            items: parseDesign(p.designJson).items.map((i) => ({
+              id: i.id,
+              sku: i.sku,
+              x: i.x,
+              y: i.y,
+              elevation: i.elevation,
+              rotation: i.rotation,
+              width: i.width,
+              depth: i.depth,
+              height: i.height,
+            })),
+            receipts: p.receipts,
+          })),
+        }
+      : {}),
   };
+  if (JSON.stringify(result).length > 2300000)
+    throw Error(
+      'Field package exceeds 2.3 MB. Export a single draft’s package from QR delivery labels.',
+    );
+  return result;
 }
 export function mergeFieldReport(
   raw: string,

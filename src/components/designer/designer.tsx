@@ -936,6 +936,15 @@ function Editor({ ownerId }: { ownerId: string }) {
       </nav>
       <ProjectHub
         key={`hub:${design.id}`}
+        selectedIds={selection.length ? selection : selected ? [selected] : []}
+        onApply={(next) => commit(() => next, true)}
+        onLocate={(id) => {
+          setSelected(id);
+          setMode('2d');
+          document
+            .getElementById('design-workspace')
+            ?.scrollIntoView({ behavior: 'smooth' });
+        }}
         design={design}
         ownerId={ownerId}
         onRestore={(next) => {

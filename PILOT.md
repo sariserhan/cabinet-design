@@ -65,3 +65,14 @@ Automated fixtures remain synthetic. These steps do not establish real-world sup
 - Navigate key flows with keyboard only; check focus visibility, skip links, tab-list arrow keys and mobile touch controls. Check the actual field device’s browser and storage retention before taking it on site.
 
 Synthetic browser QA exercises offline reloads and report transfer. A real installation, supplier fulfillment, OS install prompts and a comprehensive assistive-technology audit remain pilot work.
+
+## Product support acceptance
+
+- Enter real manufacturer rules from a cited current specification, review the source, and check one matching and one incompatible cabinet/component pair. Confirm absent rules remain unverified and imports clear prior reviews.
+- Measure a straight-wall run on site. Enter fillers, survey uncertainty and wall unevenness; reconcile the remaining end space with the installer. Change room geometry and verify the old measurement becomes unverified.
+- Obtain an actual supplier replacement proposal. Compare dimensions, finish, configuration, affected neighbors and product-price difference against the immutable draft. Revise and review the design separately if the replacement is selected.
+- Capture a frequently used assembly and place it in a separate project. Check host links, finishes, new item identities, overlap rejection and Undo. Confirm service locations need fresh site measurements.
+- Print a QR label at 100%, scan it with the intended phone camera and reachable hosted address, and import the matching field package. Verify exact item/order identity, original location, delivery evidence and an offline reload. Confirm an unrelated package does not open another item. Refresh packages when delivery records change.
+- Record a real warranty and follow-up visit, assign a replacement part and attach evidence. Export/restore a complete backup and reconcile all records and attached assembly templates.
+
+Automated tests use synthetic specifications and QR decoding. Real manufacturer verification, physical label printing/camera scanning, reachable production hosting and actual supplier/installer acceptance remain field-pilot tasks.

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { replacementSchema } from './replacement-schema';
 const date = z
   .string()
   .refine(
@@ -23,6 +24,7 @@ export const supplierConfirmationSchema = z.object({
         substituteSku: z.string().max(100),
         substitution: z.enum(['none', 'proposed', 'accepted', 'rejected']),
         note: z.string().max(2000),
+        replacement: replacementSchema.optional(),
       }),
     )
     .max(100),

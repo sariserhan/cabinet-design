@@ -25,6 +25,14 @@ import {
   writeLocalBatch,
 } from '@/designer/local-project-events';
 import { downloadJson } from './business-tools';
+import { ProductChecks } from './product-checks';
+import { AftercareTools } from './aftercare-tools';
+import { AssemblyLibrary } from './assembly-library';
+import {
+  emptySupport,
+  parseSupport,
+  type ProductSupport,
+} from '@/designer/product-support';
 import { CloseoutTools } from './closeout-tools';
 export function openProjectTool(label: string) {
   const target =
@@ -45,10 +53,16 @@ export function ProjectHub({
   design,
   ownerId,
   onRestore,
+  onApply,
+  selectedIds,
+  onLocate,
 }: {
   design: Design;
   ownerId: string;
   onRestore: (d: Design) => void;
+  onApply: (d: Design) => void;
+  selectedIds: string[];
+  onLocate: (id: string) => void;
 }) {
   const books = useQuery(api.supplierPricing.list, {}),
     stored =
@@ -99,6 +113,25 @@ export function ProjectHub({
     setBundle({ ...bundle, closeout: checked });
     projectDataChanged();
   }
+  function saveSupport(next: ProductSupport) {
+    if (!bundle) throw Error('Project records are not loaded.');
+    const key = `kitchen-product-support:${ownerId}:${design.id}`;
+    const raw = localStorage.getItem(key);
+    const current = raw
+      ? parseSupport(raw, design.id, true)
+      : emptySupport(design.id);
+    if (
+      canonical(current) !==
+      canonical(bundle.support ?? emptySupport(design.id))
+    )
+      throw Error(
+        'Product support changed in another tab. Refresh before editing.',
+      );
+    const checked = parseSupport(JSON.stringify(next), design.id, true);
+    localStorage.setItem(key, JSON.stringify(checked));
+    setBundle({ ...bundle, support: checked });
+    projectDataChanged();
+  }
   function restore() {
     if (!pending) return;
     try {
@@ -127,6 +160,11 @@ export function ProjectHub({
         [`kitchen-directory:${ownerId}`, JSON.stringify(updatedDirectory)],
         [`kitchen-studio:${ownerId}:draft`, JSON.stringify(b.design)],
       ];
+      if (b.support)
+        entries.push([
+          `kitchen-product-support:${ownerId}:${id}`,
+          JSON.stringify(b.support),
+        ]);
       if (b.priceBook)
         entries.push([
           `kitchen-restored-price:${ownerId}:${id}`,
@@ -188,8 +226,9 @@ export function ProjectHub({
         <p>
           One file includes the current design, selections, site photos, local
           revision history, purchasing and supplier records, closeout,
-          organization and a supplier price reference. Cloud-only revisions and
-          catalog source documents are not included.
+          organization, product checks, aftercare, project assembly templates
+          and a supplier price reference. Cloud-only revisions and catalog
+          source documents are not included.
         </p>
         <div className="designer-row">
           <button
@@ -268,6 +307,34 @@ export function ProjectHub({
         )}
       </details>
       {bundle && (
+        <>
+          <ProductChecks
+            design={design}
+            value={bundle.support ?? emptySupport(design.id)}
+            onChange={saveSupport}
+            onLocate={onLocate}
+          />
+          <AssemblyLibrary
+            design={design}
+            ownerId={ownerId}
+            selectedIds={selectedIds}
+            attached={bundle.support?.assemblies ?? []}
+            onAttach={(assemblies) =>
+              saveSupport({
+                ...(bundle.support ?? emptySupport(design.id)),
+                assemblies,
+              })
+            }
+            onApply={onApply}
+          />
+          <AftercareTools
+            design={design}
+            value={bundle.support ?? emptySupport(design.id)}
+            onChange={saveSupport}
+          />
+        </>
+      )}
+      {bundle && (
         <CloseoutTools
           design={design}
           value={bundle.closeout}
@@ -286,11 +353,15 @@ export function ProjectHub({
           <button
             disabled={!bundle}
             onClick={() => {
-              if (bundle)
-                downloadJson(
-                  fieldPackage(design, bundle.closeout),
-                  'kitchen-field-package.json',
-                );
+              try {
+                if (bundle)
+                  downloadJson(
+                    fieldPackage(design, bundle.closeout, bundle.purchasing),
+                    'kitchen-field-package.json',
+                  );
+              } catch (error) {
+                setMessage((error as Error).message);
+              }
             }}
           >
             Download field package

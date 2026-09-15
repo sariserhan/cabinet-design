@@ -55,6 +55,7 @@ export function dashboardSummary(b: ProjectBackup, now = Date.now()) {
   }
   const site = d.siteTasks?.filter((t) => t.status !== 'resolved').length ?? 0,
     punch = b.closeout.tasks.filter((t) => t.status !== 'done').length;
+  const service = b.support?.cases.filter((c) => c.status !== 'resolved') ?? [];
   const rows = [
     {
       id: 'approval',
@@ -85,6 +86,13 @@ export function dashboardSummary(b: ProjectBackup, now = Date.now()) {
       count: shortages + pending,
       detail: `${shortages} missing/damaged · ${pending} pending · ${overdue} overdue lines`,
       target: 'Orders, changes & deliveries',
+    },
+    {
+      id: 'aftercare',
+      title: 'Aftercare',
+      count: service.length,
+      detail: `${service.filter((c) => c.visit && c.visit <= today).length} visits due · ${service.filter((c) => c.status === 'waiting_parts').length} waiting for parts`,
+      target: 'Aftercare, warranties & service visits',
     },
     {
       id: 'closeout',

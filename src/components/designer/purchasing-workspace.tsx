@@ -1,4 +1,5 @@
 'use client';
+import { DeliveryLabelTools } from './delivery-label-tools';
 import { SupplierConfirmations } from './supplier-confirmations';
 import { projectDataChanged } from '@/designer/local-project-events';
 import { compactPhoto } from './compact-photo';
@@ -526,6 +527,11 @@ function PurchasingTools({
             )}
             {purchase && (
               <article className="purchase-card">
+                <DeliveryLabelTools
+                  purchase={purchase}
+                  design={design}
+                  ownerId={ownerId}
+                />
                 <SupplierConfirmations
                   purchase={purchase}
                   onChange={(confirmation) =>

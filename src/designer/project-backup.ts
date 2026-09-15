@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  productSupportSchema,
+  parseSupport,
+  emptySupport,
+} from './product-support';
 import { designSchema, type Design, parseDesign } from './model';
 import {
   type Milestone,
@@ -28,6 +33,7 @@ export const projectBackupSchema = z.object({
   closeout: closeoutSchema,
   organization: directoryEntrySchema,
   priceBook: priceBookSchema.optional(),
+  support: productSupportSchema.optional(),
 });
 export type ProjectBackup = z.infer<typeof projectBackupSchema>;
 export function parseProjectBackup(
@@ -52,6 +58,9 @@ export function parseProjectBackup(
     trustedLocal,
   );
   b.closeout = parseCloseout(JSON.stringify(b.closeout), id, trustedLocal);
+  b.support = b.support
+    ? parseSupport(JSON.stringify(b.support), id, trustedLocal)
+    : emptySupport(id);
   return b;
 }
 export function collectProjectBackup(
@@ -87,6 +96,12 @@ export function collectProjectBackup(
   const restored = storage.getItem(
     `kitchen-restored-price:${ownerId}:${design.id}`,
   );
+  const supportRaw = storage.getItem(
+    `kitchen-product-support:${ownerId}:${design.id}`,
+  );
+  const support = supportRaw
+    ? parseSupport(supportRaw, design.id, true)
+    : emptySupport(design.id);
   return parseProjectBackup(
     JSON.stringify({
       format: 'kitchen-project-backup-v1',
@@ -96,6 +111,7 @@ export function collectProjectBackup(
       purchasing,
       closeout,
       organization,
+      support,
       ...(restored && !design.supplierBookId
         ? { priceBook: JSON.parse(restored) }
         : priceBook
@@ -140,6 +156,7 @@ export function restoreProjectCopy(
   if (b.purchasing.baselineReference)
     b.purchasing.baselineReference = remap(b.purchasing.baselineReference);
   b.closeout = { ...b.closeout, designId: newId };
+  if (b.support) b.support = { ...b.support, designId: newId };
   b.organization = { ...b.organization, archived: false, status: 'draft' };
   delete b.organization.indexedRevision;
   return parseProjectBackup(JSON.stringify(b));

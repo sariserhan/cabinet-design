@@ -1,4 +1,4 @@
-const CACHE = 'kitchen-field-shell-v1';
+const CACHE = 'kitchen-field-shell-v2';
 const ASSETS = [
   '/field/index.html',
   '/field/field.css',

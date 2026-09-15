@@ -1272,3 +1272,11 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 @media(max-width:600px) { .project-hub { padding:12px; } .project-hub-cards { grid-template-columns:1fr; } }
 .project-hub-cards button { white-space:normal; min-width:0; }
 .project-hub-cards :is(span,small) { max-width:100%; overflow-wrap:anywhere; }
+
+.support-panel input, .support-panel select, .support-panel textarea { width:100%; min-width:0; max-width:100%; }
+.support-panel label { display:flex; flex-direction:column; gap:6px; margin:12px 0; min-width:0; }
+.support-panel .support-check { flex-direction:row; align-items:center; gap:10px; }
+.support-panel .support-check input { width:auto; flex-shrink:0; }
+.support-panel fieldset { min-width:0; border:1px solid #c9d7ca; border-radius:10px; padding:14px; }
+.support-panel form { margin:16px 0; }
+.support-panel img { max-width:100%; height:auto; }

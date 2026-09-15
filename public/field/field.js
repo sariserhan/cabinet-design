@@ -75,6 +75,52 @@ function validatePackage(p) {
   )
     throw Error('Invalid project design.');
   validateCloseout(p.source, d.id);
+  if (p.purchases !== undefined) {
+    if (!Array.isArray(p.purchases) || p.purchases.length > 10)
+      throw Error('Invalid order records.');
+    const ids = new Set();
+    for (const order of p.purchases) {
+      if (
+        typeof order.id !== 'string' ||
+        !order.id ||
+        ids.has(order.id) ||
+        typeof order.number !== 'string' ||
+        !Array.isArray(order.items) ||
+        order.items.length > 100 ||
+        !Array.isArray(order.receipts) ||
+        order.receipts.length > 100
+      )
+        throw Error('Invalid order snapshot.');
+      ids.add(order.id);
+      const itemIds = new Set();
+      for (const item of order.items) {
+        if (
+          typeof item.id !== 'string' ||
+          itemIds.has(item.id) ||
+          typeof item.sku !== 'string' ||
+          ['x', 'y', 'elevation', 'rotation', 'width', 'depth', 'height'].some(
+            (key) => !Number.isFinite(item[key]),
+          )
+        )
+          throw Error('Invalid labeled item.');
+        itemIds.add(item.id);
+      }
+      for (const receipt of order.receipts) {
+        if (
+          !itemIds.has(receipt.itemId) ||
+          !['pending', 'received', 'missing', 'damaged'].includes(
+            receipt.status,
+          ) ||
+          typeof receipt.note !== 'string' ||
+          (receipt.photo &&
+            (typeof receipt.photo !== 'string' ||
+              receipt.photo.length > 12000 ||
+              !photoPattern.test(receipt.photo)))
+        )
+          throw Error('Invalid delivery record.');
+      }
+    }
+  }
   return d;
 }
 function persist(next) {
@@ -183,6 +229,77 @@ async function photo(file) {
     bitmap.close();
   }
 }
+function labelTarget() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  return params.has('item')
+    ? {
+        project: params.get('project'),
+        purchase: params.get('purchase'),
+        item: params.get('item'),
+      }
+    : null;
+}
+function showLabelRecord(record) {
+  const area = $('label-record'),
+    target = labelTarget();
+  area.replaceChildren();
+  area.hidden = !target;
+  if (!target) return;
+  const order = record.package.purchases?.find((p) => p.id === target.purchase),
+    item = order?.items.find((i) => i.id === target.item);
+  if (target.project !== selected || !order || !item) {
+    area.append(
+      node(
+        'p',
+        'This label is not in the selected device package. Import the field package for this exact purchase draft.',
+      ),
+    );
+    return;
+  }
+  const receipt = order.receipts.find((r) => r.itemId === item.id);
+  area.append(
+    node('h2', `Scanned item: ${item.sku}`),
+    node(
+      'p',
+      `Purchase ${order.number} · ${item.width}×${item.depth}×${item.height} in`,
+    ),
+    node(
+      'p',
+      `Ordered location: X ${item.x}, Y ${item.y}, elevation ${item.elevation} in`,
+    ),
+    node(
+      'p',
+      `Delivery: ${receipt?.status ?? 'pending'} · ${receipt?.note ?? 'No delivery note recorded'}`,
+    ),
+    node(
+      'p',
+      `Downloaded ${record.package.exportedAt}. This is a device snapshot, not a live delivery update.`,
+    ),
+  );
+  if (receipt?.photo) {
+    const img = node('img');
+    img.src = receipt.photo;
+    img.alt = `Delivery evidence for ${item.sku}`;
+    area.append(img);
+  }
+  const link = node('a', 'Open project installation checklist');
+  link.href = '#tasks';
+  area.append(link);
+}
+function openLabel() {
+  const target = labelTarget();
+  if (!target) return;
+  if (!Object.hasOwn(records, target.project)) {
+    selected = '';
+    render();
+    message('Import the matching field package to open this QR label.');
+    return;
+  }
+  selected = target.project;
+  render();
+  $('label-record').scrollIntoView();
+  $('label-record').focus();
+}
 function renderProject() {
   const focused = $('tasks').contains(document.activeElement)
     ? document.activeElement.getAttribute('aria-label')
@@ -196,6 +313,7 @@ function renderProject() {
   $('room').textContent =
     `${d.room.width} × ${d.room.depth} × ${d.room.height} in · downloaded ${r.package.exportedAt}`;
   syncLabel(r);
+  showLabelRecord(r);
   $('items').replaceChildren(
     ...d.items.map((i) =>
       node(
@@ -292,7 +410,7 @@ $('import').onchange = async (event) => {
     if (file.size > 2300000) throw Error('Field package exceeds 2.3 MB.');
     const p = JSON.parse(await file.text()),
       d = validatePackage(p);
-    if (records[d.id])
+    if (Object.hasOwn(records, d.id))
       throw Error(
         'This project is already on the device. Export its findings and remove the device copy before importing a newer package.',
       );
@@ -307,6 +425,7 @@ $('import').onchange = async (event) => {
     selected = d.id;
     render();
     message('Project saved on this device.');
+    openLabel();
   } catch (e) {
     message(e.message);
   }
@@ -409,6 +528,8 @@ try {
     `Could not load device records: ${e.message}. Existing data retained.`,
   );
 }
+window.addEventListener('hashchange', openLabel);
+openLabel();
 window.addEventListener('online', connectivity);
 window.addEventListener('offline', connectivity);
 offlineReady();

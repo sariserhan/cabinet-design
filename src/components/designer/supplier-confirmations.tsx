@@ -1,4 +1,5 @@
 'use client';
+import { ReplacementComparison } from './replacement-comparison';
 import { type Purchase, purchaseLines } from '@/designer/purchasing';
 import { parseDesign } from '@/designer/model';
 import {
@@ -172,6 +173,19 @@ export function SupplierConfirmations({
                 />
               </label>
             </div>
+            <ReplacementComparison
+              key={`${purchase.id}:${line.id}`}
+              purchase={purchase}
+              lineId={line.id}
+              sku={c?.substituteSku ?? ''}
+              value={c?.replacement}
+              onSave={(replacement) =>
+                updateLine(line.id, {
+                  replacement,
+                  substituteSku: replacement.sku,
+                })
+              }
+            />
           </section>
         );
       })}
