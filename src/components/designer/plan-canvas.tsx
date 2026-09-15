@@ -9,6 +9,9 @@ import {
   resolvedFront,
 } from '@/designer/model';
 import { roomOutline, roomEdges } from '@/designer/room';
+import { snapPlacement, clearanceZones } from '@/designer/editing';
+import type { DropItem } from '@/designer/editing';
+import { parseDrop } from '@/designer/drop';
 import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
 
@@ -20,8 +23,13 @@ type Props = {
   snap: boolean;
   zoom: number;
   warningIds: Set<string>;
+  issueIds:Set<string>;
   panMode: boolean;
   moveTogether: boolean;
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+  showClearance: boolean;
+  onDropItem: (item: DropItem, point: { x: number; y: number }) => void;
 };
 export function PlanCanvas({
   design,
@@ -30,9 +38,13 @@ export function PlanCanvas({
   onMove,
   snap,
   zoom,
-  warningIds,
+  warningIds,issueIds,
   panMode,
   moveTogether,
+  selectedIds,
+  onToggle,
+  showClearance,
+  onDropItem,
 }: Props) {
   const svg = useRef<SVGSVGElement>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -86,7 +98,7 @@ export function PlanCanvas({
   } | null>(null);
   const { room } = design,
     padding = 28;
-  function coordinates(event: PointerEvent) {
+  function coordinates(event: { clientX: number; clientY: number }) {
     const root = svg.current,
       matrix = root?.getScreenCTM();
     if (!root || !matrix) return { x: 0, y: 0 };
@@ -98,6 +110,11 @@ export function PlanCanvas({
   function start(event: PointerEvent<SVGGElement>, item: Cabinet) {
     if (event.button !== 0 || panMode || space) return;
     event.stopPropagation();
+    if (event.shiftKey) {
+      event.preventDefault();
+      onToggle(item.id);
+      return;
+    }
     onSelect(item.id);
     event.currentTarget.focus();
     const p = coordinates(event);
@@ -141,7 +158,13 @@ export function PlanCanvas({
     const item = design.items.find((i) => i.id === drag.id);
     if (!item) return;
     const p = coordinates(event),
-      position = snapPosition(item, room, p.x - drag.dx, p.y - drag.dy, snap);
+      position = snapPlacement(
+        item,
+        design,
+        p.x - drag.dx,
+        p.y - drag.dy,
+        snap,
+      );
     setDrag({ ...drag, ...position });
   }
   function end() {
@@ -188,6 +211,19 @@ export function PlanCanvas({
         aria-label="Interactive kitchen floor plan"
         viewBox={`${room.width / 2 - (room.width + padding * 2) / zoom / 2 + pan.x} ${room.depth / 2 - (room.depth + padding * 2) / zoom / 2 + pan.y} ${(room.width + padding * 2) / zoom} ${(room.depth + padding * 2) / zoom}`}
         style={{ width: '100%', minHeight: 0, touchAction: 'none' }}
+        onDragOver={(e) => {
+          if (e.dataTransfer.types.includes('application/x-kitchen-item')) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+          }
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          const item = parseDrop(
+            e.dataTransfer.getData('application/x-kitchen-item'),
+          );
+          if (item) onDropItem(item, coordinates(e));
+        }}
         onPointerMove={move}
         onPointerUp={end}
         onPointerCancel={() => {
@@ -227,6 +263,29 @@ export function PlanCanvas({
           stroke="#c6d0d4"
           strokeWidth=".4"
         />
+        {showClearance &&
+          design.items
+            .filter((i) => !selected || i.id === selected)
+            .flatMap((item) =>
+              clearanceZones(item).map((zone) => (
+                <polygon
+                  key={`${item.id}:${zone.name}`}
+                  className="clearance-zone"
+                  data-item-id={item.id}
+                  points={zone.points.map((p) => `${p.x},${p.y}`).join(' ')}
+                  fill={issueIds.has(`clearance-${item.id}-${zone.name}`) ? '#ed987c' : '#60b4c6'}
+                  fillOpacity=".25"
+                  stroke={issueIds.has(`clearance-${item.id}-${zone.name}`) ? '#c45132' : '#308396'}
+                  strokeDasharray="2 1"
+                  strokeWidth=".5"
+                  pointerEvents="none"
+                >
+                  <title>
+                    {item.sku}: {zone.name} clearance
+                  </title>
+                </polygon>
+              )),
+            )}
         {roomEdges(room)
           .filter((edge) => room.walls[edge.side])
           .map((edge) => (
@@ -280,7 +339,7 @@ export function PlanCanvas({
                 ? { ...original, x: drag.x, y: drag.y }
                 : original;
             const b = footprint(item),
-              active = selected === item.id,
+              active = selected === item.id || selectedIds.includes(item.id),
               warning = warningIds.has(item.id);
             return (
               <g
@@ -381,6 +440,35 @@ export function PlanCanvas({
             Add a cabinet from the library to begin
           </text>
         )}
+        {drag &&
+          (() => {
+            const item = design.items.find((i) => i.id === drag.id);
+            if (!item) return null;
+            const f = footprint(item);
+            return (
+              <g pointerEvents="none">
+                <path
+                  d={`M${drag.x} ${drag.y - 5} h${f.width} M${drag.x + f.width + 5} ${drag.y} v${f.depth}`}
+                  fill="none"
+                  stroke="#087984"
+                  strokeWidth=".6"
+                />
+                <text
+                  data-testid="live-dimensions"
+                  x={drag.x}
+                  y={drag.y - 8}
+                  fontSize="4"
+                  fill="#075f68"
+                  stroke="white"
+                  strokeWidth="1"
+                  paintOrder="stroke"
+                >
+                  {item.width} W × {item.depth} D · X {drag.x.toFixed(1)} / Y{' '}
+                  {drag.y.toFixed(1)}″
+                </text>
+              </g>
+            );
+          })()}
       </svg>
     </div>
   );

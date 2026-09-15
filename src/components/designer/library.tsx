@@ -94,7 +94,26 @@ export function Library({
           <>
             <p className="designer-muted">{result.total} products</p>
             {result.records.map((p) => (
-              <article className="library-product" key={p._id}>
+              <article
+                className="library-product"
+                key={p._id}
+                draggable={canPlace(p)}
+                onDragStart={(e) => {
+                  if (!version || !canPlace(p)) {
+                    e.preventDefault();
+                    return;
+                  }
+                  e.dataTransfer.setData(
+                    'application/x-kitchen-item',
+                    JSON.stringify({
+                      kind: 'product',
+                      product: p,
+                      versionId: version._id,
+                    }),
+                  );
+                  e.dataTransfer.effectAllowed = 'copy';
+                }}
+              >
                 <CabinetIcon wall={p.category === 'wall_cabinet'} />
                 <div>
                   <strong>{p.sku}</strong>

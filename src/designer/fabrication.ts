@@ -48,10 +48,16 @@ export function panelParts(design: Design) {
     add(
       'Top / bottom',
       2,
-      w - 2 * t,
+      w -
+        2 * t +
+        (design.fabrication?.joinery === 'rabbet'
+          ? 2 * (design.fabrication.rebate ?? 0.25)
+          : 0),
       d,
       t,
-      'Butt joints between sides; no dado allowance.',
+      design.fabrication?.joinery === 'rabbet'
+        ? 'Housed top/bottom in side rabbets; allowance included.'
+        : 'Butt joints between sides; no dado allowance.',
     );
     add(
       'Applied back',
@@ -71,7 +77,7 @@ export function panelParts(design: Design) {
         w - 2 * t - 2 * g,
         d - t,
         t,
-        'Shelf support drilling excluded.',
+        'See manufacturing report for configured shelf-support drilling.',
       );
     else if (item.details?.interior !== 'shelves')
       excluded.push(
@@ -94,7 +100,7 @@ export function panelParts(design: Design) {
         (w - (count + 1) * g) / count,
         h - 2 * g,
         t,
-        'Full-overlay slab front; hinge boring, edge treatment and handles excluded.',
+        'Full-overlay slab front; see manufacturing report for banding and hinge cups. Handle drilling excluded.',
       );
     }
     const toe = item.elevation === 0 ? (item.details?.toeKick ?? 4) : 0;
@@ -150,7 +156,7 @@ export function panelCsv(design: Design) {
     .map((row) => row.map(escaped).join(','))
     .join('\r\n');
 }
-function dxfFile(entities: string[]) {
+export function dxfFile(entities: string[]) {
   return [
     '0',
     'SECTION',
@@ -178,7 +184,7 @@ function dxfFile(entities: string[]) {
     '',
   ].join('\n');
 }
-function polyline(points: { x: number; y: number }[], layer: string) {
+export function polyline(points: { x: number; y: number }[], layer: string) {
   return [
     '0',
     'LWPOLYLINE',
@@ -200,7 +206,7 @@ function polyline(points: { x: number; y: number }[], layer: string) {
     ]),
   ];
 }
-function text(x: number, y: number, label: string) {
+export function text(x: number, y: number, label: string) {
   return [
     '0',
     'TEXT',

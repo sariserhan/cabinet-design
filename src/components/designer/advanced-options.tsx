@@ -10,12 +10,11 @@ import {
 } from '@/designer/installation';
 import {
   panelParts,
-  panelCsv,
   planDxf,
-  partsDxf,
   installationSchedule,
   shopDefaults,
 } from '@/designer/fabrication';
+import { manufacturingCsv, machiningDxf } from '@/designer/machining';
 import { OptionNumber } from './demo-options';
 export function ArchitectureOptions({
   design,
@@ -428,10 +427,9 @@ export function DrawingTools({
         }
       />
       <p className="designer-muted">
-        Butt-joint boxes, full-height sides, applied backs, full-overlay slab
-        doors, separate toe platforms. CNC drilling, joinery machining, tool
-        compensation and hardware are excluded. Shop review is required before
-        fabrication.
+        Full-height sides, applied backs, full-overlay slab doors and separate
+        toe platforms. Configure joint, banding and drilling allowances below.
+        Shop review and machine toolpaths are still required.
       </p>
       <div className="designer-row">
         <button onClick={() => window.print()}>
@@ -452,7 +450,7 @@ export function DrawingTools({
           disabled={!parts.length}
           onClick={() =>
             saveFile(
-              panelCsv(design),
+              manufacturingCsv(design),
               'custom-panel-cutlist-mm.csv',
               'text/csv',
             )
@@ -464,7 +462,7 @@ export function DrawingTools({
           disabled={!parts.length}
           onClick={() =>
             saveFile(
-              partsDxf(design),
+              machiningDxf(design),
               'custom-panel-blanks-mm.dxf',
               'application/dxf',
             )
@@ -730,9 +728,10 @@ export function InstallationSheets({ design }: { design: Design }) {
       <section className="print-sheet">
         <h2>F1 · Custom panel schedule</h2>
         <p>
-          SHOP REVIEW REQUIRED. Dimensions below are millimeters. Butt-joint
-          case, applied back, slab doors. No hardware drilling, edge-banding
-          allowance, toolpaths or manufacturer cabinet internals.
+          SHOP REVIEW REQUIRED. Finished panel dimensions below are millimeters.
+          Use the manufacturing exports for raw blanks, banding allowances and
+          configured machining. Machine-specific toolpaths and manufacturer
+          cabinet internals are excluded.
         </p>
         <table>
           <thead>

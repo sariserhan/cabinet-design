@@ -41,13 +41,24 @@ export function ObjectsLibrary({
     <section className="designer-library">
       <h2>Objects library</h2>
       <p className="designer-muted">
-        Generic demo objects · dimensions are editable
+        Drag into the 2D plan or use Add · editable demo dimensions
       </p>
       <div className="library-results">
         {objectPresets.map((p) => {
           const Icon = icons[p.kind];
           return (
-            <article className="library-product" key={p.kind}>
+            <article
+              className="library-product"
+              key={p.kind}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData(
+                  'application/x-kitchen-item',
+                  JSON.stringify({ kind: 'object', object: p.kind }),
+                );
+                e.dataTransfer.effectAllowed = 'copy';
+              }}
+            >
               <Icon size={28} />
               <div>
                 <strong>{p.name}</strong>

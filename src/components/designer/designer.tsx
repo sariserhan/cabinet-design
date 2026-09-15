@@ -60,6 +60,9 @@ import { ObjectsLibrary } from './objects';
 import { PrintPackage } from './print-package';
 import { AssemblyEditor } from './assembly-editor';
 import { DesignOptions, ItemOptions, QuotePanel } from './demo-options';
+import { SelectionTools, CompareOptions } from './workflow-tools';
+import { snapPlacement, duplicateOption } from '@/designer/editing';
+import { MachiningTools } from './machining-tools';
 import { polishedSample } from '@/designer/sample';
 import { normalizeOpenings, worldToLocal } from '@/designer/model';
 import {
@@ -141,6 +144,17 @@ function Editor({ ownerId }: { ownerId: string }) {
   const overview = overviewRaw
     ? (JSON.parse(overviewRaw) as Overview)
     : undefined;
+  const [inspectorTab, setInspectorTab] = useState('design'),
+    [presenting, setPresenting] = useState(false),
+    [selection, setSelection] = useState<string[]>([]),
+    [showClearance, setShowClearance] = useState(false);
+  useEffect(() => {
+    const escape = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') setPresenting(false);
+    };
+    window.addEventListener('keydown', escape);
+    return () => window.removeEventListener('keydown', escape);
+  }, []);
   const [moveTogether, setMoveTogether] = useState(true);
   const [versionChoice, setVersionChoice] = useState('');
   const [libraryTab, setLibraryTab] = useState<'cabinets' | 'objects'>(
@@ -167,7 +181,9 @@ function Editor({ ownerId }: { ownerId: string }) {
     [saved, setSaved] = useState<Design[]>([]),
     [openId, setOpenId] = useState('');
   const [selected, setSelected] = useState<string | null>(null),
-    [mode, setMode] = useState<'2d' | '3d' | 'render' | 'quote'>('2d'),
+    [mode, setMode] = useState<'2d' | '3d' | 'render' | 'quote' | 'compare'>(
+      '2d',
+    ),
     [snap, setSnap] = useState(true),
     [zoom, setZoom] = useState(1),
     [panMode, setPanMode] = useState(false),
@@ -196,6 +212,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     setHistory({ past: [], current: initial, future: [] });
   }, [storageKey]);
   const design = history?.current;
+  useEffect(() => setSelection([]), [design?.id]);
   useEffect(() => {
     if (!design) return;
     const timer = setTimeout(() => {
@@ -282,14 +299,26 @@ function Editor({ ownerId }: { ownerId: string }) {
           };
     });
   }
-  function add(product: Product, versionId: string) {
+  function add(
+    product: Product,
+    versionId: string,
+    drop?: { x: number; y: number },
+  ) {
     if (!design || !canPlace(product)) return;
     if (design.items.length >= 100) {
       setStatus('This demo supports up to 100 cabinets per design.');
       return;
     }
     const item = fromProduct(product, versionId),
-      space = findSpace(item, design);
+      space = drop
+        ? snapPlacement(
+            item,
+            design,
+            drop.x - item.width / 2,
+            drop.y - item.depth / 2,
+            snap,
+          )
+        : findSpace(item, design);
     if (!space) {
       setStatus(
         'No free space for this cabinet. Move cabinets or increase the room size.',
@@ -300,13 +329,58 @@ function Editor({ ownerId }: { ownerId: string }) {
     setSelected(item.id);
     setStatus(`${item.sku} added. Drag it in the plan or edit its position.`);
   }
-  function addObject(kind: ObjectKind) {
+  function addObject(kind: ObjectKind, drop?: { x: number; y: number }) {
     if (!design) return;
     if (design.items.length >= 100) {
       setStatus('This demo supports 100 items per design.');
       return;
     }
     let next = fromObject(kind);
+    if (drop && !isOpening(next)) {
+      const position = snapPlacement(
+        next,
+        design,
+        drop.x - next.width / 2,
+        drop.y - next.depth / 2,
+        snap,
+      );
+      commit((d) => ({ ...d, items: [...d.items, { ...next, ...position }] }));
+      setSelected(next.id);
+      return;
+    }
+    if (drop && isOpening(next)) {
+      const edges = roomEdges(design.room).filter(
+        (e) => !e.curved && design.room.walls[e.side],
+      );
+      const edge = edges.sort(
+        (a, b) =>
+          Math.hypot(
+            drop.x - (a.a.x + a.b.x) / 2,
+            drop.y - (a.a.y + a.b.y) / 2,
+          ) -
+          Math.hypot(
+            drop.x - (b.a.x + b.b.x) / 2,
+            drop.y - (b.a.y + b.b.y) / 2,
+          ),
+      )[0];
+      if (!edge) {
+        setStatus('Add a straight wall for this opening.');
+        return;
+      }
+      next = {
+        ...next,
+        ...attachToWall(
+          { ...next, wallSegment: edge.index },
+          design.room,
+          edge.side,
+          drop.x,
+          drop.y,
+        ),
+      };
+      commit((d) => ({ ...d, items: [...d.items, next] }));
+      setSelected(next.id);
+      return;
+    }
     let assemblyHost: Cabinet | undefined;
     const host = design.items.find((i) => i.id === selected);
     if (
@@ -520,11 +594,27 @@ function Editor({ ownerId }: { ownerId: string }) {
     });
   }
   return (
-    <div className="designer-app">
+    <div className={`designer-app ${presenting ? 'is-presenting' : ''}`}>
+      {presenting && (
+        <div className="presentation-bar">
+          <strong>{design.name}</strong>
+          <button onClick={() => setPresenting(false)}>
+            Exit presentation · Esc
+          </button>
+        </div>
+      )}
       <PrintPackage design={design} />
       <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
+        <button
+          onClick={() => {
+            setMode('render');
+            setPresenting(true);
+          }}
+        >
+          Present
+        </button>
         <label className="project-name">
           Project name
           <input
@@ -580,6 +670,7 @@ function Editor({ ownerId }: { ownerId: string }) {
           >
             New room
           </button>
+          <button onClick={() => setMode('compare')}>Compare options</button>
           <button
             onClick={() => {
               commit(() => polishedSample());
@@ -776,7 +867,41 @@ function Editor({ ownerId }: { ownerId: string }) {
               )}
             </div>
           </div>
-          {mode === 'quote' ? (
+          {mode === 'compare' ? (
+            <CompareOptions
+              design={design}
+              saved={saved}
+              onOpen={(next) => {
+                commit(() => next);
+                setSelected(null);
+              }}
+              onDuplicate={(name) => {
+                const copy = duplicateOption(design, name),
+                  next = [
+                    copy,
+                    design,
+                    ...saved.filter((d) => d.id !== design.id),
+                  ];
+                if (next.length > 20) {
+                  setStatus('Saved design limit reached. Export a copy first.');
+                  return;
+                }
+                try {
+                  localStorage.setItem(
+                    storageKey + ':saved',
+                    JSON.stringify(next),
+                  );
+                  setSaved(next);
+                  commit(() => copy);
+                  setSelected(null);
+                } catch {
+                  setStorageError(
+                    'Could not save alternatives. Export a copy first.',
+                  );
+                }
+              }}
+            />
+          ) : mode === 'quote' ? (
             <QuotePanel
               design={design}
               onChange={(next) => commit(() => next)}
@@ -793,14 +918,38 @@ function Editor({ ownerId }: { ownerId: string }) {
               snap={snap}
               zoom={zoom}
               warningIds={warningIds}
+              issueIds={new Set(issues.map((i) => i.id))}
+              selectedIds={selection}
+              onToggle={(id) =>
+                setSelection((ids) =>
+                  ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+                )
+              }
+              showClearance={showClearance}
+              onDropItem={(payload, point) => {
+                if (payload.kind === 'object') addObject(payload.object, point);
+                else add(payload.product, payload.versionId, point);
+              }}
             />
           ) : mode === 'render' ? (
-            <RenderView key={design.id} design={design} />
+            <RenderView
+              key={design.id}
+              design={design}
+              onChange={(next) => commit(() => next)}
+            />
           ) : (
             <Preview
               design={design}
               selected={selected}
               onSelect={setSelected}
+            />
+          )}
+          {mode === '2d' && (
+            <SelectionTools
+              design={design}
+              ids={selection}
+              onIds={setSelection}
+              onChange={(next) => commit(() => next)}
             />
           )}
           <div className="designer-canvas-footer">
@@ -815,7 +964,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                 checked={snap}
                 onChange={(e) => setSnap(e.target.checked)}
               />{' '}
-              Snap to walls
+              Snap to walls & items
             </label>
           </div>
           <section className="designer-bill">
@@ -876,7 +1025,23 @@ function Editor({ ownerId }: { ownerId: string }) {
         </section>
         <aside className="designer-inspector">
           <h2>Properties</h2>
-          <section>
+          <div
+            role="tablist"
+            aria-label="Inspector sections"
+            className="inspector-tabs"
+          >
+            {['design', 'materials', 'installation', 'documents'].map((tab) => (
+              <button
+                key={tab}
+                role="tab"
+                aria-selected={inspectorTab === tab}
+                onClick={() => setInspectorTab(tab)}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+          <section hidden={inspectorTab !== 'design'}>
             <h3>Room</h3>
             <Numeric
               label="Room width (in)"
@@ -906,14 +1071,7 @@ function Editor({ ownerId }: { ownerId: string }) {
               design={design}
               onChange={(next) => commit(() => next)}
             />
-            <DrawingTools
-              design={design}
-              onChange={(next) => commit(() => next)}
-            />
-            <DesignOptions
-              design={design}
-              onChange={(next) => commit(() => next)}
-            />
+
             <RoomEditor
               room={design.room}
               onChange={(outline) =>
@@ -944,7 +1102,7 @@ function Editor({ ownerId }: { ownerId: string }) {
               ))}
             </div>
           </section>
-          <section>
+          <section hidden={inspectorTab !== 'design'}>
             <h3>Selected item</h3>
             {item ? (
               <>
@@ -1072,10 +1230,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                   item={item}
                   onChange={(patch) => updateItem(item.id, patch)}
                 />
-                <InstallationOptions
-                  item={item}
-                  onChange={(patch) => updateItem(item.id, patch)}
-                />
+
                 <ItemOptions
                   item={item}
                   onChange={(patch) => updateItem(item.id, patch)}
@@ -1160,7 +1315,34 @@ function Editor({ ownerId }: { ownerId: string }) {
               </p>
             )}
           </section>
-          <section>
+          <section hidden={inspectorTab !== 'documents'}>
+            {' '}
+            <DrawingTools
+              design={design}
+              onChange={(next) => commit(() => next)}
+            />
+            <MachiningTools
+              design={design}
+              onChange={(next) => commit(() => next)}
+            />
+          </section>
+          <section hidden={inspectorTab !== 'materials'}>
+            {' '}
+            <DesignOptions
+              design={design}
+              onChange={(next) => commit(() => next)}
+            />
+          </section>
+          <section hidden={inspectorTab !== 'installation'}>
+            <h3>{item?.sku ?? 'Select an appliance'}</h3>
+            {item && (
+              <InstallationOptions
+                item={item}
+                onChange={(patch) => updateItem(item.id, patch)}
+              />
+            )}
+          </section>
+          <section hidden={inspectorTab !== 'materials'}>
             <h3>Preview finish</h3>
             <div className="designer-finishes">
               {(['linen', 'oak', 'slate'] as const).map((finish) => (
@@ -1179,14 +1361,35 @@ function Editor({ ownerId }: { ownerId: string }) {
               Illustrative finishes, not manufacturer availability.
             </p>
           </section>
-          <section className="designer-checks">
+          <section
+            className="designer-checks"
+            hidden={
+              inspectorTab !== 'design' && inspectorTab !== 'installation'
+            }
+          >
             <h3>Layout checks</h3>
+            <label>
+              <input
+                type="checkbox"
+                checked={showClearance}
+                onChange={(e) => {
+                  setShowClearance(e.target.checked);
+                  setMode('2d');
+                }}
+              />{' '}
+              Show clearance zones
+            </label>
             {issues.length ? (
               <ul>
                 {issues.map((issue) => (
                   <li key={issue.id}>
                     <button
-                      onClick={() => setSelected(issue.itemIds[0] ?? null)}
+                      onClick={() => {
+                        setSelected(issue.itemIds[0] ?? null);
+                        setMode('2d');
+                        setShowClearance(true);
+                        setFitRevision((n) => n + 1);
+                      }}
                     >
                       {issue.message}
                     </button>
@@ -1201,8 +1404,8 @@ function Editor({ ownerId }: { ownerId: string }) {
               </p>
             )}
             <p className="designer-muted">
-              Geometry checks only. Clearances, utilities, and catalog
-              compatibility still need review.
+              Checks use design geometry and recorded service data. Field and
+              manufacturer review remain required.
             </p>
           </section>
         </aside>

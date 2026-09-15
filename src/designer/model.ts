@@ -137,11 +137,44 @@ export const designSchema = z
         west: z.boolean(),
       }),
     }),
+    views: z
+      .array(
+        z.object({
+          id: z.string().max(100),
+          name: z.string().min(1).max(50),
+          position: z.tuple([
+            z.number().finite(),
+            z.number().finite(),
+            z.number().finite(),
+          ]),
+          target: z.tuple([
+            z.number().finite(),
+            z.number().finite(),
+            z.number().finite(),
+          ]),
+        }),
+      )
+      .max(8)
+      .optional(),
     fabrication: z
       .object({
         thickness: z.number().min(0.25).max(1.5),
         back: z.number().min(0.125).max(0.75),
         gap: z.number().min(0.03125).max(0.25),
+        joinery: z.enum(['butt', 'rabbet']).optional(),
+        rebate: z.number().min(0).max(0.5).optional(),
+        edgeBandMm: z.number().min(0).max(3).optional(),
+        drilling: z.boolean().optional(),
+        cupDiameterMm: z.number().min(20).max(40).optional(),
+        cupEdgeMm: z.number().min(2).max(8).optional(),
+        cupEndMm: z.number().min(50).max(200).optional(),
+        drillDepthMm: z.number().min(2).max(15).optional(),
+        shelfPitchMm: z.number().min(16).max(64).optional(),
+        shelfSetbackMm: z.number().min(20).max(75).optional(),
+        sheetWidth: z.number().min(12).max(120).optional(),
+        sheetHeight: z.number().min(12).max(144).optional(),
+        kerf: z.number().min(0.01).max(0.5).optional(),
+        allowRotate: z.boolean().optional(),
       })
       .optional(),
     finish: z.enum(['linen', 'oak', 'slate']),
@@ -187,6 +220,15 @@ export const designSchema = z
     items: z.array(itemSchema).max(100),
   })
   .superRefine((design, ctx) => {
+    if (
+      design.fabrication?.joinery === 'rabbet' &&
+      (design.fabrication.rebate ?? 0.25) > design.fabrication.thickness / 2
+    )
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'Rabbet depth must not exceed half the carcass stock thickness.',
+      });
     if (JSON.stringify(design).length > 500000)
       ctx.addIssue({
         code: 'custom',

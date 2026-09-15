@@ -742,3 +742,39 @@
 @media print { .print-package + .print-package { break-before:page; } }
 .demo-options textarea { display:block; width:100%; min-height:70px; border:1px solid #c9d5db; padding:6px; }
 .demo-options a { display:block; color:#087984; font-size:12px; margin:8px 0; }
+.inspector-tabs { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:16px; }
+.inspector-tabs button { font-size:11px; padding:7px 3px; }
+.inspector-tabs [aria-selected=true] { background:#087984; color:white; }
+.designer-inspector [hidden] { display:none!important; }
+.camera-controls { padding:8px 12px; background:#fff; flex-wrap:wrap; }
+.camera-controls input { width:120px; }
+.camera-controls input,.camera-controls select,.render-controls select { border:1px solid #cad7dc; border-radius:5px; padding:5px; font-size:12px; }
+.selection-tools { padding:8px 14px; background:#fff; font-size:12px; }
+.selection-tools p { margin:6px 0; color:#596f7a; font-size:11px; }
+.selection-list { max-height:140px; overflow:auto; display:grid; grid-template-columns:1fr 1fr; }
+.selection-list label { display:flex; align-items:center; gap:5px; }
+.compare-options { padding:20px; background:white; min-height:550px; }
+.compare-options h2 { font-size:22px; margin-bottom:12px; }
+.compare-options p { font-size:12px; margin:12px 0; }
+.compare-options input,.compare-options select { border:1px solid #c6d4da; padding:7px; border-radius:5px; max-width:100%; }
+.compare-options>label { display:grid; gap:5px; margin:15px 0; }
+.comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.comparison-grid article { border:1px solid #dce5e8; padding:14px; border-radius:8px; min-width:0; }
+.comparison-grid svg { display:block; width:100%; height:240px; }
+.comparison-grid button { display:block; margin-top:12px; }
+.compare-difference { background:#e8f3f3; padding:14px; }
+.presentation-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:#fff; }
+body:has(.is-presenting) { overflow:hidden; }
+.workspace:has(.is-presenting) { grid-template-columns:1fr!important; }
+body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { display:none!important; }
+.is-presenting .designer-header,.is-presenting .designer-projectbar,.is-presenting .designer-library-column,.is-presenting .designer-inspector,.is-presenting .designer-tools,.is-presenting .designer-canvas-footer,.is-presenting .designer-bill,.is-presenting .render-hint { display:none!important; }
+.is-presenting .designer-grid { display:block; }
+.is-presenting .render-stage { height:calc(100dvh - 180px); }
+.is-presenting { position:fixed; inset:0; z-index:100; background:#e9edf0; overflow:auto; }
+.sheet-previews { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+.sheet-previews figure { margin:0; }
+.sheet-previews svg { width:100%; max-height:200px; }
+.sheet-previews figcaption { font-size:10px; }
+.machining-tools details { margin:12px 0; }
+@media(max-width:700px) { .comparison-grid { grid-template-columns:1fr; } .is-presenting .render-stage { height:calc(100dvh - 250px);min-height:260px; } .presentation-bar strong { font-size:12px; } }
+@media print { .presentation-bar { display:none!important; } }

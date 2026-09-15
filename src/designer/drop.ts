@@ -1,0 +1,30 @@
+import { z } from 'zod';
+import { canPlace, objectPresets } from './model';
+import type { DropItem } from './editing';
+const schema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('object'), object: z.string() }),
+  z.object({
+    kind: z.literal('product'),
+    versionId: z.string().min(1).max(100),
+    product: z.object({
+      _id: z.string().min(1).max(100),
+      sku: z.string().min(1).max(100),
+      category: z.string().max(100),
+      width: z.number().positive().max(600),
+      height: z.number().positive().max(600),
+      depth: z.number().positive().max(600),
+      pageNumber: z.number().int().positive(),
+    }),
+  }),
+]);
+export function parseDrop(text: string): DropItem | null {
+  try {
+    if (text.length > 5000) return null;
+    const value = schema.parse(JSON.parse(text));
+    if (value.kind === 'product') return canPlace(value.product) ? value : null;
+    const preset = objectPresets.find((p) => p.kind === value.object);
+    return preset ? { kind: 'object', object: preset.kind } : null;
+  } catch {
+    return null;
+  }
+}

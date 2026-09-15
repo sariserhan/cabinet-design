@@ -20,9 +20,24 @@ import {
   ceilingRegions,
 } from '@/designer/room';
 
-export default function RenderView({ design }: { design: Design }) {
+export default function RenderView({
+  design,
+  onChange,
+}: {
+  design: Design;
+  onChange: (design: Design) => void;
+}) {
   const host = useRef<HTMLDivElement>(null);
-  const actions = useRef<{ fit: () => void; save: () => void } | null>(null);
+  type View = NonNullable<Design['views']>[number];
+  const actions = useRef<{
+    fit: () => void;
+    save: (width: number) => void;
+    capture: () => Pick<View, 'position' | 'target'>;
+    load: (view: View) => void;
+  } | null>(null);
+  const [viewName, setViewName] = useState('Camera view'),
+    [exportWidth, setExportWidth] = useState(1920),
+    [viewId, setViewId] = useState('');
   const cameraState = useRef<{
     position: THREE.Vector3;
     target: THREE.Vector3;
@@ -595,8 +610,22 @@ export default function RenderView({ design }: { design: Design }) {
     renderer.domElement.addEventListener('webglcontextlost', lost);
     actions.current = {
       fit,
-      save: () => {
+      capture: () => ({
+        position: [camera.position.x, camera.position.y, camera.position.z],
+        target: [controls.target.x, controls.target.y, controls.target.z],
+      }),
+      load: (view) => {
+        camera.position.set(...view.position);
+        controls.target.set(...view.target);
+        controls.update();
+        render();
+      },
+      save: (width) => {
+        const oldSize = renderer.getSize(new THREE.Vector2()),
+          oldRatio = renderer.getPixelRatio();
         try {
+          renderer.setPixelRatio(1);
+          renderer.setSize(width, Math.round(width / camera.aspect), false);
           render();
           const link = document.createElement('a');
           link.download = `${design.name.replace(/[^a-z0-9-]/gi, '-').slice(0, 80) || 'kitchen'}-render.png`;
@@ -604,6 +633,10 @@ export default function RenderView({ design }: { design: Design }) {
           link.click();
         } catch {
           setError('Image export failed. Try reopening Render.');
+        } finally {
+          renderer.setSize(oldSize.x, oldSize.y, false);
+          renderer.setPixelRatio(oldRatio);
+          render();
         }
       },
     };
@@ -647,7 +680,21 @@ export default function RenderView({ design }: { design: Design }) {
           Show ceiling
         </label>
         <button onClick={() => actions.current?.fit()}>Reset camera</button>
-        <button onClick={() => actions.current?.save()} disabled={!!error}>
+        <label>
+          PNG width
+          <select
+            aria-label="Render export width"
+            value={exportWidth}
+            onChange={(e) => setExportWidth(Number(e.target.value))}
+          >
+            <option value={1920}>1920 px</option>
+            <option value={3840}>3840 px</option>
+          </select>
+        </label>
+        <button
+          onClick={() => actions.current?.save(exportWidth)}
+          disabled={!!error}
+        >
           Download PNG
         </button>
         <label>
@@ -658,6 +705,60 @@ export default function RenderView({ design }: { design: Design }) {
           />{' '}
           Cutaway walls
         </label>
+      </div>
+      <div className="camera-controls designer-row">
+        <input
+          aria-label="Camera view name"
+          value={viewName}
+          maxLength={50}
+          onChange={(e) => setViewName(e.target.value)}
+        />
+        <button
+          disabled={
+            (design.views?.length ?? 0) >= 8 || !viewName.trim() || !!error
+          }
+          onClick={() => {
+            const camera = actions.current?.capture();
+            if (camera)
+              onChange({
+                ...design,
+                views: [
+                  ...(design.views ?? []),
+                  { ...camera, id: crypto.randomUUID(), name: viewName.trim() },
+                ],
+              });
+          }}
+        >
+          Save camera
+        </button>
+        <select
+          aria-label="Saved camera views"
+          value={viewId}
+          onChange={(e) => {
+            setViewId(e.target.value);
+            const view = design.views?.find((v) => v.id === e.target.value);
+            if (view) actions.current?.load(view);
+          }}
+        >
+          <option value="">Choose camera</option>
+          {design.views?.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.name}
+            </option>
+          ))}
+        </select>
+        <button
+          disabled={!viewId}
+          onClick={() => {
+            onChange({
+              ...design,
+              views: design.views?.filter((v) => v.id !== viewId),
+            });
+            setViewId('');
+          }}
+        >
+          Delete camera
+        </button>
       </div>
       {error && <p role="alert">{error}</p>}
       <div className="render-stage" ref={host} />
