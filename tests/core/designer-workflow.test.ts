@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newDesign, fromObject, parseDesign } from '../../src/designer/model';
 import {
+  placementAt,
   alignSelection,
   snapPlacement,
   duplicateOption,
@@ -140,4 +141,30 @@ test('unsafe-depth drilling is omitted and excessive rabbet depth is rejected', 
   assert.equal(parts.panels.flatMap((p) => p.holes).length, 0);
   d.fabrication.joinery = 'rabbet';
   assert.throws(() => parseDesign(JSON.stringify(d)));
+});
+
+test('drop preview uses wall attachment and item snapping, and rejects openings without walls', () => {
+  const d = newDesign(),
+    item = fromObject('custom_cabinet');
+  d.items = [{ ...fromObject('custom_cabinet'), x: 10, y: 20 }];
+  const placed = placementAt(item, d, { x: 47, y: 32 }, true);
+  assert.equal(placed?.x, 34);
+  const door = placementAt(fromObject('door'), d, { x: 60, y: 0 }, true);
+  assert.equal(door?.wall, 'north');
+  assert.equal(door?.y, 0);
+  d.room.walls = { north: false, east: false, south: false, west: false };
+  assert.equal(
+    placementAt(fromObject('window'), d, { x: 60, y: 0 }, true),
+    null,
+  );
+});
+test('individual materials survive JSON roundtrip and changing kitchen defaults', () => {
+  const d = newDesign();
+  d.items = [
+    { ...fromObject('island'), finish: 'slate', countertop: 'granite' },
+  ];
+  const restored = parseDesign(JSON.stringify({ ...d, finish: 'linen' }));
+  assert.equal(restored.finish, 'linen');
+  assert.equal(restored.items[0]?.finish, 'slate');
+  assert.equal(restored.items[0]?.countertop, 'granite');
 });

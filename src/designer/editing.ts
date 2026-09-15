@@ -6,6 +6,8 @@ import {
   localToWorld,
   clearanceDefaults,
 } from './model';
+import { roomEdges } from './room';
+import { attachToWall } from './model';
 import { profileFor } from './installation';
 export function snapPlacement(
   item: Cabinet,
@@ -173,3 +175,48 @@ export function duplicateOption(design: Design, name: string): Design {
 export type DropItem =
   | { kind: 'object'; object: Exclude<Cabinet['kind'], 'cabinet'> }
   | { kind: 'product'; product: import('./model').Product; versionId: string };
+
+export function placementAt(
+  item: Cabinet,
+  design: Design,
+  point: { x: number; y: number },
+  snap: boolean,
+): Cabinet | null {
+  if (item.kind === 'door' || item.kind === 'window') {
+    const edge = roomEdges(design.room)
+      .filter((e) => !e.curved && design.room.walls[e.side])
+      .sort(
+        (a, b) =>
+          Math.hypot(
+            point.x - (a.a.x + a.b.x) / 2,
+            point.y - (a.a.y + a.b.y) / 2,
+          ) -
+          Math.hypot(
+            point.x - (b.a.x + b.b.x) / 2,
+            point.y - (b.a.y + b.b.y) / 2,
+          ),
+      )[0];
+    return edge
+      ? {
+          ...item,
+          ...attachToWall(
+            { ...item, wallSegment: edge.index },
+            design.room,
+            edge.side,
+            point.x,
+            point.y,
+          ),
+        }
+      : null;
+  }
+  return {
+    ...item,
+    ...snapPlacement(
+      item,
+      design,
+      point.x - item.width / 2,
+      point.y - item.depth / 2,
+      snap,
+    ),
+  };
+}

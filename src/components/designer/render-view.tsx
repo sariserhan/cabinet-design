@@ -31,15 +31,19 @@ export default function RenderView({
   cameraView,
   onCamera,
   onCapture,
+  selected,
+  onSelect,
 }: {
+  selected?: string | null;
+  onSelect?: (id: string | null) => void;
   cameraView?: CameraView;
   onCamera?: (view: CameraView) => void;
   onCapture?: (url: string) => void;
   design: Design;
   onChange: (design: Design) => void;
 }) {
-  const callbacks = useRef({ onCamera, onCapture });
-  callbacks.current = { onCamera, onCapture };
+  const callbacks = useRef({ onCamera, onCapture, onSelect });
+  callbacks.current = { onCamera, onCapture, onSelect };
   const externalCamera = useRef(cameraView);
   externalCamera.current = cameraView;
   const host = useRef<HTMLDivElement>(null);
@@ -170,28 +174,44 @@ export default function RenderView({
       materials.push(m);
       return m;
     };
-    const finish = material(
-      { linen: '#ece7dc', oak: '#b88750', slate: '#414d57' }[design.finish],
-    );
-    const inset = material(
-      { linen: '#d9d3c6', oak: '#a87947', slate: '#34404a' }[design.finish],
-    );
-    const stone = material('#eceae3', 0.05, 0.27),
-      steel = material('#a9b0b3', 0.75, 0.25),
+    const finishMaterials = new Map<
+      string,
+      { finish: THREE.MeshStandardMaterial; inset: THREE.MeshStandardMaterial }
+    >();
+    const finishFor = (name: Design['finish']) => {
+      const cached = finishMaterials.get(name);
+      if (cached) return cached;
+      const finish = material(
+        { linen: '#ece7dc', oak: '#ffffff', slate: '#414d57' }[name],
+      );
+      const inset = material(
+        { linen: '#d9d3c6', oak: '#ead5b5', slate: '#34404a' }[name],
+      );
+      if (name === 'oak') {
+        finish.map = textures[0] ?? null;
+        inset.map = textures[0] ?? null;
+        finish.bumpMap = textures[0] ?? null;
+        finish.bumpScale = 0.08;
+      }
+      const pair = { finish, inset };
+      finishMaterials.set(name, pair);
+      return pair;
+    };
+    const stoneMaterials = new Map<string, THREE.MeshStandardMaterial>();
+    const stoneFor = (name: 'quartz' | 'marble' | 'granite') => {
+      const cached = stoneMaterials.get(name);
+      if (cached) return cached;
+      const m = material('#ffffff', 0.05, 0.23);
+      const texture = materialTexture(name);
+      textures.push(texture);
+      m.map = texture;
+      stoneMaterials.set(name, m);
+      return m;
+    };
+    const steel = material('#a9b0b3', 0.75, 0.25),
       dark = material('#20282d', 0.25, 0.26),
-      wall = material('#f4f0e8');
-    const glass = material('#729da9', 0.35, 0.15);
-    if (design.finish === 'oak') {
-      finish.color.set('#ffffff');
-      inset.color.set('#ead5b5');
-      finish.map = textures[0] ?? null;
-      inset.map = textures[0] ?? null;
-      finish.bumpMap = textures[0] ?? null;
-      finish.bumpScale = 0.08;
-    }
-    stone.color.set('#ffffff');
-    stone.map = textures[1] ?? null;
-    stone.roughness = 0.23;
+      wall = material('#f4f0e8'),
+      glass = material('#729da9', 0.35, 0.15);
     const floorMaterial = material('#ffffff', 0, 0.7);
     floorMaterial.map = textures[2] ?? null;
 
@@ -285,10 +305,17 @@ export default function RenderView({
         nz: dx,
       });
     }
+    const itemGroups: THREE.Group[] = [];
     for (const item of design.items) {
+      const { finish, inset } = finishFor(item.finish ?? design.finish);
+      const stone = stoneFor(
+        item.countertop ?? design.appearance?.countertop ?? 'quartz',
+      );
       const { width: w, height: h, depth: d } = item,
         f = footprint(item);
       const group = new THREE.Group();
+      group.userData.itemId = item.id;
+      itemGroups.push(group);
       group.position.set(
         item.x + f.width / 2,
         item.elevation,
@@ -602,6 +629,45 @@ export default function RenderView({
             }
       }
     }
+    if (selected) {
+      const target = itemGroups.find((g) => g.userData.itemId === selected);
+      if (target) {
+        const outline = new THREE.BoxHelper(target, 0x087984);
+        scene.add(outline);
+        materials.push(outline.material as THREE.Material);
+      }
+    }
+    let press: { x: number; y: number } | null = null;
+    const pointerDown = (e: PointerEvent) => {
+      press = e.button === 0 ? { x: e.clientX, y: e.clientY } : null;
+    };
+    const pointerUp = (e: PointerEvent) => {
+      if (!press || Math.hypot(e.clientX - press.x, e.clientY - press.y) > 5)
+        return;
+      press = null;
+      const rect = renderer.domElement.getBoundingClientRect(),
+        ray = new THREE.Raycaster();
+      ray.setFromCamera(
+        new THREE.Vector2(
+          ((e.clientX - rect.left) / rect.width) * 2 - 1,
+          (-(e.clientY - rect.top) / rect.height) * 2 + 1,
+        ),
+        camera,
+      );
+      const hit = ray.intersectObjects(itemGroups, true).find((h) => {
+        let o: THREE.Object3D | null = h.object;
+        while (o) {
+          if (!o.visible) return false;
+          o = o.parent;
+        }
+        return true;
+      });
+      let object: THREE.Object3D | null = hit?.object ?? null;
+      while (object && !object.userData.itemId) object = object.parent;
+      callbacks.current.onSelect?.(object?.userData.itemId ?? null);
+    };
+    renderer.domElement.addEventListener('pointerdown', pointerDown);
+    renderer.domElement.addEventListener('pointerup', pointerUp);
     const render = () => {
       for (const w of walls)
         w.group.visible =
@@ -678,8 +744,14 @@ export default function RenderView({
       controls.dispose();
       actions.current = null;
       renderer.domElement.removeEventListener('webglcontextlost', lost);
+      renderer.domElement.removeEventListener('pointerdown', pointerDown);
+      renderer.domElement.removeEventListener('pointerup', pointerUp);
       scene.traverse((object) => {
-        if (object instanceof THREE.Mesh) object.geometry.dispose();
+        if (
+          object instanceof THREE.Mesh ||
+          object instanceof THREE.LineSegments
+        )
+          object.geometry.dispose();
       });
       materials.forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());
@@ -688,7 +760,7 @@ export default function RenderView({
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [design, cutaway, interiors, showCeiling]);
+  }, [design, cutaway, interiors, showCeiling, selected]);
   return (
     <div className="designer-render">
       <div className="designer-row render-controls">

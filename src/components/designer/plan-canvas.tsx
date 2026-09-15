@@ -11,7 +11,14 @@ import {
 import { roomOutline, roomEdges } from '@/designer/room';
 import { snapPlacement, clearanceZones } from '@/designer/editing';
 import type { DropItem } from '@/designer/editing';
-import { parseDrop } from '@/designer/drop';
+import {
+  fromObject,
+  fromProduct,
+  itemPolygon,
+  warnings,
+} from '@/designer/model';
+import { placementAt } from '@/designer/editing';
+import { activeDrop, parseDrop } from '@/designer/drop';
 import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
 
@@ -23,7 +30,7 @@ type Props = {
   snap: boolean;
   zoom: number;
   warningIds: Set<string>;
-  issueIds:Set<string>;
+  issueIds: Set<string>;
   panMode: boolean;
   moveTogether: boolean;
   selectedIds: string[];
@@ -38,7 +45,8 @@ export function PlanCanvas({
   onMove,
   snap,
   zoom,
-  warningIds,issueIds,
+  warningIds,
+  issueIds,
   panMode,
   moveTogether,
   selectedIds,
@@ -46,6 +54,8 @@ export function PlanCanvas({
   showClearance,
   onDropItem,
 }: Props) {
+  const [ghost, setGhost] = useState<Cabinet | null>(null);
+  const [dropError, setDropError] = useState('');
   const svg = useRef<SVGSVGElement>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [space, setSpace] = useState(false);
@@ -79,14 +89,21 @@ export function PlanCanvas({
       panning.current = null;
       setIsPanning(false);
       setDrag(null);
+      setGhost(null);
     };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
+    const dragEnd = () => {
+      setGhost(null);
+      setDropError('');
+    };
+    window.addEventListener('dragend', dragEnd);
     window.addEventListener('blur', blur);
     return () => {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
       window.removeEventListener('blur', blur);
+      window.removeEventListener('dragend', dragEnd);
     };
   }, []);
   const [drag, setDrag] = useState<{
@@ -215,9 +232,36 @@ export function PlanCanvas({
           if (e.dataTransfer.types.includes('application/x-kitchen-item')) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'copy';
+            const payload =
+              activeDrop() ??
+              parseDrop(e.dataTransfer.getData('application/x-kitchen-item'));
+            if (payload) {
+              const candidate =
+                payload.kind === 'object'
+                  ? fromObject(payload.object)
+                  : fromProduct(payload.product, payload.versionId);
+              const placed = placementAt(
+                candidate,
+                design,
+                coordinates(e),
+                snap,
+              );
+              setGhost(placed);
+              setDropError(
+                placed ? '' : 'A straight wall is required for this opening.',
+              );
+            }
+          }
+        }}
+        onDragLeave={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+            setGhost(null);
+            setDropError('');
           }
         }}
         onDrop={(e) => {
+          setGhost(null);
+          setDropError('');
           e.preventDefault();
           const item = parseDrop(
             e.dataTransfer.getData('application/x-kitchen-item'),
@@ -273,9 +317,17 @@ export function PlanCanvas({
                   className="clearance-zone"
                   data-item-id={item.id}
                   points={zone.points.map((p) => `${p.x},${p.y}`).join(' ')}
-                  fill={issueIds.has(`clearance-${item.id}-${zone.name}`) ? '#ed987c' : '#60b4c6'}
+                  fill={
+                    issueIds.has(`clearance-${item.id}-${zone.name}`)
+                      ? '#ed987c'
+                      : '#60b4c6'
+                  }
                   fillOpacity=".25"
-                  stroke={issueIds.has(`clearance-${item.id}-${zone.name}`) ? '#c45132' : '#308396'}
+                  stroke={
+                    issueIds.has(`clearance-${item.id}-${zone.name}`)
+                      ? '#c45132'
+                      : '#308396'
+                  }
                   strokeDasharray="2 1"
                   strokeWidth=".5"
                   pointerEvents="none"
@@ -469,7 +521,74 @@ export function PlanCanvas({
               </g>
             );
           })()}
+        {(ghost || drag) &&
+          (() => {
+            const base = ghost ?? design.items.find((i) => i.id === drag?.id);
+            if (!base) return null;
+            const candidate = ghost ?? {
+              ...base,
+              x: drag?.x ?? base.x,
+              y: drag?.y ?? base.y,
+            };
+            const preview = ghost
+              ? { ...design, items: [...design.items, candidate] }
+              : !moveTogether
+                ? {
+                    ...design,
+                    items: design.items.map((i) =>
+                      i.id === candidate.id ? candidate : i,
+                    ),
+                  }
+                : updateAssembly(design, candidate.id, {
+                    x: candidate.x,
+                    y: candidate.y,
+                  });
+            const issues = warnings(preview).filter(
+              (i) =>
+                i.itemIds.includes(candidate.id) &&
+                /^(outside|overlap|ceiling|swing|sink|opening|wall|clearance)-/.test(
+                  i.id,
+                ),
+            );
+            const f = footprint(candidate),
+              color = issues.length ? '#bf413b' : '#087984';
+            return (
+              <g pointerEvents="none" data-testid="placement-preview">
+                <path
+                  d={`M0 ${candidate.y} H${room.width} M${candidate.x} 0 V${room.depth} M0 ${candidate.y + f.depth} H${room.width} M${candidate.x + f.width} 0 V${room.depth}`}
+                  stroke="#168b95"
+                  strokeWidth=".4"
+                  strokeDasharray="2 2"
+                  fill="none"
+                />
+                <polygon
+                  points={itemPolygon(candidate)
+                    .map((p) => p.x + ',' + p.y)
+                    .join(' ')}
+                  fill={ghost ? color : 'none'}
+                  fillOpacity=".25"
+                  stroke={color}
+                  strokeWidth="1"
+                />
+                {ghost && (
+                  <text
+                    x={candidate.x}
+                    y={candidate.y - 5}
+                    fontSize="4"
+                    fill={color}
+                    stroke="white"
+                    strokeWidth="1"
+                    paintOrder="stroke"
+                  >
+                    {candidate.sku} ·{' '}
+                    {issues.length ? issues[0]?.message : 'Ready to place'}
+                  </text>
+                )}
+              </g>
+            );
+          })()}
       </svg>
+      {dropError && <p role="status">{dropError}</p>}
     </div>
   );
 }

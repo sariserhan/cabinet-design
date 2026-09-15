@@ -12,6 +12,8 @@ import {
 
 const dimension = z.number().finite().positive().max(600);
 export const itemSchema = z.object({
+  finish: z.enum(['linen', 'oak', 'slate']).optional(),
+  countertop: z.enum(['quartz', 'marble', 'granite']).optional(),
   id: z.string().min(1).max(100),
   recordId: z.string().max(100),
   versionId: z.string().max(100),

@@ -53,7 +53,7 @@ export function MaterialPresets({
         ))}
       </div>
       <p className="designer-muted">
-        Updates cabinet finish, countertop pattern and lighting together. Undo
+        Updates the kitchen defaults; individual material overrides remain. Undo
         restores your previous choices.
       </p>
     </section>
@@ -141,23 +141,99 @@ export function ShortcutHelp() {
   );
 }
 export function ClientPresentation({ design }: { design: Design }) {
-  const [captures, setCaptures] = useState<string[]>([]);
+  const [captures, setCaptures] = useState<{ url: string; name: string }[]>([]);
+  const [viewName, setViewName] = useState('Kitchen overview'),
+    [client, setClient] = useState(design.quote?.customer ?? ''),
+    [notes, setNotes] = useState(''),
+    [preview, setPreview] = useState(false);
   const totals = quoteTotals(design);
   return (
     <section className="client-presentation">
-      <div className="client-editor">
+      <div className={`client-editor ${preview ? 'previewing' : ''}`}>
         <h2>Client presentation</h2>
         <p>
           Orbit to a useful view and capture it. Add up to three views, then
           choose Save as PDF in the print dialog. Captures are kept only while
           this presentation is open.
         </p>
+        <div className="proposal-fields">
+          <label>
+            Client name
+            <input
+              aria-label="Presentation client name"
+              value={client}
+              maxLength={200}
+              onChange={(e) => setClient(e.target.value)}
+            />
+          </label>
+          <label>
+            Project notes
+            <textarea
+              aria-label="Presentation project notes"
+              value={notes}
+              maxLength={3000}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </label>
+          <label>
+            Next view name
+            <input
+              aria-label="Presentation view name"
+              value={viewName}
+              maxLength={100}
+              onChange={(e) => setViewName(e.target.value)}
+            />
+          </label>
+          <p>
+            Client details and captured views stay in this presentation until
+            you leave or change the design.
+          </p>
+        </div>
         <RenderView
           design={design}
           onChange={() => {}}
-          onCapture={(url) => setCaptures((c) => [...c, url].slice(-3))}
+          onCapture={(url) =>
+            setCaptures((c) =>
+              [
+                ...c,
+                { url, name: viewName.trim() || `Perspective ${c.length + 1}` },
+              ].slice(-3),
+            )
+          }
         />
+        <div className="capture-list">
+          {captures.map((c, i) => (
+            <label key={i}>
+              View {i + 1}
+              <input
+                aria-label={`Captured view ${i + 1} name`}
+                value={c.name}
+                maxLength={100}
+                onChange={(e) =>
+                  setCaptures((rows) =>
+                    rows.map((r, n) =>
+                      n === i ? { ...r, name: e.target.value } : r,
+                    ),
+                  )
+                }
+              />
+              <button
+                onClick={() =>
+                  setCaptures((rows) => rows.filter((_, n) => n !== i))
+                }
+              >
+                Remove view {i + 1}
+              </button>
+            </label>
+          ))}
+        </div>
         <div className="designer-row">
+          <button
+            disabled={!captures.length}
+            onClick={() => setPreview((v) => !v)}
+          >
+            {preview ? 'Edit presentation' : 'Preview proposal'}
+          </button>
           <button disabled={!captures.length} onClick={() => window.print()}>
             Print client presentation / PDF
           </button>
@@ -170,14 +246,18 @@ export function ClientPresentation({ design }: { design: Design }) {
       <article className="client-package" aria-label="Client PDF preview">
         <section className="client-sheet">
           <h1>{design.name}</h1>
-          <p>{design.quote?.customer || 'Kitchen design proposal'}</p>
+          <p>{client || 'Kitchen design proposal'}</p>
           <p>Concept presentation · {new Date().toLocaleDateString()}</p>
-          {captures.map((url, i) => (
+          {captures.map((capture, i) => (
             <figure key={i}>
-              <img src={url} alt={`Kitchen perspective ${i + 1}`} />
-              <figcaption>Perspective {i + 1}</figcaption>
+              <img
+                src={capture.url}
+                alt={capture.name || `Kitchen perspective ${i + 1}`}
+              />
+              <figcaption>{capture.name || `Perspective ${i + 1}`}</figcaption>
             </figure>
           ))}
+          {notes && <p className="proposal-notes">{notes}</p>}
           {!captures.length && (
             <p>Capture a render above to complete the presentation.</p>
           )}
@@ -194,6 +274,23 @@ export function ClientPresentation({ design }: { design: Design }) {
             {design.appearance?.countertop ?? 'quartz'} · Lighting:{' '}
             {design.appearance?.lighting ?? 'daylight'}
           </p>
+          {design.items.some((i) => i.finish || i.countertop) && (
+            <>
+              <h3>Individual material selections</h3>
+              <ul>
+                {design.items
+                  .filter((i) => i.finish || i.countertop)
+                  .map((i) => (
+                    <li key={i.id}>
+                      {i.sku} · object {design.items.indexOf(i) + 1}:{' '}
+                      {i.finish ? `finish ${i.finish}` : ''}
+                      {i.finish && i.countertop ? ' · ' : ''}
+                      {i.countertop ? `countertop ${i.countertop}` : ''}
+                    </li>
+                  ))}
+              </ul>
+            </>
+          )}
           <h2>Demo estimate</h2>
           <p>DEMO PRICING — NOT A MANUFACTURER QUOTE</p>
           <table>
@@ -230,6 +327,60 @@ export function ClientPresentation({ design }: { design: Design }) {
           </p>
         </section>
       </article>
+    </section>
+  );
+}
+
+export function DemoWalkthrough({
+  step,
+  onStep,
+  onClose,
+}: {
+  step: number;
+  onStep: (step: number) => void;
+  onClose: () => void;
+}) {
+  const steps = [
+    [
+      'Explore the sample',
+      'The sample is ready. Orbit the kitchen to show the overall layout.',
+    ],
+    [
+      'Change the style',
+      'Choose a coordinated style in Materials, then try an individual cabinet finish.',
+    ],
+    [
+      'Move a cabinet',
+      'Drag the selected cabinet in the plan. Watch the alignment guides and conflict outline; Undo restores it.',
+    ],
+    [
+      'Compare alternatives',
+      'Save the current design as an alternative, change it, then enable linked rendered views to compare.',
+    ],
+    [
+      'Export the proposal',
+      'Capture and name a view, enter the client details, preview the proposal, then print to PDF.',
+    ],
+  ];
+  return (
+    <section className="demo-walkthrough" aria-label="Demo walkthrough">
+      <div>
+        <strong>
+          Demo walkthrough · {step + 1} / {steps.length} · {steps[step]?.[0]}
+        </strong>
+        <p>{steps[step]?.[1]}</p>
+      </div>
+      <div className="designer-row">
+        <button disabled={step === 0} onClick={() => onStep(step - 1)}>
+          Previous step
+        </button>
+        {step < steps.length - 1 ? (
+          <button onClick={() => onStep(step + 1)}>Next step</button>
+        ) : (
+          <button onClick={onClose}>Finish walkthrough</button>
+        )}
+        <button onClick={onClose}>Close walkthrough</button>
+      </div>
     </section>
   );
 }

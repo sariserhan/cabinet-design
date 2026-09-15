@@ -812,3 +812,30 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 
 .client-editor .camera-controls { display:none; }
 @media print { .has-client-presentation .designer-grid,.has-client-presentation .designer-center { min-height:0!important; height:auto!important; overflow:visible!important; } }
+
+.project-controls > summary { padding:10px 20px; cursor:pointer; color:#506874; font-size:13px; }
+.canvas-panel-controls { padding:8px 12px; border-bottom:1px solid #dce5e9; }
+.library-collapsed .designer-library-column,.inspector-collapsed .designer-inspector { display:none; }
+.designer-app.library-collapsed .designer-grid { grid-template-columns:minmax(0,1fr) 250px; }
+.designer-app.inspector-collapsed .designer-grid { grid-template-columns:250px minmax(0,1fr); }
+.designer-app.library-collapsed.inspector-collapsed .designer-grid { grid-template-columns:minmax(0,1fr); }
+.library-collapsed.inspector-collapsed .render-stage { height:65vh; min-height:380px; }
+.library-collapsed.inspector-collapsed .comparison-grid .render-stage { height:48vh; }
+.demo-walkthrough { padding:14px 20px; background:#e5f4ed; border:1px solid #bdd7c9; display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; }
+.demo-walkthrough p { margin:6px 0; }
+.proposal-fields { display:grid; gap:12px; margin:16px 0; }
+.proposal-fields label,.capture-list label { display:grid; gap:5px; }
+.proposal-fields textarea { width:100%; min-height:90px; border:1px solid #c9d9dc; padding:8px; border-radius:5px; }
+.capture-list { display:flex; flex-wrap:wrap; gap:12px; margin:14px 0; }
+.client-editor.previewing .designer-render,.client-editor.previewing .proposal-fields,.client-editor.previewing .capture-list { display:none; }
+.proposal-notes { white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:900px) {
+  .designer-app.library-collapsed .designer-grid,.designer-app.inspector-collapsed .designer-grid { grid-template-columns:minmax(0,1fr); }
+}
+@media print {
+  .canvas-panel-controls,.demo-walkthrough { display:none!important; }
+}
+.client-package table { table-layout:fixed; }
+.client-package td { overflow-wrap:anywhere; }
+.client-package h1,.client-package figcaption { white-space:normal; overflow-wrap:anywhere; }
+.is-presenting .canvas-panel-controls,.is-presenting .demo-walkthrough,.is-presenting .project-controls,.is-presenting .shortcut-help,.is-presenting .start-guide { display:none!important; }

@@ -1,4 +1,5 @@
 'use client';
+import { setActiveDrop } from '@/designer/drop';
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { Search, Plus } from 'lucide-react';
@@ -98,6 +99,7 @@ export function Library({
                 className="library-product"
                 key={p._id}
                 draggable={canPlace(p)}
+                onDragEnd={() => setActiveDrop(null)}
                 onDragStart={(e) => {
                   if (!version || !canPlace(p)) {
                     e.preventDefault();
@@ -110,6 +112,9 @@ export function Library({
                       product: p,
                       versionId: version._id,
                     }),
+                  );
+                  setActiveDrop(
+                    e.dataTransfer.getData('application/x-kitchen-item'),
                   );
                   e.dataTransfer.effectAllowed = 'copy';
                 }}

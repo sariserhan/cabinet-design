@@ -149,9 +149,10 @@ export function Preview({
       ],
     };
   }
-  const palette = finishes[design.finish];
+
   const faces = design.items
     .flatMap((item) => {
+      const palette = finishes[item.finish ?? design.finish];
       const { v, local } = cabinetPoints(item);
       const wood =
         item.kind === 'cabinet' ||

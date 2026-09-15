@@ -138,3 +138,14 @@ Validation for this update: 111 core and 15 backend tests passed, along with lin
 - **Reset demo** restores the polished sample, camera and editing controls, clears object search and leaves named saves intact. Undo restores the previous working design.
 
 QA: desktop and mobile browser checks cover the guided room dimensions, object filtering, style changes, linked rendered comparison, captured client PDF, reset and undo. PDF output is a concept proposal with demo pricing, not an order or construction approval.
+
+## Canvas and client presentation polish
+
+- **Focus canvas** collapses both side panels; Show library and Show properties control them independently. Compare options opens with more canvas space. File management and examples live under **Project files & examples**; Open design expands that section automatically.
+- In **Render**, click an object to select it and open its properties. Dragging still orbits. The selected object has an outline; edit its dimensions under Design or its finish under Materials.
+- **Individual materials** lets the selected object override the kitchen finish. Countertops and island objects can also override their stone pattern. For an island made from multiple custom cabinets and a separate countertop, select each component to customize it. JSON saves retain overrides; global presets retain them too. Choose Use kitchen to remove an override.
+- Library dragging shows a translucent footprint before placement, dashed edge guides, and red collision/clearance feedback. Openings preview their straight-wall attachment. Moving existing items also displays alignment guides and a conflict outline. Conflicts remain editable rather than silently blocking placement.
+- **Client presentation / PDF** now includes a client name, project notes, named captures, editable captions, remove-view controls and **Preview proposal**. Individual material overrides appear in the proposal. Details and images remain temporary until you print/save the PDF.
+- **Demo walkthrough** guides five steps: sample, style, placement, comparison and proposal. Starting it loads the sample with Undo available. Use Next step when ready, or close it to continue freely.
+
+Validation: 113 core and 15 backend tests, including preview placement parity, wall attachment and per-object material persistence. Browser QA covers render selection versus orbit, panel collapse, material overrides, drag collision preview, proposal editing/printing, walkthrough navigation and mobile layout.

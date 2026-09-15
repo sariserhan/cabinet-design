@@ -28,3 +28,12 @@ export function parseDrop(text: string): DropItem | null {
     return null;
   }
 }
+
+// Native drag data is protected during dragover; retain this tab's validated payload.
+let active: DropItem | null = null;
+export function setActiveDrop(value: string | null) {
+  active = value ? parseDrop(value) : null;
+}
+export function activeDrop() {
+  return active;
+}

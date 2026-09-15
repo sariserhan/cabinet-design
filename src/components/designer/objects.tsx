@@ -1,4 +1,5 @@
 'use client';
+import { setActiveDrop } from '@/designer/drop';
 import { useState } from 'react';
 import {
   DoorOpen,
@@ -72,10 +73,14 @@ export function ObjectsLibrary({
               className="library-product"
               key={p.kind}
               draggable
+              onDragEnd={() => setActiveDrop(null)}
               onDragStart={(e) => {
                 e.dataTransfer.setData(
                   'application/x-kitchen-item',
                   JSON.stringify({ kind: 'object', object: p.kind }),
+                );
+                setActiveDrop(
+                  e.dataTransfer.getData('application/x-kitchen-item'),
                 );
                 e.dataTransfer.effectAllowed = 'copy';
               }}

@@ -64,11 +64,13 @@ import { SelectionTools, CompareOptions } from './workflow-tools';
 import { snapPlacement, duplicateOption } from '@/designer/editing';
 import { MachiningTools } from './machining-tools';
 import {
+  DemoWalkthrough,
   StartGuide,
   MaterialPresets,
   ShortcutHelp,
   ClientPresentation,
 } from './demo-tools';
+import { placementAt } from '@/designer/editing';
 import { polishedSample } from '@/designer/sample';
 import { normalizeOpenings, worldToLocal } from '@/designer/model';
 import {
@@ -150,6 +152,9 @@ function Editor({ ownerId }: { ownerId: string }) {
   const overview = overviewRaw
     ? (JSON.parse(overviewRaw) as Overview)
     : undefined;
+  const [libraryCollapsed, setLibraryCollapsed] = useState(false),
+    [inspectorCollapsed, setInspectorCollapsed] = useState(false),
+    [walkStep, setWalkStep] = useState<number | null>(null);
   const [showStart, setShowStart] = useState(false);
   const [inspectorTab, setInspectorTab] = useState('design'),
     [presenting, setPresenting] = useState(false),
@@ -350,53 +355,15 @@ function Editor({ ownerId }: { ownerId: string }) {
       return;
     }
     let next = fromObject(kind);
-    if (drop && !isOpening(next)) {
-      const position = snapPlacement(
-        next,
-        design,
-        drop.x - next.width / 2,
-        drop.y - next.depth / 2,
-        snap,
-      );
-      commit((d) => ({ ...d, items: [...d.items, { ...next, ...position }] }));
-      setSelected(next.id);
-      setStatus(
-        next.sku +
-          ' placed. Check red outlines and Layout checks for conflicts.',
-      );
-      return;
-    }
-    if (drop && isOpening(next)) {
-      const edges = roomEdges(design.room).filter(
-        (e) => !e.curved && design.room.walls[e.side],
-      );
-      const edge = edges.sort(
-        (a, b) =>
-          Math.hypot(
-            drop.x - (a.a.x + a.b.x) / 2,
-            drop.y - (a.a.y + a.b.y) / 2,
-          ) -
-          Math.hypot(
-            drop.x - (b.a.x + b.b.x) / 2,
-            drop.y - (b.a.y + b.b.y) / 2,
-          ),
-      )[0];
-      if (!edge) {
+    if (drop) {
+      const placed = placementAt(next, design, drop, snap);
+      if (!placed) {
         setStatus('Add a straight wall for this opening.');
         return;
       }
-      next = {
-        ...next,
-        ...attachToWall(
-          { ...next, wallSegment: edge.index },
-          design.room,
-          edge.side,
-          drop.x,
-          drop.y,
-        ),
-      };
-      commit((d) => ({ ...d, items: [...d.items, next] }));
-      setSelected(next.id);
+      commit((d) => ({ ...d, items: [...d.items, placed] }));
+      setSelected(placed.id);
+      setStatus(placed.sku + ' placed. Layout checks explain any conflicts.');
       return;
     }
     let assemblyHost: Cabinet | undefined;
@@ -611,6 +578,29 @@ function Editor({ ownerId }: { ownerId: string }) {
       ...snapPosition(rotated, design.room, item.x, item.y, snap),
     });
   }
+  function walkthroughStep(step: number) {
+    setWalkStep(step);
+    setShowStart(false);
+    setInspectorCollapsed(step === 0 || step === 3 || step === 4);
+    setLibraryCollapsed(true);
+    if (step === 0) {
+      startDesign(polishedSample());
+      setMode('render');
+    }
+    if (step === 1) {
+      setMode('render');
+      setInspectorTab('materials');
+    }
+    if (step === 2) {
+      setMode('2d');
+      setInspectorTab('design');
+      setSelected(
+        design?.items.find((i) => i.kind === 'custom_cabinet')?.id ?? null,
+      );
+    }
+    if (step === 3) setMode('compare');
+    if (step === 4) setMode('client');
+  }
   function startDesign(next: Design) {
     commit(() => next);
     setShowStart(false);
@@ -634,7 +624,7 @@ function Editor({ ownerId }: { ownerId: string }) {
   }
   return (
     <div
-      className={`designer-app ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''}`}
+      className={`designer-app ${libraryCollapsed ? 'library-collapsed' : ''} ${inspectorCollapsed ? 'inspector-collapsed' : ''} ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''}`}
     >
       {presenting && (
         <div className="presentation-bar">
@@ -647,10 +637,27 @@ function Editor({ ownerId }: { ownerId: string }) {
       {showStart && (
         <StartGuide onStart={startDesign} onClose={() => setShowStart(false)} />
       )}
+      {walkStep !== null && (
+        <DemoWalkthrough
+          step={walkStep}
+          onStep={walkthroughStep}
+          onClose={() => setWalkStep(null)}
+        />
+      )}
       <PrintPackage design={design} />
       <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
+        <button onClick={() => walkthroughStep(0)}>Demo walkthrough</button>
+        <button
+          onClick={() => {
+            setMode('compare');
+            setLibraryCollapsed(true);
+            setInspectorCollapsed(true);
+          }}
+        >
+          Compare options
+        </button>
         <button onClick={() => setShowStart((v) => !v)}>Start here</button>
         <button
           onClick={() => {
@@ -691,6 +698,9 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
           <button
             onClick={() => {
+              const files =
+                document.querySelector<HTMLDetailsElement>('.project-controls');
+              if (files) files.open = true;
               document.getElementById('saved-designs')?.focus();
             }}
           >
@@ -699,77 +709,82 @@ function Editor({ ownerId }: { ownerId: string }) {
         </div>
       </header>
       <ShortcutHelp />
-      <div className="designer-projectbar">
-        <span>Draft saves automatically in this browser</span>
-        <div className="designer-row">
-          <select
-            id="saved-designs"
-            aria-label="Saved designs"
-            value={openId}
-            onChange={(e) => setOpenId(e.target.value)}
-          >
-            <option value="">Choose a saved design</option>
-            {saved.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} · {d.items.length} cabinets
-              </option>
-            ))}
-          </select>
-          <button disabled={!openId} onClick={open}>
-            Open
-          </button>
-          <button
-            onClick={() => {
-              commit(() => newDesign());
-              setSelected(null);
-              setStatus('New room created. Undo restores the previous design.');
-            }}
-          >
-            New room
-          </button>
-          <button onClick={() => setMode('compare')}>Compare options</button>
-          <button
-            onClick={() => {
-              commit(() => polishedSample());
-              setSelected(null);
-              setMode('render');
-              setStatus(
-                'Presentation kitchen loaded. Undo restores your previous design.',
-              );
-            }}
-          >
-            Load presentation kitchen
-          </button>
-          <button disabled={!templateRaw} onClick={example}>
-            Load example kitchen
-          </button>
-          <button
-            onClick={() =>
-              download(
-                JSON.stringify(design, null, 2),
-                `${design.name.replace(/[^a-z0-9-]/gi, '_')}.json`,
-                'application/json',
-              )
-            }
-          >
-            <Download size={14} /> Export
-          </button>
-          <button onClick={() => file.current?.click()}>
-            <Upload size={14} /> Import
-          </button>
-          <input
-            hidden
-            ref={file}
-            type="file"
-            accept=".json,application/json"
-            aria-label="Import design file"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void importFile(f);
-            }}
-          />
+      <details className="project-controls">
+        <summary>Project files & examples</summary>
+        <div className="designer-projectbar">
+          <span>Draft saves automatically in this browser</span>
+          <div className="designer-row">
+            <select
+              id="saved-designs"
+              aria-label="Saved designs"
+              value={openId}
+              onChange={(e) => setOpenId(e.target.value)}
+            >
+              <option value="">Choose a saved design</option>
+              {saved.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name} · {d.items.length} cabinets
+                </option>
+              ))}
+            </select>
+            <button disabled={!openId} onClick={open}>
+              Open
+            </button>
+            <button
+              onClick={() => {
+                commit(() => newDesign());
+                setSelected(null);
+                setStatus(
+                  'New room created. Undo restores the previous design.',
+                );
+              }}
+            >
+              New room
+            </button>
+
+            <button
+              onClick={() => {
+                commit(() => polishedSample());
+                setSelected(null);
+                setMode('render');
+                setStatus(
+                  'Presentation kitchen loaded. Undo restores your previous design.',
+                );
+              }}
+            >
+              Load presentation kitchen
+            </button>
+            <button disabled={!templateRaw} onClick={example}>
+              Load example kitchen
+            </button>
+            <button
+              onClick={() =>
+                download(
+                  JSON.stringify(design, null, 2),
+                  `${design.name.replace(/[^a-z0-9-]/gi, '_')}.json`,
+                  'application/json',
+                )
+              }
+            >
+              <Download size={14} /> Export
+            </button>
+            <button onClick={() => file.current?.click()}>
+              <Upload size={14} /> Import
+            </button>
+            <input
+              hidden
+              ref={file}
+              type="file"
+              accept=".json,application/json"
+              aria-label="Import design file"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void importFile(f);
+              }}
+            />
+          </div>
         </div>
-      </div>
+      </details>
       {(status || storageError || history.error) && (
         <div
           role="status"
@@ -817,6 +832,31 @@ function Editor({ ownerId }: { ownerId: string }) {
           )}
         </div>
         <section className="designer-center" aria-label="Design workspace">
+          <div className="canvas-panel-controls designer-row">
+            <button
+              aria-pressed={!libraryCollapsed}
+              onClick={() => setLibraryCollapsed((v) => !v)}
+            >
+              {libraryCollapsed ? 'Show library' : 'Hide library'}
+            </button>
+            <button
+              aria-pressed={!inspectorCollapsed}
+              onClick={() => setInspectorCollapsed((v) => !v)}
+            >
+              {inspectorCollapsed ? 'Show properties' : 'Hide properties'}
+            </button>
+            <button
+              onClick={() => {
+                const collapse = !(libraryCollapsed && inspectorCollapsed);
+                setLibraryCollapsed(collapse);
+                setInspectorCollapsed(collapse);
+              }}
+            >
+              {libraryCollapsed && inspectorCollapsed
+                ? 'Restore panels'
+                : 'Focus canvas'}
+            </button>
+          </div>
           <div className="designer-tools">
             <div className="designer-row">
               <button
@@ -994,6 +1034,14 @@ function Editor({ ownerId }: { ownerId: string }) {
             <RenderView
               key={design.id}
               design={design}
+              selected={selected}
+              onSelect={(id) => {
+                setSelected(id);
+                if (id) {
+                  setInspectorCollapsed(false);
+                  setInspectorTab('design');
+                }
+              }}
               onChange={(next) => commit(() => next)}
             />
           ) : (
@@ -1406,6 +1454,72 @@ function Editor({ ownerId }: { ownerId: string }) {
               design={design}
               onChange={(next) => commit(() => next)}
             />
+            {item &&
+              [
+                'cabinet',
+                'custom_cabinet',
+                'corner',
+                'island',
+                'countertop',
+                'door',
+                'window',
+                'filler',
+                'trim',
+                'molding',
+                'toe_kick',
+              ].includes(item.kind) && (
+                <section>
+                  <h3>{item.sku} · individual materials</h3>
+                  {item.kind !== 'countertop' && (
+                    <label>
+                      Cabinet / island finish
+                      <select
+                        aria-label="Selected object finish"
+                        value={item.finish ?? ''}
+                        onChange={(e) =>
+                          updateItem(item.id, {
+                            finish: (e.target.value ||
+                              undefined) as Cabinet['finish'],
+                          })
+                        }
+                      >
+                        <option value="">Use kitchen finish</option>
+                        {(['linen', 'oak', 'slate'] as const).map((f) => (
+                          <option key={f} value={f}>
+                            {f}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
+                  {['countertop', 'island'].includes(item.kind) && (
+                    <label>
+                      Countertop pattern
+                      <select
+                        aria-label="Selected countertop pattern"
+                        value={item.countertop ?? ''}
+                        onChange={(e) =>
+                          updateItem(item.id, {
+                            countertop: (e.target.value ||
+                              undefined) as Cabinet['countertop'],
+                          })
+                        }
+                      >
+                        <option value="">Use kitchen pattern</option>
+                        {(['quartz', 'marble', 'granite'] as const).map((f) => (
+                          <option key={f} value={f}>
+                            {f}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
+                  <p>
+                    Overrides apply to this object only. Select Use kitchen to
+                    follow the global style again.
+                  </p>
+                </section>
+              )}
             <h3>Preview finish</h3>
             <div className="designer-finishes">
               {(['linen', 'oak', 'slate'] as const).map((finish) => (
