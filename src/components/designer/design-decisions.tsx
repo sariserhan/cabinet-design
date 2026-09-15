@@ -1,4 +1,5 @@
 'use client';
+import { isPublicRecord } from '@/designer/public-catalogs';
 import { useEffect, useMemo, useState } from 'react';
 import { useConvex, useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -114,6 +115,7 @@ function DecisionWorkspace({
     const ids = JSON.parse(evidenceKey) as string[];
     void Promise.all(
       ids.map(async (recordId) => {
+        if (isPublicRecord(recordId)) return null;
         try {
           const result = JSON.parse(
             await client.query(api.workspace.record, {

@@ -1,4 +1,5 @@
 'use client';
+import { sourceLink } from '@/designer/design-decisions';
 import {
   SampleGallery,
   SampleStory,
@@ -1797,11 +1798,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                       <td>{quantity}</td>
                       <td>
                         {i.kind === 'cabinet' ? (
-                          <Link
-                            href={`/review?version=${encodeURIComponent(i.versionId)}&record=${encodeURIComponent(i.recordId)}`}
-                          >
-                            PDF {i.pageNumber}
-                          </Link>
+                          <Link href={sourceLink(i)}>PDF {i.pageNumber}</Link>
                         ) : (
                           <span>Demo object</span>
                         )}
@@ -2159,10 +2156,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                   </p>
                 )}
                 {item.kind === 'cabinet' && (
-                  <Link
-                    className="designer-source"
-                    href={`/review?version=${encodeURIComponent(item.versionId)}&record=${encodeURIComponent(item.recordId)}`}
-                  >
+                  <Link className="designer-source" href={sourceLink(item)}>
                     Inspect source · PDF {item.pageNumber}
                   </Link>
                 )}

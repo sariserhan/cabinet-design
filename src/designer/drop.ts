@@ -11,6 +11,7 @@ const schema = z.discriminatedUnion('kind', [
     kind: z.literal('product'),
     versionId: z.string().min(1).max(100),
     product: z.object({
+      sourceNote: z.string().max(1000).optional(),
       _id: z.string().min(1).max(100),
       sku: z.string().min(1).max(100),
       category: z.string().max(100),

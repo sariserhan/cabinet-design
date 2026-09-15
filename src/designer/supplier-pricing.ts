@@ -64,6 +64,9 @@ function priceKey(line: {
 }
 export function itemConfiguration(item: Cabinet) {
   const options = {
+    catalogVersion: item.versionId.startsWith('public-')
+      ? item.versionId
+      : undefined,
     details: item.details,
     surface: item.surface,
     sinkStyle: item.sinkStyle,

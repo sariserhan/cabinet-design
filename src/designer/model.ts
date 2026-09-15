@@ -355,6 +355,7 @@ export type Design = z.infer<typeof designSchema>;
 export type Cabinet = z.infer<typeof itemSchema>;
 export type Room = Design['room'];
 export type Product = {
+  sourceNote?: string | undefined;
   _id: string;
   sku: string;
   category: string;
@@ -593,6 +594,7 @@ export function fromProduct(product: Product, versionId: string): Cabinet {
     );
   return {
     id: crypto.randomUUID(),
+    ...(product.sourceNote ? { note: product.sourceNote } : {}),
     recordId: product._id,
     versionId,
     sku: product.sku,

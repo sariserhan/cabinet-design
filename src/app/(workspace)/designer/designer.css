@@ -1308,3 +1308,12 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .everyday-editing .quick-find { margin-bottom:12px; }
 .everyday-editing .quick-find input { min-width:0; width:100%; }
 @media(max-width:700px){.studio-workflow{padding:12px}.studio-stages{gap:4px}.studio-stages button{padding:10px 4px;font-size:12px;gap:4px;flex-direction:column}.studio-support{margin:8px 12px}.studio-stage-tools{padding:8px 12px}.everyday-grid{grid-template-columns:1fr}.studio-extras{width:100%}}
+
+.public-catalog-notice { margin:12px 0; padding:10px; border:1px solid var(--studio-line); border-radius:8px; background:#f8f4e8; font-size:12px; color:#443d2d; }
+.designer-library > label:has(select) { display:grid; gap:6px; font-size:12px; margin:8px 0; }
+.designer-library > label select { width:100%; min-width:0; }
+.library-product a { display:block; font-size:12px; margin:6px 0; text-decoration:underline; }
+
+.public-catalog-notice summary { cursor:pointer; margin:8px 0; }
+.catalog-placeable-filter { display:flex; gap:6px; align-items:center; font-size:12px; margin:10px 0; }
+.catalog-placeable-filter input { width:auto; }

@@ -1,4 +1,5 @@
 'use client';
+import { isPublicRecord } from '@/designer/public-catalogs';
 import { projectDataChanged } from '@/designer/local-project-events';
 import { useEffect, useMemo, useState } from 'react';
 import { useConvex, useQuery } from 'convex/react';
@@ -83,6 +84,7 @@ export function ProjectWorkflow({
     let active = true;
     void Promise.all(
       (JSON.parse(idsKey) as string[]).map(async (id) => {
+        if (isPublicRecord(id)) return null;
         try {
           return (
             JSON.parse(

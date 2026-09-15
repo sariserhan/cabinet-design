@@ -1,0 +1,852 @@
+{
+  "catalog": {
+    "id": "public-allure-18424d5f3fc4",
+    "series": "Allure",
+    "documentVersion": "02-26-26",
+    "sourceUrl": "https://downloads.ctfassets.net/h0sz29d5jfiq/hMD9fgIvMzJcwmYgi7Oj0/6dc8130d4cec78aaee7533b4318c468d/Allure_Spec_Book_02-26-26.pdf",
+    "sourcePath": "sources/fabuwood-allure/Allure_Spec_Book_02-26-26.pdf",
+    "sha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+    "pageCount": 139,
+    "productCount": 1190,
+    "placeableCount": 145,
+    "humanVerified": false,
+    "coverage": "All pages scanned for ITEM columns; extraction completeness and configurations unverified",
+    "freshness": "Dated February 2026; book warns of missing updates. Confirm current specifications with supplier."
+  },
+  "pages": [
+    {
+      "pageNumber": 1,
+      "title": "Other catalog items",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 2,
+      "title": "Other catalog items",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 3,
+      "title": "Construction Specifications",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 4,
+      "title": "Construction Specifications",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 5,
+      "title": "Q12\u00ae",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 6,
+      "title": "Limited Lifetime Warranty",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 7,
+      "title": "Door Styles",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 8,
+      "title": "Door Styles",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 9,
+      "title": "Door Styles",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 10,
+      "title": "Door Styles",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 11,
+      "title": "Sample Doors",
+      "itemHeaders": 1,
+      "extractedRows": 35
+    },
+    {
+      "pageNumber": 12,
+      "title": "Sample Doors",
+      "itemHeaders": 2,
+      "extractedRows": 63
+    },
+    {
+      "pageNumber": 13,
+      "title": "Sample Doors",
+      "itemHeaders": 1,
+      "extractedRows": 35
+    },
+    {
+      "pageNumber": 14,
+      "title": "Sample Doors",
+      "itemHeaders": 2,
+      "extractedRows": 63
+    },
+    {
+      "pageNumber": 15,
+      "title": "Sample Doors",
+      "itemHeaders": 1,
+      "extractedRows": 35
+    },
+    {
+      "pageNumber": 16,
+      "title": "Sample Doors",
+      "itemHeaders": 2,
+      "extractedRows": 63
+    },
+    {
+      "pageNumber": 17,
+      "title": "Sales Tools",
+      "itemHeaders": 4,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 18,
+      "title": "Sales Tools",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 19,
+      "title": "Sales Tools",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 20,
+      "title": "Sales Tools",
+      "itemHeaders": 2,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 21,
+      "title": "Sales Tools",
+      "itemHeaders": 2,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 22,
+      "title": "12\u201d- 27\u201d High Wall Cabinets Wall Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 27
+    },
+    {
+      "pageNumber": 23,
+      "title": "12\u201d- 24\u201d High & 24\u201d Deep Wall Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 16
+    },
+    {
+      "pageNumber": 24,
+      "title": "12\u201d- 24\u201d High & 24\u201d Deep Wall Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 25,
+      "title": "30\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 26,
+      "title": "30\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 27,
+      "title": "36\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 28,
+      "title": "36\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 29,
+      "title": "39\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 30,
+      "title": "39\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 31,
+      "title": "42\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 32,
+      "title": "42\" High Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 33,
+      "title": "Glass Doors",
+      "itemHeaders": 1,
+      "extractedRows": 26
+    },
+    {
+      "pageNumber": 34,
+      "title": "Doors Prepped for Glass",
+      "itemHeaders": 1,
+      "extractedRows": 26
+    },
+    {
+      "pageNumber": 35,
+      "title": "Specialty Wall Cabinets",
+      "itemHeaders": 1,
+      "extractedRows": 23
+    },
+    {
+      "pageNumber": 36,
+      "title": "Specialty Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 37,
+      "title": "Specialty Wall Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 16
+    },
+    {
+      "pageNumber": 38,
+      "title": "Specialty Wall Cabinets",
+      "itemHeaders": 1,
+      "extractedRows": 8
+    },
+    {
+      "pageNumber": 39,
+      "title": "Microwave Wall Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 40,
+      "title": "Microwave Wall Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 2
+    },
+    {
+      "pageNumber": 41,
+      "title": "Wine Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 8
+    },
+    {
+      "pageNumber": 42,
+      "title": "Euro & Farmhouse Hoods Hoods",
+      "itemHeaders": 2,
+      "extractedRows": 12
+    },
+    {
+      "pageNumber": 43,
+      "title": "Signature Hoods",
+      "itemHeaders": 2,
+      "extractedRows": 9
+    },
+    {
+      "pageNumber": 44,
+      "title": "Curved Artisan Hoods",
+      "itemHeaders": 2,
+      "extractedRows": 9
+    },
+    {
+      "pageNumber": 45,
+      "title": "Arched Hoods",
+      "itemHeaders": 2,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 46,
+      "title": "Hood Liner Specifications",
+      "itemHeaders": 1,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 47,
+      "title": "Hood Liner Specifications",
+      "itemHeaders": 1,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 48,
+      "title": "Hood Liner Specifications",
+      "itemHeaders": 1,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 49,
+      "title": "Hood Ventilation Systems",
+      "itemHeaders": 2,
+      "extractedRows": 2
+    },
+    {
+      "pageNumber": 50,
+      "title": "Hood Ventilation Systems",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 51,
+      "title": "Base Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 15
+    },
+    {
+      "pageNumber": 52,
+      "title": "Base Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 19
+    },
+    {
+      "pageNumber": 53,
+      "title": "Base Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 9
+    },
+    {
+      "pageNumber": 54,
+      "title": "Base Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 8
+    },
+    {
+      "pageNumber": 55,
+      "title": "Sink Base Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 10
+    },
+    {
+      "pageNumber": 56,
+      "title": "Base Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 57,
+      "title": "Specialty Base Cabinets",
+      "itemHeaders": 4,
+      "extractedRows": 6
+    },
+    {
+      "pageNumber": 58,
+      "title": "24\" Deep Tall Pantry Cabinets Tall Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 20
+    },
+    {
+      "pageNumber": 59,
+      "title": "12\" Deep Tall Pantry Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 20
+    },
+    {
+      "pageNumber": 60,
+      "title": "Oven Cabinets",
+      "itemHeaders": 1,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 61,
+      "title": "Oven Cabinets",
+      "itemHeaders": 1,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 62,
+      "title": "Oven Cabinets",
+      "itemHeaders": 1,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 63,
+      "title": "Vanities Vanity Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 64,
+      "title": "Vanities",
+      "itemHeaders": 3,
+      "extractedRows": 11
+    },
+    {
+      "pageNumber": 65,
+      "title": "Vanities",
+      "itemHeaders": 3,
+      "extractedRows": 5
+    },
+    {
+      "pageNumber": 66,
+      "title": "Vanities",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 67,
+      "title": "Vanities",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 68,
+      "title": "Vanities",
+      "itemHeaders": 1,
+      "extractedRows": 1
+    },
+    {
+      "pageNumber": 69,
+      "title": "Vanity Platforms",
+      "itemHeaders": 2,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 70,
+      "title": "Vanity Platforms",
+      "itemHeaders": 2,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 71,
+      "title": "Vanity Platform Loose Parts",
+      "itemHeaders": 3,
+      "extractedRows": 16
+    },
+    {
+      "pageNumber": 72,
+      "title": "ADA Cabinets",
+      "itemHeaders": 3,
+      "extractedRows": 13
+    },
+    {
+      "pageNumber": 73,
+      "title": "ADA Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 5
+    },
+    {
+      "pageNumber": 74,
+      "title": "ADA Cabinets",
+      "itemHeaders": 2,
+      "extractedRows": 5
+    },
+    {
+      "pageNumber": 75,
+      "title": "Waste Solutions Storage Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 76,
+      "title": "Base Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 16
+    },
+    {
+      "pageNumber": 77,
+      "title": "Base Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 6
+    },
+    {
+      "pageNumber": 78,
+      "title": "Base Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 79,
+      "title": "Base Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 6
+    },
+    {
+      "pageNumber": 80,
+      "title": "Base Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 2
+    },
+    {
+      "pageNumber": 81,
+      "title": "Base & Wall Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 82,
+      "title": "Wall Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 83,
+      "title": "Wall Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 21
+    },
+    {
+      "pageNumber": 84,
+      "title": "Sink Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 85,
+      "title": "Drawer Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 86,
+      "title": "Drawer Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 87,
+      "title": "Drawer Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 88,
+      "title": "Drawer Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 89,
+      "title": "Vanity Accessories",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 90,
+      "title": "Vanity Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 2
+    },
+    {
+      "pageNumber": 91,
+      "title": "Fillers Cabinet Accessories",
+      "itemHeaders": 2,
+      "extractedRows": 13
+    },
+    {
+      "pageNumber": 92,
+      "title": "Fillers",
+      "itemHeaders": 1,
+      "extractedRows": 10
+    },
+    {
+      "pageNumber": 93,
+      "title": "Valances",
+      "itemHeaders": 3,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 94,
+      "title": "Posts",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 95,
+      "title": "Posts and Pilasters",
+      "itemHeaders": 3,
+      "extractedRows": 10
+    },
+    {
+      "pageNumber": 96,
+      "title": "Corbels",
+      "itemHeaders": 1,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 97,
+      "title": "Moldings (8')",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 98,
+      "title": "Moldings (8')",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 99,
+      "title": "Moldings (8')",
+      "itemHeaders": 5,
+      "extractedRows": 5
+    },
+    {
+      "pageNumber": 100,
+      "title": "Moldings (8')",
+      "itemHeaders": 3,
+      "extractedRows": 5
+    },
+    {
+      "pageNumber": 101,
+      "title": "Moldings (8')",
+      "itemHeaders": 6,
+      "extractedRows": 8
+    },
+    {
+      "pageNumber": 102,
+      "title": "Moldings (8')",
+      "itemHeaders": 1,
+      "extractedRows": 1
+    },
+    {
+      "pageNumber": 103,
+      "title": "Panels",
+      "itemHeaders": 2,
+      "extractedRows": 14
+    },
+    {
+      "pageNumber": 104,
+      "title": "Panels",
+      "itemHeaders": 1,
+      "extractedRows": 9
+    },
+    {
+      "pageNumber": 105,
+      "title": "Panels",
+      "itemHeaders": 2,
+      "extractedRows": 5
+    },
+    {
+      "pageNumber": 106,
+      "title": "Panels",
+      "itemHeaders": 1,
+      "extractedRows": 16
+    },
+    {
+      "pageNumber": 107,
+      "title": "Panels & Columns",
+      "itemHeaders": 3,
+      "extractedRows": 15
+    },
+    {
+      "pageNumber": 108,
+      "title": "Paint & Touch Up Kits",
+      "itemHeaders": 4,
+      "extractedRows": 5
+    },
+    {
+      "pageNumber": 109,
+      "title": "Cabinet Lighting Hafele Lighting",
+      "itemHeaders": 1,
+      "extractedRows": 11
+    },
+    {
+      "pageNumber": 110,
+      "title": "Cabinet Lighting",
+      "itemHeaders": 3,
+      "extractedRows": 21
+    },
+    {
+      "pageNumber": 111,
+      "title": "Cabinet Lighting",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 112,
+      "title": "Cabinet Lighting",
+      "itemHeaders": 3,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 113,
+      "title": "Other catalog items",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 114,
+      "title": "Cut Modifications",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 115,
+      "title": "Cut Modifications",
+      "itemHeaders": 4,
+      "extractedRows": 3
+    },
+    {
+      "pageNumber": 116,
+      "title": "Cut Modifications",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 117,
+      "title": "Cut Modifications",
+      "itemHeaders": 1,
+      "extractedRows": 1
+    },
+    {
+      "pageNumber": 118,
+      "title": "Pipe Chase",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 119,
+      "title": "Pipe Chase",
+      "itemHeaders": 1,
+      "extractedRows": 1
+    },
+    {
+      "pageNumber": 120,
+      "title": "Create Returns",
+      "itemHeaders": 2,
+      "extractedRows": 2
+    },
+    {
+      "pageNumber": 121,
+      "title": "Custom Columns & Doors",
+      "itemHeaders": 2,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 122,
+      "title": "Customizations",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 123,
+      "title": "Customizations",
+      "itemHeaders": 1,
+      "extractedRows": 1
+    },
+    {
+      "pageNumber": 124,
+      "title": "Customizations",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 125,
+      "title": "Customizations",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 126,
+      "title": "Customizations",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 127,
+      "title": "Customizations",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 128,
+      "title": "Customizations",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 129,
+      "title": "Customizations",
+      "itemHeaders": 4,
+      "extractedRows": 4
+    },
+    {
+      "pageNumber": 130,
+      "title": "Two Tone Hood Modification",
+      "itemHeaders": 1,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 131,
+      "title": "Upgrades & Configuartions",
+      "itemHeaders": 2,
+      "extractedRows": 7
+    },
+    {
+      "pageNumber": 132,
+      "title": "Loose Parts",
+      "itemHeaders": 1,
+      "extractedRows": 8
+    },
+    {
+      "pageNumber": 133,
+      "title": "Height Alignment Guide",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 134,
+      "title": "84\" Height Alignment",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 135,
+      "title": "90\" Height Alignment",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 136,
+      "title": "96\" Height Alignment",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 137,
+      "title": "SKU Glossary",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 138,
+      "title": "SKU Glossary",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    },
+    {
+      "pageNumber": 139,
+      "title": "Other catalog items",
+      "itemHeaders": 0,
+      "extractedRows": 0
+    }
+  ]
+}

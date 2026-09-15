@@ -1,3 +1,4 @@
+import { publicSourceLink } from './public-catalogs';
 import {
   type Cabinet,
   type Design,
@@ -23,7 +24,10 @@ export type CatalogChoice = Product & {
   blockers: string[];
 };
 export function sourceLink(item: Pick<Cabinet, 'recordId' | 'versionId'>) {
-  return `/review?version=${encodeURIComponent(item.versionId)}&record=${encodeURIComponent(item.recordId)}`;
+  return (
+    publicSourceLink(item) ??
+    `/review?version=${encodeURIComponent(item.versionId)}&record=${encodeURIComponent(item.recordId)}`
+  );
 }
 export function storageSummary(design: Design) {
   const cabinets = design.items.filter((i) =>
@@ -167,6 +171,15 @@ function replacementOptions(
         line.configuration === 'standard' ? {} : JSON.parse(line.configuration);
     } catch {
       continue;
+    }
+    if (
+      configuration &&
+      typeof configuration === 'object' &&
+      'catalogVersion' in configuration
+    ) {
+      const { catalogVersion, ...rest } = configuration;
+      if (catalogVersion !== item.versionId) continue;
+      configuration = rest;
     }
     const config = itemSchema
       .pick({

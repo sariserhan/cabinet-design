@@ -16,6 +16,14 @@ The drawing package is standalone HTML with a **Print / save PDF** button. Use A
 
 Outputs are coordination drafts: verify site measurements, appliance specifications, service locations, manufacturer options and source records before ordering or installation. Mirrored fronts do not establish manufacturer handing. Real dealer and installer review is still required.
 
+## Additional Fabuwood catalogs
+
+In **Cabinets**, use **Catalog source** to choose the workspace catalog or the public Allure, Illume and Ovela reference drafts. Search product codes, filter by category, or select **Placeable cabinets only**. Each entry links to its exact physical page in the pinned February 2026 PDF.
+
+The public library has 1,190 Allure, 605 Illume and 602 Ovela reference entries, including accessories, samples and modification codes. Of these, 145 / 16 / 16 respectively have cabinet dimensions supported for draft placement. Other records remain reference-only. Counts are extracted entries, not proof of complete manufacturer coverage. See [the catalog expansion notes](artifacts/public-catalogs/README.md) for provenance and limitations.
+
+These source books warn of missing updates. Verify current specifications, finish choices and prices with the supplier. Public-catalog price requests include series/version identity in the configuration field; retain it when returning prices.
+
 ## Connect from your laptop
 
 The demo runs on the remote machine at `127.0.0.1:3000`.

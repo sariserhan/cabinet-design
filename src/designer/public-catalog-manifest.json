@@ -1,0 +1,44 @@
+[
+  {
+    "id": "public-allure-18424d5f3fc4",
+    "series": "Allure",
+    "documentVersion": "02-26-26",
+    "sourceUrl": "https://downloads.ctfassets.net/h0sz29d5jfiq/hMD9fgIvMzJcwmYgi7Oj0/6dc8130d4cec78aaee7533b4318c468d/Allure_Spec_Book_02-26-26.pdf",
+    "sourcePath": "sources/fabuwood-allure/Allure_Spec_Book_02-26-26.pdf",
+    "sha256": "18424d5f3fc49f84d7a5095bc6d2a169a8d417a16e5d9ca1ee8fd7db1c2bc530",
+    "pageCount": 139,
+    "productCount": 1190,
+    "placeableCount": 145,
+    "humanVerified": false,
+    "coverage": "All pages scanned for ITEM columns; extraction completeness and configurations unverified",
+    "freshness": "Dated February 2026; book warns of missing updates. Confirm current specifications with supplier."
+  },
+  {
+    "id": "public-illume-8a4cf53755cc",
+    "series": "Illume",
+    "documentVersion": "02-26-26",
+    "sourceUrl": "https://assets.ctfassets.net/h0sz29d5jfiq/3WQpoFMclEwEKiuRTDTLwJ/d14e44c04a340fcc5b4dae475dd79aca/Illume_Spec_Book_02-26-26.pdf",
+    "sourcePath": "sources/fabuwood-illume/Illume_Spec_Book_02-26-26.pdf",
+    "sha256": "8a4cf53755cc5b02175afbe727469917136ace2e39cb9b26534555680ca12a62",
+    "pageCount": 92,
+    "productCount": 605,
+    "placeableCount": 16,
+    "humanVerified": false,
+    "coverage": "All pages scanned for ITEM columns; extraction completeness and configurations unverified",
+    "freshness": "Dated February 2026; book warns of missing updates. Confirm current specifications with supplier."
+  },
+  {
+    "id": "public-ovela-9f756af2f20d",
+    "series": "Ovela",
+    "documentVersion": "02-26-26",
+    "sourceUrl": "https://assets.ctfassets.net/h0sz29d5jfiq/W8MqbqBF0iuKOOK4o0GDA/10cb0535527c41d38266029f17e07675/Ovela_Spec_Book_02-26-26.pdf",
+    "sourcePath": "sources/fabuwood-ovela/Ovela_Spec_Book_02-26-26.pdf",
+    "sha256": "9f756af2f20d56525b6f8ace8acecd5456cf754d8c8320716b5b3e45b052e327",
+    "pageCount": 84,
+    "productCount": 602,
+    "placeableCount": 16,
+    "humanVerified": false,
+    "coverage": "All pages scanned for ITEM columns; extraction completeness and configurations unverified",
+    "freshness": "Dated February 2026; book warns of missing updates. Confirm current specifications with supplier."
+  }
+]
