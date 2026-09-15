@@ -7,6 +7,8 @@ import {
   SurfaceEditor,
   ReadinessCheck,
 } from './studio-panels';
+import { DesignerKeyboardSupport } from './keyboard-support';
+import { ProjectHub } from './project-hub';
 import { PurchasingWorkspace } from './purchasing-workspace';
 import { FirstUseGuide } from './first-use-guide';
 import { ProjectWorkflow } from './project-workflow';
@@ -783,6 +785,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     <div
       className={`designer-app ${libraryCollapsed ? 'library-collapsed' : ''} ${inspectorCollapsed ? 'inspector-collapsed' : ''} ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''} ${showroom ? 'has-showroom' : ''}`}
     >
+      <DesignerKeyboardSupport />
       {showroom && (
         <Showroom
           key={design.id}
@@ -911,6 +914,38 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         </div>
       </header>
+      <nav className="designer-skip-links" aria-label="Designer shortcuts">
+        <a href="#project-dashboard">Skip to project overview</a>
+        <a href="#design-workspace">Skip to design canvas</a>
+        <a
+          href="#designer-inspector"
+          onClick={(event) => {
+            event.preventDefault();
+            setInspectorCollapsed(false);
+            setPresenting(false);
+            setMode('2d');
+            requestAnimationFrame(() => {
+              const target = document.getElementById('designer-inspector');
+              target?.scrollIntoView({ behavior: 'smooth' });
+              target?.focus({ preventScroll: true });
+            });
+          }}
+        >
+          Skip to item controls
+        </a>
+      </nav>
+      <ProjectHub
+        key={`hub:${design.id}`}
+        design={design}
+        ownerId={ownerId}
+        onRestore={(next) => {
+          setHistory({ past: [], current: next, future: [] });
+          setSelected(null);
+          setSelection([]);
+          setBefore(next);
+          setStatus('Complete project restored as a separate local copy.');
+        }}
+      />
       <FirstUseGuide
         ownerId={ownerId}
         design={design}
@@ -1227,7 +1262,12 @@ function Editor({ ownerId }: { ownerId: string }) {
             />
           )}
         </div>
-        <section className="designer-center" aria-label="Design workspace">
+        <section
+          className="designer-center"
+          aria-label="Design workspace"
+          id="design-workspace"
+          tabIndex={-1}
+        >
           <div className="canvas-panel-controls designer-row">
             <button
               aria-pressed={!libraryCollapsed}
@@ -1606,6 +1646,8 @@ function Editor({ ownerId }: { ownerId: string }) {
             onChange={(next) => commit(() => next)}
           />
           <div
+            id="designer-inspector"
+            tabIndex={-1}
             role="tablist"
             aria-label="Inspector sections"
             className="inspector-tabs"

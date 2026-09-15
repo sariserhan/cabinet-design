@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { supplierConfirmationSchema } from './supplier-confirmation';
 import { type Design, parseDesign, isOpening, warnings } from './model';
 import { canonical } from './installer-handoff';
 import { milestoneDesign, reviewContent } from './project-workflow';
@@ -53,6 +54,7 @@ const purchaseSchema = z.object({
   approval: approvalSchema.optional(),
   supplierNote: z.string().max(2000),
   receipts: z.array(receiptSchema).max(100),
+  confirmation: supplierConfirmationSchema.optional(),
 });
 export const purchasingSchema = z.object({
   format: z.literal('kitchen-purchasing-v1'),
@@ -60,6 +62,7 @@ export const purchasingSchema = z.object({
   baseline: z
     .object({ designJson: snapshot, approval: approvalSchema })
     .optional(),
+  baselineReference: snapshot.optional(),
   changes: z.array(changeSchema).max(10),
   purchases: z.array(purchaseSchema).max(10),
 });
@@ -89,6 +92,7 @@ export function parsePurchasing(
     throw Error('Purchasing records belong to another project.');
   const snapshots = [
     data.baseline?.designJson,
+    data.baselineReference,
     ...data.changes.flatMap((c) => [c.before, c.after]),
     ...data.purchases.map((p) => p.designJson),
   ].filter((s): s is string => !!s);
@@ -99,6 +103,28 @@ export function parsePurchasing(
     throw Error('Duplicate record identifiers.');
   for (const p of data.purchases) {
     const items = supplyDesign(parseDesign(p.designJson)).items;
+    const lines = purchaseLines(parseDesign(p.designJson), p.book);
+    if (p.confirmation) {
+      if (
+        new Set(p.confirmation.lines.map((l) => l.lineId)).size !==
+        p.confirmation.lines.length
+      )
+        throw Error('Duplicate supplier confirmation lines.');
+      for (const confirmation of p.confirmation.lines) {
+        const line = lines.find((l) => l.id === confirmation.lineId);
+        if (!line || confirmation.confirmedQuantity > line.quantity)
+          throw Error(
+            'Confirmed quantity exceeds the ordered quantity or references an unknown line.',
+          );
+        if (
+          confirmation.substitution !== 'none' &&
+          !confirmation.substituteSku.trim()
+        )
+          throw Error(
+            'Enter a substitute SKU before recording a substitution.',
+          );
+      }
+    }
     if (
       new Set(p.receipts.map((r) => r.itemId)).size !== p.receipts.length ||
       p.receipts.some((r) => !items.some((i) => i.id === r.itemId))
@@ -108,6 +134,7 @@ export function parsePurchasing(
       throw Error('Use at most four photos per purchase draft.');
   }
   if (!trustedLocal) {
+    if (data.baseline) data.baselineReference = data.baseline.designJson;
     delete data.baseline;
     data.changes.forEach((c) => {
       delete c.approval;

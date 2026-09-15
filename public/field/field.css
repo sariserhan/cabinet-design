@@ -1,0 +1,135 @@
+:root {
+  font: 16px system-ui;
+  color: #20392c;
+  background: #f1f5ef;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 860px;
+  margin: 32px auto;
+  padding: 20px;
+}
+header {
+  padding: 8px 0 20px;
+}
+h1 {
+  font-size: clamp(28px, 6vw, 42px);
+}
+h2 {
+  font-size: 23px;
+}
+.card,
+details {
+  padding: 20px;
+  margin: 16px 0;
+  border: 1px solid #bdcebf;
+  border-radius: 14px;
+  background: white;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+}
+input,
+select,
+textarea,
+button {
+  box-sizing: border-box;
+  font: inherit;
+  min-height: 44px;
+  border: 1px solid #698772;
+  border-radius: 7px;
+  padding: 10px;
+  max-width: 100%;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  background: white;
+  color: #20392c;
+}
+textarea {
+  min-height: 95px;
+}
+button {
+  background: #214c39;
+  color: white;
+  cursor: pointer;
+  margin: 4px 4px 4px 0;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+:focus-visible {
+  outline: 3px solid #176cbb;
+  outline-offset: 3px;
+}
+summary {
+  cursor: pointer;
+  min-height: 32px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+img {
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+}
+p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.skip {
+  position: absolute;
+  left: -10000px;
+}
+.skip:focus {
+  left: 16px;
+  top: 8px;
+  background: white;
+  padding: 12px;
+}
+#connectivity,
+#sync {
+  padding: 12px;
+  background: #e0eddf;
+  border-radius: 8px;
+}
+small {
+  letter-spacing: 0.08em;
+}
+@media (max-width: 480px) {
+  main {
+    padding: 12px;
+    margin: 10px auto;
+  }
+  .card {
+    padding: 14px;
+  }
+}
+@media print {
+  button,
+  input,
+  select,
+  #add,
+  header,
+  #import,
+  .skip {
+    display: none;
+  }
+  main {
+    max-width: none;
+  }
+  .card {
+    break-inside: avoid;
+  }
+}

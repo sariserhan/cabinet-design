@@ -1,4 +1,7 @@
 'use client';
+import { SupplierConfirmations } from './supplier-confirmations';
+import { projectDataChanged } from '@/designer/local-project-events';
+import { compactPhoto } from './compact-photo';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useConvex, useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -107,6 +110,7 @@ function PurchasingTools({
     latest.current = checked;
     setData(checked);
     setMessage('Purchasing records saved in this browser.');
+    projectDataChanged();
   }
   function act(fn: () => void) {
     try {
@@ -295,6 +299,21 @@ function PurchasingTools({
         {tab === 'changes' && (
           <div>
             <h3>Change orders</h3>
+            {data.baselineReference && (
+              <p>
+                Imported baseline retained as an unverified reference.{' '}
+                <button
+                  onClick={() =>
+                    downloadJson(
+                      parseDesign(data.baselineReference ?? ''),
+                      'unverified-baseline-design.json',
+                    )
+                  }
+                >
+                  Export baseline reference
+                </button>
+              </p>
+            )}
             <p>
               {data.baseline
                 ? `Baseline: approved revision ${data.baseline.approval.revision}`
@@ -507,6 +526,19 @@ function PurchasingTools({
             )}
             {purchase && (
               <article className="purchase-card">
+                <SupplierConfirmations
+                  purchase={purchase}
+                  onChange={(confirmation) =>
+                    act(() =>
+                      save({
+                        ...data,
+                        purchases: data.purchases.map((p) =>
+                          p.id === purchase.id ? { ...p, confirmation } : p,
+                        ),
+                      }),
+                    )
+                  }
+                />
                 <h3>{purchase.number} · immutable draft</h3>
                 <p>
                   {reviewContent(parseDesign(purchase.designJson)) ===
@@ -735,25 +767,4 @@ function PurchasingTools({
       </fieldset>
     </section>
   );
-}
-async function compactPhoto(file: File) {
-  if (!file.type.startsWith('image/') || file.size > 10000000)
-    throw Error('Choose an image smaller than 10 MB.');
-  const bitmap = await createImageBitmap(file);
-  try {
-    const canvas = document.createElement('canvas'),
-      ratio = Math.min(1, 320 / Math.max(bitmap.width, bitmap.height));
-    canvas.width = Math.max(1, Math.round(bitmap.width * ratio));
-    canvas.height = Math.max(1, Math.round(bitmap.height * ratio));
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw Error('Photo processing unavailable.');
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    for (const quality of [0.7, 0.5, 0.3, 0.15]) {
-      const url = canvas.toDataURL('image/jpeg', quality);
-      if (url.length <= 12000) return url;
-    }
-    throw Error('Photo is too detailed; crop it and retry.');
-  } finally {
-    bitmap.close();
-  }
 }

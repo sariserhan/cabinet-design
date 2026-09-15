@@ -1,0 +1,17 @@
+{
+  "name": "Kitchen Studio Field Workspace",
+  "short_name": "Kitchen Field",
+  "start_url": "/field/index.html",
+  "scope": "/field/",
+  "display": "standalone",
+  "background_color": "#f1f5ef",
+  "theme_color": "#214c39",
+  "icons": [
+    {
+      "src": "/field/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

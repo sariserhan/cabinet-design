@@ -1250,3 +1250,25 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .purchase-table td:first-child { max-width: 350px; overflow-wrap: anywhere; }
 .project-directory { width: 100%; min-width: 0; }
 @media(max-width:600px) { .purchase-plan-grid { grid-template-columns: 1fr; } .purchasing-panel fieldset, .purchase-card { padding: 10px; } }
+
+/* Project overview, closeout, and accessible designer controls. */
+.project-hub { margin: 18px 0; padding: 20px; border: 1px solid #c9d7ca; border-radius: 16px; background: #f5f8f2; }
+.project-hub > header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+.project-hub h2 { font-size:24px; margin:8px 0; }
+.project-hub-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:12px; }
+.project-hub-cards button { display:flex; flex-direction:column; align-items:flex-start; gap:8px; text-align:left; padding:16px; background:white; }
+.project-hub-cards strong { font-size:28px; color:#254d37; }
+.project-hub-cards small { line-height:1.5; color:#405647; }
+.project-hub label,.supplier-confirmations label { display:flex; flex-direction:column; gap:6px; margin:12px 0; min-width:0; }
+.project-hub input,.project-hub select,.project-hub textarea { width:100%; min-width:0; max-width:100%; }
+.project-hub img { max-width:100%; height:auto; }
+.designer-app :is(button,a,input,select,textarea,summary,[role="button"]):focus-visible { outline:3px solid #176cbb; outline-offset:3px; }
+.designer-app :is(button,input,select,summary) { min-height:36px; }
+.designer-app [id] { scroll-margin-top:24px; }
+.designer-skip-links a { position:fixed; top:8px; left:-10000px; z-index:1000; padding:12px; background:white; color:#153e2a; }
+.designer-skip-links a:focus { left:12px; }
+@media(pointer:coarse) { .designer-app :is(button,input,select,summary) { min-height:44px; } }
+@media(prefers-reduced-motion:reduce) { .designer-app *, .designer-app *::before, .designer-app *::after { scroll-behavior:auto !important; animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
+@media(max-width:600px) { .project-hub { padding:12px; } .project-hub-cards { grid-template-columns:1fr; } }
+.project-hub-cards button { white-space:normal; min-width:0; }
+.project-hub-cards :is(span,small) { max-width:100%; overflow-wrap:anywhere; }

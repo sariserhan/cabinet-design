@@ -1,4 +1,5 @@
 'use client';
+import { projectDataChanged } from '@/designer/local-project-events';
 import { useEffect, useRef, useState } from 'react';
 import { useConvex } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -42,15 +43,26 @@ export function ProjectDirectory({
   const latest = useRef(entries);
   latest.current = entries;
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw) setEntries(directorySchema.parse(JSON.parse(raw)));
-      setReady(true);
-    } catch {
-      setMessage(
-        'Directory could not be read. Import a valid backup to recover it.',
-      );
+    function refresh() {
+      try {
+        const raw = localStorage.getItem(key);
+        const next = raw ? directorySchema.parse(JSON.parse(raw)) : {};
+        latest.current = next;
+        setEntries(next);
+        setReady(true);
+      } catch {
+        setMessage(
+          'Directory could not be read. Import a valid backup to recover it.',
+        );
+      }
     }
+    refresh();
+    window.addEventListener('storage', refresh);
+    window.addEventListener('kitchen-project-data', refresh);
+    return () => {
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('kitchen-project-data', refresh);
+    };
   }, [key]);
   function save(next: Record<string, DirectoryEntry>) {
     try {
@@ -58,6 +70,7 @@ export function ProjectDirectory({
       localStorage.setItem(key, JSON.stringify(valid));
       latest.current = valid;
       setEntries(valid);
+      projectDataChanged();
       return true;
     } catch (e) {
       setMessage((e as Error).message);

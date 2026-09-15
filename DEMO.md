@@ -364,3 +364,35 @@ Purchasing records live in this browser under the account and design ID, separat
 The cloud-project panel includes a directory for the latest 50 account projects. Search name, client, room, tags, workflow status and indexed SKU. **Refresh SKU search index** reads the current cloud snapshots; refresh after cloud edits to update SKU results. Archive/restore changes visibility without deleting cloud data. Organization metadata and archive choices are browser-local and have a separate export/import backup. Workflow labels are user-entered labels, not verified approvals.
 
 The three-step getting-started guide opens the sample walkthrough, room measurements and ordering workspace. It distinguishes illustrative sample data from confirmed surveys and supplier offers, suggests the next project action, and remembers completion in this browser. Reopen it with **Show getting-started guide**.
+
+## Project overview, complete backups and installation completion
+
+The **Project overview** combines captured approvals, open site/layout questions, supplier confirmation gaps, delivery shortages and installation closeout. Its next-action button opens the relevant tools. Counts include every saved purchase draft; they are not a claim that an order has been placed. Supplier quantities count as confirmed once a reference and confirmation date are recorded. Overdue lines use the expected delivery date and outstanding item receipts. Proposed or accepted substitutions remain flagged for a revised design review.
+
+### Complete backup and restore
+
+**Complete project backup → Export complete project** downloads one validated JSON file containing the current design (including selections and site photos), local milestone history, purchasing snapshots, supplier confirmations, closeout and photos, organization, and a supplier price reference. It does not fetch cloud-only historical revisions or embed catalog PDFs. Maximum file size is 6 MB; available browser storage can be smaller.
+
+Import validates before presenting a contents summary. **Restore as separate project** assigns a new design ID, remaps project snapshots, keeps original records, clears cloud binding, and rolls back local writes if storage fails. Imported approval/completion claims are removed; an imported approved baseline is retained as an unverified design reference. Organization is restored as an active draft and transfers to the cloud-project directory when that copy is saved. Export the bundled supplier list and import it in Supplier quotes to use it for new pricing. Restored copies do not inherit remote review links.
+
+### Supplier confirmations
+
+Inside a purchase draft, open **Supplier confirmations & lead times**. Record the supplier reference, contact, confirmation date, exact confirmed quantities, lead days, delivery dates, proposed substitute SKU, project-team decision, and line notes. Confirmed quantities cannot exceed the immutable draft quantity. An accepted substitution does not edit the design or represent client approval. Confirmation details appear in purchase JSON, printable purchase drafts and complete backups.
+
+### Installation closeout and customer handover
+
+Open **Installation closeout & handover** to start a five-item checklist, then add room-specific checklist items or punch-list findings. Record assignments, notes, statuses, and up to eight compact photos (60 tasks total). Add customer care, warranty and contact notes. All tasks must be done before recording completion under a self-reported name. Changes to the design, findings or care notes invalidate that completion. Export a printable customer handover with the item schedule and evidence; incomplete or changed projects are labelled DRAFT.
+
+### Offline field mode
+
+1. Download a **field package** from the project overview.
+2. Open `/field/index.html` online and import it. Wait for **Ready offline**; the scoped service worker caches only the public field page assets, not account pages or cloud responses.
+3. Up to three downloaded projects can remain on the device. Reopen the field page offline to view the item schedule, edit closeout checks, add room findings and attach compact photos. Changes save to local browser storage. Export before clearing browser data or removing a device copy.
+4. Export a **field return report**. The page explicitly says that exporting has not yet transferred findings to the main project.
+5. In the main project, import the report under **Offline field workspace**. It validates project identity, unchanged design and unchanged closeout baseline before applying findings. A stale report is rejected; export a current package and reconcile the findings. Completion must be recorded again after transfer.
+
+Field reports transfer closeout data only; they do not edit design geometry or synchronize automatically to Convex. No network connection is required to export a report. Offline readiness depends on a successful initial visit, service-worker support, storage availability and retention. The installable manifest is provided, but OS-specific installation prompts have not been validated.
+
+### Accessibility improvements
+
+Designer skip links focus the overview, canvas or item controls. Tab lists support arrow keys plus Home/End with a single tab stop for the selected tab. Controls have visible focus outlines, larger touch targets, and reduced-motion styling. Dashboard text wraps at desktop and mobile widths. This is targeted accessibility work, not a full WCAG conformance audit.

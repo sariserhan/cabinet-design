@@ -1,4 +1,5 @@
 'use client';
+import { projectDataChanged } from '@/designer/local-project-events';
 import { useEffect, useMemo, useState } from 'react';
 import { useConvex, useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -116,6 +117,7 @@ export function ProjectWorkflow({
       parseMilestones(raw, design.id, true);
       localStorage.setItem(key, raw);
       setEntries(entries);
+      projectDataChanged();
       setMessage(
         'Revision history saved in this browser. Export it for backup.',
       );

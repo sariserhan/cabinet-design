@@ -55,3 +55,13 @@ With the pilot client and actual supplier list, also verify:
 - Add client, room and tags; refresh SKU search; archive and restore a completed project. Export organization metadata separately.
 
 Automated fixtures remain synthetic. These steps do not establish real-world supplier accuracy or constitute a completed field pilot.
+
+## Completion and offline acceptance
+
+- Record actual supplier confirmation references, quantities, lead times and dates. Check an overdue line and an unresolved substitution in the overview.
+- Start the installation checklist, add a second room and a punch-list finding, attach evidence, resolve all findings and record completion. Change the design afterward and verify the handover becomes a draft again.
+- Download a field package. Open the field page online, wait for Ready offline, disable networking and reload. Record a finding and photo, reload again, export the report offline, and import it on the main project. Verify a repeated or conflicting return report is rejected.
+- Export a complete project backup. Restore it as a separate copy and compare design, selections, site photos, history, supplier records, deliveries, closeout photos and organization. Verify the original is preserved and imported approval/completion claims need re-verification.
+- Navigate key flows with keyboard only; check focus visibility, skip links, tab-list arrow keys and mobile touch controls. Check the actual field device’s browser and storage retention before taking it on site.
+
+Synthetic browser QA exercises offline reloads and report transfer. A real installation, supplier fulfillment, OS install prompts and a comprehensive assistive-technology audit remain pilot work.

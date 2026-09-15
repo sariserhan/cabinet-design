@@ -4,6 +4,8 @@ import { useConvex, useMutation, useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
 import { parseDesign, type Design } from '@/designer/model';
+import { directorySchema } from '@/designer/project-directory';
+import { projectDataChanged } from '@/designer/local-project-events';
 import { ProjectDirectory } from './project-directory';
 import { downloadJson } from './business-tools';
 
@@ -79,6 +81,22 @@ export function CloudProjects({
         `kitchen-cloud:${ownerId}:${designId}`,
         JSON.stringify(value),
       );
+      const directoryKey = `kitchen-directory:${ownerId}`;
+      const directory = directorySchema.parse(
+        JSON.parse(localStorage.getItem(directoryKey) ?? '{}'),
+      );
+      if (directory[designId] && !directory[value.projectId]) {
+        localStorage.setItem(
+          directoryKey,
+          JSON.stringify(
+            directorySchema.parse({
+              ...directory,
+              [value.projectId]: directory[designId],
+            }),
+          ),
+        );
+      }
+      projectDataChanged();
     } catch {
       /* Cloud save succeeded even when browser storage is full. */
     }

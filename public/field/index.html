@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#214c39" />
+    <title>Kitchen Studio · Offline field workspace</title>
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./field.css" />
+    <script defer src="./field.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#project">Skip to field project</a>
+    <main>
+      <header>
+        <small>KITCHEN STUDIO · FIELD WORKSPACE</small>
+        <h1>Take the project on site</h1>
+        <p>
+          Open a downloaded field package. Record installation checks and
+          findings here, even without a connection.
+        </p>
+        <p id="connectivity" role="status">Checking offline readiness…</p>
+      </header>
+      <section class="card">
+        <h2>Projects on this device</h2>
+        <p>
+          Up to three projects stay in this browser. Export reports before
+          clearing browser data or removing a project. Device copies are not
+          cloud backups.
+        </p>
+        <label
+          >Open field package<input
+            id="import"
+            type="file"
+            accept=".json" /></label
+        ><label
+          >Saved field project<select id="projects">
+            <option value="">Choose a project</option>
+          </select></label
+        ><button id="remove" disabled>Remove selected device copy</button>
+        <p id="message" role="status"></p>
+      </section>
+      <section id="project" tabindex="-1" hidden>
+        <h2 id="name"></h2>
+        <p id="room"></p>
+        <p id="sync" role="status"></p>
+        <div class="actions">
+          <button id="export">Export field return report</button
+          ><button id="print">Print field notes</button>
+        </div>
+        <details>
+          <summary>Design item schedule</summary>
+          <div id="items"></div>
+        </details>
+        <h2>Installation findings</h2>
+        <form id="add" class="card">
+          <label
+            >Room<input
+              id="finding-room"
+              maxlength="100"
+              value="Kitchen"
+              required /></label
+          ><label
+            >Finding title<input
+              id="finding-title"
+              maxlength="160"
+              required /></label
+          ><label
+            >Item type<select id="finding-kind">
+              <option value="punch">Punch-list finding</option>
+              <option value="check">Checklist task</option>
+            </select></label
+          ><button>Add field finding</button>
+        </form>
+        <div id="tasks"></div>
+        <p>
+          To transfer changes: export this report, return to the main project’s
+          Offline field workspace panel, and import it. Exporting alone does not
+          update the main project.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
