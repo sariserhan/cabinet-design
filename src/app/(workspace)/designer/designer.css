@@ -839,3 +839,4 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .client-package td { overflow-wrap:anywhere; }
 .client-package h1,.client-package figcaption { white-space:normal; overflow-wrap:anywhere; }
 .is-presenting .canvas-panel-controls,.is-presenting .demo-walkthrough,.is-presenting .project-controls,.is-presenting .shortcut-help,.is-presenting .start-guide { display:none!important; }
+.is-presenting .designer-message,.is-presenting .camera-controls { display:none!important; }

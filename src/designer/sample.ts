@@ -13,7 +13,21 @@ export function polishedSample() {
     ceiling: { axis: 'x', kind: 'vault', endHeight: 138, ridge: 0.5 },
     walls: { north: true, east: true, south: true, west: true },
   };
-  d.appearance = { countertop: 'marble', lighting: 'daylight' };
+  d.appearance = {
+    countertop: 'quartz',
+    lighting: 'daylight',
+    backsplash: 'subway',
+    hardware: 'brass',
+    pendants: true,
+  };
+  d.views = [
+    {
+      id: crypto.randomUUID(),
+      name: 'Kitchen hero',
+      position: [210, 108, 295],
+      target: [110, 42, 48],
+    },
+  ];
   d.fabrication = { thickness: 0.75, back: 0.25, gap: 0.125 };
   const add = (kind: Cabinet['kind'], patch: Partial<Cabinet>) => {
     const item = {
@@ -173,6 +187,7 @@ export function polishedSample() {
   for (const x of [70, 98, 126])
     add('custom_cabinet', {
       sku: 'CUSTOM-ISLAND28',
+      finish: 'slate',
       x,
       y: 100,
       width: 28,

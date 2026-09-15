@@ -30,6 +30,89 @@ export function MaterialPresets({
 }) {
   return (
     <section>
+      <h3>Render styling</h3>
+      <label>
+        Back-wall backsplash
+        <select
+          aria-label="Backsplash style"
+          value={design.appearance?.backsplash ?? 'none'}
+          onChange={(e) =>
+            onChange({
+              ...design,
+              appearance: {
+                countertop: 'quartz',
+                lighting: 'daylight',
+                ...design.appearance,
+                backsplash: e.target.value as 'none' | 'subway' | 'slab',
+              },
+            })
+          }
+        >
+          <option value="none">None</option>
+          <option value="subway">Ivory subway tile</option>
+          <option value="slab">Matching stone slab</option>
+        </select>
+      </label>
+      <label>
+        Cabinet hardware
+        <select
+          aria-label="Hardware finish"
+          value={design.appearance?.hardware ?? 'steel'}
+          onChange={(e) =>
+            onChange({
+              ...design,
+              appearance: {
+                countertop: 'quartz',
+                lighting: 'daylight',
+                ...design.appearance,
+                hardware: e.target.value as 'steel' | 'brass' | 'black',
+              },
+            })
+          }
+        >
+          <option value="steel">Brushed steel</option>
+          <option value="brass">Satin brass</option>
+          <option value="black">Matte black</option>
+        </select>
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={design.appearance?.pendants ?? false}
+          onChange={(e) =>
+            onChange({
+              ...design,
+              appearance: {
+                countertop: 'quartz',
+                lighting: 'daylight',
+                ...design.appearance,
+                pendants: e.target.checked,
+              },
+            })
+          }
+        />{' '}
+        Island pendant lights
+      </label>
+      <div className="designer-row">
+        {(['daylight', 'warm', 'studio'] as const).map((l) => (
+          <button
+            key={l}
+            aria-pressed={design.appearance?.lighting === l}
+            onClick={() =>
+              onChange({
+                ...design,
+                appearance: {
+                  countertop: 'quartz',
+                  ...design.appearance,
+                  lighting: l,
+                },
+              })
+            }
+          >
+            {l} lighting
+          </button>
+        ))}
+      </div>
       <h3>Coordinated styles</h3>
       <div className="designer-row">
         {materialPresets.map((p) => (
@@ -39,7 +122,11 @@ export function MaterialPresets({
               onChange({
                 ...design,
                 finish: p.finish,
-                appearance: { countertop: p.countertop, lighting: p.lighting },
+                appearance: {
+                  ...design.appearance,
+                  countertop: p.countertop,
+                  lighting: p.lighting,
+                },
               })
             }
             aria-pressed={

@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { applianceDetails, metalPull } from './render-details';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { materialTexture } from './render-textures';
 import { wallPanels, partitionPanels } from '@/designer/model';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Design } from '@/designer/model';
 import {
+  containsFootprint,
   cutPanels,
   footprint,
   resolvedFront,
@@ -32,9 +35,11 @@ export default function RenderView({
   onCamera,
   onCapture,
   selected,
+  selectedIds,
   onSelect,
 }: {
   selected?: string | null;
+  selectedIds?: string[];
   onSelect?: (id: string | null) => void;
   cameraView?: CameraView;
   onCamera?: (view: CameraView) => void;
@@ -88,7 +93,7 @@ export default function RenderView({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 0.95;
     renderer.domElement.setAttribute('aria-label', 'Rendered kitchen');
     container.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
@@ -96,7 +101,7 @@ export default function RenderView({
       environmentScene = new RoomEnvironment(),
       environment = pmrem.fromScene(environmentScene, 0.04);
     scene.environment = environment.texture;
-    scene.environmentIntensity = 0.45;
+    scene.environmentIntensity = 0.32;
     environmentScene.dispose();
     pmrem.dispose();
     const lighting = design.appearance?.lighting ?? 'daylight';
@@ -130,22 +135,28 @@ export default function RenderView({
       camera.position.copy(cameraState.current.position);
       controls.target.copy(cameraState.current.target);
       controls.update();
+    } else if (design.views?.[0]) {
+      camera.position.set(...design.views[0].position);
+      controls.target.set(...design.views[0].target);
+      controls.update();
     } else fit();
     scene.add(
       new THREE.HemisphereLight(
         lighting === 'warm' ? '#ffdfb4' : '#ffffff',
         '#a39a8c',
-        lighting === 'studio' ? 2 : 1.35,
+        lighting === 'studio' ? 0.65 : 0.48,
       ),
     );
     const sun = new THREE.DirectionalLight(
       lighting === 'warm' ? '#ffcb91' : '#fff4dd',
-      lighting === 'studio' ? 1.5 : 2.5,
+      lighting === 'studio' ? 2.2 : 3.2,
     );
     sun.position.set(-size * 0.4, size * 2, size * 0.8);
     sun.target.position.set(design.room.width / 2, 0, design.room.depth / 2);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.mapSize.set(4096, 4096);
+    sun.shadow.bias = -0.00005;
+    sun.shadow.radius = 2;
     Object.assign(sun.shadow.camera, {
       left: -size,
       right: size,
@@ -158,7 +169,7 @@ export default function RenderView({
     scene.add(sun, sun.target);
     const fillLight = new THREE.DirectionalLight(
       '#d6e7ff',
-      lighting === 'studio' ? 1.8 : 0.6,
+      lighting === 'studio' ? 0.7 : 0.25,
     );
     fillLight.position.set(size, size, -size);
     scene.add(fillLight);
@@ -211,7 +222,19 @@ export default function RenderView({
     const steel = material('#a9b0b3', 0.75, 0.25),
       dark = material('#20282d', 0.25, 0.26),
       wall = material('#f4f0e8'),
-      glass = material('#729da9', 0.35, 0.15);
+      glass = material('#203138', 0.48, 0.12);
+    const hardware = material(
+      design.appearance?.hardware === 'brass'
+        ? '#b99a5e'
+        : design.appearance?.hardware === 'black'
+          ? '#24282a'
+          : '#b9c0c3',
+      0.8,
+      0.28,
+    );
+    const windowGlass = material('#c5e0e5', 0.1, 0.12);
+    windowGlass.transparent = true;
+    windowGlass.opacity = 0.28;
     const floorMaterial = material('#ffffff', 0, 0.7);
     floorMaterial.map = textures[2] ?? null;
 
@@ -226,13 +249,33 @@ export default function RenderView({
       m: THREE.Material,
     ) => {
       const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(
+        new RoundedBoxGeometry(
           Math.max(0.01, w),
           Math.max(0.01, h),
           Math.max(0.01, d),
+          2,
+          Math.min(
+            0.1,
+            Math.max(0.01, w) / 5,
+            Math.max(0.01, h) / 5,
+            Math.max(0.01, d) / 5,
+          ),
         ),
         m,
       );
+      if (m instanceof THREE.MeshStandardMaterial && m.map === textures[0]) {
+        const uv = mesh.geometry.getAttribute('uv'),
+          normal = mesh.geometry.getAttribute('normal');
+        for (let i = 0; i < uv.count; i++) {
+          const vertical = Math.abs(normal.getY(i)) < 0.5;
+          const scaleX = Math.abs(normal.getX(i)) > 0.5 ? d : w;
+          uv.setXY(
+            i,
+            (uv.getX(i) * scaleX) / 24,
+            (uv.getY(i) * (vertical ? h : d)) / 36,
+          );
+        }
+      }
       mesh.position.set(x, y, z);
       mesh.castShadow = true;
       mesh.receiveShadow = true;
@@ -245,7 +288,7 @@ export default function RenderView({
     const floor = new THREE.Mesh(new THREE.ShapeGeometry(shape), floorMaterial);
     const floorUV = floor.geometry.getAttribute('uv');
     for (let i = 0; i < floorUV.count; i++)
-      floorUV.setXY(i, floorUV.getX(i) / 96, floorUV.getY(i) / 96);
+      floorUV.setXY(i, floorUV.getX(i) / 48, floorUV.getY(i) / 48);
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
@@ -366,7 +409,7 @@ export default function RenderView({
           0,
           h / 2,
           0,
-          item.kind === 'window' ? glass : finish,
+          item.kind === 'window' ? windowGlass : finish,
         );
         for (const x of [-w / 2 + 1, w / 2 - 1]) b(2, h, d, x, h / 2, 0, wall);
         for (const y of [1, h - 1]) b(w, 2, d, 0, y, 0, wall);
@@ -424,6 +467,62 @@ export default function RenderView({
         if (item.kind === 'molding') b(w, 0.7, d + 1, 0, h - 0.35, 0.5, finish);
         continue;
       }
+      if (cabinet && item.elevation >= 48 && item.category === 'wall_cabinet') {
+        const led = material('#fff2d8');
+        led.emissive.set('#ffd4a0');
+        led.emissiveIntensity = 2;
+        b(w - 2, 0.12, 0.5, 0, -0.05, d / 2 - 1, led);
+        const glow = new THREE.PointLight('#ffe0b5', 120, 55, 2);
+        glow.position.set(0, -2, d / 2);
+        group.add(glow);
+      }
+      if (
+        (cabinet || ['range', 'dishwasher'].includes(item.kind)) &&
+        item.elevation === 0 &&
+        item.y <= 2 &&
+        item.rotation === 0 &&
+        design.room.walls.north &&
+        design.appearance?.backsplash &&
+        design.appearance.backsplash !== 'none'
+      ) {
+        const bottom = cabinet ? item.height + 1.5 : 36,
+          height = 18;
+        const openings = design.items
+          .filter(
+            (i) =>
+              (i.kind === 'window' || i.kind === 'door') &&
+              i.wall === 'north' &&
+              !i.opening,
+          )
+          .map((i) => ({
+            x: i.x - item.x,
+            y: i.elevation - bottom,
+            width: i.width,
+            height: i.height,
+          }));
+        const tile =
+          design.appearance.backsplash === 'subway'
+            ? material('#ffffff', 0.02, 0.3)
+            : stone;
+        if (design.appearance.backsplash === 'subway') {
+          const map = materialTexture('subway');
+          textures.push(map);
+          tile.map = map;
+          map.repeat.set(w / 24, height / 12);
+          tile.bumpMap = map;
+          tile.bumpScale = 0.03;
+        }
+        for (const panel of cutPanels(w, height, openings))
+          b(
+            panel.width,
+            panel.height,
+            0.3,
+            -w / 2 + panel.x + panel.width / 2,
+            bottom + panel.y + panel.height / 2,
+            -d / 2 + 0.18 - item.y,
+            tile,
+          );
+      }
       if (cabinet) {
         const diagonal =
             item.kind === 'corner' &&
@@ -447,13 +546,32 @@ export default function RenderView({
         b(1, h, d, -w / 2 + 0.5, h / 2, 0, finish);
         b(1, h, d - cut, w / 2 - 0.5, h / 2, -cut / 2, finish);
         b(w, h, 1, 0, h / 2, -d / 2 + 0.5, finish);
-        if (diagonal) cornerShelf(1, finish);
-        else b(w, 1, d, 0, 1, 0, finish);
+
         const toe =
           item.elevation === 0
             ? Math.min(item.details?.toeKick ?? 4, h - 1)
             : 0;
-        if (toe) b(w - 2, toe, d - cut - 3, 0, toe / 2, -cut / 2 - 1.5, dark);
+        if (diagonal) cornerShelf(toe + 0.5, finish);
+        else
+          b(
+            Math.max(0.2, w - 2),
+            1,
+            Math.max(0.2, d - 1),
+            0,
+            toe + 0.5,
+            0.5,
+            finish,
+          );
+        if (toe)
+          b(
+            w - 2,
+            toe,
+            Math.max(0.2, d - cut - 4),
+            0,
+            toe / 2,
+            -cut / 2 - 1,
+            dark,
+          );
         const details = item.details ?? {
           shelves: 2,
           interior: 'shelves',
@@ -506,30 +624,50 @@ export default function RenderView({
                 ph = (h - toe) / rows - 0.6,
                 x = -w / 2 + ((col + 0.5) * w) / columns,
                 y = toe + ((row + 0.5) * (h - toe)) / rows;
-              b(pw, ph, 1, x, y, d / 2, finish);
+              b(pw, ph, 0.75, x, y, d / 2, inset);
               b(
                 Math.max(0.2, pw - 4),
                 Math.max(0.2, ph - 4),
                 0.2,
                 x,
                 y,
-                d / 2 + 0.6,
+                d / 2 + 0.3,
                 style === 'glass' ? glass : inset,
               );
+              for (const sign of [-1, 1]) {
+                b(
+                  1.8,
+                  ph,
+                  0.3,
+                  x + sign * (pw / 2 - 0.9),
+                  y,
+                  d / 2 + 0.55,
+                  finish,
+                );
+                b(
+                  Math.max(0.2, pw - 3.6),
+                  1.8,
+                  0.3,
+                  x,
+                  y + sign * (ph / 2 - 0.9),
+                  d / 2 + 0.55,
+                  finish,
+                );
+              }
               const hx =
                 style === 'drawers'
                   ? x
                   : columns === 2
                     ? x + (col === 0 ? 1 : -1) * (pw / 2 - 2)
                     : x + (item.mirrored ? -1 : 1) * (pw / 2 - 2);
-              b(
-                style === 'drawers' ? 5 : 0.5,
-                style === 'drawers' ? 0.5 : 5,
-                0.8,
+              metalPull(
+                group,
                 hx,
                 y + ph / 2 - 5,
-                d / 2 + 1.2,
-                steel,
+                d / 2 + 1.5,
+                5,
+                style === 'drawers',
+                hardware,
               );
             }
         if (diagonal) {
@@ -573,64 +711,100 @@ export default function RenderView({
           b(0.5, 5, 1, sign * (w / 2 - 3), h - 6, d / 2 + 1, steel);
         }
         if (item.kind === 'island') surface(h - 0.75, 1.5);
-        else if (!diagonal && !sinkHoles(item, design.items).length)
+        else if (
+          !diagonal &&
+          !design.items.some(
+            (s) =>
+              s.kind === 'sink' &&
+              containsFootprint(item, s) &&
+              s.elevation < item.elevation + item.height &&
+              s.elevation + s.height > item.elevation + item.height,
+          )
+        )
           b(w, 0.6, d, 0, h - 0.3, 0, finish);
       } else {
-        b(w, h, d, 0, h / 2, 0, steel);
-        for (const x of [-w / 2 + 2, w / 2 - 2])
-          b(2, 1.5, 2, x, 0.75, d / 2 - 2, dark);
-        b(w - 2, 3, 0.7, 0, h - 2, d / 2 + 0.5, dark);
-        for (let k = 0; k < 4; k++) {
-          const knob = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.65, 0.65, 0.7, 20),
-            steel,
-          );
-          knob.rotation.x = Math.PI / 2;
-          knob.position.set(-w / 3 + (k * w) / 4, h - 2, d / 2 + 1);
-          group.add(knob);
-        }
-        if (item.kind === 'refrigerator') {
-          b(0.3, h * 0.7, 0.8, 0, h * 0.65, d / 2 + 0.5, dark);
-          for (const x of [-1.7, 1.7])
-            b(0.6, 14, 1.4, x, h * 0.65, d / 2 + 1.2, steel);
-          b(7, 9, 0.7, -w / 4, h * 0.63, d / 2 + 0.8, dark);
-        }
-
-        if (item.kind === 'washing_machine') {
-          const drum = new THREE.Mesh(
-            new THREE.CylinderGeometry(w * 0.32, w * 0.32, 1, 48),
-            dark,
-          );
-          drum.rotation.x = Math.PI / 2;
-          drum.position.set(0, h * 0.45, d / 2 + 0.7);
-          group.add(drum);
-        } else
-          b(
-            w - 3,
-            h * 0.65,
-            0.5,
-            0,
-            h * 0.45,
-            d / 2 + 0.3,
-            item.kind === 'refrigerator' ? steel : dark,
-          );
-        b(w - 5, 0.7, 1.5, 0, h - 5, d / 2 + 1, dark);
-        if (item.kind === 'refrigerator')
-          b(w, 0.3, 0.6, 0, h * 0.3, d / 2 + 0.5, dark);
-        if (item.kind === 'range')
-          for (const x of [-w / 4, w / 4])
-            for (const z of [-d / 4, d / 4]) {
-              const burner = new THREE.Mesh(
-                new THREE.CylinderGeometry(4, 4, 0.4, 32),
-                dark,
-              );
-              burner.position.set(x, h + 0.2, z);
-              group.add(burner);
-            }
+        applianceDetails(group, item, b, steel, dark, glass);
       }
     }
-    if (selected) {
-      const target = itemGroups.find((g) => g.userData.itemId === selected);
+
+    if (design.appearance?.pendants) {
+      const island = design.items
+        .filter(
+          (i) =>
+            (i.kind === 'countertop' || i.kind === 'island') &&
+            i.y > 30 &&
+            i.width >= 48,
+        )
+        .sort((a, b) => b.width - a.width)[0];
+      if (island) {
+        const f = footprint(island),
+          top = island.elevation + island.height,
+          midX = island.x + f.width / 2,
+          midZ = island.y + f.depth / 2;
+        const count = Math.max(2, Math.min(3, Math.floor(f.width / 32)));
+        for (let i = 0; i < count; i++) {
+          const x = island.x + ((i + 0.5) * f.width) / count,
+            y = Math.min(top + 36, ceilingAt(design.room, x, midZ) - 12),
+            ceiling = ceilingAt(design.room, x, midZ);
+          const cord = new THREE.Mesh(
+            new THREE.CylinderGeometry(
+              0.12,
+              0.12,
+              Math.max(1, ceiling - y),
+              10,
+            ),
+            dark,
+          );
+          cord.position.set(x, (ceiling + y) / 2, midZ);
+          scene.add(cord);
+          const shade = new THREE.Mesh(
+            new THREE.ConeGeometry(5, 6, 40, 1, true),
+            hardware,
+          );
+          shade.position.set(x, y, midZ);
+          shade.castShadow = true;
+          shade.material.side = THREE.DoubleSide;
+          scene.add(shade);
+          const bulb = material('#fff7e0');
+          bulb.emissive.set('#ffe2ac');
+          bulb.emissiveIntensity = 2;
+          const globe = new THREE.Mesh(
+            new THREE.SphereGeometry(1.2, 16, 12),
+            bulb,
+          );
+          globe.position.set(x, y - 2, midZ);
+          scene.add(globe);
+          const lamp = new THREE.PointLight('#ffe0ad', 200, 100, 2);
+          lamp.position.set(x, y - 4, midZ);
+          scene.add(lamp);
+        }
+        const ceramic = material('#d6c4a6', 0.05, 0.5);
+        const bowl = new THREE.Mesh(
+          new THREE.LatheGeometry(
+            [
+              new THREE.Vector2(0, 0),
+              new THREE.Vector2(2, 0.3),
+              new THREE.Vector2(4, 1),
+              new THREE.Vector2(5, 2.3),
+              new THREE.Vector2(4.7, 2.4),
+              new THREE.Vector2(3.7, 1.2),
+              new THREE.Vector2(0, 0.5),
+            ],
+            40,
+          ),
+          ceramic,
+        );
+        bowl.position.set(midX + f.width * 0.22, top + 0.1, midZ);
+        bowl.castShadow = true;
+        bowl.receiveShadow = true;
+        scene.add(bowl);
+      }
+    }
+    for (const id of new Set([
+      ...(selectedIds ?? []),
+      ...(selected ? [selected] : []),
+    ])) {
+      const target = itemGroups.find((g) => g.userData.itemId === id);
       if (target) {
         const outline = new THREE.BoxHelper(target, 0x087984);
         scene.add(outline);
@@ -760,7 +934,7 @@ export default function RenderView({
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [design, cutaway, interiors, showCeiling, selected]);
+  }, [design, cutaway, interiors, showCeiling, selected, selectedIds]);
   return (
     <div className="designer-render">
       <div className="designer-row render-controls">

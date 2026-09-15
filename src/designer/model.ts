@@ -182,6 +182,9 @@ export const designSchema = z
     finish: z.enum(['linen', 'oak', 'slate']),
     appearance: z
       .object({
+        backsplash: z.enum(['none', 'subway', 'slab']).optional(),
+        hardware: z.enum(['steel', 'brass', 'black']).optional(),
+        pendants: z.boolean().optional(),
         countertop: z.enum(['quartz', 'marble', 'granite']),
         lighting: z.enum(['daylight', 'warm', 'studio']),
       })

@@ -220,3 +220,41 @@ export function placementAt(
     ),
   };
 }
+
+export function assemblyMembers(design: Design, id: string) {
+  const item = design.items.find((i) => i.id === id);
+  return item
+    ? design.items
+        .filter(
+          (i) =>
+            i.id === id ||
+            (item.assemblyId && i.assemblyId === item.assemblyId),
+        )
+        .map((i) => i.id)
+    : [];
+}
+export function finishAssembly(
+  design: Design,
+  id: string,
+  finish: Design['finish'],
+): Design {
+  const ids = new Set(assemblyMembers(design, id));
+  return {
+    ...design,
+    items: design.items.map((i) =>
+      ids.has(i.id) &&
+      [
+        'cabinet',
+        'custom_cabinet',
+        'corner',
+        'island',
+        'filler',
+        'trim',
+        'molding',
+        'toe_kick',
+      ].includes(i.kind)
+        ? { ...i, finish }
+        : i,
+    ),
+  };
+}

@@ -70,7 +70,11 @@ import {
   ShortcutHelp,
   ClientPresentation,
 } from './demo-tools';
-import { placementAt } from '@/designer/editing';
+import {
+  assemblyMembers,
+  finishAssembly,
+  placementAt,
+} from '@/designer/editing';
 import { polishedSample } from '@/designer/sample';
 import { normalizeOpenings, worldToLocal } from '@/designer/model';
 import {
@@ -648,6 +652,16 @@ function Editor({ ownerId }: { ownerId: string }) {
       <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
+        <button
+          className="designer-primary"
+          title="Load the sample and its hero camera"
+          onClick={() => {
+            startDesign(polishedSample());
+            setPresenting(true);
+          }}
+        >
+          Show this kitchen
+        </button>
         <button onClick={() => walkthroughStep(0)}>Demo walkthrough</button>
         <button
           onClick={() => {
@@ -1035,6 +1049,7 @@ function Editor({ ownerId }: { ownerId: string }) {
               key={design.id}
               design={design}
               selected={selected}
+              selectedIds={selection}
               onSelect={(id) => {
                 setSelected(id);
                 if (id) {
@@ -1214,6 +1229,22 @@ function Editor({ ownerId }: { ownerId: string }) {
             {item ? (
               <>
                 <strong className="selected-sku">{item.sku}</strong>
+                {item.assemblyId && (
+                  <button
+                    onClick={() => {
+                      setSelection(assemblyMembers(design, item.id));
+                      setMoveTogether(true);
+                    }}
+                  >
+                    Select whole assembly / island
+                  </button>
+                )}
+                {item.assemblyId && selection.includes(item.id) && (
+                  <p>
+                    {assemblyMembers(design, item.id).length} assembly parts
+                    selected. Drag any member to move them together.
+                  </p>
+                )}
                 <p className="designer-muted">
                   {item.width} W × {item.depth} D × {item.height} H (in)
                 </p>
@@ -1450,6 +1481,32 @@ function Editor({ ownerId }: { ownerId: string }) {
             )}
           </section>
           <section hidden={inspectorTab !== 'materials'}>
+            {item?.assemblyId && (
+              <label>
+                Whole assembly finish
+                <select
+                  aria-label="Whole assembly finish"
+                  value=""
+                  onChange={(e) => {
+                    commit((d) =>
+                      finishAssembly(
+                        d,
+                        item.id,
+                        e.target.value as Design['finish'],
+                      ),
+                    );
+                    setSelection(assemblyMembers(design, item.id));
+                  }}
+                >
+                  <option value="" disabled>
+                    Choose for all cabinet parts
+                  </option>
+                  <option value="linen">Linen</option>
+                  <option value="oak">Oak</option>
+                  <option value="slate">Slate</option>
+                </select>
+              </label>
+            )}
             <MaterialPresets
               design={design}
               onChange={(next) => commit(() => next)}

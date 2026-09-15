@@ -149,3 +149,13 @@ QA: desktop and mobile browser checks cover the guided room dimensions, object f
 - **Demo walkthrough** guides five steps: sample, style, placement, comparison and proposal. Starting it loads the sample with Undo available. Use Next step when ready, or close it to continue freely.
 
 Validation: 113 core and 15 backend tests, including preview placement parity, wall attachment and per-object material persistence. Browser QA covers render selection versus orbit, panel collapse, material overrides, drag collision preview, proposal editing/printing, walkthrough navigation and mobile layout.
+
+## More realistic kitchen demo
+
+- **Show this kitchen** loads the polished sample, recalls its Kitchen hero camera and opens presentation mode. Escape returns to editing; Undo restores the previous design.
+- Rendering now includes beveled edges, recessed framed cabinet fronts, metal bar pulls, separate appliance models, better sink clearance in the cabinet carcass, toned-down wood grain at consistent scale, finer floor planks, stronger shadow detail and less washed-out lighting.
+- **Materials → Render styling** controls brushed steel/brass/black hardware, daylight/warm/studio lighting, back-wall subway tile or matching stone backsplash, and island pendants. Backsplash styling currently covers straight north-wall base runs; window/door holes remain open. Pendants and a decorative bowl are illustrative staging placed over a wide freestanding countertop or island; they are not added to the bill of materials.
+- **Select whole assembly / island** highlights all linked parts and enables moving them together. **Whole assembly finish** updates the linked cabinet parts without changing the countertop, appliances or unrelated cabinets. The sample island contains three cabinet bodies and its countertop.
+- The sample includes a saved hero camera, slate island, oak perimeter cabinetry, quartz worktops and brass hardware. These are improved real-time demo visuals, not manufacturer-exact models or a photorealistic offline rendering engine.
+
+The live benchmark was rerun successfully against the expanded working catalog after the timeout fix. It produced and stored a report without timing out. Benchmark validation still fails: reference truth is not human-verified, SKU precision is about 60.8%, rule precision is about 69.6%, and 5 of 8 cases pass. This is a successful execution check, not a catalog accuracy certification.

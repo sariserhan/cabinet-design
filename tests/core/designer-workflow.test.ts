@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newDesign, fromObject, parseDesign } from '../../src/designer/model';
 import {
+  assemblyMembers,
+  finishAssembly,
   placementAt,
   alignSelection,
   snapPlacement,
@@ -167,4 +169,25 @@ test('individual materials survive JSON roundtrip and changing kitchen defaults'
   assert.equal(restored.finish, 'linen');
   assert.equal(restored.items[0]?.finish, 'slate');
   assert.equal(restored.items[0]?.countertop, 'granite');
+});
+
+test('whole-island finish changes cabinet members but preserves countertop and unrelated cabinets', () => {
+  const d = newDesign(),
+    a = { ...fromObject('custom_cabinet'), assemblyId: 'island' },
+    b = { ...fromObject('custom_cabinet'), assemblyId: 'island' },
+    top = {
+      ...fromObject('countertop'),
+      assemblyId: 'island',
+      countertop: 'granite' as const,
+    },
+    other = fromObject('custom_cabinet');
+  d.items = [a, b, top, other];
+  assert.deepEqual(assemblyMembers(d, top.id), [a.id, b.id, top.id]);
+  const next = finishAssembly(d, top.id, 'slate');
+  assert.equal(next.items[0]?.finish, 'slate');
+  assert.equal(next.items[1]?.finish, 'slate');
+  assert.equal(next.items[2]?.countertop, 'granite');
+  assert.equal(next.items[2]?.finish, undefined);
+  assert.equal(next.items[3]?.finish, undefined);
+  assert.equal(d.items[0]?.finish, undefined);
 });

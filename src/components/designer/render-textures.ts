@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 /** Deterministic material maps generated locally; no external image service. */
 export function materialTexture(
-  kind: 'wood' | 'floor' | 'quartz' | 'marble' | 'granite',
+  kind: 'wood' | 'floor' | 'quartz' | 'marble' | 'granite' | 'subway',
 ) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 512;
@@ -16,13 +16,30 @@ export function materialTexture(
     kind === 'granite'
       ? '#55585a'
       : kind === 'wood' || kind === 'floor'
-        ? '#cfaa78'
+        ? kind === 'floor'
+          ? '#c5b08f'
+          : '#c4a579'
         : '#f2f0ea';
   ctx.fillRect(0, 0, 512, 512);
-  if (kind === 'wood' || kind === 'floor') {
+  if (kind === 'subway') {
+    ctx.fillStyle = '#c9c4ba';
+    ctx.fillRect(0, 0, 512, 512);
+    for (let row = 0; row < 4; row++)
+      for (let col = -1; col < 3; col++) {
+        const x = col * 256 + (row % 2) * 128,
+          y = row * 128;
+        ctx.fillStyle =
+          ['#eeeae1', '#e6e4dc', '#f3f0e8'][Math.floor(random() * 3)] ??
+          '#eeeae1';
+        ctx.fillRect(x + 3, y + 3, 250, 122);
+        ctx.strokeStyle = 'rgba(255,255,255,.5)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x + 5, y + 5, 246, 118);
+      }
+  } else if (kind === 'wood' || kind === 'floor') {
     for (let i = 0; i < 1100; i++) {
       const x = random() * 512;
-      ctx.strokeStyle = `rgba(${random() > 0.5 ? '86,49,19' : '244,218,174'},${0.025 + random() * 0.12})`;
+      ctx.strokeStyle = `rgba(${random() > 0.5 ? '86,49,19' : '244,218,174'},${0.012 + random() * 0.045})`;
       ctx.lineWidth = 0.3 + random() * 1.2;
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -37,14 +54,14 @@ export function materialTexture(
       const x = random() * 512,
         y = random() * 512;
       for (let j = 0; j < 12; j++) {
-        ctx.strokeStyle = 'rgba(96,59,28,.06)';
+        ctx.strokeStyle = 'rgba(96,59,28,.025)';
         ctx.beginPath();
         ctx.ellipse(x, y, 3 + j * 1.2, 12 + j * 5, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
     }
     if (kind === 'floor') {
-      ctx.strokeStyle = '#967447';
+      ctx.strokeStyle = 'rgba(105,85,61,.32)';
       ctx.lineWidth = 1;
       for (let x = 0; x <= 512; x += 64) {
         ctx.beginPath();
