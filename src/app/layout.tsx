@@ -4,8 +4,8 @@ import { ConvexAuthNextjsServerProvider } from '@convex-dev/auth/nextjs/server';
 import { Providers } from '@/components/providers';
 import { Toaster } from '@/components/ui/sonner';
 export const metadata = {
-  title: 'Catalog Compiler',
-  description: 'Source-linked manufacturer catalog review',
+  title: 'Kitchen Studio',
+  description: 'Kitchen planning with source-linked cabinet specifications',
 };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
