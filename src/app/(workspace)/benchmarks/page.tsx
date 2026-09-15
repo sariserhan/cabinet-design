@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useAction } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import type { Overview } from '@/lib/workspace-types';
@@ -15,7 +15,7 @@ export default function Benchmarks() {
     [truth, setTruth] = useState(''),
     [pending, setPending] = useState(false),
     [result, setResult] = useState('');
-  const run = useMutation(api.versions.benchmark);
+  const run = useAction(api.versions.benchmark);
   const inspect = useQuery(
     api.versions.inspect,
     truth ? { versionId: truth as Id<'versions'> } : 'skip',

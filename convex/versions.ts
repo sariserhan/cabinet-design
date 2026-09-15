@@ -1,4 +1,5 @@
 import { v } from 'convex/values';
+import { paginationOptsValidator } from 'convex/server';
 import { crossSourceConflicts } from '../src/catalog/cross-source';
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { action, internalQuery, internalMutation } from './_generated/server';
@@ -212,12 +213,135 @@ export const inspect = ownedQuery({
     });
   },
 });
-export const benchmark = ownedMutation({
-  args: { versionId: v.id('versions'), truthVersionId: v.id('versions') },
+export const benchmarkInput = internalQuery({
+  args: {
+    userId: v.id('users'),
+    versionId: v.id('versions'),
+    paginationOpts: paginationOptsValidator,
+  },
   returns: v.string(),
   handler: async (ctx, args) => {
-    const version = await ownedVersion(ctx, args.versionId, ctx.userId, true),
-      truth = await ownedVersion(ctx, args.truthVersionId, ctx.userId);
+    const version = await ownedVersion(ctx, args.versionId, args.userId);
+    const document = await ctx.db.get(version.documentId);
+    if (!document) throw new Error('Source missing');
+    const records = await ctx.db
+      .query('records')
+      .withIndex('by_versionId_and_entityKey', (q) =>
+        q.eq('versionId', version._id),
+      )
+      .paginate({ ...args.paginationOpts, numItems: 100 });
+    const pages =
+      args.paginationOpts.cursor === null
+        ? await ctx.db
+            .query('pages')
+            .withIndex('by_versionId_and_pageNumber', (q) =>
+              q.eq('versionId', version._id),
+            )
+            .take(41)
+        : [];
+    if (pages.length > 40)
+      throw new Error('Full-book compilation requires the completed milestone');
+    return JSON.stringify({
+      version,
+      sha256: document.sha256,
+      records: records.page.map((r) => ({
+        payloadJson: r.payloadJson,
+        truthVerified: r.truthVerified,
+        blockers: r.blockers,
+      })),
+      isDone: records.isDone,
+      cursor: records.continueCursor,
+      pages: pages.map((p) => ({
+        pageNumber: p.pageNumber,
+        printedLabel: p.printedLabel,
+        text: p.text,
+      })),
+    });
+  },
+});
+export const commitBenchmark = internalMutation({
+  args: {
+    userId: v.id('users'),
+    versionId: v.id('versions'),
+    truthVersionId: v.id('versions'),
+    revision: v.number(),
+    truthRevision: v.number(),
+    reportJson: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const version = await ownedVersion(ctx, args.versionId, args.userId, true);
+    const truth = await ownedVersion(ctx, args.truthVersionId, args.userId);
+    if (
+      version.revision !== args.revision ||
+      truth.revision !== args.truthRevision
+    )
+      throw new Error('Benchmark became stale. Run it again.');
+    await ctx.db.patch(version._id, {
+      benchmarkJson: args.reportJson,
+      benchmarkRevision: version.revision,
+      gateJson: undefined,
+      gateRevision: undefined,
+      gateContentHash: undefined,
+    });
+    return null;
+  },
+});
+export const benchmark = action({
+  args: { versionId: v.id('versions'), truthVersionId: v.id('versions') },
+  returns: v.string(),
+  handler: async (ctx, args): Promise<string> => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error('Sign in required');
+    type Input = {
+      version: Doc<'versions'>;
+      sha256: string;
+      records: {
+        payloadJson: string;
+        truthVerified: boolean;
+        blockers: string[];
+      }[];
+      pages: { pageNumber: number; printedLabel: string; text: string }[];
+      isDone: boolean;
+      cursor: string;
+    };
+    const load = async (versionId: Id<'versions'>) => {
+      let cursor: string | null = null;
+      let first: Input | undefined;
+      const rows: import('../src/catalog/benchmark').BenchmarkRow[] = [];
+      do {
+        const batch: Input = JSON.parse(
+          await ctx.runQuery(internal.versions.benchmarkInput, {
+            userId,
+            versionId,
+            paginationOpts: { numItems: 100, cursor },
+          }),
+        );
+        if (first && batch.version.revision !== first.version.revision)
+          throw new Error('Benchmark became stale. Run it again.');
+        first ??= batch;
+        rows.push(
+          ...batch.records.map((r) => ({
+            payload: recordDataSchema.parse(JSON.parse(r.payloadJson)),
+            truthVerified: r.truthVerified,
+            blockers: r.blockers,
+          })),
+        );
+        if (rows.length > 2000)
+          throw new Error('Subset exceeds the reviewed snapshot limit');
+        cursor = batch.isDone ? null : batch.cursor;
+      } while (cursor !== null);
+      if (!first) throw new Error('Source missing');
+      return { ...first, rows };
+    };
+    const [a, b] = await Promise.all([
+      load(args.versionId),
+      load(args.truthVersionId),
+    ]);
+    const version = a.version,
+      truth = b.version;
+    if (version.status === 'published' || version.status === 'superseded')
+      throw new Error('Published versions are immutable');
     if (
       version._id === truth._id ||
       version.origin === 'benchmark_draft' ||
@@ -226,38 +350,31 @@ export const benchmark = ownedMutation({
       throw new Error(
         'Compare an independent compiler run against the reviewed benchmark draft',
       );
-    const a = await materialize(ctx, version),
-      b = await materialize(ctx, truth);
     if (
-      a.document.sha256 !== b.document.sha256 ||
-      canonicalJson(a.candidate.coverage) !==
-        canonicalJson(b.candidate.coverage)
+      a.sha256 !== b.sha256 ||
+      canonicalJson(JSON.parse(version.coverageJson)) !==
+        canonicalJson(JSON.parse(truth.coverageJson))
     )
       throw new Error('Benchmark source and coverage must match');
-    const rows = (data: typeof a) =>
-      data.parsed.map((r) => ({
-        payload: r.payload,
-        truthVerified: r.row.truthVerified,
-        blockers: r.row.blockers,
-      }));
     const report = {
-      ...measureBenchmark(rows(a), rows(b), a.sourcePages),
+      ...measureBenchmark(a.rows, b.rows, a.pages),
       runId:
         'benchmark:' +
         contentHash([version._id, version.revision, truth._id, truth.revision]),
       truthVersionId: truth._id,
       truthRevision: truth.revision,
-      truthHash: contentHash(rows(b)),
+      truthHash: contentHash(b.rows),
       at: Date.now(),
     };
-    await ctx.db.patch(version._id, {
-      benchmarkJson: JSON.stringify(report),
-      benchmarkRevision: version.revision,
-      gateJson: undefined,
-      gateRevision: undefined,
-      gateContentHash: undefined,
+    const reportJson = JSON.stringify(report);
+    await ctx.runMutation(internal.versions.commitBenchmark, {
+      ...args,
+      userId,
+      revision: version.revision,
+      truthRevision: truth.revision,
+      reportJson,
     });
-    return JSON.stringify(report);
+    return reportJson;
   },
 });
 export const publicationSource = internalQuery({

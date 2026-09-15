@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest';
 import { convexTest } from 'convex-test';
 import schema from '../../convex/schema';
-import { api } from '../../convex/_generated/api';
+import { api, internal } from '../../convex/_generated/api';
 import { importBenchmarkDraft } from '../../src/ingestion/benchmark-draft';
 import { upsertRecord } from '../../convex/recordHelpers';
 const modules = import.meta.glob('../../convex/**/*.{ts,js}');
@@ -455,4 +455,91 @@ test('AI geometry policy is audited as automation and invalidates benchmark', as
     JSON.parse(result.version?.profilesJson ?? '[]')[0].requirements.depthIn
       .required,
   ).toBe(true);
+});
+
+test('benchmark action batches inputs and rejects unauthorized or stale results', async () => {
+  const s = await setup();
+  const candidate = await s.t.run(async (ctx) => {
+    const original = await ctx.db.get(s.versionId),
+      record = await ctx.db.get(s.recordId);
+    if (!original || !record) throw Error('fixture missing');
+    const { _id, _creationTime, ...version } = original;
+    void _id;
+    void _creationTime;
+    const id = await ctx.db.insert('versions', {
+      ...version,
+      origin: 'compiler',
+    });
+    const { _id: rid, _creationTime: rt, ...row } = record;
+    void rid;
+    void rt;
+    for (let i = 0; i < 105; i++) {
+      const payload = structuredClone(s.payload);
+      payload.data.id = 'product:fixture-' + i;
+      const copy = {
+        ...row,
+        entityKey: payload.data.id,
+        payloadJson: JSON.stringify(payload),
+      };
+      await ctx.db.insert('records', { ...copy, versionId: id });
+      await ctx.db.insert('records', { ...copy, versionId: s.versionId });
+    }
+    return id;
+  });
+  const batch = JSON.parse(
+    await s.t.query(internal.versions.benchmarkInput, {
+      userId: s.owner,
+      versionId: candidate,
+      paginationOpts: { numItems: 100, cursor: null },
+    }),
+  );
+  expect(batch.records).toHaveLength(100);
+  expect(batch.isDone).toBe(false);
+  await expect(
+    s.otherClient.action(api.versions.benchmark, {
+      versionId: candidate,
+      truthVersionId: s.versionId,
+    }),
+  ).rejects.toThrow('not found');
+  await expect(
+    s.t.action(api.versions.benchmark, {
+      versionId: candidate,
+      truthVersionId: s.versionId,
+    }),
+  ).rejects.toThrow('Sign in');
+  const report = await s.ownerClient.action(api.versions.benchmark, {
+    versionId: candidate,
+    truthVersionId: s.versionId,
+  });
+  expect(JSON.parse(report).truthVersionId).toBe(s.versionId);
+  expect(
+    await s.t.run(async (ctx) => (await ctx.db.get(candidate))?.benchmarkJson),
+  ).toBe(report);
+  await s.t.run(async (ctx) => {
+    await ctx.db.patch(s.versionId, { revision: 1 });
+  });
+  await expect(
+    s.t.mutation(internal.versions.commitBenchmark, {
+      userId: s.owner,
+      versionId: candidate,
+      truthVersionId: s.versionId,
+      revision: 0,
+      truthRevision: 0,
+      reportJson: report,
+    }),
+  ).rejects.toThrow('stale');
+  await s.t.run(async (ctx) => {
+    await ctx.db.patch(s.versionId, { revision: 0 });
+    await ctx.db.patch(candidate, { revision: 1 });
+  });
+  await expect(
+    s.t.mutation(internal.versions.commitBenchmark, {
+      userId: s.owner,
+      versionId: candidate,
+      truthVersionId: s.versionId,
+      revision: 0,
+      truthRevision: 0,
+      reportJson: report,
+    }),
+  ).rejects.toThrow('stale');
 });
