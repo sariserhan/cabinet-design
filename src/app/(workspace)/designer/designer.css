@@ -1084,3 +1084,125 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .client-review select { max-width: 100%; min-width: 0; padding: 8px; border: 1px solid #789286; border-radius: 5px; background: #fff; }
 .client-review svg [role="button"]:focus { outline: none; }
 .client-review svg [role="button"]:focus polygon { stroke: #0b5c43; stroke-width: 3px; }
+
+/* Connected decision and site workflows */
+.design-decisions {
+  margin-block: 12px;
+}
+.decision-workspace {
+  padding: 12px 0;
+}
+.decision-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #a4b8ae;
+  padding-bottom: 12px;
+}
+.decision-tabs button[aria-selected='true'] {
+  background: #215c49;
+  color: white;
+  border-color: #215c49;
+}
+.decision-card {
+  padding: 16px;
+  margin-block: 12px;
+  border: 1px solid #a4b8ae;
+  border-radius: 10px;
+  background: #fafcf9;
+  color: #233b35;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.decision-card h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.decision-card button {
+  margin: 4px 6px 4px 0;
+}
+.decision-preview {
+  padding: 20px;
+  border: 2px solid #356e58;
+  background: #f0f6ee;
+  border-radius: 12px;
+  margin-block: 16px;
+}
+.decision-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.decision-evidence {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 240px;
+  overflow: auto;
+  font: 12px/1.6 monospace;
+}
+.proposal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+}
+.decision-check {
+  display: flex !important;
+  gap: 8px;
+  align-items: center;
+}
+.decision-workspace input[type='checkbox'] {
+  width: auto;
+}
+.decision-workspace label,
+.installer-page label {
+  display: grid;
+  gap: 6px;
+  margin-block: 8px;
+  min-width: 0;
+}
+.decision-workspace input:not([type='checkbox']),
+.decision-workspace select,
+.decision-workspace textarea,
+.installer-page input,
+.installer-page select,
+.installer-page textarea {
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #849b8f;
+  border-radius: 6px;
+  background: white;
+  color: #233b35;
+}
+.installer-page {
+  max-width: 1000px;
+  margin: auto;
+  padding: 24px;
+}
+.site-tasks svg {
+  max-height: 320px;
+}
+@media (max-width: 600px) {
+  .decision-preview {
+    padding: 12px;
+  }
+  .decision-tabs button {
+    flex: 1 1 140px;
+  }
+  .installer-page {
+    padding: 14px;
+  }
+  .decision-workspace .business-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  .installer-page input[type='file'],
+  .installer-page button {
+    display: none;
+  }
+  .decision-card {
+    break-inside: avoid;
+  }
+}

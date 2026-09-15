@@ -477,3 +477,38 @@ test('supplier books support independent updates and enforce owner isolation and
     }),
   ).rejects.toThrow('limit');
 });
+
+test('cloud snapshots preserve household preferences and installer tasks through save and reopen', async () => {
+  const s = await setup();
+  const design = {
+    ...newDesign(),
+    storageProfile: {
+      household: 4,
+      cookware: 'extensive',
+      pantry: 'bulk',
+      reach: 'low',
+      priority: 'drawers',
+    },
+    siteTasks: [
+      {
+        id: 'site-1',
+        wall: 0,
+        title: 'Confirm outlet',
+        notes: 'Measured on site',
+        status: 'resolved',
+        assignee: 'Installer',
+        updatedAt: '2026-09-15',
+      },
+    ],
+  };
+  const saved = await s.owner.mutation(api.projects.save, {
+    name: design.name,
+    designJson: JSON.stringify(design),
+  });
+  const restored = JSON.parse(
+    (await s.owner.query(api.projects.get, { projectId: saved.projectId }))
+      .designJson,
+  );
+  expect(restored.storageProfile).toEqual(design.storageProfile);
+  expect(restored.siteTasks).toEqual(design.siteTasks);
+});

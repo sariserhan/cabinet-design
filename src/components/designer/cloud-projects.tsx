@@ -100,6 +100,22 @@ export function CloudProjects({
           : {}),
       });
       bind(result);
+      if (source.storageProfile || source.siteTasks?.length) {
+        const savedProject = await client.query(api.projects.get, {
+          projectId: result.projectId,
+        });
+        const savedDesign = parseDesign(savedProject.designJson);
+        if (
+          JSON.stringify(savedDesign.storageProfile) !==
+            JSON.stringify(source.storageProfile) ||
+          JSON.stringify(savedDesign.siteTasks ?? []) !==
+            JSON.stringify(source.siteTasks ?? [])
+        ) {
+          throw Error(
+            'Cloud storage did not preserve the new storage/site fields. Update the backend before syncing this design; export a local backup now',
+          );
+        }
+      }
       lastSaved.current = snapshot;
       setPaused(false);
       setMessage(`Cloud saved · revision ${result.revision}`);

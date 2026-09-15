@@ -7,6 +7,7 @@ import {
   SurfaceEditor,
   ReadinessCheck,
 } from './studio-panels';
+import { DesignDecisions } from './design-decisions';
 import { MeasurementWizard } from './measurement-wizard';
 import { CloudProjects } from './cloud-projects';
 import { AlternativeLayouts, SupplierQuotes } from './business-tools';
@@ -952,6 +953,15 @@ function Editor({ ownerId }: { ownerId: string }) {
         onChange={(next) => commit(() => next, true)}
       />
       <SupplierQuotes design={design} onChange={(next) => commit(() => next)} />
+      <DesignDecisions
+        design={design}
+        versionId={version?._id}
+        onChange={(next) => commit(() => next)}
+        onLocate={(id) => {
+          setSelected(id);
+          setMode('2d');
+        }}
+      />
       <ShortcutHelp />
       <details className="project-controls">
         <summary>Project files & examples</summary>

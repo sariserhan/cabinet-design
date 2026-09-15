@@ -73,7 +73,13 @@ export function SelectionTools({
     </details>
   );
 }
-export function MiniPlan({ design }: { design: Design }) {
+export function MiniPlan({
+  design,
+  highlightedIds = [],
+}: {
+  design: Design;
+  highlightedIds?: string[];
+}) {
   return (
     <svg
       aria-label={`${design.name} comparison plan`}
@@ -94,7 +100,13 @@ export function MiniPlan({ design }: { design: Design }) {
             points={itemPolygon(item)
               .map((p) => `${p.x},${p.y}`)
               .join(' ')}
-            fill={item.elevation > 40 ? '#b7d6e0' : '#c9ad83'}
+            fill={
+              highlightedIds.includes(item.id)
+                ? '#e6a35a'
+                : item.elevation > 40
+                  ? '#b7d6e0'
+                  : '#c9ad83'
+            }
             fillOpacity=".7"
             stroke="#5a707a"
             strokeWidth=".5"
