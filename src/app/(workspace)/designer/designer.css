@@ -1286,3 +1286,25 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .support-panel fieldset { margin:12px 0; padding:12px; min-width:0; border:1px solid #bac9c5; border-radius:8px; }
 .support-panel fieldset label { display:flex; align-items:center; gap:8px; margin:6px 0; }
 @media(max-width:700px) { .workflow-stages { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+/* Primary dealer workflow keeps project administration behind a disclosure. */
+.studio-workflow { padding:16px 20px; border-bottom:1px solid var(--studio-line); background:#f7faf8; }
+.studio-workflow p { margin:10px 0 0; color:#45615b; font-size:13px; }
+.studio-stages { display:flex; gap:8px; }
+.studio-stages button { flex:1; display:flex; align-items:center; justify-content:center; gap:10px; padding:12px; font-weight:600; }
+.studio-stages button span { font-size:11px; opacity:.75; }
+.designer-app .studio-stages button[aria-pressed="true"] { background:#245955; border-color:#245955; color:white; }
+.studio-support,.studio-extras { margin:8px 20px; border:1px solid var(--studio-line); border-radius:8px; background:white; }
+.studio-support > summary,.studio-extras > summary { cursor:pointer; padding:10px 12px; font-size:13px; font-weight:600; }
+.studio-support[open] { padding-bottom:12px; }
+.studio-support .project-hub { margin:12px; }
+.studio-extras { margin:0; order:4; }
+.studio-extras[open] { flex-basis:100%; }
+.studio-extras > .designer-row { padding:12px; }
+.studio-stage-tools { padding:8px 20px; }
+.studio-stage-tools[hidden],.designer-grid[hidden] { display:none !important; }
+.everyday-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.everyday-grid section { border:1px solid var(--studio-line); border-radius:8px; padding:12px; }
+.everyday-editing { margin:8px 0; }
+.everyday-editing .quick-find { margin-bottom:12px; }
+.everyday-editing .quick-find input { min-width:0; width:100%; }
+@media(max-width:700px){.studio-workflow{padding:12px}.studio-stages{gap:4px}.studio-stages button{padding:10px 4px;font-size:12px;gap:4px;flex-direction:column}.studio-support{margin:8px 12px}.studio-stage-tools{padding:8px 12px}.everyday-grid{grid-template-columns:1fr}.studio-extras{width:100%}}

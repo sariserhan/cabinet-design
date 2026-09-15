@@ -59,7 +59,11 @@ export function Library({
   return (
     <section className="designer-library" aria-label="Cabinet library">
       <h2>Cabinet library</h2>
-      <p className="designer-muted">Allure · source-linked products</p>
+      <p className="designer-muted">
+        {version
+          ? `${version.label} · ${version.status === 'published' ? 'published catalog' : 'draft catalog — verify before ordering'}`
+          : 'Choose a manufacturer catalog to begin'}
+      </p>
       <label className="library-search">
         <Search size={15} />
         <input

@@ -48,20 +48,34 @@ export function openProjectTool(label: string) {
   const target =
     label === 'canvas'
       ? document.getElementById('design-workspace')
-      : Array.from(document.querySelectorAll('details')).find(
-          (d) => d.querySelector(':scope > summary')?.textContent === label,
-        );
+      : label === 'overview'
+        ? document.getElementById('project-dashboard')
+        : Array.from(document.querySelectorAll('details')).find(
+            (d) => d.querySelector(':scope > summary')?.textContent === label,
+          );
+  const stage =
+    label === 'canvas'
+      ? 'Design'
+      : target
+          ?.closest('[data-workflow-stage]')
+          ?.getAttribute('data-workflow-stage');
+  if (stage)
+    window.dispatchEvent(
+      new CustomEvent('kitchen-workflow-stage', { detail: stage }),
+    );
   let ancestor: Element | null = target ?? null;
   while (ancestor) {
     if (ancestor instanceof HTMLDetailsElement) ancestor.open = true;
     ancestor = ancestor.parentElement;
   }
-  target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const focus =
-    target instanceof HTMLDetailsElement
-      ? target.querySelector('summary')
-      : target;
-  if (focus instanceof HTMLElement) focus.focus({ preventScroll: true });
+  requestAnimationFrame(() => {
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const focus =
+      target instanceof HTMLDetailsElement
+        ? target.querySelector('summary')
+        : target;
+    if (focus instanceof HTMLElement) focus.focus({ preventScroll: true });
+  });
 }
 export function ProjectHub({
   design,

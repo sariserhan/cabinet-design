@@ -97,8 +97,10 @@ export function AlternativeLayouts({
 export function SupplierQuotes({
   design,
   onChange,
+  expanded = false,
 }: {
   design: Design;
+  expanded?: boolean;
   onChange: (d: Design) => void;
 }) {
   const books = useQuery(api.supplierPricing.list, {}),
@@ -132,7 +134,7 @@ export function SupplierQuotes({
     [book, design],
   );
   return (
-    <details className="business-panel">
+    <details className="business-panel" open={expanded || undefined}>
       <summary>Supplier quotes</summary>
       <p>
         Import a supplier-confirmed USD price list. Prices match SKU, finish and

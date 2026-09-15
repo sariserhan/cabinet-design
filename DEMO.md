@@ -2,6 +2,20 @@
 
 A browser-based kitchen planner using the existing Allure catalog. The entry page is `/designer`; sign in with your existing account. Your expanded catalog contains 311 products. Cabinets with known width, depth, and height can be placed. Other records remain available in Catalog and Review.
 
+## Everyday kitchen workflow
+
+Use the primary steps **Room → Cabinets → Design → Quote → Present**. Supporting approvals, orders, installation and aftercare are under **Project tools**. Examples and presentation shortcuts are in the header disclosure.
+
+- **Room:** record and verify the room survey.
+- **Cabinets:** choose a catalog and place products. Draft catalog records require verification before ordering.
+- **Design:** use **Quick edits · move, repeat & finish** to find items, move a selection by exact offsets, repeat a run with a gap, or change cabinet finishes. Linked items move together. Preview changes before applying; each application is one Undo step. New boundary/overlap/ceiling/sink conflicts block the edit.
+- **Quote:** select a supplier price list and review its coverage and validity.
+- **Present:** enter the drawing reference, revision, author and issue date in **Drawings & item list**. Export the drawing package, dealer CSV and matching design snapshot from the same unchanged design.
+
+The drawing package is standalone HTML with a **Print / save PDF** button. Use A3 landscape, 100% / actual size, and check the 100 mm calibration line. Select a smaller scale if the drawing exceeds a sheet. Plans, straight-wall elevations and schedules share item marks and a design fingerprint. CSV dimensions are always inches. Curved-wall elevations are omitted and identified in the wall schedule.
+
+Outputs are coordination drafts: verify site measurements, appliance specifications, service locations, manufacturer options and source records before ordering or installation. Mirrored fronts do not establish manufacturer handing. Real dealer and installer review is still required.
+
 ## Connect from your laptop
 
 The demo runs on the remote machine at `127.0.0.1:3000`.

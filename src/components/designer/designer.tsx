@@ -8,7 +8,9 @@ import {
   ReadinessCheck,
 } from './studio-panels';
 import { DesignerKeyboardSupport } from './keyboard-support';
-import { ProjectHub } from './project-hub';
+import { EverydayEditing } from './everyday-editing';
+import { ProfessionalOutput } from './professional-output';
+import { ProjectHub, openProjectTool } from './project-hub';
 import { PurchasingWorkspace } from './purchasing-workspace';
 import { FirstUseGuide } from './first-use-guide';
 import { ProjectWorkflow } from './project-workflow';
@@ -186,6 +188,9 @@ function Editor({ ownerId }: { ownerId: string }) {
   const [presentationCamera, setPresentationCamera] = useState<
     CameraView | undefined
   >();
+  const [workspaceStage, setWorkspaceStage] = useState<
+    'Room' | 'Cabinets' | 'Design' | 'Quote' | 'Present'
+  >('Design');
   const [showStart, setShowStart] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [inspectorTab, setInspectorTab] = useState('design'),
@@ -198,6 +203,19 @@ function Editor({ ownerId }: { ownerId: string }) {
     };
     window.addEventListener('keydown', escape);
     return () => window.removeEventListener('keydown', escape);
+  }, []);
+  useEffect(() => {
+    const navigate = (event: Event) => {
+      const stage = (event as CustomEvent).detail;
+      if (['Room', 'Cabinets', 'Design', 'Quote', 'Present'].includes(stage)) {
+        setWorkspaceStage(stage);
+        setMode(
+          stage === 'Quote' ? 'quote' : stage === 'Present' ? 'client' : '2d',
+        );
+      }
+    };
+    window.addEventListener('kitchen-workflow-stage', navigate);
+    return () => window.removeEventListener('kitchen-workflow-stage', navigate);
   }, []);
   const [showroom, setShowroom] = useState(false);
   const [moveTogether, setMoveTogether] = useState(true);
@@ -259,8 +277,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         }
         setLastSession(initial);
       } else {
-        setWalkStep(0);
-        setShowGallery(true);
+        setWorkspaceStage('Room');
       }
       const raw = localStorage.getItem(storageKey + ':saved');
       if (raw) {
@@ -734,6 +751,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     });
   }
   function walkthroughStep(step: number) {
+    setWorkspaceStage('Design');
     setWalkStep(step);
     setShowStart(false);
     setInspectorCollapsed(step === 0 || step === 3 || step === 4);
@@ -760,6 +778,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     if (step === 4) setMode('client');
   }
   function startDesign(next: Design) {
+    setWorkspaceStage(next.items.length ? 'Design' : 'Room');
     setBefore(structuredClone(next));
     setPresentationCamera(undefined);
     commit(() => next);
@@ -833,58 +852,68 @@ function Editor({ ownerId }: { ownerId: string }) {
       <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
-        <button
-          onClick={() => {
-            setShowroom(true);
-            setPresenting(false);
-          }}
-        >
-          Open showroom
-        </button>
-        <button
-          className="designer-primary"
-          title="Present the current kitchen"
-          onClick={() => {
-            setMode('render');
-            setPresentationCamera(design.views?.[0]);
-            setPresenting(true);
-          }}
-        >
-          Show this kitchen
-        </button>
-        <button onClick={() => walkthroughStep(0)}>Demo walkthrough</button>
-        <button
-          onClick={() => {
-            setMode('compare');
-            setLibraryCollapsed(true);
-            setInspectorCollapsed(true);
-          }}
-        >
-          Compare options
-        </button>
-        <button onClick={() => setShowStart((v) => !v)}>Start here</button>
-        <button onClick={() => setShowGallery((v) => !v)}>
-          Choose a sample kitchen
-        </button>
-        <button
-          onClick={() => {
-            setShowStart(false);
-            setMode('client');
-          }}
-        >
-          Client presentation / PDF
-        </button>
-        <button onClick={() => startDesign(polishedSample())}>
-          Reset demo
-        </button>
-        <button
-          onClick={() => {
-            setMode('render');
-            setPresenting(true);
-          }}
-        >
-          Present
-        </button>
+        <details className="studio-extras">
+          <summary>Examples & presentation tools</summary>
+          <div className="designer-row">
+            {' '}
+            <button
+              onClick={() => {
+                setShowroom(true);
+                setPresenting(false);
+              }}
+            >
+              Open showroom
+            </button>
+            <button
+              className="designer-primary"
+              title="Present the current kitchen"
+              onClick={() => {
+                setWorkspaceStage('Design');
+                setMode('render');
+                setPresentationCamera(design.views?.[0]);
+                setPresenting(true);
+              }}
+            >
+              Show this kitchen
+            </button>
+            <button onClick={() => walkthroughStep(0)}>Demo walkthrough</button>
+            <button
+              onClick={() => {
+                setWorkspaceStage('Design');
+                setMode('compare');
+                setLibraryCollapsed(true);
+                setInspectorCollapsed(true);
+              }}
+            >
+              Compare options
+            </button>
+            <button onClick={() => setShowStart((v) => !v)}>Start here</button>
+            <button onClick={() => setShowGallery((v) => !v)}>
+              Choose a sample kitchen
+            </button>
+            <button
+              onClick={() => {
+                setShowStart(false);
+                setWorkspaceStage('Design');
+                setMode('client');
+              }}
+            >
+              Client presentation / PDF
+            </button>
+            <button onClick={() => startDesign(polishedSample())}>
+              Reset demo
+            </button>
+            <button
+              onClick={() => {
+                setWorkspaceStage('Design');
+                setMode('render');
+                setPresenting(true);
+              }}
+            >
+              Present
+            </button>
+          </div>
+        </details>
         <label className="project-name">
           Project name
           <input
@@ -897,8 +926,13 @@ function Editor({ ownerId }: { ownerId: string }) {
           />
         </label>
         <div className="designer-row">
-          <button onClick={() => window.print()}>
-            <Printer size={16} /> Print / PDF
+          <button
+            onClick={() => {
+              setWorkspaceStage('Present');
+              setMode('client');
+            }}
+          >
+            <Printer size={16} /> Drawings & item list
           </button>
           <button className="designer-primary" onClick={save}>
             <Save size={16} /> Save design
@@ -915,14 +949,131 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         </div>
       </header>
+      <section className="studio-workflow" aria-label="Kitchen design workflow">
+        <nav className="studio-stages" aria-label="Main workflow">
+          {(['Room', 'Cabinets', 'Design', 'Quote', 'Present'] as const).map(
+            (stage, n) => (
+              <button
+                key={stage}
+                aria-pressed={workspaceStage === stage}
+                onClick={() => {
+                  setWorkspaceStage(stage);
+                  setPresenting(false);
+                  setShowroom(false);
+                  if (stage === 'Cabinets') {
+                    setLibraryCollapsed(false);
+                    setLibraryTab('cabinets');
+                    setMode('2d');
+                  }
+                  if (stage === 'Design' || stage === 'Room') {
+                    setMode('2d');
+                    setInspectorCollapsed(stage !== 'Room');
+                  }
+                  if (stage === 'Quote') setMode('quote');
+                  if (stage === 'Present') {
+                    setMode('client');
+                    setLibraryCollapsed(true);
+                    setInspectorCollapsed(true);
+                  }
+                }}
+              >
+                <span>{n + 1}</span>
+                {stage}
+              </button>
+            ),
+          )}
+        </nav>
+        <p>
+          {
+            {
+              Room: 'Measure the room and place its doors, windows and services.',
+              Cabinets:
+                'Choose a manufacturer catalog, then find and place the cabinets you need.',
+              Design:
+                'Arrange the kitchen. Select an item to move, repeat or edit it.',
+              Quote:
+                'Select a current supplier list and review exact configurations and quantities.',
+              Present:
+                'Prepare the client presentation and a matching drawing issue.',
+            }[workspaceStage]
+          }
+        </p>
+      </section>
+      <section
+        className="studio-stage-tools"
+        hidden={workspaceStage !== 'Room'}
+        aria-label="Room stage"
+        data-workflow-stage="Room"
+      >
+        <MeasurementWizard
+          expanded
+          key={`measure:${design.id}`}
+          design={design}
+          onApply={(next) => {
+            setHistory((h) =>
+              h
+                ? {
+                    past: [...h.past, h.current].slice(-60),
+                    current: next,
+                    future: [],
+                  }
+                : { past: [], current: next, future: [] },
+            );
+            setSelected(null);
+            setMode('2d');
+            setBefore(next);
+          }}
+        />
+      </section>
+      <section
+        className="studio-stage-tools"
+        hidden={workspaceStage !== 'Quote'}
+        aria-label="Quote stage"
+        data-workflow-stage="Quote"
+      >
+        <SupplierQuotes
+          expanded
+          design={design}
+          onChange={(next) => commit(() => next)}
+        />
+      </section>
+      <section
+        className="studio-stage-tools"
+        hidden={workspaceStage !== 'Present'}
+        aria-label="Present stage"
+        data-workflow-stage="Present"
+      >
+        <ProfessionalOutput
+          key={`output:${design.id}`}
+          design={design}
+          ownerId={ownerId}
+        />
+      </section>
       <nav className="designer-skip-links" aria-label="Designer shortcuts">
-        <a href="#project-dashboard">Skip to project overview</a>
-        <a href="#design-workspace">Skip to design canvas</a>
+        <a
+          href="#project-dashboard"
+          onClick={(event) => {
+            event.preventDefault();
+            openProjectTool('overview');
+          }}
+        >
+          Skip to project overview
+        </a>
+        <a
+          href="#design-workspace"
+          onClick={(event) => {
+            event.preventDefault();
+            openProjectTool('canvas');
+          }}
+        >
+          Skip to design canvas
+        </a>
         <a
           href="#designer-inspector"
           onClick={(event) => {
             event.preventDefault();
             setInspectorCollapsed(false);
+            setWorkspaceStage('Design');
             setPresenting(false);
             setMode('2d');
             requestAnimationFrame(() => {
@@ -935,164 +1086,161 @@ function Editor({ ownerId }: { ownerId: string }) {
           Skip to item controls
         </a>
       </nav>
-      <ProjectHub
-        key={`hub:${design.id}:${recordsEpoch}`}
-        selectedIds={selection.length ? selection : selected ? [selected] : []}
-        onApply={(next) => commit(() => next, true)}
-        onLocate={(id) => {
-          setSelected(id);
-          setMode('2d');
-          document
-            .getElementById('design-workspace')
-            ?.scrollIntoView({ behavior: 'smooth' });
-        }}
-        design={design}
-        ownerId={ownerId}
-        onSharedLoad={(next) => {
-          setHistory({ past: [], current: next, future: [] });
-          setSelected(null);
-          setSelection([]);
-          setBefore(next);
-          setRecordsEpoch((v) => v + 1);
-          setStatus('Shared project revision loaded locally.');
-        }}
-        onRestore={(next) => {
-          setHistory({ past: [], current: next, future: [] });
-          setSelected(null);
-          setSelection([]);
-          setBefore(next);
-          setStatus('Complete project restored as a separate local copy.');
-        }}
-      />
-      <FirstUseGuide
-        ownerId={ownerId}
-        design={design}
-        onDemo={() => walkthroughStep(0)}
-      />
-      <PurchasingWorkspace
-        key={`purchasing:${design.id}:${recordsEpoch}`}
-        ownerId={ownerId}
-        design={design}
-        onLocate={(id) => {
-          setSelected(id);
-          setMode('2d');
-          document
-            .querySelector('.canvas-panel-controls')
-            ?.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
-      <ProjectWorkflow
-        key={`workflow:${design.id}:${recordsEpoch}`}
-        design={design}
-        ownerId={ownerId}
-        onLocate={(id) => {
-          setSelected(id);
-          setMode('2d');
-          document
-            .querySelector('.canvas-panel-controls')
-            ?.scrollIntoView({ behavior: 'smooth' });
-        }}
-        onNavigate={(stage, target) => {
-          if (stage === 'Design') {
+      <details className="studio-support">
+        <summary>
+          Project tools · approvals, orders, installation & aftercare
+        </summary>
+        <ProjectHub
+          key={`hub:${design.id}:${recordsEpoch}`}
+          selectedIds={
+            selection.length ? selection : selected ? [selected] : []
+          }
+          onApply={(next) => commit(() => next, true)}
+          onLocate={(id) => {
+            setWorkspaceStage('Design');
+            setSelected(id);
+            setMode('2d');
+            document
+              .getElementById('design-workspace')
+              ?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          design={design}
+          ownerId={ownerId}
+          onSharedLoad={(next) => {
+            setHistory({ past: [], current: next, future: [] });
+            setSelected(null);
+            setSelection([]);
+            setBefore(next);
+            setRecordsEpoch((v) => v + 1);
+            setStatus('Shared project revision loaded locally.');
+          }}
+          onRestore={(next) => {
+            setHistory({ past: [], current: next, future: [] });
+            setSelected(null);
+            setSelection([]);
+            setBefore(next);
+            setStatus('Complete project restored as a separate local copy.');
+          }}
+        />
+        <FirstUseGuide
+          ownerId={ownerId}
+          design={design}
+          onDemo={() => walkthroughStep(0)}
+        />
+        <PurchasingWorkspace
+          key={`purchasing:${design.id}:${recordsEpoch}`}
+          ownerId={ownerId}
+          design={design}
+          onLocate={(id) => {
+            setWorkspaceStage('Design');
+            setSelected(id);
             setMode('2d');
             document
               .querySelector('.canvas-panel-controls')
               ?.scrollIntoView({ behavior: 'smooth' });
-            return;
-          }
-          const label =
-            target === 'selections'
-              ? 'Design decisions · budget, checks & site handoff'
-              : stage === 'Measure'
-                ? 'Guided room measurements'
-                : stage === 'Price'
-                  ? 'Supplier quotes'
-                  : stage === 'Present'
-                    ? 'Cloud projects & client reviews'
-                    : 'Design decisions · budget, checks & site handoff';
-          const section = Array.from(document.querySelectorAll('details')).find(
-            (d) => d.querySelector(':scope > summary')?.textContent === label,
-          );
-          if (section) {
-            section.open = true;
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-          if (
-            target === 'selections' ||
-            stage === 'Install' ||
-            stage === 'Check'
-          )
-            setTimeout(() => {
-              const name =
-                target === 'selections'
-                  ? 'Client selections'
-                  : stage === 'Install'
-                    ? 'Installer handoff'
-                    : 'Explain checks';
-              Array.from(
-                section?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ??
-                  [],
-              )
-                .find((b) => b.textContent === name)
-                ?.click();
-            }, 100);
-        }}
-      />
-      <CloudProjects
-        onLocate={(id) => {
-          setSelected(id);
-          setMode('2d');
-        }}
-        key={`cloud:${design.id}`}
-        design={design}
-        ownerId={ownerId}
-        onOpen={(next) => {
-          setHistory((h) =>
-            h
-              ? {
-                  past: [...h.past, h.current].slice(-60),
-                  current: next,
-                  future: [],
-                }
-              : { past: [], current: next, future: [] },
-          );
-          setSelected(null);
-          setBefore(next);
-        }}
-      />
-      <MeasurementWizard
-        key={`measure:${design.id}`}
-        design={design}
-        onApply={(next) => {
-          setHistory((h) =>
-            h
-              ? {
-                  past: [...h.past, h.current].slice(-60),
-                  current: next,
-                  future: [],
-                }
-              : { past: [], current: next, future: [] },
-          );
-          setSelected(null);
-          setMode('2d');
-          setBefore(next);
-        }}
-      />
-      <AlternativeLayouts
-        design={design}
-        onChange={(next) => commit(() => next, true)}
-      />
-      <SupplierQuotes design={design} onChange={(next) => commit(() => next)} />
-      <DesignDecisions
-        design={design}
-        versionId={version?._id}
-        onChange={(next) => commit(() => next)}
-        onLocate={(id) => {
-          setSelected(id);
-          setMode('2d');
-        }}
-      />
-      <ShortcutHelp />
+          }}
+        />
+        <ProjectWorkflow
+          key={`workflow:${design.id}:${recordsEpoch}`}
+          design={design}
+          ownerId={ownerId}
+          onLocate={(id) => {
+            setWorkspaceStage('Design');
+            setSelected(id);
+            setMode('2d');
+            document
+              .querySelector('.canvas-panel-controls')
+              ?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          onNavigate={(stage, target) => {
+            if (stage === 'Design') {
+              setMode('2d');
+              document
+                .querySelector('.canvas-panel-controls')
+                ?.scrollIntoView({ behavior: 'smooth' });
+              return;
+            }
+            const label =
+              target === 'selections'
+                ? 'Design decisions · budget, checks & site handoff'
+                : stage === 'Measure'
+                  ? 'Guided room measurements'
+                  : stage === 'Price'
+                    ? 'Supplier quotes'
+                    : stage === 'Present'
+                      ? 'Cloud projects & client reviews'
+                      : 'Design decisions · budget, checks & site handoff';
+            openProjectTool(label);
+            const section = Array.from(
+              document.querySelectorAll('details'),
+            ).find(
+              (d) => d.querySelector(':scope > summary')?.textContent === label,
+            );
+            if (section) {
+              section.open = true;
+              section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            if (
+              target === 'selections' ||
+              stage === 'Install' ||
+              stage === 'Check'
+            )
+              setTimeout(() => {
+                const name =
+                  target === 'selections'
+                    ? 'Client selections'
+                    : stage === 'Install'
+                      ? 'Installer handoff'
+                      : 'Explain checks';
+                Array.from(
+                  section?.querySelectorAll<HTMLButtonElement>(
+                    '[role="tab"]',
+                  ) ?? [],
+                )
+                  .find((b) => b.textContent === name)
+                  ?.click();
+              }, 100);
+          }}
+        />
+        <CloudProjects
+          onLocate={(id) => {
+            setWorkspaceStage('Design');
+            setSelected(id);
+            setMode('2d');
+          }}
+          key={`cloud:${design.id}`}
+          design={design}
+          ownerId={ownerId}
+          onOpen={(next) => {
+            setHistory((h) =>
+              h
+                ? {
+                    past: [...h.past, h.current].slice(-60),
+                    current: next,
+                    future: [],
+                  }
+                : { past: [], current: next, future: [] },
+            );
+            setSelected(null);
+            setBefore(next);
+          }}
+        />
+        <AlternativeLayouts
+          design={design}
+          onChange={(next) => commit(() => next, true)}
+        />
+        <DesignDecisions
+          design={design}
+          versionId={version?._id}
+          onChange={(next) => commit(() => next)}
+          onLocate={(id) => {
+            setWorkspaceStage('Design');
+            setSelected(id);
+            setMode('2d');
+          }}
+        />
+        <ShortcutHelp />
+      </details>
       <details className="project-controls">
         <summary>Project files & examples</summary>
         <div className="designer-projectbar">
@@ -1190,47 +1338,50 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         )}
       </div>
-      <DesignRecovery
-        key={`recovery-${design.id}`}
-        design={design}
-        ownerId={ownerId}
-        past={history.past}
-        onRestore={(next) => {
-          setHistory((h) =>
-            h
-              ? {
-                  past: [...h.past, h.current].slice(-60),
-                  current: next,
-                  future: [],
-                }
-              : h,
-          );
-          setSelected(null);
-          setSelection([]);
-          setStatus('Design restored. Undo returns to the previous version.');
-        }}
-      />
-      <SmartPlacement
-        design={design}
-        selected={selected}
-        onChange={(next) => commit(() => next, true)}
-      />
-      <SampleStory design={design} onChange={(next) => commit(() => next)} />
-      <ObjectManager
-        design={design}
-        onChange={(next) => commit(() => next)}
-        onSelect={(id) => {
-          setSelected(id);
-          setInspectorCollapsed(false);
-        }}
-      />
-      <ReadinessCheck
-        design={design}
-        onSelect={(id) => {
-          setSelected(id);
-          setMode('2d');
-        }}
-      />
+      <details className="studio-support">
+        <summary>Recovery & advanced placement</summary>
+        <DesignRecovery
+          key={`recovery-${design.id}`}
+          design={design}
+          ownerId={ownerId}
+          past={history.past}
+          onRestore={(next) => {
+            setHistory((h) =>
+              h
+                ? {
+                    past: [...h.past, h.current].slice(-60),
+                    current: next,
+                    future: [],
+                  }
+                : h,
+            );
+            setSelected(null);
+            setSelection([]);
+            setStatus('Design restored. Undo returns to the previous version.');
+          }}
+        />
+        <SmartPlacement
+          design={design}
+          selected={selected}
+          onChange={(next) => commit(() => next, true)}
+        />
+        <SampleStory design={design} onChange={(next) => commit(() => next)} />
+        <ObjectManager
+          design={design}
+          onChange={(next) => commit(() => next)}
+          onSelect={(id) => {
+            setSelected(id);
+            setInspectorCollapsed(false);
+          }}
+        />
+        <ReadinessCheck
+          design={design}
+          onSelect={(id) => {
+            setSelected(id);
+            setMode('2d');
+          }}
+        />
+      </details>
       {(status || storageError || history.error) && (
         <div
           role="status"
@@ -1241,7 +1392,7 @@ function Editor({ ownerId }: { ownerId: string }) {
           {storageError || history.error || status}
         </div>
       )}
-      <div className="designer-grid">
+      <div className="designer-grid" hidden={workspaceStage === 'Quote'}>
         <div className="designer-library-column">
           {overview && version && (
             <select
@@ -1311,6 +1462,21 @@ function Editor({ ownerId }: { ownerId: string }) {
                 : 'Focus canvas'}
             </button>
           </div>
+          {mode === '2d' && (
+            <EverydayEditing
+              key={`quick:${design.id}`}
+              design={design}
+              selectedIds={
+                selection.length ? selection : selected ? [selected] : []
+              }
+              onApply={(next) => commit(() => next, true)}
+              onLocate={(id) => {
+                setWorkspaceStage('Design');
+                setSelected(id);
+                setSelection([]);
+              }}
+            />
+          )}
           <QuickInspector
             design={design}
             item={item}
@@ -1348,7 +1514,10 @@ function Editor({ ownerId }: { ownerId: string }) {
               </button>
               <button
                 aria-pressed={mode === 'quote'}
-                onClick={() => setMode('quote')}
+                onClick={() => {
+                  setWorkspaceStage('Quote');
+                  setMode('quote');
+                }}
               >
                 Quote / order
               </button>

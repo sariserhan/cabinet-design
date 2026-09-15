@@ -28,8 +28,10 @@ const blank: Survey = {
 export function MeasurementWizard({
   design,
   onApply,
+  expanded = false,
 }: {
   design: Design;
+  expanded?: boolean;
   onApply: (d: Design) => void;
 }) {
   const [active, setActive] = useState(false),
@@ -86,7 +88,7 @@ export function MeasurementWizard({
     /* Issues appear below. */
   }
   return (
-    <details className="business-panel">
+    <details className="business-panel" open={expanded || undefined}>
       <summary>Guided room measurements</summary>
       <p>
         Record each wall, opening and utility before placing cabinets. This
