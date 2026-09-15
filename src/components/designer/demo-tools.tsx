@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { newDesign, type Design } from '@/designer/model';
-import { polishedSample } from '@/designer/sample';
+import { type Design } from '@/designer/model';
+import { RoomSetup } from './room-setup';
+import { zipFiles } from '@/designer/presentation-bundle';
 import { money, quoteTotals } from '@/designer/quote';
 import { MiniPlan } from './workflow-tools';
 const RenderView = dynamic(() => import('./render-view'), { ssr: false });
@@ -136,6 +137,8 @@ export function MaterialPresets({
         {materialPresets.map((p) => (
           <button
             key={p.name}
+            className="material-style-card"
+            aria-label={p.name}
             onClick={() =>
               onChange({
                 ...design,
@@ -153,7 +156,14 @@ export function MaterialPresets({
               design.appearance?.lighting === p.lighting
             }
           >
-            {p.name}
+            <span
+              aria-hidden="true"
+              className={`material-swatch swatch-${p.finish}`}
+            />
+            <strong>{p.name}</strong>
+            <span>
+              {p.countertop} countertop · {p.lighting}
+            </span>
           </button>
         ))}
       </div>
@@ -164,66 +174,7 @@ export function MaterialPresets({
     </section>
   );
 }
-export function StartGuide({
-  onStart,
-  onClose,
-}: {
-  onStart: (d: Design) => void;
-  onClose: () => void;
-}) {
-  const [width, setWidth] = useState(144),
-    [depth, setDepth] = useState(120),
-    [height, setHeight] = useState(96);
-  return (
-    <section className="start-guide" aria-label="Start a kitchen">
-      <h2>Start your kitchen</h2>
-      <p>
-        Explore the furnished sample, or set up a room and add objects from the
-        library. Starting a room is undoable.
-      </p>
-      <button
-        className="designer-primary"
-        onClick={() => onStart(polishedSample())}
-      >
-        Explore sample kitchen
-      </button>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const d = newDesign();
-          onStart({ ...d, room: { ...d.room, width, depth, height } });
-        }}
-      >
-        <h3>Use your room dimensions</h3>
-        <div className="designer-row">
-          {(
-            [
-              ['Width', width, setWidth],
-              ['Depth', depth, setDepth],
-              ['Ceiling height', height, setHeight],
-            ] as const
-          ).map(([label, value, set]) => (
-            <label key={label}>
-              {label} (in)
-              <input
-                aria-label={`Starting ${label.toLowerCase()}`}
-                type="number"
-                required
-                min={label === 'Ceiling height' ? 60 : 48}
-                max={label === 'Ceiling height' ? 240 : 600}
-                step="0.25"
-                value={value}
-                onChange={(e) => set(Number(e.target.value))}
-              />
-            </label>
-          ))}
-        </div>
-        <button type="submit">Create room & start designing</button>
-      </form>
-      <button onClick={onClose}>Continue current design</button>
-    </section>
-  );
-}
+export const StartGuide = RoomSetup;
 export function ShortcutHelp() {
   return (
     <details className="shortcut-help">
@@ -251,6 +202,67 @@ export function ClientPresentation({ design }: { design: Design }) {
     [client, setClient] = useState(design.quote?.customer ?? ''),
     [notes, setNotes] = useState(''),
     [preview, setPreview] = useState(false);
+  const packageRef = useRef<HTMLElement>(null);
+  const [bundleError, setBundleError] = useState('');
+  function downloadBundle() {
+    try {
+      const article = packageRef.current;
+      if (!article) return;
+      const encode = (s: string) => new TextEncoder().encode(s);
+      const html =
+        '<!doctype html><html><head><meta charset="utf-8"><title>Kitchen presentation</title><style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px;color:#243e49}img,svg{max-width:100%;height:auto}svg{max-height:550px}table{border-collapse:collapse;width:100%}td{padding:8px;border-bottom:1px solid #ddd}figure{margin:20px 0}dt{font-weight:bold}dd{margin-bottom:12px}@media print{.client-sheet{break-before:page}}</style></head><body>' +
+        article.outerHTML +
+        '</body></html>';
+      const files = [
+        { name: 'presentation.html', data: encode(html) },
+        { name: 'design.json', data: encode(JSON.stringify(design, null, 2)) },
+        {
+          name: 'floor-plan.svg',
+          data: encode(
+            (article.querySelector('svg')?.outerHTML ?? '').replace(
+              '<svg',
+              '<svg xmlns="http://www.w3.org/2000/svg"',
+            ),
+          ),
+        },
+        ...captures.map((c, i) => ({
+          name: `render-${i + 1}.png`,
+          data: Uint8Array.from(atob(c.url.split(',')[1] ?? ''), (v) =>
+            v.charCodeAt(0),
+          ),
+        })),
+      ];
+      const csv = [
+        ['DEMO PRICING — NOT A MANUFACTURER QUOTE'],
+        ['SKU', 'Description', 'Price'],
+        ...quoteTotals(design).lines.map((l) => [
+          l.sku,
+          l.description,
+          money(l.unitCents),
+        ]),
+        ['Total', '', money(quoteTotals(design).total)],
+      ]
+        .map((row) =>
+          row.map((v) => '"' + v.replaceAll('"', '""') + '"').join(','),
+        )
+        .join('\r\n');
+      files.push({ name: 'demo-quote.csv', data: encode(csv) });
+      const archive = zipFiles(files),
+        url = URL.createObjectURL(
+          new Blob([new Uint8Array(archive)], { type: 'application/zip' }),
+        ),
+        link = document.createElement('a');
+      link.href = url;
+      link.download = 'kitchen-presentation.zip';
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setBundleError('');
+    } catch {
+      setBundleError(
+        'The package could not be downloaded. Try again with fewer captured views.',
+      );
+    }
+  }
   const totals = quoteTotals(design);
   return (
     <section className="client-presentation">
@@ -346,9 +358,22 @@ export function ClientPresentation({ design }: { design: Design }) {
             Clear captured views
           </button>
         </div>
+        <button disabled={!captures.length} onClick={downloadBundle}>
+          Download presentation package
+        </button>
+        <p>
+          ZIP includes a presentation you can open in a browser, render PNGs, a
+          floor plan, demo quote and editable design. Extract it and open
+          presentation.html.
+        </p>
+        {bundleError && <p role="alert">{bundleError}</p>}
         <p role="status">{captures.length} of 3 views captured</p>
       </div>
-      <article className="client-package" aria-label="Client PDF preview">
+      <article
+        ref={packageRef}
+        className="client-package"
+        aria-label="Client PDF preview"
+      >
         <section className="client-sheet">
           <h1>{design.name}</h1>
           <p>{client || 'Kitchen design proposal'}</p>

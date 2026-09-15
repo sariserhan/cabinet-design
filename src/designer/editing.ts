@@ -67,6 +67,44 @@ export function snapPlacement(
           ny = target;
         }
   }
+  if (
+    item.elevation >= 40 &&
+    item.rotation % 90 === 0 &&
+    ['cabinet', 'custom_cabinet'].includes(item.kind)
+  ) {
+    for (const base of design.items.filter(
+      (i) =>
+        i.elevation === 0 &&
+        ['cabinet', 'custom_cabinet'].includes(i.kind) &&
+        i.rotation === item.rotation,
+    )) {
+      const b = footprint(base);
+      if (item.rotation % 180 === 0 && Math.abs(position.y - base.y) < 24) {
+        for (const target of [
+          base.x,
+          base.x + (b.width - f.width) / 2,
+          base.x + b.width - f.width,
+        ])
+          if (Math.abs(target - position.x) < dx) {
+            dx = Math.abs(target - position.x);
+            nx = target;
+          }
+      } else if (
+        item.rotation % 180 !== 0 &&
+        Math.abs(position.x - base.x) < 24
+      ) {
+        for (const target of [
+          base.y,
+          base.y + (b.depth - f.depth) / 2,
+          base.y + b.depth - f.depth,
+        ])
+          if (Math.abs(target - position.y) < dy) {
+            dy = Math.abs(target - position.y);
+            ny = target;
+          }
+      }
+    }
+  }
   return { x: nx, y: ny };
 }
 export function alignSelection(

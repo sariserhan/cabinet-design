@@ -1,4 +1,5 @@
 'use client';
+import { PlacementAssist } from './placement-assist';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -206,14 +207,30 @@ function Editor({ ownerId }: { ownerId: string }) {
     [fitRevision, setFitRevision] = useState(0),
     [status, setStatus] = useState(''),
     [storageError, setStorageError] = useState('');
+  const [saveState, setSaveState] = useState<'saving' | 'saved' | 'error'>(
+    'saving',
+  );
+  const [lastSession, setLastSession] = useState<Design | null>(null);
+  const [savedAt, setSavedAt] = useState('');
   const file = useRef<HTMLInputElement>(null);
   const storageKey = `kitchen-studio:${ownerId}`;
   useEffect(() => {
     let initial = newDesign();
     try {
       const draft = localStorage.getItem(storageKey + ':draft');
-      if (draft) initial = parseDesign(draft);
-      else setShowStart(true);
+      if (draft) {
+        try {
+          initial = parseDesign(draft);
+        } catch {
+          const backup = localStorage.getItem(storageKey + ':recovery');
+          if (!backup) throw Error('No recovery copy');
+          initial = parseDesign(backup);
+          setStorageError(
+            'Recovered the previous valid draft because the latest draft could not be read.',
+          );
+        }
+        setLastSession(initial);
+      } else setShowStart(true);
       const raw = localStorage.getItem(storageKey + ':saved');
       if (raw) {
         const list: unknown = JSON.parse(raw);
@@ -232,16 +249,34 @@ function Editor({ ownerId }: { ownerId: string }) {
   useEffect(() => setSelection([]), [design?.id]);
   useEffect(() => {
     if (!design) return;
-    const timer = setTimeout(() => {
+    setSaveState('saving');
+    const persist = () => {
       try {
+        const previous = localStorage.getItem(storageKey + ':draft');
+        if (previous) {
+          try {
+            parseDesign(previous);
+            localStorage.setItem(storageKey + ':recovery', previous);
+          } catch {
+            /* Keep the last valid recovery copy. */
+          }
+        }
         localStorage.setItem(storageKey + ':draft', JSON.stringify(design));
+        setSaveState('saved');
+        setSavedAt(new Date().toLocaleTimeString());
       } catch {
+        setSaveState('error');
         setStorageError(
           'Browser storage is unavailable. Export your design to keep it.',
         );
       }
-    }, 350);
-    return () => clearTimeout(timer);
+    };
+    const timer = setTimeout(persist, 350);
+    window.addEventListener('pagehide', persist);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('pagehide', persist);
+    };
   }, [design, storageKey]);
   function commit(change: (current: Design) => Design) {
     setHistory((h) => {
@@ -639,7 +674,13 @@ function Editor({ ownerId }: { ownerId: string }) {
         </div>
       )}
       {showStart && (
-        <StartGuide onStart={startDesign} onClose={() => setShowStart(false)} />
+        <StartGuide
+          onStart={(next, mode) => {
+            startDesign(next);
+            setMode(mode ?? '2d');
+          }}
+          onClose={() => setShowStart(false)}
+        />
       )}
       {walkStep !== null && (
         <DemoWalkthrough
@@ -799,6 +840,27 @@ function Editor({ ownerId }: { ownerId: string }) {
           </div>
         </div>
       </details>
+      <div className="save-status" role="status">
+        <span>
+          {saveState === 'saving'
+            ? 'Saving changes…'
+            : saveState === 'error'
+              ? 'Changes not saved'
+              : `Saved in this browser · ${savedAt}`}
+        </span>
+        {lastSession && (
+          <button
+            onClick={() => {
+              commit(() => structuredClone(lastSession));
+              setStatus(
+                'Restored the design from the start of this session. Undo is available.',
+              );
+            }}
+          >
+            Restore last session
+          </button>
+        )}
+      </div>
       {(status || storageError || history.error) && (
         <div
           role="status"
@@ -978,6 +1040,13 @@ function Editor({ ownerId }: { ownerId: string }) {
               )}
             </div>
           </div>
+          {mode === '2d' && (
+            <PlacementAssist
+              design={design}
+              selected={selected}
+              onChange={(next) => commit(() => next)}
+            />
+          )}
           {mode === 'compare' ? (
             <CompareOptions
               design={design}
@@ -1026,6 +1095,20 @@ function Editor({ ownerId }: { ownerId: string }) {
               selected={selected}
               onSelect={setSelected}
               onMove={(id, x, y) => updateItem(id, { x, y })}
+              onResize={(id, width, depth) =>
+                commit((d) =>
+                  id
+                    ? {
+                        ...d,
+                        items: d.items.map((i) =>
+                          i.id === id && i.kind !== 'cabinet'
+                            ? { ...i, width, depth }
+                            : i,
+                        ),
+                      }
+                    : { ...d, room: { ...d.room, width, depth } },
+                )
+              }
               snap={snap}
               zoom={zoom}
               warningIds={warningIds}

@@ -23,6 +23,7 @@ import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
 
 type Props = {
+  onResize: (id: string | null, width: number, depth: number) => void;
   design: Design;
   selected: string | null;
   onSelect: (id: string | null) => void;
@@ -53,7 +54,27 @@ export function PlanCanvas({
   onToggle,
   showClearance,
   onDropItem,
+  onResize,
 }: Props) {
+  const [dimension, setDimension] = useState<{
+    id: string | null;
+    width: number;
+    depth: number;
+  } | null>(null);
+  function editDimension(id: string | null) {
+    const item = design.items.find((i) => i.id === id);
+    if (item?.kind === 'cabinet') {
+      setDropError(
+        'Catalog dimensions are fixed. Choose a custom cabinet to resize it.',
+      );
+      return;
+    }
+    setDimension({
+      id,
+      width: item?.width ?? design.room.width,
+      depth: item?.depth ?? design.room.depth,
+    });
+  }
   const [ghost, setGhost] = useState<Cabinet | null>(null);
   const [dropError, setDropError] = useState('');
   const svg = useRef<SVGSVGElement>(null);
@@ -363,6 +384,18 @@ export function PlanCanvas({
           <path d={`M-8 0 H-17 M-8 ${room.depth} H-17 M-13 0 V${room.depth}`} />
         </g>
         <text
+          role="button"
+          tabIndex={0}
+          aria-label="Edit room width"
+          className="editable-dimension"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => editDimension(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              editDimension(null);
+            }
+          }}
           x={room.width / 2}
           y={-17}
           textAnchor="middle"
@@ -372,6 +405,18 @@ export function PlanCanvas({
           {room.width}″ · {(room.width / 12).toFixed(1)} ft
         </text>
         <text
+          role="button"
+          tabIndex={0}
+          aria-label="Edit room depth"
+          className="editable-dimension"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => editDimension(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              editDimension(null);
+            }
+          }}
           transform={`translate(-18 ${room.depth / 2}) rotate(-90)`}
           textAnchor="middle"
           fontSize="4"
@@ -469,13 +514,29 @@ export function PlanCanvas({
                 )}
                 {active && (
                   <text
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Edit selected object dimensions"
+                    className="editable-dimension"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      editDimension(item.id);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        editDimension(item.id);
+                      }
+                    }}
                     x={b.width / 2}
                     y={b.depth + 5}
                     textAnchor="middle"
                     fontSize="3"
                     fill="#087984"
                   >
-                    {b.width}″ × {b.depth}″
+                    W {item.width}″ · D {item.depth}″
                   </text>
                 )}
               </g>
@@ -588,6 +649,55 @@ export function PlanCanvas({
             );
           })()}
       </svg>
+      {dimension && (
+        <div
+          className="dimension-editor"
+          role="dialog"
+          aria-label="Edit plan dimensions"
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onResize(dimension.id, dimension.width, dimension.depth);
+              setDimension(null);
+            }}
+          >
+            <strong>
+              {dimension.id ? 'Object dimensions' : 'Room dimensions'} (in)
+            </strong>
+            <p>
+              {dimension.id
+                ? 'Edits this object; linked parts keep their existing sizes.'
+                : 'Existing objects keep their positions. Review layout checks after resizing.'}
+            </p>
+            {(['width', 'depth'] as const).map((axis) => (
+              <label key={axis}>
+                {axis}
+                <input
+                  autoFocus={axis === 'width'}
+                  aria-label={`Plan ${axis}`}
+                  type="number"
+                  required
+                  min={dimension.id ? 0.25 : 48}
+                  max={dimension.id ? 600 : 600}
+                  step="0.25"
+                  value={dimension[axis]}
+                  onChange={(e) =>
+                    setDimension({
+                      ...dimension,
+                      [axis]: Number(e.target.value),
+                    })
+                  }
+                />
+              </label>
+            ))}
+            <button type="submit">Apply dimensions</button>
+            <button type="button" onClick={() => setDimension(null)}>
+              Cancel dimensions
+            </button>
+          </form>
+        </div>
+      )}
       {dropError && <p role="status">{dropError}</p>}
     </div>
   );
