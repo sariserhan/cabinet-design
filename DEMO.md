@@ -194,3 +194,18 @@ Validation: 118 core tests and 16 backend tests; lint, TypeScript, benchmark art
 - The visible save indicator reports saving, saved or storage failure. Drafts restore automatically when reopening this browser. **Restore last session** returns to the design loaded at the start of the current session, with Undo available. A previous valid draft is retained as recovery data; a corrupt latest draft falls back to it. Session recovery is local to the browser and account, not cloud synchronization.
 
 Validation: 123 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build passed. Desktop/mobile browser checks cover guided setup, room/object measurements, filler insertion, style changes, reload and session restoration, and package download. ZIP integrity and an offline browser opening of the extracted presentation were also verified.
+
+## Faster kitchen assembly and audience presentation
+
+Open **2D plan → Build your kitchen faster**:
+
+- **Quick layout:** preview L-shaped, U-shaped or island starter cabinets, then apply. Room measurements, architecture, doors and windows remain; furniture is replaced. Candidates that intersect architecture or leave the room are skipped. Undo restores the previous arrangement.
+- **Complete selected cabinets:** select floor-level straight cabinets, including multiple selections, then add flush countertops and exposed ¾-inch end panels. Cabinet detailing gets a built-in four-inch toe kick. Parts join the host assembly and inherit its finish; stone uses the room countertop choice. Existing or obstructed parts are kept/skipped, and repeating the action does not duplicate them. Individual countertop sections are a demo assembly, not a fabrication seam plan.
+- **Appliance package:** add missing refrigerator, range, hood, dishwasher and sink with generic demo dimensions. The sink gets a suitable custom sink cabinet and top where needed. Placement finds open floor positions while keeping existing furniture. Adjust positions and check utility/clearance requirements afterward. If the complete package cannot fit, the design is unchanged.
+- **Corner options:** compare diagonal, blind-left and blind-right diagrams, choose a room corner, and place a rotated cabinet. The full 36 × 36-inch footprint must be clear. These are illustrative configurations, not manufacturer-specific corner or hinge calculations.
+
+**Compare options → Before / after** compares your current design with a separate browser-saved snapshot. Starting a room or sample sets its initial snapshot. **Use current design as before** replaces it deliberately. Edits and undo do not modify it. Enable rendered comparison for matching cameras; switching a camera angle or orbiting a view updates both. **Saved alternatives** retains the existing named-design comparison workflow.
+
+**Present** and **Show this kitchen** open an audience welcome screen. **Begin kitchen tour** steps through saved viewpoints (or built-in viewpoints when none are saved). Use Previous/Next, the saved-viewpoint selector, or **Explore freely**. Escape exits presentation. The mobile welcome title wraps, and render editing controls are hidden while the welcome or tour is shown.
+
+Validation: 127 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build. Browser checks cover layout replacement, run completion, appliance insertion, corner placement, snapshot persistence after reload, nonblank linked comparison renders, tour navigation and mobile layout. All additions remain within the demo scope.

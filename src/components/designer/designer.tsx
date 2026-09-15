@@ -1,4 +1,7 @@
 'use client';
+import { KitchenActions } from './kitchen-actions';
+import { PresentationTour } from './presentation-tour';
+import type { CameraView } from './render-view';
 import { PlacementAssist } from './placement-assist';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -160,6 +163,10 @@ function Editor({ ownerId }: { ownerId: string }) {
   const [libraryCollapsed, setLibraryCollapsed] = useState(false),
     [inspectorCollapsed, setInspectorCollapsed] = useState(false),
     [walkStep, setWalkStep] = useState<number | null>(null);
+  const [before, setBefore] = useState<Design | null>(null);
+  const [presentationCamera, setPresentationCamera] = useState<
+    CameraView | undefined
+  >();
   const [showStart, setShowStart] = useState(false);
   const [inspectorTab, setInspectorTab] = useState('design'),
     [presenting, setPresenting] = useState(false),
@@ -243,8 +250,25 @@ function Editor({ ownerId }: { ownerId: string }) {
         'A saved design could not be loaded. You can still work and export a copy.',
       );
     }
+    try {
+      const raw = localStorage.getItem(storageKey + ':before');
+      const baseline = raw ? parseDesign(raw) : null;
+      setBefore(baseline?.id === initial.id ? baseline : initial);
+    } catch {
+      setBefore(initial);
+    }
     setHistory({ past: [], current: initial, future: [] });
   }, [storageKey]);
+  useEffect(() => {
+    if (before)
+      try {
+        localStorage.setItem(storageKey + ':before', JSON.stringify(before));
+      } catch {
+        setStorageError(
+          'Could not save the comparison snapshot in this browser.',
+        );
+      }
+  }, [before, storageKey]);
   const design = history?.current;
   useEffect(() => setSelection([]), [design?.id]);
   useEffect(() => {
@@ -641,6 +665,8 @@ function Editor({ ownerId }: { ownerId: string }) {
     if (step === 4) setMode('client');
   }
   function startDesign(next: Design) {
+    setBefore(structuredClone(next));
+    setPresentationCamera(undefined);
     commit(() => next);
     setShowStart(false);
     setSelected(null);
@@ -666,12 +692,11 @@ function Editor({ ownerId }: { ownerId: string }) {
       className={`designer-app ${libraryCollapsed ? 'library-collapsed' : ''} ${inspectorCollapsed ? 'inspector-collapsed' : ''} ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''}`}
     >
       {presenting && (
-        <div className="presentation-bar">
-          <strong>{design.name}</strong>
-          <button onClick={() => setPresenting(false)}>
-            Exit presentation · Esc
-          </button>
-        </div>
+        <PresentationTour
+          design={design}
+          onCamera={setPresentationCamera}
+          onExit={() => setPresenting(false)}
+        />
       )}
       {showStart && (
         <StartGuide
@@ -1041,6 +1066,14 @@ function Editor({ ownerId }: { ownerId: string }) {
             </div>
           </div>
           {mode === '2d' && (
+            <KitchenActions
+              key={design.id}
+              design={design}
+              ids={selection.length ? selection : selected ? [selected] : []}
+              onChange={(next) => commit(() => next)}
+            />
+          )}
+          {mode === '2d' && (
             <PlacementAssist
               design={design}
               selected={selected}
@@ -1049,6 +1082,8 @@ function Editor({ ownerId }: { ownerId: string }) {
           )}
           {mode === 'compare' ? (
             <CompareOptions
+              before={before?.id === design.id ? before : null}
+              onSnapshot={() => setBefore(structuredClone(design))}
               design={design}
               saved={saved}
               onOpen={(next) => {
@@ -1129,6 +1164,7 @@ function Editor({ ownerId }: { ownerId: string }) {
             <ClientPresentation key={JSON.stringify(design)} design={design} />
           ) : mode === 'render' ? (
             <RenderView
+              cameraView={presenting ? presentationCamera : undefined}
               key={design.id}
               design={design}
               selected={selected}

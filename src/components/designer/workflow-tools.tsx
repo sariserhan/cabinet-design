@@ -101,6 +101,8 @@ export function MiniPlan({ design }: { design: Design }) {
   );
 }
 export function CompareOptions({
+  before,
+  onSnapshot,
   design,
   saved,
   onDuplicate,
@@ -108,10 +110,13 @@ export function CompareOptions({
 }: {
   design: Design;
   saved: Design[];
+  before?: Design | null;
+  onSnapshot?: () => void;
   onDuplicate: (name: string) => void;
   onOpen: (design: Design) => void;
 }) {
   const [rendered, setRendered] = useState(false);
+  const [original, setOriginal] = useState(true);
   const size = Math.max(
     design.room.width,
     design.room.depth,
@@ -133,43 +138,71 @@ export function CompareOptions({
   const [choice, setChoice] = useState(''),
     [name, setName] = useState('Option B');
   const options = saved.filter((d) => d.id !== design.id),
-    reference = options.find((d) => d.id === choice) ?? options[0];
+    reference =
+      original && before
+        ? before
+        : (options.find((d) => d.id === choice) ?? options[0]);
   return (
     <section className="compare-options">
       <h2>Design alternatives</h2>
-      <p>
-        Create an independent copy; layouts, materials and demo prices can then
-        diverge. Orders are kept with their original design.
-      </p>
       <div className="designer-row">
-        <input
-          aria-label="Alternative name"
-          value={name}
-          maxLength={100}
-          onChange={(e) => setName(e.target.value)}
-        />
         <button
-          disabled={!name.trim()}
-          onClick={() => onDuplicate(name.trim())}
+          aria-pressed={original}
+          disabled={!before}
+          onClick={() => setOriginal(true)}
         >
-          Save current & create alternative
+          Before / after
         </button>
+        <button aria-pressed={!original} onClick={() => setOriginal(false)}>
+          Saved alternatives
+        </button>
+        <button onClick={onSnapshot}>Use current design as before</button>
       </div>
-      <label>
-        Compare with
-        <select
-          aria-label="Compare saved design"
-          value={reference?.id ?? ''}
-          onChange={(e) => setChoice(e.target.value)}
-        >
-          <option value="">Choose saved option</option>
-          {options.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <p>
+        {original && before
+          ? 'Before is a separate saved snapshot. Your edits do not change it. Both rendered views use matching camera angles.'
+          : 'Compare independent saved designs.'}
+      </p>
+      {!(original && before) && (
+        <>
+          <p>
+            Create an independent copy; layouts, materials and demo prices can
+            then diverge. Orders are kept with their original design.
+          </p>
+          <div className="designer-row">
+            <input
+              aria-label="Alternative name"
+              value={name}
+              maxLength={100}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button
+              disabled={!name.trim()}
+              onClick={() => onDuplicate(name.trim())}
+            >
+              Save current & create alternative
+            </button>
+          </div>
+          <label>
+            Compare with
+            <select
+              aria-label="Compare saved design"
+              value={reference?.id ?? ''}
+              onChange={(e) => {
+                setChoice(e.target.value);
+                setOriginal(false);
+              }}
+            >
+              <option value="">Choose saved option</option>
+              {options.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </>
+      )}
       <label>
         <input
           type="checkbox"
@@ -186,9 +219,9 @@ export function CompareOptions({
       <div className="comparison-grid">
         {[design, reference].map((d, i) =>
           d ? (
-            <article key={d.id}>
+            <article key={`${i}:${d.id}`}>
               <h3>
-                {i === 0 ? 'Current: ' : ''}
+                {i === 0 ? 'Current: ' : original && before ? 'Before: ' : ''}
                 {d.name}
               </h3>
               {rendered ? (
