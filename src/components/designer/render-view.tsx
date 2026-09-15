@@ -247,7 +247,15 @@ export default function RenderView({
     const textures = [
       materialTexture('wood'),
       materialTexture(design.appearance?.countertop ?? 'quartz'),
-      materialTexture('floor'),
+      materialTexture(
+        design.appearance?.flooring === 'walnut'
+          ? 'walnut'
+          : design.appearance?.flooring === 'tile'
+            ? 'tile'
+            : design.appearance?.flooring === 'slate'
+              ? 'slate'
+              : 'floor',
+      ),
     ];
 
     const materials: THREE.Material[] = [];
@@ -482,11 +490,31 @@ export default function RenderView({
         continue;
       }
       if (item.kind === 'sink') {
-        b(w, 1, d, 0, 1, 0, steel);
-        b(1, h, d, -w / 2 + 0.5, h / 2, 0, steel);
-        b(1, h, d, w / 2 - 0.5, h / 2, 0, steel);
-        b(w, h, 1, 0, h / 2, -d / 2 + 0.5, steel);
-        b(w, h, 1, 0, h / 2, d / 2 - 0.5, steel);
+        const basin =
+          item.sinkStyle === 'farmhouse' ? material('#f7f5ef', 0, 0.2) : steel;
+        b(w, 1, d, 0, 1, 0, basin);
+        b(1, h, d, -w / 2 + 0.5, h / 2, 0, basin);
+        b(1, h, d, w / 2 - 0.5, h / 2, 0, basin);
+        b(w, h, 1, 0, h / 2, -d / 2 + 0.5, basin);
+        b(
+          w,
+          h,
+          item.sinkStyle === 'farmhouse' ? 2 : 1,
+          0,
+          h / 2,
+          d / 2 - 0.5,
+          basin,
+        );
+        if (item.sinkStyle === 'double')
+          b(1.2, h - 1, d - 2, 0, h / 2, 0, basin);
+        for (const x of item.sinkStyle === 'double' ? [-w / 4, w / 4] : [0]) {
+          const drain = new THREE.Mesh(
+            new THREE.CylinderGeometry(1, 1, 0.15, 20),
+            dark,
+          );
+          drain.position.set(x, 1.6, 0);
+          group.add(drain);
+        }
         const faucet =
           design.appearance?.faucet === 'brass'
             ? material('#b99a48', 0.85, 0.25)
@@ -870,12 +898,17 @@ export default function RenderView({
         group.position.set(run.x, 0, run.z);
         group.rotation.y = run.rotation;
         scene.add(group);
-        const tile =
-          design.appearance.backsplash === 'subway'
-            ? material('#ffffff', 0.02, 0.35)
-            : stoneFor(design.appearance.countertop);
-        if (design.appearance.backsplash === 'subway') {
-          const map = materialTexture('subway');
+        const tile = ['subway', 'mosaic', 'stacked'].includes(
+          design.appearance.backsplash,
+        )
+          ? material('#ffffff', 0.02, 0.35)
+          : stoneFor(design.appearance.countertop);
+        if (
+          ['subway', 'mosaic', 'stacked'].includes(design.appearance.backsplash)
+        ) {
+          const map = materialTexture(
+            design.appearance.backsplash as 'subway' | 'mosaic' | 'stacked',
+          );
           textures.push(map);
           tile.map = map;
           map.repeat.set(run.width / 24, 1.5);

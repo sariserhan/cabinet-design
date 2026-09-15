@@ -21,6 +21,10 @@ export const itemSchema = z.object({
       seating: z.enum(['none', 'north', 'south', 'east', 'west']).optional(),
     })
     .optional(),
+  refrigeratorStyle: z
+    .enum(['single', 'double', 'french', 'top_freezer'])
+    .optional(),
+  sinkStyle: z.enum(['single', 'double', 'farmhouse', 'prep']).optional(),
   finish: z.enum(['linen', 'oak', 'slate']).optional(),
   countertop: z.enum(['quartz', 'marble', 'granite']).optional(),
   id: z.string().min(1).max(100),
@@ -192,7 +196,10 @@ export const designSchema = z
     finish: z.enum(['linen', 'oak', 'slate']),
     appearance: z
       .object({
-        backsplash: z.enum(['none', 'subway', 'slab']).optional(),
+        backsplash: z
+          .enum(['none', 'subway', 'slab', 'mosaic', 'stacked'])
+          .optional(),
+        flooring: z.enum(['oak', 'walnut', 'tile', 'slate']).optional(),
         hardware: z.enum(['steel', 'brass', 'black']).optional(),
         pendants: z.boolean().optional(),
         pendantLevel: z.number().min(0).max(100).optional(),
@@ -742,9 +749,90 @@ export const objectPresets: {
     elevation: 34.5,
   },
 ];
-export function fromObject(kind: ObjectKind): Cabinet {
+export const objectOptions: {
+  id: string;
+  kind: ObjectKind;
+  name: string;
+  patch: Partial<Cabinet>;
+}[] = [
+  ...([24, 28, 30, 32, 36, 42] as const).map((width) => ({
+    id: `door-${width}`,
+    kind: 'door' as const,
+    name: `Door ${width} × 80`,
+    patch: { width, height: 80 },
+  })),
+  ...(
+    [
+      [24, 36],
+      [36, 36],
+      [48, 48],
+      [60, 42],
+      [72, 48],
+    ] as const
+  ).map(([width, height]) => ({
+    id: `window-${width}`,
+    kind: 'window' as const,
+    name: `Window ${width} × ${height}`,
+    patch: { width, height },
+  })),
+  ...(['single', 'double', 'french', 'top_freezer'] as const).map(
+    (style, index) => ({
+      id: `fridge-${style}`,
+      kind: 'refrigerator' as const,
+      name:
+        [
+          'Single-door refrigerator',
+          'Two-door refrigerator',
+          'French-door refrigerator',
+          'Top-freezer refrigerator',
+        ][index] ?? style,
+      patch: {
+        refrigeratorStyle: style,
+        width: style === 'single' ? 28 : 36,
+        height: 70,
+      },
+    }),
+  ),
+  ...(['single', 'double', 'farmhouse', 'prep'] as const).map(
+    (style, index) => ({
+      id: `sink-${style}`,
+      kind: 'sink' as const,
+      name:
+        [
+          'Single-bowl sink',
+          'Double-bowl sink',
+          'Farmhouse apron sink',
+          'Compact prep sink',
+        ][index] ?? style,
+      patch: {
+        sinkStyle: style,
+        width: style === 'prep' ? 18 : style === 'single' ? 30 : 33,
+        depth: style === 'prep' ? 16 : 22,
+        height: style === 'farmhouse' ? 10 : 8,
+      },
+    }),
+  ),
+  ...(
+    [
+      [48, 30],
+      [72, 36],
+      [96, 42],
+    ] as const
+  ).map(([width, depth]) => ({
+    id: `island-${width}`,
+    kind: 'island' as const,
+    name: `Island ${width} × ${depth}`,
+    patch: {
+      width,
+      depth,
+      surface: { seating: 'south' as const, waterfall: false },
+    },
+  })),
+];
+export function fromObject(kind: ObjectKind, option?: string): Cabinet {
   const preset = objectPresets.find((p) => p.kind === kind);
   if (!preset) throw Error('Unknown object');
+  const choice = objectOptions.find((o) => o.id === option && o.kind === kind);
   return {
     id: crypto.randomUUID(),
     recordId: `demo-${kind}`,
@@ -765,6 +853,32 @@ export function fromObject(kind: ObjectKind): Cabinet {
     mirrored: false,
     x: 0,
     y: 0,
+    ...(choice?.patch ?? {}),
+    ...(choice ? { sku: choice.name } : {}),
+    ...(kind === 'sink' && choice
+      ? { elevation: 36 - (choice.patch.height ?? 8) }
+      : {}),
+  };
+}
+export function objectOptionPatch(
+  item: Cabinet,
+  optionId: string,
+): Partial<Cabinet> {
+  const option = objectOptions.find(
+    (o) => o.id === optionId && o.kind === item.kind,
+  );
+  if (!option) return {};
+  return {
+    ...option.patch,
+    sku: option.name,
+    ...(item.kind === 'sink'
+      ? {
+          elevation: Math.max(
+            0,
+            item.elevation + item.height - (option.patch.height ?? item.height),
+          ),
+        }
+      : {}),
   };
 }
 export function isOpening(item: Cabinet) {

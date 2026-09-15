@@ -291,7 +291,7 @@ export function PlanCanvas({
             if (payload) {
               const candidate =
                 payload.kind === 'object'
-                  ? fromObject(payload.object)
+                  ? fromObject(payload.object, payload.option)
                   : fromProduct(payload.product, payload.versionId);
               const placed = placementAt(
                 candidate,
@@ -569,7 +569,9 @@ export function PlanCanvas({
                 )}
                 {active &&
                   !item.locked &&
-                  ['custom_cabinet', 'countertop'].includes(item.kind) &&
+                  ['custom_cabinet', 'countertop', 'island'].includes(
+                    item.kind,
+                  ) &&
                   (() => {
                     const point = localToWorld(item, item.width, item.depth);
                     return (

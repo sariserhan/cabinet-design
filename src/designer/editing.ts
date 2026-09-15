@@ -211,7 +211,11 @@ export function duplicateOption(design: Design, name: string): Design {
 }
 
 export type DropItem =
-  | { kind: 'object'; object: Exclude<Cabinet['kind'], 'cabinet'> }
+  | {
+      kind: 'object';
+      object: Exclude<Cabinet['kind'], 'cabinet'>;
+      option?: string | undefined;
+    }
   | { kind: 'product'; product: import('./model').Product; versionId: string };
 
 export function placementAt(

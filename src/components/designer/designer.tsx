@@ -44,6 +44,8 @@ import {
   canPlace,
   updateAssembly,
   fromObject,
+  objectOptions,
+  objectOptionPatch,
   isOpening,
   attachToWall,
   billKey,
@@ -60,13 +62,7 @@ import {
   snapPosition,
   warnings,
 } from '@/designer/model';
-import type {
-  Cabinet,
-  Design,
-  Product,
-  ObjectKind,
-  Wall,
-} from '@/designer/model';
+import type { Cabinet, Design, Product, ObjectKind } from '@/designer/model';
 import { PlanCanvas } from './plan-canvas';
 import { Preview } from './preview';
 import { Library } from './library';
@@ -428,13 +424,17 @@ function Editor({ ownerId }: { ownerId: string }) {
     setSelected(item.id);
     setStatus(`${item.sku} added. Drag it in the plan or edit its position.`);
   }
-  function addObject(kind: ObjectKind, drop?: { x: number; y: number }) {
+  function addObject(
+    kind: ObjectKind,
+    drop?: { x: number; y: number },
+    option?: string,
+  ) {
     if (!design) return;
     if (design.items.length >= 100) {
       setStatus('This demo supports 100 items per design.');
       return;
     }
-    let next = fromObject(kind);
+    let next = fromObject(kind, option);
     if (drop) {
       const placed = placementAt(next, design, drop, snap);
       if (!placed) {
@@ -483,31 +483,45 @@ function Editor({ ownerId }: { ownerId: string }) {
         elevation: host.elevation + host.height,
       };
     } else if (isOpening(next)) {
-      const wall = Object.entries(design.room.walls).find(
-        ([, active]) => active,
-      )?.[0] as Wall | undefined;
-      if (!wall) {
-        setStatus('Enable a room wall before adding a door or window.');
-        return;
-      }
+      const edges = roomEdges(design.room).filter(
+        (edge) =>
+          !edge.curved &&
+          design.room.walls[edge.side] &&
+          edge.length >= next.width,
+      );
       let placed = false;
-      for (
-        let offset = 0;
-        offset <= Math.max(design.room.width, design.room.depth);
-        offset += 6
-      ) {
-        const candidate = {
-          ...next,
-          ...attachToWall(next, design.room, wall, offset, offset),
-        };
-        if (!design.items.some((i) => placementCollision(candidate, i))) {
-          next = candidate;
-          placed = true;
-          break;
+      for (const edge of edges) {
+        for (
+          let offset = next.width / 2;
+          offset <= edge.length - next.width / 2;
+          offset += 3
+        ) {
+          const candidate = {
+            ...next,
+            ...attachToWall(
+              { ...next, wallSegment: edge.index },
+              design.room,
+              edge.side,
+              edge.a.x +
+                ((edge.b.x - edge.a.x) * offset) / edge.length -
+                next.width / 2,
+              edge.a.y +
+                ((edge.b.y - edge.a.y) * offset) / edge.length -
+                next.depth / 2,
+            ),
+          };
+          if (!design.items.some((i) => placementCollision(candidate, i))) {
+            next = candidate;
+            placed = true;
+            break;
+          }
         }
+        if (placed) break;
       }
       if (!placed) {
-        setStatus('No free space on this wall. Move existing items first.');
+        setStatus(
+          'No free space on an enabled straight wall for this opening. Move existing items or choose a smaller size.',
+        );
         return;
       }
     } else {
@@ -975,7 +989,10 @@ function Editor({ ownerId }: { ownerId: string }) {
           {libraryTab === 'cabinets' ? (
             <Library version={version} onAdd={add} />
           ) : (
-            <ObjectsLibrary key={design.id} onAdd={addObject} />
+            <ObjectsLibrary
+              key={design.id}
+              onAdd={(kind, option) => addObject(kind, undefined, option)}
+            />
           )}
         </div>
         <section className="designer-center" aria-label="Design workspace">
@@ -1210,7 +1227,8 @@ function Editor({ ownerId }: { ownerId: string }) {
               }
               showClearance={showClearance}
               onDropItem={(payload, point) => {
-                if (payload.kind === 'object') addObject(payload.object, point);
+                if (payload.kind === 'object')
+                  addObject(payload.object, point, payload.option);
                 else add(payload.product, payload.versionId, point);
               }}
             />
@@ -1435,6 +1453,38 @@ function Editor({ ownerId }: { ownerId: string }) {
                   Footprint: {footprint(item).width} × {footprint(item).depth}{' '}
                   in · {item.rotation}°
                 </p>
+                {objectOptions.some((o) => o.kind === item.kind) && (
+                  <label className="designer-numeric">
+                    <span>Size / style preset</span>
+                    <select
+                      aria-label="Selected object preset"
+                      value=""
+                      onChange={(e) => {
+                        const option = objectOptions.find(
+                          (o) => o.id === e.target.value,
+                        );
+                        if (option)
+                          commit((d) => ({
+                            ...d,
+                            items: d.items.map((i) =>
+                              i.id === item.id
+                                ? { ...i, ...objectOptionPatch(i, option.id) }
+                                : i,
+                            ),
+                          }));
+                      }}
+                    >
+                      <option value="">Choose a preset…</option>
+                      {objectOptions
+                        .filter((o) => o.kind === item.kind)
+                        .map((o) => (
+                          <option value={o.id} key={o.id}>
+                            {o.name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                )}
                 {item.kind !== 'cabinet' && (
                   <>
                     <Numeric

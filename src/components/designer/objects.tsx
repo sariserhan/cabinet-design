@@ -11,7 +11,12 @@ import {
   Droplets,
   Plus,
 } from 'lucide-react';
-import { objectPresets, sinkHoles, objectTransform } from '@/designer/model';
+import {
+  objectPresets,
+  objectOptions,
+  sinkHoles,
+  objectTransform,
+} from '@/designer/model';
 import type { Cabinet, ObjectKind } from '@/designer/model';
 const icons = {
   door: DoorOpen,
@@ -37,11 +42,21 @@ const icons = {
 export function ObjectsLibrary({
   onAdd,
 }: {
-  onAdd: (kind: ObjectKind) => void;
+  onAdd: (kind: ObjectKind, option?: string) => void;
 }) {
   const [query, setQuery] = useState('');
+  const [choices, setChoices] = useState<Record<string, string>>({});
   const matches = objectPresets.filter((p) =>
-    (p.name + ' ' + p.kind.replaceAll('_', ' '))
+    (
+      p.name +
+      ' ' +
+      p.kind.replaceAll('_', ' ') +
+      ' ' +
+      objectOptions
+        .filter((o) => o.kind === p.kind)
+        .map((o) => o.name)
+        .join(' ')
+    )
       .toLowerCase()
       .includes(query.trim().toLowerCase()),
   );
@@ -68,6 +83,12 @@ export function ObjectsLibrary({
       <div className="library-results">
         {matches.map((p) => {
           const Icon = icons[p.kind];
+          const dimensions = {
+            ...p,
+            ...objectOptions.find(
+              (o) => o.id === choices[p.kind] && o.kind === p.kind,
+            )?.patch,
+          };
           return (
             <article
               className="library-product"
@@ -77,7 +98,11 @@ export function ObjectsLibrary({
               onDragStart={(e) => {
                 e.dataTransfer.setData(
                   'application/x-kitchen-item',
-                  JSON.stringify({ kind: 'object', object: p.kind }),
+                  JSON.stringify({
+                    kind: 'object',
+                    object: p.kind,
+                    option: choices[p.kind],
+                  }),
                 );
                 setActiveDrop(
                   e.dataTransfer.getData('application/x-kitchen-item'),
@@ -89,11 +114,31 @@ export function ObjectsLibrary({
               <div>
                 <strong>{p.name}</strong>
                 <small>
-                  {p.width} W × {p.depth} D × {p.height} H (in)
+                  {dimensions.width} W × {dimensions.depth} D ×{' '}
+                  {dimensions.height} H (in)
                 </small>
+                {objectOptions.some((o) => o.kind === p.kind) && (
+                  <select
+                    aria-label={`${p.name} option`}
+                    value={choices[p.kind] ?? ''}
+                    onChange={(e) =>
+                      setChoices({ ...choices, [p.kind]: e.target.value })
+                    }
+                    onPointerDown={(e) => e.stopPropagation()}
+                  >
+                    <option value="">Standard {p.name.toLowerCase()}</option>
+                    {objectOptions
+                      .filter((o) => o.kind === p.kind)
+                      .map((o) => (
+                        <option key={o.id} value={o.id}>
+                          {o.name}
+                        </option>
+                      ))}
+                  </select>
+                )}
                 <button
                   aria-label={`Add ${p.name}`}
-                  onClick={() => onAdd(p.kind)}
+                  onClick={() => onAdd(p.kind, choices[p.kind])}
                 >
                   <Plus size={13} /> Add
                 </button>
@@ -207,6 +252,24 @@ export function ObjectPlan({
             stroke="#758e99"
             strokeWidth=".5"
           />
+          {item.sinkStyle === 'double' && (
+            <path
+              d={`M${w / 2} 2 V${d - 2}`}
+              stroke="#758e99"
+              strokeWidth="1.5"
+            />
+          )}
+          {item.sinkStyle === 'farmhouse' && (
+            <rect
+              x="0"
+              y={d - 2}
+              width={w}
+              height="2"
+              fill="#fffdf8"
+              stroke="#758e99"
+              strokeWidth=".5"
+            />
+          )}
           <circle cx={w / 2} cy={d / 2} r="1" fill="#718a96" />
         </>
       )}
@@ -233,9 +296,10 @@ export function ObjectPlan({
           stroke="#738b97"
         />
       )}
-      {item.kind === 'refrigerator' && (
-        <path d={`M${w / 2} 0 V${d}`} stroke="#81949c" strokeWidth=".5" />
-      )}
+      {item.kind === 'refrigerator' &&
+        ['double', 'french'].includes(
+          item.refrigeratorStyle ?? 'top_freezer',
+        ) && <path d={`M${w / 2} 0 V${d}`} stroke="#81949c" strokeWidth=".5" />}
       {!opening && (
         <text
           x={w / 2}

@@ -1,7 +1,19 @@
 import * as THREE from 'three';
 /** Deterministic material maps generated locally; no external image service. */
 export function materialTexture(
-  kind: 'wood' | 'floor' | 'quartz' | 'marble' | 'granite' | 'subway' | 'metal',
+  kind:
+    | 'wood'
+    | 'floor'
+    | 'quartz'
+    | 'marble'
+    | 'granite'
+    | 'subway'
+    | 'metal'
+    | 'walnut'
+    | 'tile'
+    | 'slate'
+    | 'mosaic'
+    | 'stacked',
 ) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 512;
@@ -15,13 +27,37 @@ export function materialTexture(
   ctx.fillStyle =
     kind === 'granite'
       ? '#55585a'
-      : kind === 'wood' || kind === 'floor'
-        ? kind === 'floor'
-          ? '#c5b08f'
-          : '#c4a579'
+      : kind === 'wood' || kind === 'floor' || kind === 'walnut'
+        ? kind === 'walnut'
+          ? '#72503a'
+          : kind === 'floor'
+            ? '#c5b08f'
+            : '#c4a579'
         : '#f2f0ea';
   ctx.fillRect(0, 0, 512, 512);
-  if (kind === 'metal') {
+  if (['tile', 'slate', 'mosaic', 'stacked'].includes(kind)) {
+    ctx.fillStyle = '#b2b1aa';
+    ctx.fillRect(0, 0, 512, 512);
+    const size = kind === 'mosaic' ? 32 : kind === 'stacked' ? 64 : 256;
+    for (let y = 0; y < 512; y += size)
+      for (let x = 0; x < 512; x += size) {
+        const palette =
+          kind === 'slate'
+            ? ['#4b5154', '#586064', '#62686a']
+            : kind === 'mosaic'
+              ? ['#b8d4cf', '#e9eee5', '#739c99']
+              : kind === 'stacked'
+                ? ['#dad1bc', '#eee6d4', '#d1c5ad']
+                : ['#ddd9cd', '#e8e4d9', '#d5d1c6'];
+        ctx.fillStyle =
+          palette[Math.floor(random() * palette.length)] ?? '#ddd9cd';
+        ctx.fillRect(x + 2, y + 2, size - 4, size - 4);
+        for (let i = 0; i < 100; i++) {
+          ctx.fillStyle = 'rgba(60,60,55,.025)';
+          ctx.fillRect(x + random() * size, y + random() * size, 2, 1);
+        }
+      }
+  } else if (kind === 'metal') {
     ctx.fillStyle = '#d5d7d8';
     ctx.fillRect(0, 0, 512, 512);
     for (let i = 0; i < 1800; i++) {
@@ -48,7 +84,7 @@ export function materialTexture(
         ctx.lineWidth = 2;
         ctx.strokeRect(x + 5, y + 5, 246, 118);
       }
-  } else if (kind === 'wood' || kind === 'floor') {
+  } else if (kind === 'wood' || kind === 'floor' || kind === 'walnut') {
     for (let i = 0; i < 1100; i++) {
       const x = random() * 512;
       ctx.strokeStyle = `rgba(${random() > 0.5 ? '86,49,19' : '244,218,174'},${0.012 + random() * 0.045})`;
@@ -72,7 +108,7 @@ export function materialTexture(
         ctx.stroke();
       }
     }
-    if (kind === 'floor') {
+    if (kind === 'floor' || kind === 'walnut') {
       ctx.strokeStyle = 'rgba(105,85,61,.32)';
       ctx.lineWidth = 1;
       for (let x = 0; x <= 512; x += 64) {

@@ -126,6 +126,27 @@ export function MaterialPresets({
         day/evening comparisons.
       </p>
       <label>
+        Flooring
+        <select
+          aria-label="Flooring material"
+          value={design.appearance?.flooring ?? 'oak'}
+          onChange={(e) =>
+            appearance({
+              flooring: e.target.value as 'oak' | 'walnut' | 'tile' | 'slate',
+            })
+          }
+        >
+          <option value="oak">Light oak planks</option>
+          <option value="walnut">Dark walnut planks</option>
+          <option value="tile">Porcelain tile</option>
+          <option value="slate">Slate tile</option>
+        </select>
+      </label>
+      <p className="designer-muted">
+        Flooring and backsplash are visual demo finishes; supply and
+        installation are not included in the estimate.
+      </p>
+      <label>
         Wall-run backsplash
         <select
           aria-label="Backsplash style"
@@ -137,7 +158,8 @@ export function MaterialPresets({
                 countertop: 'quartz',
                 lighting: 'daylight',
                 ...design.appearance,
-                backsplash: e.target.value as 'none' | 'subway' | 'slab',
+                backsplash: e.target.value as
+                  'none' | 'subway' | 'slab' | 'mosaic' | 'stacked',
               },
             })
           }
@@ -145,6 +167,8 @@ export function MaterialPresets({
           <option value="none">None</option>
           <option value="subway">Ivory subway tile</option>
           <option value="slab">Matching stone slab</option>
+          <option value="mosaic">Sage mosaic tile</option>
+          <option value="stacked">Sand stacked tile</option>
         </select>
       </label>
       <label>

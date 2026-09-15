@@ -8,6 +8,16 @@ export const quoteDefaults = {
 };
 export function demoUnitPrice(item: Cabinet) {
   if (item.demoPrice !== undefined) return item.demoPrice;
+  if (item.kind === 'refrigerator' && item.refrigeratorStyle)
+    return { single: 1500, double: 2000, french: 2800, top_freezer: 1800 }[
+      item.refrigeratorStyle
+    ];
+  if (item.kind === 'sink' && item.sinkStyle)
+    return { single: 300, double: 420, farmhouse: 650, prep: 220 }[
+      item.sinkStyle
+    ];
+  if (item.kind === 'island')
+    return Math.round((1400 * item.width * item.depth) / (60 * 36));
   const prices: Partial<Record<Cabinet['kind'], number>> = {
     refrigerator: 1800,
     range: 1100,

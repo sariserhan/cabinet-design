@@ -232,3 +232,19 @@ Editing and review:
 - **Demo readiness** lists missing appliances, missing countertop coverage, pinned notes and existing layout/installation flags. It helps prepare a demonstration and does not certify installation readiness.
 
 Validation: 134 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build pass. Browser checks cover all three prepared downloads and offline presentations, photo persistence, object search/hide/lock/notes, drag resizing, island overhang/seating/waterfall/storage, lighting and accessories, elevation SVG export, budget snapshots, material alternatives, stale-render invalidation and mobile gallery layout.
+
+## Object styles and surface finishes
+
+In **Objects**, use the option selector above Add (or drag the card) to choose:
+
+- Refrigerators: single door, two side-by-side doors, French doors with a freezer drawer, or top freezer.
+- Doors: 24, 28, 30, 32, 36 or 42 inches wide, at 80 inches high.
+- Windows: 24 × 36, 36 × 36, 48 × 48, 60 × 42 or 72 × 48 inches.
+- Sinks: single bowl, double bowl, white farmhouse apron, or compact prep bowl.
+- Islands: 48 × 30, 72 × 36 or 96 × 42 inches to start. Edit width/depth/height numerically or drag the plan corner for width/depth; use the existing island controls for seating side, waterfall ends and storage.
+
+Select a placed object and use **Size / style preset** to switch its variant. Custom dimensions remain available. Sink style changes preserve the rim height. The plan distinguishes double basins and refrigerator door divisions; Render shows appliance doors/handles, basin dividers, drains and farmhouse ceramic fronts.
+
+**Materials → Flooring** offers light oak, walnut, porcelain tile and slate. Backsplash choices are none, subway, matching slab, sage mosaic and sand stacked tile. These procedural finishes render locally. Floor and backsplash supply/installation are excluded from the demo estimate. Refrigerator and sink variants carry explicit demo allowances; island allowances scale with footprint. Existing saved designs retain their previous defaults.
+
+Validation: 138 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build pass. Playwright checks cover refrigerator style changes, door/window preset placement, custom island width, double/farmhouse/prep sinks, visible floor/backsplash render changes, persistence after reload and mobile layout without console errors. Opening placement now searches every enabled straight wall, and sink preset changes leave linked cabinetry in place.

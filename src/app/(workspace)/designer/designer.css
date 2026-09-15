@@ -920,3 +920,6 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .studio-panel:has(> summary:first-child) > label { display:block;margin:10px 0; }
 .elevation-view table { width:100%;border-collapse:collapse;font-size:12px; }
 .elevation-view td,.elevation-view th { padding:6px;text-align:left;border-bottom:1px solid #dce4df; }
+
+.library-product select {width:100%;min-width:0;max-width:100%;margin:8px 0;font-size:12px;}
+.library-product > div {min-width:0;}

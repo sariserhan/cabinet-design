@@ -53,7 +53,45 @@ export function applianceDetails(
   b(w - 1, 2, 0.6, 0, 1, d / 2, dark);
   const face = d / 2 + 0.65;
   if (item.kind === 'refrigerator') {
-    // Top-freezer configuration matches the sample's appliance class.
+    if (item.refrigeratorStyle === 'single') {
+      b(w - 0.6, h - 2.6, 1, 0, h / 2, face, steel);
+      metalPull(
+        group,
+        (item.mirrored ? 1 : -1) * (w / 2 - 2.5),
+        h * 0.6,
+        face + 1.1,
+        18,
+        false,
+        steel,
+      );
+      return;
+    }
+    if (
+      item.refrigeratorStyle === 'double' ||
+      item.refrigeratorStyle === 'french'
+    ) {
+      const bottom = item.refrigeratorStyle === 'french' ? h * 0.28 : 2;
+      for (const sign of [-1, 1]) {
+        b(
+          w / 2 - 0.5,
+          h - bottom - 0.5,
+          1,
+          (sign * w) / 4,
+          (h + bottom) / 2,
+          face,
+          steel,
+        );
+        metalPull(group, sign * 2, h * 0.65, face + 1.1, 18, false, steel);
+      }
+      b(0.3, h - bottom, 1.2, 0, (h + bottom) / 2, face, dark);
+      if (item.refrigeratorStyle === 'french') {
+        b(w - 0.6, bottom - 2.5, 1, 0, bottom / 2, face, steel);
+        b(w - 0.6, 0.3, 1.2, 0, bottom, face, dark);
+        metalPull(group, 0, bottom - 4, face + 1.1, w - 6, true, steel);
+      }
+      return;
+    }
+    // Legacy appliances retain their top-freezer configuration.
     b(w - 0.6, h * 0.27 - 0.35, 1, 0, h * 0.865, face, steel);
     b(w - 0.6, h * 0.73 - 2.6, 1, 0, 1.3 + (h * 0.73 - 2.6) / 2, face, steel);
     b(w - 0.8, 0.25, 1.1, 0, h * 0.73, face, dark);
