@@ -1,5 +1,6 @@
 'use client';
 import { TradeWorkspaces } from './trade-workspaces';
+import { JobWorkspace } from './job-workspace';
 import { sourceLink } from '@/designer/design-decisions';
 import {
   SampleGallery,
@@ -1051,6 +1052,17 @@ function Editor({ ownerId }: { ownerId: string }) {
           ownerId={ownerId}
         />
       </section>
+      <JobWorkspace
+        key={`job:${design.id}:${recordsEpoch}`}
+        design={design}
+        ownerId={ownerId}
+        onApply={(next) => commit(() => next)}
+        onLocate={(id) => {
+          setWorkspaceStage('Design');
+          setSelected(id);
+          setMode('2d');
+        }}
+      />
       <TradeWorkspaces
         key={`trades:${design.id}`}
         design={design}

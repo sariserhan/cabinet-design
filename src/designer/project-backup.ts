@@ -1,4 +1,9 @@
 import {
+  jobWorkflowSchema,
+  parseJobWorkflow,
+  emptyJobWorkflow,
+} from './job-workflow';
+import {
   presentationScenesSchema,
   parsePresentationScenes,
   emptyPresentationScenes,
@@ -47,6 +52,7 @@ export const projectBackupSchema = z.object({
   support: productSupportSchema.optional(),
   operations: operationsSchema.optional(),
   trades: tradesSchema.optional(),
+  job: jobWorkflowSchema.optional(),
   presentationScenes: presentationScenesSchema.optional(),
 });
 export type ProjectBackup = z.infer<typeof projectBackupSchema>;
@@ -84,6 +90,9 @@ export function parseProjectBackup(
   b.presentationScenes = b.presentationScenes
     ? parsePresentationScenes(JSON.stringify(b.presentationScenes), id)
     : emptyPresentationScenes(id);
+  b.job = b.job
+    ? parseJobWorkflow(JSON.stringify(b.job), id, trustedLocal)
+    : emptyJobWorkflow(id);
   return b;
 }
 export function collectProjectBackup(
@@ -135,6 +144,12 @@ export function collectProjectBackup(
       closeout,
       organization,
       support,
+      job: parseJobWorkflow(
+        storage.getItem(`kitchen-job:${ownerId}:${design.id}`) ??
+          JSON.stringify(emptyJobWorkflow(design.id)),
+        design.id,
+        true,
+      ),
       presentationScenes: parsePresentationScenes(
         storage.getItem(`kitchen-scenes:${ownerId}:${design.id}`) ??
           JSON.stringify(emptyPresentationScenes(design.id)),
@@ -196,6 +211,13 @@ export function restoreProjectCopy(
   b.closeout = { ...b.closeout, designId: newId };
   if (b.support) b.support = { ...b.support, designId: newId };
   if (b.operations) b.operations = { ...b.operations, designId: newId };
+  if (b.job) {
+    b.job.designId = newId;
+    for (const r of [...b.job.options, ...b.job.revisions]) {
+      r.design.id = newId;
+      delete r.design.supplierBookId;
+    }
+  }
   if (b.presentationScenes)
     b.presentationScenes = { ...b.presentationScenes, designId: newId };
   if (b.trades) {

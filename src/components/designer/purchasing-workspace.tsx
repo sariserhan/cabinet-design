@@ -460,6 +460,28 @@ function PurchasingTools({
               dimensions. Door and window room openings are excluded. Drafts are
               never sent automatically.
             </p>
+            <p>
+              Before issuing an installer or order coordination package,
+              complete{' '}
+              <button
+                onClick={() => {
+                  const panel = Array.from(
+                    document.querySelectorAll('details'),
+                  ).find(
+                    (d) =>
+                      d.querySelector(':scope > summary')?.textContent ===
+                      'Job workflow · site to installation',
+                  );
+                  if (panel) {
+                    panel.open = true;
+                    panel.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Job workflow release review
+              </button>
+              . Purchase drafts below remain drafts.
+            </p>
             <ul>
               {purchaseChecks(design, book, approved).map((s) => (
                 <li key={s}>{s}</li>
