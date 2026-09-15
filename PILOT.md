@@ -42,7 +42,7 @@ No real room or supplier list was supplied with the feature request. Real-projec
 
 ## Deployment prerequisite
 
-The development backend must use the updated shared design schema to retain storage preferences, site notes and selection boards in cloud saves. This deployment remains subject to the previously requested approval. Local drafts and portable files can be piloted now. Keep downloaded reports and histories as backups; the unsigned client workspaces retain unsaved changes only in the current tab.
+The development backend must use the updated shared design schema to retain storage preferences, site notes and selection boards in cloud saves. The updated development backend was deployed with approval on 2026-09-15. Local drafts and portable files can be piloted now. Keep downloaded reports and histories as backups; the unsigned client workspaces retain unsaved changes only in the current tab.
 
 ## Purchasing pilot extension
 
@@ -84,4 +84,4 @@ Automated tests use synthetic specifications and QR decoding. Real manufacturer 
 - Preview an out-of-room or overlap fix. Check assembly integrity, locks, no added warnings, stale-preview rejection and Undo. Recheck utility requirements and client approval after moving items.
 - Create a task chain tied to delivered items and site resolutions. Verify pending/damaged items block completion, received items release it, and invalidating an earlier completed task blocks later work. Reconcile expected/planned dates with the installer.
 - Run one real kitchen from measured survey through installation. Record actual work and rework separately, quote revisions, installation issues and the three most useful improvements. Keep synthetic rehearsals clearly labeled. An estimated baseline is not proof of time saved.
-- After approved backend deployment, use separate owner/editor/viewer accounts and two devices to verify shared load/publish, simultaneous-edit rejection, membership revocation, source/approval re-verification, backup recovery, and storage/quota errors. The local backend tests cover permissions and revisions; this live device acceptance remains pending deployment.
+- After approved backend deployment, use separate owner/editor/viewer accounts and two devices to verify shared load/publish, simultaneous-edit rejection, membership revocation, source/approval re-verification, backup recovery, and storage/quota errors. Local backend tests and live synthetic browser checks now cover permissions, revisions, owner/editor transfers, mobile reload and revocation. The expected-conflict-message follow-up awaits deployment approval; actual field-device acceptance remains pilot work.

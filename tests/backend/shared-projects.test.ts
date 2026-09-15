@@ -5,6 +5,17 @@ import { api } from '../../convex/_generated/api';
 import { newDesign } from '../../src/designer/model';
 import { collectProjectBackup } from '../../src/designer/project-backup';
 const modules = import.meta.glob('../../convex/**/*.{ts,js}');
+function published(
+  result:
+    | {
+        sharedId: import('../../convex/_generated/dataModel').Id<'sharedProjects'>;
+        revision: number;
+      }
+    | { error: string },
+) {
+  if ('error' in result) throw Error(result.error);
+  return result;
+}
 async function setup() {
   const t = convexTest(schema, modules);
   const ids = await t.run(async (ctx) => ({
@@ -32,10 +43,12 @@ async function setup() {
 test('shared records enforce authentication, membership, roles and revocation', async () => {
   const s = await setup(),
     args = { expectedRevision: 0, backupJson: JSON.stringify(s.backup) };
-  await expect(s.t.mutation(api.sharedProjects.publish, args)).rejects.toThrow(
-    'Sign in',
-  );
-  const { sharedId } = await s.owner.mutation(api.sharedProjects.publish, args);
+  await expect(
+    s.t.mutation(api.sharedProjects.publish, args).then(published),
+  ).rejects.toThrow('Sign in');
+  const { sharedId } = await s.owner
+    .mutation(api.sharedProjects.publish, args)
+    .then(published);
   await expect(
     s.other.query(api.sharedProjects.get, { sharedId }),
   ).rejects.toThrow('not found');
@@ -54,11 +67,13 @@ test('shared records enforce authentication, membership, roles and revocation', 
     (await s.viewer.query(api.sharedProjects.get, { sharedId })).revision,
   ).toBe(1);
   await expect(
-    s.viewer.mutation(api.sharedProjects.publish, {
-      ...args,
-      sharedId,
-      expectedRevision: 1,
-    }),
+    s.viewer
+      .mutation(api.sharedProjects.publish, {
+        ...args,
+        sharedId,
+        expectedRevision: 1,
+      })
+      .then(published),
   ).rejects.toThrow('Viewers');
   await expect(
     s.editor.mutation(api.sharedProjects.setMember, {
@@ -86,32 +101,40 @@ test('shared records enforce authentication, membership, roles and revocation', 
 test('editor revisions reject stale saves and different project identities atomically', async () => {
   const s = await setup(),
     args = { expectedRevision: 0, backupJson: JSON.stringify(s.backup) };
-  const { sharedId } = await s.owner.mutation(api.sharedProjects.publish, args);
+  const { sharedId } = await s.owner
+    .mutation(api.sharedProjects.publish, args)
+    .then(published);
   await s.owner.mutation(api.sharedProjects.setMember, {
     sharedId,
     userId: s.ids.editor,
     role: 'editor',
   });
   s.backup.closeout.care = 'Updated by editor';
-  await s.editor.mutation(api.sharedProjects.publish, {
-    sharedId,
-    expectedRevision: 1,
-    backupJson: JSON.stringify(s.backup),
-  });
-  await expect(
-    s.owner.mutation(api.sharedProjects.publish, {
-      ...args,
+  await s.editor
+    .mutation(api.sharedProjects.publish, {
       sharedId,
       expectedRevision: 1,
-    }),
+      backupJson: JSON.stringify(s.backup),
+    })
+    .then(published);
+  await expect(
+    s.owner
+      .mutation(api.sharedProjects.publish, {
+        ...args,
+        sharedId,
+        expectedRevision: 1,
+      })
+      .then(published),
   ).rejects.toThrow('changed');
   const wrong = { ...s.backup, design: { ...s.backup.design, id: 'wrong' } };
   await expect(
-    s.owner.mutation(api.sharedProjects.publish, {
-      sharedId,
-      expectedRevision: 2,
-      backupJson: JSON.stringify(wrong),
-    }),
+    s.owner
+      .mutation(api.sharedProjects.publish, {
+        sharedId,
+        expectedRevision: 2,
+        backupJson: JSON.stringify(wrong),
+      })
+      .then(published),
   ).rejects.toThrow();
   const record = await s.owner.query(api.sharedProjects.get, { sharedId });
   expect(record.revision).toBe(2);
@@ -135,10 +158,12 @@ test('shared snapshots strip unverifiable claims, retain operations and chunk la
     issues: 1,
     note: '木'.repeat(1800),
   }));
-  const { sharedId } = await s.owner.mutation(api.sharedProjects.publish, {
-    expectedRevision: 0,
-    backupJson: JSON.stringify(s.backup),
-  });
+  const { sharedId } = await s.owner
+    .mutation(api.sharedProjects.publish, {
+      expectedRevision: 0,
+      backupJson: JSON.stringify(s.backup),
+    })
+    .then(published);
   const record = await s.owner.query(api.sharedProjects.get, { sharedId }),
     b = JSON.parse(record.backupJson);
   expect(b.closeout.signoff).toBeUndefined();
@@ -154,4 +179,29 @@ test('shared snapshots strip unverifiable claims, retain operations and chunk la
   expect(
     chunks.every((c) => new TextEncoder().encode(c.content).length < 1000000),
   ).toBe(true);
+});
+
+test('expected conflicts and revoked publishing return messages without throwing server errors', async () => {
+  const s = await setup();
+  const args = { expectedRevision: 0, backupJson: JSON.stringify(s.backup) };
+  const { sharedId } = published(
+    await s.owner.mutation(api.sharedProjects.publish, args),
+  );
+  const conflict = await s.owner.mutation(api.sharedProjects.publish, {
+    ...args,
+    sharedId,
+  });
+  expect(conflict).toEqual({
+    error:
+      'Shared project changed. Load the latest revision before publishing.',
+  });
+  const denied = await s.other.mutation(api.sharedProjects.publish, {
+    ...args,
+    sharedId,
+    expectedRevision: 1,
+  });
+  expect(denied).toEqual({ error: 'Shared project not found' });
+  expect(
+    (await s.owner.query(api.sharedProjects.get, { sharedId })).revision,
+  ).toBe(1);
 });

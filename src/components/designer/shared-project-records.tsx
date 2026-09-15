@@ -98,6 +98,7 @@ export function SharedProjectRecords({
       expectedRevision: create ? 0 : (binding?.revision ?? 0),
       ...(!create && binding ? { sharedId: binding.id } : {}),
     });
+    if ('error' in saved) throw Error(saved.error);
     const next: SharedBinding = {
       id: saved.sharedId,
       revision: saved.revision,

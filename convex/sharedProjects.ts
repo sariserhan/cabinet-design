@@ -16,13 +16,13 @@ const summary = v.object({
   updatedAt: v.number(),
   role,
 });
-async function access(
+async function lookupAccess(
   ctx: QueryCtx | MutationCtx,
   sharedId: Id<'sharedProjects'>,
   userId: Id<'users'>,
 ) {
   const project = await ctx.db.get(sharedId);
-  if (!project) throw Error('Shared project not found');
+  if (!project) return null;
   const member =
     project.ownerId === userId
       ? null
@@ -33,8 +33,17 @@ async function access(
           )
           .unique();
   const role = project.ownerId === userId ? ('owner' as const) : member?.role;
-  if (!role) throw Error('Shared project not found');
+  if (!role) return null;
   return { project, role };
+}
+async function access(
+  ctx: QueryCtx | MutationCtx,
+  sharedId: Id<'sharedProjects'>,
+  userId: Id<'users'>,
+) {
+  const result = await lookupAccess(ctx, sharedId, userId);
+  if (!result) throw Error('Shared project not found');
+  return result;
 }
 export const list = ownedQuery({
   args: {},
@@ -101,7 +110,10 @@ export const publish = ownedMutation({
     expectedRevision: v.number(),
     backupJson: v.string(),
   },
-  returns: v.object({ sharedId: v.id('sharedProjects'), revision: v.number() }),
+  returns: v.union(
+    v.object({ sharedId: v.id('sharedProjects'), revision: v.number() }),
+    v.object({ error: v.string() }),
+  ),
   handler: async (ctx, args) => {
     if (new TextEncoder().encode(args.backupJson).length > 6000000)
       throw Error('Shared projects are limited to 6 MB.');
@@ -111,14 +123,17 @@ export const publish = ownedMutation({
     let sharedId = args.sharedId,
       revision = 1;
     if (sharedId) {
-      const { project, role } = await access(ctx, sharedId, ctx.userId);
-      if (role === 'viewer') throw Error('Viewers cannot publish changes');
+      const membership = await lookupAccess(ctx, sharedId, ctx.userId);
+      if (!membership) return { error: 'Shared project not found' };
+      const { project, role } = membership;
+      if (role === 'viewer') return { error: 'Viewers cannot publish changes' };
       if (project.revision !== args.expectedRevision)
-        throw Error(
-          'Shared project changed. Load the latest revision before publishing.',
-        );
+        return {
+          error:
+            'Shared project changed. Load the latest revision before publishing.',
+        };
       if (project.designId !== backup.design.id)
-        throw Error('Design identity does not match the shared project');
+        return { error: 'Design identity does not match the shared project' };
       revision = project.revision + 1;
       await ctx.db.patch(sharedId, {
         name: backup.design.name,
