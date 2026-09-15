@@ -165,9 +165,21 @@ The live benchmark was rerun successfully against the expanded working catalog a
 - **High quality shadows** enables soft shadow filtering and screen-space contact shading. It is optional and works with PNG export; standard mode is less demanding. Materials now include brushed-metal detail, subtle stone relief and transmissive window glass.
 - **Kitchen styling** adds stools where the room and existing objects leave space, island end panels, a small countertop arrangement and decorative outlets. These are presentation objects, not priced or installation-validated equipment.
 - Backsplash runs now follow matching straight perimeter walls, including rotated cabinets and angled straight walls, and retain door/window cutouts. Curved-wall runs remain unsupported.
-- **Eye-level walkthrough** uses drag-to-look, WASD/arrow keys when the canvas is focused, and on-screen movement buttons. Eye height follows the ceiling and movement stays inside the room outline. It is an exploratory camera, not a person/furniture collision simulation.
+- **Eye-level walkthrough** uses drag-to-look, WASD/arrow keys when the canvas is focused, and on-screen movement buttons. Eye height follows the ceiling. Held keys move continuously at the selected speed, with an approximate eight-inch body radius against room boundaries, closed design objects and solid partition panels. Doorway cutouts remain passable. Decorative staging and animated fronts are excluded from navigation checks.
 - **Front opening (%)** opens the selected straight cabinet's doors or drawers; with no selected object it opens all straight cabinet fronts. Custom cabinets now expose their front style under Design. Corner fronts and appliance doors remain fixed. The obstruction message uses a conservative rectangular opening envelope; it is not an exact hinge-sweep or hardware certification.
 - **Presentation camera angle** offers Entrance, Island, Sink detail (or countertop detail), and Overhead. The sample includes these four saved cameras plus its hero view. Capture these views in the client presentation or download PNGs directly.
 - Openness, walkthrough and rendering quality are temporary view controls. Styling and saved cameras are included in design JSON.
 
 QA includes scene-content checks for high-quality output (not just canvas presence), 1920-pixel export, opening fronts, camera presets, keyboard and button walking, styling toggles, mobile layout, and pure tests for rotated backsplash runs, window cutouts, room-boundary walking and approximate open-front conflicts.
+
+
+## Presentation polish and demo rehearsal
+
+- Render tools are grouped under **Camera & walk**, **Lighting & scene**, **Cabinet fronts**, **Compare materials**, and **Export image**. Saved cameras have their own expandable section outside presentation mode.
+- The sample island has a 15-inch rear seating overhang, two tucked-in stools, coordinated pendant positions and countertop accessories. Decorative seating is illustrative; support engineering is not specified.
+- Hold WASD or arrow keys on the focused canvas for continuous movement. Choose Slow, Normal or Fast. Releasing the key or leaving the canvas stops motion. Buttons remain available for touch navigation. Entry selection searches for clear standing space in irregular rooms.
+- **Open fronts / Close fronts** animates straight cabinet doors and drawers; the slider sets the desired opening. The warnings explicitly describe their approximate scope. Corner fronts and appliance doors remain fixed.
+- **Compare materials** previews warm oak/quartz, soft white/quartz or dark slate/marble without moving the camera or changing the saved design. **Show original** restores the original finishes; **Apply preview materials** commits the preview through the normal undo/autosave flow. These whole-kitchen previews replace individual cabinet and countertop material overrides when applied.
+- Rehearsal: Show this kitchen → compare/apply materials → inspect cabinet fronts and walkthrough → export PNG → save and create an alternative → Client presentation / PDF → capture a view → preview/print proposal → Reset demo.
+
+Validation: 118 core tests and 16 backend tests; lint, TypeScript, benchmark artifact integrity and production build. Browser rehearsal covers the flow above on desktop and the render menus on mobile, including nonblank rendered-image checks. Rendering remains an illustrative browser-based demo, not a photographic or manufacturer-certified simulation.

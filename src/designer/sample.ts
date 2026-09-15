@@ -203,7 +203,7 @@ export function polishedSample() {
     x: 68,
     y: 98,
     width: 88,
-    depth: 36,
+    depth: 47,
     elevation: 34.5,
     assemblyId,
   });

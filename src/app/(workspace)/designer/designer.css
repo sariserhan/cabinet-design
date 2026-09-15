@@ -840,3 +840,14 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 .client-package h1,.client-package figcaption { white-space:normal; overflow-wrap:anywhere; }
 .is-presenting .canvas-panel-controls,.is-presenting .demo-walkthrough,.is-presenting .project-controls,.is-presenting .shortcut-help,.is-presenting .start-guide { display:none!important; }
 .is-presenting .designer-message,.is-presenting .camera-controls { display:none!important; }
+
+/* Compact render tools expand in normal flow so touch screens never clip menus. */
+.render-controls { align-items:flex-start; }
+.render-menu { border:1px solid #cad7dc; border-radius:8px; background:#f8faf9; max-width:100%; }
+.render-menu summary,.camera-controls summary { cursor:pointer; padding:8px 12px; font-size:13px; font-weight:600; }
+.render-menu[open] { flex:1 1 280px; }
+.render-menu-content { flex-wrap:wrap; padding:10px; max-width:420px; gap:10px; border-top:1px solid #dae2e3; }
+.render-menu-content p { flex-basis:100%; margin:0; font-size:12px; color:#52646b; }
+.render-menu-content select { max-width:100%; }
+.opening-conflicts { border-left:3px solid #c48a36; padding-left:12px; }
+@media(max-width:700px) { .render-menu[open] { flex-basis:100%; } .render-menu-content { max-width:100%; } }

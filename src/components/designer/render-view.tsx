@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -10,6 +10,8 @@ import {
   openingConflicts,
   presentationViews,
   walkPosition,
+  walkEntry,
+  materialVariant,
   backsplashRuns,
 } from '@/designer/render-planning';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -43,7 +45,7 @@ export type CameraView = {
 };
 
 export default function RenderView({
-  design,
+  design: sourceDesign,
   onChange,
   cameraView,
   onCamera,
@@ -61,6 +63,14 @@ export default function RenderView({
   design: Design;
   onChange: (design: Design) => void;
 }) {
+  const [variant, setVariant] = useState('original');
+  const design = useMemo(
+    () => materialVariant(sourceDesign, variant),
+    [sourceDesign, variant],
+  );
+  const [speed, setSpeed] = useState(30);
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
   const callbacks = useRef({ onCamera, onCapture, onSelect });
   callbacks.current = { onCamera, onCapture, onSelect };
   const externalCamera = useRef(cameraView);
@@ -81,10 +91,15 @@ export default function RenderView({
   const cameraState = useRef<{
     position: THREE.Vector3;
     target: THREE.Vector3;
+    walking: boolean;
   } | null>(null);
   const [quality, setQuality] = useState(false),
     [walking, setWalking] = useState(false),
     [opening, setOpening] = useState(0);
+  const conflicts = useMemo(
+    () => openingConflicts(design, opening, selected),
+    [design, opening, selected],
+  );
   const openingRef = useRef(opening);
   openingRef.current = opening;
   const [error, setError] = useState('');
@@ -141,10 +156,10 @@ export default function RenderView({
     controls.maxDistance = size * 6;
     const fit = () => {
       if (walking) {
-        const p = presentationViews(design)[0];
+        const p = walkEntry(design);
         if (p) {
-          camera.position.set(...p.position);
-          controls.target.set(...p.target);
+          camera.position.set(...p);
+          controls.target.set(p[0], p[1], p[2] - 60);
           camera.lookAt(controls.target);
           controls.update();
         }
@@ -175,19 +190,23 @@ export default function RenderView({
       controls.update();
     } else fit();
     if (walking) {
-      const entry = presentationViews(design)[0];
       const p =
         walkPosition(design, camera.position.x, camera.position.z) ??
-        (entry
-          ? walkPosition(design, entry.position[0], entry.position[2])
-          : null);
-      if (p) {
-        camera.position.set(...p);
-        controls.target.set(
-          design.room.width / 2,
-          p[1],
-          design.room.depth * 0.15,
+        walkEntry(design);
+      if (!p)
+        setError(
+          'There is no clear standing space for a walkthrough. Move objects or use orbit mode.',
         );
+      if (p) {
+        const delta = new THREE.Vector3(...p).sub(camera.position);
+        camera.position.set(...p);
+        if (cameraState.current?.walking) controls.target.add(delta);
+        else
+          controls.target.set(
+            design.room.width / 2,
+            p[1],
+            design.room.depth * 0.15,
+          );
       }
       controls.enabled = false;
       camera.lookAt(controls.target);
@@ -943,7 +962,7 @@ export default function RenderView({
         .sort((a, b) => b.width - a.width)[0];
       if (island) {
         const f = footprint(island),
-          z = island.y + f.depth + 13,
+          z = island.y + f.depth + 3,
           seat = material('#c3ad8b', 0, 0.9);
         for (const fraction of [0.25, 0.75]) {
           const x = island.x + f.width * fraction;
@@ -1063,6 +1082,7 @@ export default function RenderView({
         target: [controls.target.x, controls.target.y, controls.target.z],
       });
     };
+    const held = new Set<string>();
     const key = (e: KeyboardEvent) => {
       if (!walking) return;
       const moves: Record<string, [number, number, number?]> = {
@@ -1075,11 +1095,47 @@ export default function RenderView({
         ArrowLeft: [0, 0, 0.12],
         ArrowRight: [0, 0, -0.12],
       };
-      const move = moves[e.key];
+      const keyName = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      const move = moves[keyName];
       if (move) {
         e.preventDefault();
-        step(...move);
+        held.add(keyName);
       }
+    };
+    const keyUp = (e: KeyboardEvent) =>
+      held.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+    const clearKeys = () => held.clear();
+    window.addEventListener('keyup', keyUp);
+    window.addEventListener('blur', clearKeys);
+    renderer.domElement.addEventListener('blur', clearKeys);
+    let frame = 0,
+      lastFrame = 0;
+    let currentOpening = openingRef.current,
+      targetOpening = currentOpening;
+    const animate = (now: number) => {
+      const elapsed = (now - (lastFrame || now)) / 1000;
+      const dt = Math.min(0.05, elapsed);
+      lastFrame = now;
+      if (walking && held.size) {
+        const f =
+          Number(held.has('w') || held.has('ArrowUp')) -
+          Number(held.has('s') || held.has('ArrowDown'));
+        const side = Number(held.has('d')) - Number(held.has('a'));
+        const turn =
+          Number(held.has('ArrowLeft')) - Number(held.has('ArrowRight'));
+        const scale =
+          (speedRef.current * dt) / (6 * Math.max(1, Math.hypot(f, side)));
+        if (f || side) step(f * scale, side * scale);
+        if (turn) step(0, 0, turn * dt * 1.5);
+      }
+      if (Math.abs(targetOpening - currentOpening) > 0.01) {
+        const distance = targetOpening - currentOpening;
+        currentOpening +=
+          Math.sign(distance) * Math.min(Math.abs(distance), elapsed * 150);
+        for (const front of movingFronts) front.apply(currentOpening / 100);
+        render();
+      }
+      frame = requestAnimationFrame(animate);
     };
     renderer.domElement.tabIndex = 0;
     renderer.domElement.addEventListener('keydown', key);
@@ -1112,6 +1168,11 @@ export default function RenderView({
       render();
     };
     const lookEnd = () => {
+      if (look)
+        callbacks.current.onCamera?.({
+          position: camera.position.toArray() as [number, number, number],
+          target: controls.target.toArray() as [number, number, number],
+        });
       look = null;
     };
     renderer.domElement.addEventListener('pointerdown', lookDown);
@@ -1123,7 +1184,11 @@ export default function RenderView({
       press = e.button === 0 ? { x: e.clientX, y: e.clientY } : null;
     };
     const pointerUp = (e: PointerEvent) => {
-      if (!press || Math.hypot(e.clientX - press.x, e.clientY - press.y) > 5)
+      if (
+        walking ||
+        !press ||
+        Math.hypot(e.clientX - press.x, e.clientY - press.y) > 5
+      )
         return;
       press = null;
       const rect = renderer.domElement.getBoundingClientRect(),
@@ -1180,6 +1245,7 @@ export default function RenderView({
     const observer = new ResizeObserver(resize);
     observer.observe(container);
     resize();
+    frame = requestAnimationFrame(animate);
     const lost = (event: Event) => {
       event.preventDefault();
       setError(
@@ -1196,8 +1262,7 @@ export default function RenderView({
     actions.current = {
       walk: step,
       open: (amount) => {
-        for (const front of movingFronts) front.apply(amount / 100);
-        render();
+        targetOpening = amount;
       },
       fit,
       capture: () => ({
@@ -1235,7 +1300,12 @@ export default function RenderView({
       cameraState.current = {
         position: camera.position.clone(),
         target: controls.target.clone(),
+        walking,
       };
+      cancelAnimationFrame(frame);
+      window.removeEventListener('keyup', keyUp);
+      window.removeEventListener('blur', clearKeys);
+      renderer.domElement.removeEventListener('blur', clearKeys);
       observer.disconnect();
       renderer.domElement.removeEventListener('keydown', key);
       renderer.domElement.removeEventListener('pointerdown', lookDown);
@@ -1277,119 +1347,219 @@ export default function RenderView({
   return (
     <div className="designer-render">
       <div className="designer-row render-controls">
-        <label>
-          <input
-            type="checkbox"
-            checked={quality}
-            onChange={(e) => setQuality(e.target.checked)}
-          />{' '}
-          High quality shadows
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={walking}
-            onChange={(e) => setWalking(e.target.checked)}
-          />{' '}
-          Eye-level walkthrough
-        </label>
-        <label>
-          Front opening (%)
-          <input
-            aria-label="Front opening (%)"
-            type="range"
-            min="0"
-            max="100"
-            value={opening}
-            onChange={(e) => {
-              const value = Number(e.target.value);
-              setOpening(value);
-              actions.current?.open(value);
-            }}
-          />
-        </label>
-        <select
-          aria-label="Presentation camera angle"
-          defaultValue=""
-          onChange={(e) => {
-            const view = presentationViews(design).find(
-              (v) => v.id === e.target.value,
-            );
-            if (view) {
-              setWalking(false);
-              actions.current?.load(view);
-              onCamera?.(view);
-            }
-          }}
-        >
-          <option value="">Choose presentation angle</option>
-          {presentationViews(design).map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.name}
-            </option>
-          ))}
-        </select>
-        <label>
-          <input
-            type="checkbox"
-            checked={interiors}
-            onChange={(e) => setInteriors(e.target.checked)}
-          />{' '}
-          Show interiors
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={showCeiling}
-            onChange={(e) => setShowCeiling(e.target.checked)}
-          />{' '}
-          Show ceiling
-        </label>
-        <button
-          onClick={() => {
-            actions.current?.fit();
-            const view = actions.current?.capture();
-            if (view) onCamera?.(view);
-          }}
-        >
-          Reset camera
-        </button>
-        {onCapture && (
-          <button
-            disabled={!!error}
-            onClick={() => actions.current?.save(1920, true)}
-          >
-            Capture presentation view
-          </button>
-        )}
-        <label>
-          PNG width
-          <select
-            aria-label="Render export width"
-            value={exportWidth}
-            onChange={(e) => setExportWidth(Number(e.target.value))}
-          >
-            <option value={1920}>1920 px</option>
-            <option value={3840}>3840 px</option>
-          </select>
-        </label>
-        <button
-          onClick={() => actions.current?.save(exportWidth)}
-          disabled={!!error}
-        >
-          Download PNG
-        </button>
-        <label>
-          <input
-            type="checkbox"
-            checked={cutaway}
-            onChange={(e) => setCutaway(e.target.checked)}
-          />{' '}
-          Cutaway walls
-        </label>
+        <details className="render-menu">
+          <summary>Camera & walk</summary>
+          <div className="render-menu-content designer-row">
+            {' '}
+            <select
+              aria-label="Presentation camera angle"
+              defaultValue=""
+              onChange={(e) => {
+                const view = presentationViews(design).find(
+                  (v) => v.id === e.target.value,
+                );
+                if (view) {
+                  setWalking(false);
+                  actions.current?.load(view);
+                  onCamera?.(view);
+                }
+              }}
+            >
+              <option value="">Choose presentation angle</option>
+              {presentationViews(design).map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.name}
+                </option>
+              ))}
+            </select>
+            <label>
+              <input
+                type="checkbox"
+                checked={walking}
+                onChange={(e) => setWalking(e.target.checked)}
+              />{' '}
+              Eye-level walkthrough
+            </label>
+            <button
+              onClick={() => {
+                actions.current?.fit();
+                const view = actions.current?.capture();
+                if (view) onCamera?.(view);
+              }}
+            >
+              Reset camera
+            </button>
+          </div>
+        </details>
+        <details className="render-menu">
+          <summary>Lighting & scene</summary>
+          <div className="render-menu-content designer-row">
+            <label>
+              Lighting
+              <select
+                aria-label="Render lighting"
+                value={sourceDesign.appearance?.lighting ?? 'daylight'}
+                onChange={(e) =>
+                  onChange({
+                    ...sourceDesign,
+                    appearance: {
+                      ...sourceDesign.appearance,
+                      countertop:
+                        sourceDesign.appearance?.countertop ?? 'quartz',
+                      lighting: e.target.value as
+                        'daylight' | 'warm' | 'studio',
+                    },
+                  })
+                }
+              >
+                <option value="daylight">Daylight</option>
+                <option value="warm">Warm evening</option>
+                <option value="studio">Studio</option>
+              </select>
+            </label>{' '}
+            <label>
+              <input
+                type="checkbox"
+                checked={quality}
+                onChange={(e) => setQuality(e.target.checked)}
+              />{' '}
+              High quality shadows
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={showCeiling}
+                onChange={(e) => setShowCeiling(e.target.checked)}
+              />{' '}
+              Show ceiling
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={cutaway}
+                onChange={(e) => setCutaway(e.target.checked)}
+              />{' '}
+              Cutaway walls
+            </label>
+          </div>
+        </details>
+        <details className="render-menu">
+          <summary>Cabinet fronts</summary>
+          <div className="render-menu-content designer-row">
+            {' '}
+            <label>
+              Front opening (%)
+              <input
+                aria-label="Front opening (%)"
+                type="range"
+                min="0"
+                max="100"
+                value={opening}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  setOpening(value);
+                  actions.current?.open(value);
+                }}
+              />
+            </label>
+            <button
+              onClick={() => {
+                setOpening(opening ? 0 : 100);
+                actions.current?.open(opening ? 0 : 100);
+              }}
+            >
+              {opening ? 'Close fronts' : 'Open fronts'}
+            </button>{' '}
+            <label>
+              <input
+                type="checkbox"
+                checked={interiors}
+                onChange={(e) => setInteriors(e.target.checked)}
+              />{' '}
+              Show interiors
+            </label>
+          </div>
+        </details>
+        <details className="render-menu">
+          <summary>Compare materials</summary>
+          <div className="render-menu-content designer-row">
+            <p>
+              Compare finishes from the same camera. Preview changes are
+              temporary until applied.
+            </p>
+            <select
+              aria-label="Material preview"
+              value={variant}
+              onChange={(e) => setVariant(e.target.value)}
+            >
+              <option value="original">Original design</option>
+              <option value="oak">Warm oak / quartz</option>
+              <option value="white">Soft white / quartz</option>
+              <option value="dark">Dark slate / marble</option>
+            </select>
+            <button
+              disabled={variant === 'original'}
+              onClick={() => setVariant('original')}
+            >
+              Show original
+            </button>
+            <button
+              disabled={variant === 'original'}
+              onClick={() => {
+                onChange(design);
+                setVariant('original');
+              }}
+            >
+              Apply preview materials
+            </button>
+          </div>
+        </details>
+        <details className="render-menu">
+          <summary>Export image</summary>
+          <div className="render-menu-content designer-row">
+            {' '}
+            {onCapture && (
+              <button
+                disabled={!!error}
+                onClick={() => actions.current?.save(1920, true)}
+              >
+                Capture presentation view
+              </button>
+            )}
+            <label>
+              PNG width
+              <select
+                aria-label="Render export width"
+                value={exportWidth}
+                onChange={(e) => setExportWidth(Number(e.target.value))}
+              >
+                <option value={1920}>1920 px</option>
+                <option value={3840}>3840 px</option>
+              </select>
+            </label>
+            <button
+              onClick={() => actions.current?.save(exportWidth)}
+              disabled={!!error}
+            >
+              Download PNG
+            </button>
+          </div>
+        </details>
       </div>
       {walking && (
         <div className="walk-controls designer-row">
+          <label>
+            Walking speed
+            <select
+              aria-label="Walking speed"
+              value={speed}
+              onChange={(e) => setSpeed(Number(e.target.value))}
+            >
+              <option value={18}>Slow</option>
+              <option value={30}>Normal</option>
+              <option value={48}>Fast</option>
+            </select>
+          </label>
           <button onClick={() => actions.current?.walk(1, 0)}>
             Walk forward
           </button>
@@ -1410,7 +1580,8 @@ export default function RenderView({
           </button>
           <span>
             Drag to look. Focus the canvas and use WASD / arrow keys. Movement
-            stays inside the room outline.
+            avoids cabinets, appliances and solid partitions. Door openings
+            remain passable.
           </span>
         </div>
       )}
@@ -1423,76 +1594,82 @@ export default function RenderView({
       )}
       {opening > 0 && (
         <div className="opening-conflicts" role="status">
-          {openingConflicts(design, opening, selected).length ? (
+          {conflicts.length ? (
             <ul>
-              {openingConflicts(design, opening, selected)
-                .slice(0, 6)
-                .map((message, i) => (
-                  <li key={i}>{message}</li>
-                ))}
+              {conflicts.slice(0, 6).map((message, i) => (
+                <li key={i}>{message}</li>
+              ))}
             </ul>
           ) : (
             <p>
-              No object intersections found in the approximate front-opening
-              envelope.
+              No intersections with closed design objects detected. Approximate
+              check; decorative stools, accessories and other moving fronts are
+              not checked.
             </p>
           )}
         </div>
       )}
-      <div className="camera-controls designer-row">
-        <input
-          aria-label="Camera view name"
-          value={viewName}
-          maxLength={50}
-          onChange={(e) => setViewName(e.target.value)}
-        />
-        <button
-          disabled={
-            (design.views?.length ?? 0) >= 8 || !viewName.trim() || !!error
-          }
-          onClick={() => {
-            const camera = actions.current?.capture();
-            if (camera)
+      <details className="camera-controls">
+        <summary>Saved cameras</summary>
+        <div className="designer-row">
+          <input
+            aria-label="Camera view name"
+            value={viewName}
+            maxLength={50}
+            onChange={(e) => setViewName(e.target.value)}
+          />
+          <button
+            disabled={
+              (design.views?.length ?? 0) >= 8 || !viewName.trim() || !!error
+            }
+            onClick={() => {
+              const camera = actions.current?.capture();
+              if (camera)
+                onChange({
+                  ...sourceDesign,
+                  views: [
+                    ...(design.views ?? []),
+                    {
+                      ...camera,
+                      id: crypto.randomUUID(),
+                      name: viewName.trim(),
+                    },
+                  ],
+                });
+            }}
+          >
+            Save camera
+          </button>
+          <select
+            aria-label="Saved camera views"
+            value={viewId}
+            onChange={(e) => {
+              setViewId(e.target.value);
+              const view = design.views?.find((v) => v.id === e.target.value);
+              if (view) actions.current?.load(view);
+            }}
+          >
+            <option value="">Choose camera</option>
+            {design.views?.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.name}
+              </option>
+            ))}
+          </select>
+          <button
+            disabled={!viewId}
+            onClick={() => {
               onChange({
-                ...design,
-                views: [
-                  ...(design.views ?? []),
-                  { ...camera, id: crypto.randomUUID(), name: viewName.trim() },
-                ],
+                ...sourceDesign,
+                views: design.views?.filter((v) => v.id !== viewId),
               });
-          }}
-        >
-          Save camera
-        </button>
-        <select
-          aria-label="Saved camera views"
-          value={viewId}
-          onChange={(e) => {
-            setViewId(e.target.value);
-            const view = design.views?.find((v) => v.id === e.target.value);
-            if (view) actions.current?.load(view);
-          }}
-        >
-          <option value="">Choose camera</option>
-          {design.views?.map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.name}
-            </option>
-          ))}
-        </select>
-        <button
-          disabled={!viewId}
-          onClick={() => {
-            onChange({
-              ...design,
-              views: design.views?.filter((v) => v.id !== viewId),
-            });
-            setViewId('');
-          }}
-        >
-          Delete camera
-        </button>
-      </div>
+              setViewId('');
+            }}
+          >
+            Delete camera
+          </button>
+        </div>
+      </details>
       {error && <p role="alert">{error}</p>}
       <div className="render-stage" ref={host} />
       <p className="render-hint">

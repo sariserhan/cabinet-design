@@ -1,5 +1,7 @@
 import {
   overlaps,
+  itemPolygon,
+  partitionPanels,
   resolvedFront,
   footprint,
   localToWorld,
@@ -53,11 +55,108 @@ export function presentationViews(
     },
   ];
 }
+// A small body radius keeps eye-level navigation away from solid geometry.
+function nearPolygon(
+  x: number,
+  z: number,
+  polygon: { x: number; y: number }[],
+  radius = 8,
+) {
+  if (inside({ x, y: z }, polygon)) return true;
+  return polygon.some((a, i) => {
+    const b = polygon[(i + 1) % polygon.length];
+    if (!b) return false;
+    const dx = b.x - a.x,
+      dy = b.y - a.y;
+    const t = Math.max(
+      0,
+      Math.min(1, ((x - a.x) * dx + (z - a.y) * dy) / (dx * dx + dy * dy || 1)),
+    );
+    return Math.hypot(x - a.x - t * dx, z - a.y - t * dy) < radius;
+  });
+}
 export function walkPosition(design: Design, x: number, z: number) {
-  if (!inside({ x, y: z }, roomOutline(design.room))) return null;
+  const outline = roomOutline(design.room);
+  if (
+    !(
+      [
+        [-8, -8],
+        [-8, 8],
+        [8, -8],
+        [8, 8],
+      ] as const
+    ).every(([dx, dz]) => inside({ x: x + dx, y: z + dz }, outline))
+  )
+    return null;
   const eye = Math.min(64, ceilingAt(design.room, x, z) - 6);
   if (eye < 36) return null;
+  for (const item of design.items) {
+    if (
+      ['door', 'window'].includes(item.kind) ||
+      item.elevation > eye + 4 ||
+      item.elevation + item.height < 4
+    )
+      continue;
+    if (item.kind === 'partition') {
+      for (const panel of partitionPanels(item, design.items)) {
+        if (
+          item.elevation + panel.y > eye + 4 ||
+          item.elevation + panel.y + panel.height < 4
+        )
+          continue;
+        const polygon = (
+          [
+            [panel.x, 0],
+            [panel.x + panel.width, 0],
+            [panel.x + panel.width, item.depth],
+            [panel.x, item.depth],
+          ] as const
+        ).map(([px, py]) => localToWorld(item, px, py));
+        if (nearPolygon(x, z, polygon)) return null;
+      }
+    } else if (nearPolygon(x, z, itemPolygon(item))) return null;
+  }
   return [x, eye, z] as [number, number, number];
+}
+export function walkEntry(design: Design) {
+  const preferred = presentationViews(design)[0]?.position ?? [
+    design.room.width / 2,
+    64,
+    design.room.depth / 2,
+  ];
+  const entry = walkPosition(design, preferred[0], preferred[2]);
+  if (entry) return entry;
+  for (let z = design.room.depth - 12; z >= 12; z -= 12)
+    for (let x = 12; x < design.room.width; x += 12) {
+      const point = walkPosition(design, x, z);
+      if (point) return point;
+    }
+  return null;
+}
+export function materialVariant(design: Design, variant: string): Design {
+  if (variant === 'original') return design;
+  const finish =
+    variant === 'white' ? 'linen' : variant === 'dark' ? 'slate' : 'oak';
+  const countertop = variant === 'dark' ? 'marble' : 'quartz';
+  return {
+    ...design,
+    finish,
+    appearance: {
+      ...design.appearance,
+      lighting: design.appearance?.lighting ?? 'daylight',
+      countertop,
+    },
+    items: design.items.map((item) => ({
+      ...item,
+      finish: ['cabinet', 'custom_cabinet', 'island'].includes(item.kind)
+        ? finish
+        : item.finish,
+      countertop:
+        item.kind === 'countertop' || item.kind === 'island'
+          ? countertop
+          : item.countertop,
+    })),
+  };
 }
 export function backsplashRuns(design: Design) {
   const edges = roomEdges(design.room).filter(

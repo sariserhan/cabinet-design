@@ -2,6 +2,8 @@ import {
   backsplashRuns,
   presentationViews,
   walkPosition,
+  walkEntry,
+  materialVariant,
   openingConflicts,
 } from '../../src/designer/render-planning';
 import test from 'node:test';
@@ -232,4 +234,63 @@ test('presentation cameras, room-boundary walking and open-front conflict checks
   assert.doesNotThrow(() =>
     parseDesign(JSON.stringify({ ...d, views: presentationViews(d) })),
   );
+});
+
+test('walk navigation avoids rotated solids while leaving partition doorways passable', () => {
+  const d = newDesign();
+  const wall = {
+    ...fromObject('partition'),
+    x: 20,
+    y: 70,
+    width: 100,
+    depth: 4,
+    height: 96,
+  };
+  d.items = [
+    wall,
+    {
+      ...fromObject('door'),
+      opening: { hostId: wall.id, offset: 34, sill: 0 },
+      elevation: 0,
+      width: 32,
+      height: 80,
+    },
+  ];
+  assert.equal(walkPosition(d, 30, 72), null);
+  assert.deepEqual(walkPosition(d, 70, 72), [70, 64, 72]);
+  d.items.push({
+    ...fromObject('custom_cabinet'),
+    x: 60,
+    y: 100,
+    rotation: 45,
+  });
+  assert.equal(walkPosition(d, 75, 115), null);
+  assert.ok(walkEntry(d));
+  d.items = [
+    {
+      ...fromObject('custom_cabinet'),
+      x: 0,
+      y: 0,
+      width: d.room.width,
+      depth: d.room.depth,
+      height: 90,
+    },
+  ];
+  assert.equal(walkEntry(d), null);
+});
+test('material previews preserve layout, camera and lighting without mutating the original', () => {
+  const d = newDesign();
+  d.items = [
+    { ...fromObject('custom_cabinet'), finish: 'oak' },
+    fromObject('countertop'),
+  ];
+  d.views = presentationViews(d);
+  const json = JSON.stringify(d),
+    variant = materialVariant(d, 'dark');
+  assert.equal(variant.items[0]?.finish, 'slate');
+  assert.equal(variant.items[1]?.countertop, 'marble');
+  assert.deepEqual(variant.views, d.views);
+  assert.equal(variant.items[0]?.x, d.items[0]?.x);
+  assert.equal(JSON.stringify(d), json);
+  assert.equal(materialVariant(d, 'original'), d);
 });
