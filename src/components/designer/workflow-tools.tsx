@@ -1,6 +1,6 @@
 'use client';
 import { BudgetComparison } from './studio-panels';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import type { CameraView } from './render-view';
 const RenderView = dynamic(() => import('./render-view'), { ssr: false });
@@ -118,6 +118,14 @@ export function CompareOptions({
   onDuplicate: (name: string) => void;
   onOpen: (design: Design) => void;
 }) {
+  const [fullscreen, setFullscreen] = useState(false);
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFullscreen(false);
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, []);
   const [rendered, setRendered] = useState(false);
   const [original, setOriginal] = useState(true);
   const size = Math.max(
@@ -146,8 +154,20 @@ export function CompareOptions({
         ? before
         : (options.find((d) => d.id === choice) ?? options[0]);
   return (
-    <section className="compare-options">
+    <section
+      className={`compare-options ${fullscreen ? 'comparison-fullscreen' : ''}`}
+    >
       <h2>Design alternatives</h2>
+      <button
+        onClick={() => {
+          setFullscreen(!fullscreen);
+          if (!fullscreen) setRendered(true);
+        }}
+      >
+        {fullscreen
+          ? 'Exit full-screen comparison · Esc'
+          : 'Full-screen comparison'}
+      </button>
       <div className="designer-row">
         <button
           aria-pressed={original}

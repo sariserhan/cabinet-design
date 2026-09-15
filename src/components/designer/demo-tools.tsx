@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { type Design } from '@/designer/model';
+import { MaterialSwatches } from './refinement-tools';
 import { RoomSetup } from './room-setup';
 import { isPreparedSample } from '@/designer/demo-gallery';
 import { zipFiles } from '@/designer/presentation-bundle';
@@ -41,7 +42,8 @@ export function MaterialPresets({
       },
     });
   return (
-    <section>
+    <section className="render-styling">
+      <MaterialSwatches design={design} onChange={onChange} />
       <h3>Render styling</h3>
       <label>
         Pendant brightness {design.appearance?.pendantLevel ?? 100}%

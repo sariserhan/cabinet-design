@@ -923,3 +923,11 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 
 .library-product select {width:100%;min-width:0;max-width:100%;margin:8px 0;font-size:12px;}
 .library-product > div {min-width:0;}
+.quick-inspector {display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;background:#eff5f3;border-block:1px solid #c9dbd5;}
+.quick-inspector>strong{max-width:220px;overflow-wrap:anywhere}.quick-inspector>span{font-size:12px;color:#527064}.quick-inspector label{display:flex;align-items:center;gap:5px;font-size:12px}.quick-inspector input{width:68px}.quick-inspector button,.quick-inspector select{font-size:12px}.quick-inspector p{flex-basis:100%}
+.fit-controls{padding:12px;border-block:1px solid #c9dbd5;background:#f3f7f4}.fit-controls summary{font-weight:600;cursor:pointer}.fit-controls label,.render-styling>label{display:block;margin:10px 0}.fit-controls input,.fit-controls select{max-width:100%;width:100%}.fit-controls p{font-size:12px}.edge-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fit-controls button{max-width:100%;white-space:normal}
+.material-swatches fieldset{border:0;padding:8px 0;display:flex;flex-wrap:wrap;gap:6px}.material-swatches legend{text-transform:capitalize;font-size:12px}.material-swatches button{display:flex;flex-direction:column;align-items:center;font-size:10px;padding:5px;min-width:52px}.material-swatches button>span{width:32px;height:24px;border-radius:4px;border:1px solid #aaa}.material-swatches button[aria-pressed=true]{outline:2px solid #087984;background:#e4f1ee}
+.comparison-fullscreen{position:fixed;inset:0;z-index:1000;overflow:auto;padding:20px;background:#f7faf8}.comparison-fullscreen .render-controls,.comparison-fullscreen .camera-controls{display:none}.comparison-fullscreen .render-stage{height:65vh}.comparison-fullscreen .comparison-grid{grid-template-columns:1fr 1fr}.is-presenting .quick-inspector{display:none}
+@media(min-width:1200px){.designer-app:not(.library-collapsed):not(.inspector-collapsed) .designer-grid{grid-template-columns:200px minmax(0,1fr) 236px}}
+@media(max-width:800px){.comparison-fullscreen .comparison-grid{grid-template-columns:1fr}.quick-inspector>strong{max-width:100%;flex-basis:100%}}
+.compare-options>label{display:flex;gap:8px;align-items:center;margin:12px 0}.compare-options>label input{width:auto}

@@ -17,12 +17,27 @@ export const itemSchema = z.object({
   note: z.string().max(1000).optional(),
   surface: z
     .object({
+      overhangs: z
+        .object({
+          front: z.number().min(0).max(18),
+          back: z.number().min(0).max(18),
+          left: z.number().min(0).max(18),
+          right: z.number().min(0).max(18),
+        })
+        .optional(),
       waterfall: z.boolean().optional(),
       seating: z.enum(['none', 'north', 'south', 'east', 'west']).optional(),
     })
     .optional(),
   refrigeratorStyle: z
     .enum(['single', 'double', 'french', 'top_freezer'])
+    .optional(),
+  sinkMount: z
+    .object({
+      hostId: z.string().min(1).max(100),
+      mount: z.enum(['undermount', 'drop_in', 'apron']),
+      offset: z.number().finite().min(-300).max(300),
+    })
     .optional(),
   sinkStyle: z.enum(['single', 'double', 'farmhouse', 'prep']).optional(),
   finish: z.enum(['linen', 'oak', 'slate']).optional(),
@@ -1012,7 +1027,9 @@ export function sinkHoles(host: Cabinet, items: Cabinet[]) {
       (s) =>
         s.kind === 'sink' &&
         containsFootprint(host, s) &&
-        Math.abs(s.elevation + s.height - host.elevation - host.height) < 0.1,
+        (s.sinkMount?.hostId === host.id ||
+          Math.abs(s.elevation + s.height - host.elevation - host.height) <
+            0.1),
     )
     .map((s) => {
       const points = itemPolygon(s).map((p) => worldToLocal(host, p.x, p.y)),
@@ -1024,11 +1041,19 @@ export function sinkHoles(host: Cabinet, items: Cabinet[]) {
           x: Math.max(...points.map((p) => p.x)),
           y: Math.max(...points.map((p) => p.y)),
         };
+      const back =
+        s.sinkMount?.mount === 'apron' &&
+        Math.abs(((s.rotation - host.rotation + 360) % 360) - 180) < 0.1;
       return {
         x: Math.min(a.x, b.x),
-        y: Math.min(a.y, b.y),
+        y: back ? 0 : Math.min(a.y, b.y),
         width: Math.abs(a.x - b.x),
-        height: Math.abs(a.y - b.y),
+        height:
+          s.sinkMount?.mount === 'apron'
+            ? back
+              ? Math.max(a.y, b.y)
+              : host.depth - Math.min(a.y, b.y)
+            : Math.abs(a.y - b.y),
       };
     });
 }

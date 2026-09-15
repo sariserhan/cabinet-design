@@ -1,6 +1,7 @@
 import type { Cabinet, Design } from './model';
 import {
   footprint,
+  placementCollision,
   snapPosition,
   updateAssembly,
   localToWorld,
@@ -105,7 +106,23 @@ export function snapPlacement(
       }
     }
   }
-  return { x: nx, y: ny };
+  const candidates = [
+    { x: nx, y: ny },
+    { x: nx, y: position.y },
+    { x: position.x, y: ny },
+    position,
+  ];
+  return (
+    candidates.find(
+      (p) =>
+        !design.items.some(
+          (other) =>
+            other.id !== item.id &&
+            (!item.assemblyId || item.assemblyId !== other.assemblyId) &&
+            placementCollision({ ...item, ...p }, other),
+        ),
+    ) ?? position
+  );
 }
 export function alignSelection(
   design: Design,

@@ -206,6 +206,52 @@ export function ObjectPlan({
           strokeWidth={active ? 0.8 : 0.5}
         />
       )}
+      {item.kind === 'island' && item.surface?.overhangs && (
+        <rect
+          x={-item.surface.overhangs.left}
+          y={-item.surface.overhangs.back}
+          width={w + item.surface.overhangs.left + item.surface.overhangs.right}
+          height={
+            d + item.surface.overhangs.front + item.surface.overhangs.back
+          }
+          fill="none"
+          stroke="#82724c"
+          strokeWidth=".6"
+        />
+      )}
+      {['island', 'countertop'].includes(item.kind) &&
+        item.surface?.seating &&
+        item.surface.seating !== 'none' && (
+          <g
+            aria-label="Seating space guides"
+            stroke="#087984"
+            strokeWidth=".5"
+            strokeDasharray="2 1"
+            fill="none"
+          >
+            {(() => {
+              const side = item.surface.seating,
+                vertical = side === 'east' || side === 'west',
+                length = vertical ? d : w;
+              return Array.from(
+                { length: Math.max(1, Math.floor(length / 24)) },
+                (_, i) => {
+                  const along =
+                    ((i + 0.5) * length) / Math.max(1, Math.floor(length / 24));
+                  return (
+                    <rect
+                      key={i}
+                      x={vertical ? (side === 'east' ? w : -24) : along - 12}
+                      y={vertical ? along - 12 : side === 'south' ? d : -24}
+                      width="24"
+                      height="24"
+                    />
+                  );
+                },
+              );
+            })()}
+          </g>
+        )}
       {item.kind === 'corner' && (
         <path
           d={

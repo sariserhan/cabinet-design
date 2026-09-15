@@ -17,6 +17,7 @@ import {
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { applianceDetails, metalPull } from './render-details';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { apronHeight, closeupViews } from '@/designer/refinements';
 import { materialTexture } from './render-textures';
 import { wallPanels, partitionPanels } from '@/designer/model';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -25,6 +26,7 @@ import {
   itemPolygon,
   isUpperCabinet,
   localToWorld,
+  worldToLocal,
   containsFootprint,
   cutPanels,
   footprint,
@@ -472,14 +474,27 @@ export default function RenderView({
         m: THREE.Material,
       ) => box(group, bw, bh, bd, x, y, z, m);
       const surface = (y: number, thickness: number) => {
-        for (const p of cutPanels(w, d, sinkHoles(item, design.items)))
+        const e = item.kind === 'island' ? item.surface?.overhangs : undefined;
+        const left = e?.left ?? 0,
+          back = e?.back ?? 0,
+          sw = w + left + (e?.right ?? 0),
+          sd = d + back + (e?.front ?? 0);
+        for (const p of cutPanels(
+          sw,
+          sd,
+          sinkHoles(item, design.items).map((hole) => ({
+            ...hole,
+            x: hole.x + left,
+            y: hole.y + back,
+          })),
+        ))
           b(
             p.width,
             thickness,
             p.height,
-            p.x + p.width / 2 - w / 2,
+            p.x + p.width / 2 - w / 2 - left,
             y,
-            p.y + p.height / 2 - d / 2,
+            p.y + p.height / 2 - d / 2 - back,
             stone,
           );
       };
@@ -506,6 +521,14 @@ export default function RenderView({
           d / 2 - 0.5,
           basin,
         );
+        if (item.sinkMount?.mount === 'drop_in') {
+          for (const z of [-d / 2 + 0.5, d / 2 - 0.5])
+            b(w + 0.5, 0.35, 1.5, 0, h, z, basin);
+          for (const x of [-w / 2 + 0.5, w / 2 - 0.5])
+            b(1.5, 0.35, d + 0.5, x, h, 0, basin);
+        }
+        if (item.sinkMount?.mount === 'apron')
+          b(w, h, 2.5, 0, h / 2, d / 2 + 1, basin);
         if (item.sinkStyle === 'double')
           b(1.2, h - 1, d - 2, 0, h / 2, 0, basin);
         for (const x of item.sinkStyle === 'double' ? [-w / 4, w / 4] : [0]) {
@@ -621,8 +644,52 @@ export default function RenderView({
           group.add(mesh);
         };
         // Open carcass preserves countertop and sink cutouts.
-        b(1, h, d, -w / 2 + 0.5, h / 2, 0, finish);
-        b(1, h, d - cut, w / 2 - 0.5, h / 2, -cut / 2, finish);
+        const sideHeight = Math.max(1, h - apronHeight(design, item));
+        const apronCuts = design.items
+          .filter(
+            (s) =>
+              s.sinkMount?.mount === 'apron' &&
+              design.items.some(
+                (host) =>
+                  host.id === s.sinkMount?.hostId &&
+                  (host.id === item.id ||
+                    (host.assemblyId && host.assemblyId === item.assemblyId)),
+              ),
+          )
+          .map((s) => ({
+            x:
+              worldToLocal(
+                item,
+                s.x + footprint(s).width / 2,
+                s.y + footprint(s).depth / 2,
+              ).x -
+              s.width / 2,
+            y: 0,
+            width: s.width,
+            height: h - sideHeight,
+          }));
+        if (sideHeight < h)
+          for (const panel of cutPanels(w, h - sideHeight, apronCuts))
+            b(
+              panel.width,
+              panel.height,
+              1,
+              panel.x + panel.width / 2 - w / 2,
+              sideHeight + panel.y + panel.height / 2,
+              d / 2,
+              finish,
+            );
+
+        b(1, sideHeight, d, -w / 2 + 0.5, sideHeight / 2, 0, finish);
+        b(
+          1,
+          sideHeight,
+          d - cut,
+          w / 2 - 0.5,
+          sideHeight / 2,
+          -cut / 2,
+          finish,
+        );
         b(w, h, 1, 0, h / 2, -d / 2 + 0.5, finish);
 
         const toe =
@@ -717,6 +784,7 @@ export default function RenderView({
           b(w + 1, 2, d + 1, 0, h + 1, 0, finish);
           b(w + 2, 0.7, d + 2, 0, h + 2.3, 0, finish);
         }
+        const frontHeight = Math.max(toe + 1, h - apronHeight(design, item));
         const style = resolvedFront(item),
           columns = style === 'double' ? 2 : 1,
           rows = style === 'drawers' ? 3 : 1;
@@ -725,9 +793,9 @@ export default function RenderView({
             for (let row = 0; row < rows; row++) {
               const childStart = group.children.length;
               const pw = w / columns - 0.6,
-                ph = (h - toe) / rows - 0.6,
+                ph = (frontHeight - toe) / rows - 0.6,
                 x = -w / 2 + ((col + 0.5) * w) / columns,
-                y = toe + ((row + 0.5) * (h - toe)) / rows;
+                y = toe + ((row + 0.5) * (frontHeight - toe)) / rows;
               b(pw, ph, 0.75, x, y, d / 2, inset);
               b(
                 Math.max(0.2, pw - 4),
@@ -880,6 +948,17 @@ export default function RenderView({
           group.add(light);
         } else if (
           !diagonal &&
+          item.kind !== 'island' &&
+          !design.items.some(
+            (s) =>
+              s.sinkMount &&
+              design.items.some(
+                (host) =>
+                  host.id === s.sinkMount?.hostId &&
+                  host.assemblyId &&
+                  host.assemblyId === item.assemblyId,
+              ),
+          ) &&
           !design.items.some(
             (s) =>
               s.kind === 'sink' &&
@@ -1205,6 +1284,16 @@ export default function RenderView({
     window.addEventListener('keyup', keyUp);
     window.addEventListener('blur', clearKeys);
     renderer.domElement.addEventListener('blur', clearKeys);
+    let cameraTween: {
+      start: number;
+      from: THREE.Vector3;
+      targetFrom: THREE.Vector3;
+      to: THREE.Vector3;
+      targetTo: THREE.Vector3;
+    } | null = null;
+    controls.addEventListener('start', () => {
+      cameraTween = null;
+    });
     let frame = 0,
       lastFrame = 0;
     let currentOpening = openingRef.current,
@@ -1213,6 +1302,19 @@ export default function RenderView({
       const elapsed = (now - (lastFrame || now)) / 1000;
       const dt = Math.min(0.05, elapsed);
       lastFrame = now;
+      if (cameraTween) {
+        const t = Math.min(1, (now - cameraTween.start) / 700),
+          ease = t * t * (3 - 2 * t);
+        camera.position.lerpVectors(cameraTween.from, cameraTween.to, ease);
+        controls.target.lerpVectors(
+          cameraTween.targetFrom,
+          cameraTween.targetTo,
+          ease,
+        );
+        controls.update();
+        render();
+        if (t === 1) cameraTween = null;
+      }
       if (walking && held.size) {
         const f =
           Number(held.has('w') || held.has('ArrowUp')) -
@@ -1367,10 +1469,19 @@ export default function RenderView({
         target: [controls.target.x, controls.target.y, controls.target.z],
       }),
       load: (view) => {
-        camera.position.set(...view.position);
-        controls.target.set(...view.target);
-        controls.update();
-        render();
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          camera.position.set(...view.position);
+          controls.target.set(...view.target);
+          controls.update();
+          render();
+        } else
+          cameraTween = {
+            start: performance.now(),
+            from: camera.position.clone(),
+            targetFrom: controls.target.clone(),
+            to: new THREE.Vector3(...view.position),
+            targetTo: new THREE.Vector3(...view.target),
+          };
       },
       save: (width, captureOnly = false) => {
         const oldSize = renderer.getSize(new THREE.Vector2()),
@@ -1708,6 +1819,13 @@ export default function RenderView({
       )}
       <details className="camera-controls">
         <summary>Saved cameras</summary>
+        <div className="designer-row">
+          {closeupViews(design).map((view) => (
+            <button key={view.id} onClick={() => actions.current?.load(view)}>
+              {view.name}
+            </button>
+          ))}
+        </div>
         <div className="designer-row">
           <input
             aria-label="Camera view name"

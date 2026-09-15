@@ -65,6 +65,14 @@ export function materialPrice(item: Cabinet, design: Design) {
     price =
       ((item.width * item.depth) / 144) *
       (stone === 'marble' ? 85 : stone === 'granite' ? 75 : 65);
+  if (item.kind === 'island' && item.surface?.overhangs) {
+    const e = item.surface.overhangs;
+    price +=
+      (((item.width + e.left + e.right) * (item.depth + e.front + e.back) -
+        item.width * item.depth) /
+        144) *
+      (stone === 'marble' ? 85 : stone === 'granite' ? 75 : 65);
+  }
   if (item.surface?.waterfall)
     price +=
       ((2 * (item.elevation || item.height) * item.depth) / 144) *

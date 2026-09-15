@@ -7,6 +7,7 @@ import {
   type Cabinet,
   type Design,
 } from './model';
+import { fitSink } from './refinements';
 import { roomEdges } from './room';
 export function lockViolation(before: Design, after: Design) {
   if (before.id !== after.id) return null;
@@ -30,11 +31,28 @@ export function resizeFromPoint(item: Cabinet, x: number, y: number) {
     f = footprint({ ...item, width, depth });
   return { width, depth, x: center.x - f.width / 2, y: center.y - f.depth / 2 };
 }
-export function overhang(design: Design, id: string, inches: number): Design {
-  const top = design.items.find((i) => i.id === id && i.kind === 'countertop');
+export function overhang(
+  design: Design,
+  id: string,
+  inches: number | { front: number; back: number; left: number; right: number },
+): Design {
+  const edges =
+    typeof inches === 'number'
+      ? { front: inches, back: inches, left: inches, right: inches }
+      : inches;
+  const top = design.items.find(
+    (i) => i.id === id && ['countertop', 'island'].includes(i.kind),
+  );
   if (!top) throw Error('Select a countertop.');
-  if (!Number.isFinite(inches) || inches < 0 || inches > 18)
+  if (Object.values(edges).some((v) => !Number.isFinite(v) || v < 0 || v > 18))
     throw Error('Overhang must be between 0 and 18 inches.');
+  if (top.kind === 'island')
+    return {
+      ...design,
+      items: design.items.map((i) =>
+        i.id === id ? { ...i, surface: { ...i.surface, overhangs: edges } } : i,
+      ),
+    };
   const hosts = design.items.filter(
     (i) =>
       i.assemblyId &&
@@ -59,18 +77,19 @@ export function overhang(design: Design, id: string, inches: number): Design {
       ),
     ),
   );
-  const x = Math.min(...pts.map((p) => p.x)) - inches,
-    y = Math.min(...pts.map((p) => p.y)) - inches,
-    w = Math.max(...pts.map((p) => p.x)) - x + inches,
-    d = Math.max(...pts.map((p) => p.y)) - y + inches;
+  const x = Math.min(...pts.map((p) => p.x)) - edges.left,
+    y = Math.min(...pts.map((p) => p.y)) - edges.back,
+    w = Math.max(...pts.map((p) => p.x)) - x + edges.right,
+    d = Math.max(...pts.map((p) => p.y)) - y + edges.front;
   const center = localToWorld(top, x + w / 2, y + d / 2),
     f = footprint({ ...top, width: w, depth: d });
-  return {
+  let next: Design = {
     ...design,
     items: design.items.map((i) =>
       i.id === id
         ? {
             ...i,
+            surface: { ...i.surface, overhangs: edges },
             width: w,
             depth: d,
             x: center.x - f.width / 2,
@@ -79,6 +98,17 @@ export function overhang(design: Design, id: string, inches: number): Design {
         : i,
     ),
   };
+  for (const sink of design.items.filter((i) => i.sinkMount?.hostId === id)) {
+    if (sink.sinkMount)
+      next = fitSink(
+        next,
+        sink.id,
+        id,
+        sink.sinkMount.mount,
+        sink.sinkMount.offset,
+      );
+  }
+  return next;
 }
 export function connectCountertops(design: Design, ids: string[]): Design {
   const tops = design.items.filter(
@@ -121,7 +151,7 @@ export function connectCountertops(design: Design, ids: string[]): Design {
     f = footprint({ ...base, width });
   const assemblyId = base.assemblyId ?? crypto.randomUUID(),
     oldGroups = new Set(tops.map((t) => t.assemblyId).filter(Boolean));
-  return {
+  const next: Design = {
     ...design,
     items: design.items
       .filter(
@@ -141,6 +171,29 @@ export function connectCountertops(design: Design, ids: string[]): Design {
             ? { ...i, assemblyId }
             : i,
       ),
+  };
+  const host = next.items.find((i) => i.id === base.id);
+  if (!host) return next;
+  return {
+    ...next,
+    items: next.items.map((i) =>
+      i.sinkMount && ids.includes(i.sinkMount.hostId)
+        ? {
+            ...i,
+            sinkMount: {
+              ...i.sinkMount,
+              hostId: host.id,
+              offset:
+                worldToLocal(
+                  host,
+                  i.x + footprint(i).width / 2,
+                  i.y + footprint(i).depth / 2,
+                ).x -
+                host.width / 2,
+            },
+          }
+        : i,
+    ),
   };
 }
 export function readiness(design: Design) {

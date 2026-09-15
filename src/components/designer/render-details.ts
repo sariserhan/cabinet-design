@@ -49,9 +49,11 @@ export function applianceDetails(
   glass: THREE.Material,
 ) {
   const { width: w, height: h, depth: d } = item;
-  b(w, h, d, 0, h / 2, 0, steel);
+  b(w, h, Math.max(1, d - 1), 0, h / 2, -0.5, dark);
   b(w - 1, 2, 0.6, 0, 1, d / 2, dark);
-  const face = d / 2 + 0.65;
+  const face = d / 2 - 0.1;
+  for (let x = -w / 2 + 2; x < w / 2 - 1; x += 2)
+    b(0.75, 1, 0.15, x, 1, d / 2 + 0.1, steel);
   if (item.kind === 'refrigerator') {
     if (item.refrigeratorStyle === 'single') {
       b(w - 0.6, h - 2.6, 1, 0, h / 2, face, steel);

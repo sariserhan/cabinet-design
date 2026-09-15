@@ -250,3 +250,16 @@ Select a placed object and use **Size / style preset** to switch its variant. Cu
 Validation: 138 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build pass. Playwright checks cover refrigerator style changes, door/window preset placement, custom island width, double/farmhouse/prep sinks, visible floor/backsplash render changes, persistence after reload and mobile layout without console errors. Opening placement now searches every enabled straight wall, and sink preset changes leave linked cabinetry in place.
 
 Upper-cabinet door pulls and knobs sit near the bottom edge in Render; the 3D preview uses the same lower placement. This applies to catalog wall cabinets and elevated custom upper cabinets. Refreshed sample gallery/presentation images include this correction.
+
+## Guided editing and review refinements
+
+- Moves, rotations and drops reject new cabinet/appliance overlaps and placements outside the room; nearby cabinet edges snap together. Existing layout issues remain visible for correction.
+- The toolbar above the canvas keeps the selected object's dimensions, finish, rotation, hinge and lock together. **Finish selected run** adds exposed side panels, countertops and toe kicks; **Join selected seams** merges compatible adjoining selected countertop sections.
+- **Fit sink to surface** supports drop-in rims, undermount basins and farmhouse apron fronts. Choose the surface and horizontal offset, then Fit sink. Fitting respects rotated surfaces, checks room for the basin, preserves linked cabinet positions and creates the appropriate countertop opening. Apron fitting lowers host cabinet fronts below the basin. This is illustrative cabinetry, not fabrication-ready sink engineering.
+- **Individual overhangs & seating** provides front/back/left/right values in the object's local orientation. Linked tops resize relative to their base cabinets and fitted sinks follow their surface. Standalone islands extend their rendered top while retaining the cabinet body. Dashed plan rectangles indicate 24-inch seating bays; the 12-inch knee-space suggestion is a demo guide.
+- **Materials → Material palette** provides clickable cabinet, flooring, countertop and backsplash swatches. The renderer adds recessed appliance fronts and toe ventilation detail. Island top extensions add a demo stone-area allowance.
+- **Compare options → Full-screen comparison** shows both rendered designs with linked cameras; Escape exits. Tours include sink/worktop and upper-cabinet close-ups. Viewpoint changes ease over 700 ms; reduced-motion preferences switch immediately. Direct camera interaction cancels the transition.
+
+**Show this kitchen** presents the current design without replacing it. Use **Reset demo** or the sample gallery to load a different kitchen.
+
+Validation: 144 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build pass. Browser rehearsal covers collision rejection, quick edit/lock controls, sink mounts, individual overhangs, material swatches, linked full-screen comparison, close-up tours, current-design preservation, reload persistence and mobile layout. The three sample images were regenerated from the updated renderer.

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { Design } from '@/designer/model';
+import { closeupViews } from '@/designer/refinements';
 import { presentationViews } from '@/designer/render-planning';
 import type { CameraView } from './render-view';
 export function PresentationTour({
@@ -13,7 +14,10 @@ export function PresentationTour({
   onExit: () => void;
 }) {
   const [step, setStep] = useState(-1);
-  const views = design.views?.length ? design.views : presentationViews(design);
+  const views = [
+    ...(design.views?.length ? design.views : presentationViews(design)),
+    ...closeupViews(design),
+  ];
   const index = Math.max(0, Math.min(step, views.length - 1)),
     view = views[index];
   const captions = [

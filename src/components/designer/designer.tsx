@@ -10,6 +10,8 @@ import {
 import { ElevationView } from './elevation-view';
 import { lockViolation } from '@/designer/studio-tools';
 import { KitchenActions } from './kitchen-actions';
+import { QuickInspector, FitAndOverhang } from './refinement-tools';
+import { placementBlock } from '@/designer/refinements';
 import { PresentationTour } from './presentation-tour';
 import type { CameraView } from './render-view';
 import { PlacementAssist } from './placement-assist';
@@ -309,7 +311,10 @@ function Editor({ ownerId }: { ownerId: string }) {
       window.removeEventListener('pagehide', persist);
     };
   }, [design, storageKey]);
-  function commit(change: (current: Design) => Design) {
+  function commit(
+    change: (current: Design) => Design,
+    protectPlacement = false,
+  ) {
     setHistory((h) => {
       if (!h) return h;
       let next = change(h.current);
@@ -328,6 +333,10 @@ function Editor({ ownerId }: { ownerId: string }) {
             })),
           },
         };
+      const placementError = protectPlacement
+        ? placementBlock(h.current, next)
+        : null;
+      if (placementError) return { ...h, error: placementError };
       const locked = lockViolation(h.current, next);
       if (locked)
         return {
@@ -356,37 +365,44 @@ function Editor({ ownerId }: { ownerId: string }) {
     setStatus('');
   }
   function updateItem(id: string, patch: Partial<Cabinet>) {
-    commit((d) => {
-      const current = d.items.find((i) => i.id === id);
-      let applied = patch;
-      if (
-        current?.opening &&
-        (patch.x !== undefined || patch.y !== undefined)
-      ) {
-        const host = d.items.find((h) => h.id === current.opening?.hostId);
-        if (host) {
-          const f = footprint(current),
-            point = worldToLocal(
-              host,
-              (patch.x ?? current.x) + f.width / 2,
-              (patch.y ?? current.y) + f.depth / 2,
-            );
-          applied = {
-            ...patch,
-            opening: {
-              ...current.opening,
-              offset: Math.max(0, point.x - current.width / 2),
-            },
-          };
+    commit(
+      (d) => {
+        const current = d.items.find((i) => i.id === id);
+        let applied = patch;
+        if (
+          current?.opening &&
+          (patch.x !== undefined || patch.y !== undefined)
+        ) {
+          const host = d.items.find((h) => h.id === current.opening?.hostId);
+          if (host) {
+            const f = footprint(current),
+              point = worldToLocal(
+                host,
+                (patch.x ?? current.x) + f.width / 2,
+                (patch.y ?? current.y) + f.depth / 2,
+              );
+            applied = {
+              ...patch,
+              opening: {
+                ...current.opening,
+                offset: Math.max(0, point.x - current.width / 2),
+              },
+            };
+          }
         }
-      }
-      return moveTogether
-        ? updateAssembly(d, id, applied)
-        : {
-            ...d,
-            items: d.items.map((i) => (i.id === id ? { ...i, ...applied } : i)),
-          };
-    });
+        return moveTogether
+          ? updateAssembly(d, id, applied)
+          : {
+              ...d,
+              items: d.items.map((i) =>
+                i.id === id ? { ...i, ...applied } : i,
+              ),
+            };
+      },
+      patch.x !== undefined ||
+        patch.y !== undefined ||
+        patch.rotation !== undefined,
+    );
   }
   function add(
     product: Product,
@@ -420,7 +436,7 @@ function Editor({ ownerId }: { ownerId: string }) {
       );
       return;
     }
-    commit((d) => ({ ...d, items: [...d.items, { ...item, ...space }] }));
+    commit((d) => ({ ...d, items: [...d.items, { ...item, ...space }] }), true);
     setSelected(item.id);
     setStatus(`${item.sku} added. Drag it in the plan or edit its position.`);
   }
@@ -441,7 +457,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         setStatus('Add a straight wall for this opening.');
         return;
       }
-      commit((d) => ({ ...d, items: [...d.items, placed] }));
+      commit((d) => ({ ...d, items: [...d.items, placed] }), true);
       setSelected(placed.id);
       setStatus(placed.sku + ' placed. Layout checks explain any conflicts.');
       return;
@@ -761,9 +777,10 @@ function Editor({ ownerId }: { ownerId: string }) {
         <h1>Kitchen designer</h1>
         <button
           className="designer-primary"
-          title="Load the sample and its hero camera"
+          title="Present the current kitchen"
           onClick={() => {
-            startDesign(polishedSample());
+            setMode('render');
+            setPresentationCamera(design.views?.[0]);
             setPresenting(true);
           }}
         >
@@ -1021,6 +1038,15 @@ function Editor({ ownerId }: { ownerId: string }) {
                 : 'Focus canvas'}
             </button>
           </div>
+          <QuickInspector
+            design={design}
+            item={item}
+            ids={selection}
+            onPatch={(patch) => {
+              if (item) updateItem(item.id, patch);
+            }}
+            onChange={(next) => commit(() => next)}
+          />
           <div className="designer-tools">
             <div className="designer-row">
               <button
@@ -1341,6 +1367,12 @@ function Editor({ ownerId }: { ownerId: string }) {
           <RoomPhoto
             key={design.id}
             storageKey={`kitchen-photo:${ownerId}:${design.id}`}
+          />
+          <FitAndOverhang
+            key={selected}
+            design={design}
+            selected={selected}
+            onChange={(next) => commit(() => next)}
           />
           <SurfaceEditor
             design={design}
