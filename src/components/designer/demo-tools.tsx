@@ -32,7 +32,7 @@ export function MaterialPresets({
     <section>
       <h3>Render styling</h3>
       <label>
-        Back-wall backsplash
+        Wall-run backsplash
         <select
           aria-label="Backsplash style"
           value={design.appearance?.backsplash ?? 'none'}
@@ -113,6 +113,24 @@ export function MaterialPresets({
           </button>
         ))}
       </div>
+      <label>
+        <input
+          type="checkbox"
+          checked={design.appearance?.staging ?? false}
+          onChange={(e) =>
+            onChange({
+              ...design,
+              appearance: {
+                countertop: 'quartz',
+                lighting: 'daylight',
+                ...design.appearance,
+                staging: e.target.checked,
+              },
+            })
+          }
+        />{' '}
+        Kitchen styling: stools, outlets & accessories
+      </label>
       <h3>Coordinated styles</h3>
       <div className="designer-row">
         {materialPresets.map((p) => (

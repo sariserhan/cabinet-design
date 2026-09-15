@@ -1343,7 +1343,9 @@ function Editor({ ownerId }: { ownerId: string }) {
                     54″ is a starting mounting height; adjust for your room.
                   </p>
                 )}
-                {item.kind === 'cabinet' && (
+                {['cabinet', 'custom_cabinet', 'island'].includes(
+                  item.kind,
+                ) && (
                   <label className="designer-numeric">
                     <span>Illustrative front</span>
                     <select

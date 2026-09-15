@@ -159,3 +159,15 @@ Validation: 113 core and 15 backend tests, including preview placement parity, w
 - The sample includes a saved hero camera, slate island, oak perimeter cabinetry, quartz worktops and brass hardware. These are improved real-time demo visuals, not manufacturer-exact models or a photorealistic offline rendering engine.
 
 The live benchmark was rerun successfully against the expanded working catalog after the timeout fix. It produced and stored a report without timing out. Benchmark validation still fails: reference truth is not human-verified, SKU precision is about 60.8%, rule precision is about 69.6%, and 5 of 8 cases pass. This is a successful execution check, not a catalog accuracy certification.
+
+## Rendering, walkthrough and storage demonstration
+
+- **High quality shadows** enables soft shadow filtering and screen-space contact shading. It is optional and works with PNG export; standard mode is less demanding. Materials now include brushed-metal detail, subtle stone relief and transmissive window glass.
+- **Kitchen styling** adds stools where the room and existing objects leave space, island end panels, a small countertop arrangement and decorative outlets. These are presentation objects, not priced or installation-validated equipment.
+- Backsplash runs now follow matching straight perimeter walls, including rotated cabinets and angled straight walls, and retain door/window cutouts. Curved-wall runs remain unsupported.
+- **Eye-level walkthrough** uses drag-to-look, WASD/arrow keys when the canvas is focused, and on-screen movement buttons. Eye height follows the ceiling and movement stays inside the room outline. It is an exploratory camera, not a person/furniture collision simulation.
+- **Front opening (%)** opens the selected straight cabinet's doors or drawers; with no selected object it opens all straight cabinet fronts. Custom cabinets now expose their front style under Design. Corner fronts and appliance doors remain fixed. The obstruction message uses a conservative rectangular opening envelope; it is not an exact hinge-sweep or hardware certification.
+- **Presentation camera angle** offers Entrance, Island, Sink detail (or countertop detail), and Overhead. The sample includes these four saved cameras plus its hero view. Capture these views in the client presentation or download PNGs directly.
+- Openness, walkthrough and rendering quality are temporary view controls. Styling and saved cameras are included in design JSON.
+
+QA includes scene-content checks for high-quality output (not just canvas presence), 1920-pixel export, opening fronts, camera presets, keyboard and button walking, styling toggles, mobile layout, and pure tests for rotated backsplash runs, window cutouts, room-boundary walking and approximate open-front conflicts.

@@ -1,3 +1,4 @@
+import { presentationViews } from './render-planning';
 import { newDesign, fromObject, normalizeOpenings } from './model';
 import type { Cabinet } from './model';
 import { installationDefaults, installationProfiles } from './installation';
@@ -19,6 +20,7 @@ export function polishedSample() {
     backsplash: 'subway',
     hardware: 'brass',
     pendants: true,
+    staging: true,
   };
   d.views = [
     {
@@ -218,5 +220,6 @@ export function polishedSample() {
     height: 80,
     opening: { hostId: partition.id, offset: 28, sill: 0 },
   });
+  d.views = [...(d.views ?? []), ...presentationViews(d)];
   return normalizeOpenings(d);
 }

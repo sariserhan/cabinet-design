@@ -1,3 +1,9 @@
+import {
+  backsplashRuns,
+  presentationViews,
+  walkPosition,
+  openingConflicts,
+} from '../../src/designer/render-planning';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newDesign, fromObject, parseDesign } from '../../src/designer/model';
@@ -190,4 +196,40 @@ test('whole-island finish changes cabinet members but preserves countertop and u
   assert.equal(next.items[2]?.finish, undefined);
   assert.equal(next.items[3]?.finish, undefined);
   assert.equal(d.items[0]?.finish, undefined);
+});
+
+test('backsplash follows opposite wall runs and retains window cutouts', () => {
+  const d = newDesign();
+  d.items = [
+    { ...fromObject('custom_cabinet'), x: 10, y: 0 },
+    { ...fromObject('custom_cabinet'), x: 60, y: 96, rotation: 180 },
+    {
+      ...fromObject('window'),
+      x: 15,
+      y: 0,
+      width: 20,
+      elevation: 44,
+      wall: 'north',
+      wallSegment: 0,
+    },
+  ];
+  const runs = backsplashRuns(d);
+  assert.equal(runs.length, 2);
+  assert.equal(runs[0]?.holes.length, 1);
+  assert.ok(Math.abs(Math.abs(runs[1]?.rotation ?? 0) - Math.PI) < 0.001);
+});
+test('presentation cameras, room-boundary walking and open-front conflict checks', () => {
+  const d = newDesign();
+  d.items = [
+    { ...fromObject('custom_cabinet'), x: 0, y: 0 },
+    { ...fromObject('custom_cabinet'), x: 0, y: 40 },
+  ];
+  assert.equal(presentationViews(d).length, 4);
+  assert.deepEqual(walkPosition(d, 60, 80), [60, 64, 80]);
+  assert.equal(walkPosition(d, -1, 80), null);
+  assert.equal(openingConflicts(d, 0).length, 0);
+  assert.ok(openingConflicts(d, 100, d.items[0]?.id).length > 0);
+  assert.doesNotThrow(() =>
+    parseDesign(JSON.stringify({ ...d, views: presentationViews(d) })),
+  );
 });

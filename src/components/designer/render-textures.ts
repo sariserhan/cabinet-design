@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 /** Deterministic material maps generated locally; no external image service. */
 export function materialTexture(
-  kind: 'wood' | 'floor' | 'quartz' | 'marble' | 'granite' | 'subway',
+  kind: 'wood' | 'floor' | 'quartz' | 'marble' | 'granite' | 'subway' | 'metal',
 ) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 512;
@@ -21,7 +21,19 @@ export function materialTexture(
           : '#c4a579'
         : '#f2f0ea';
   ctx.fillRect(0, 0, 512, 512);
-  if (kind === 'subway') {
+  if (kind === 'metal') {
+    ctx.fillStyle = '#d5d7d8';
+    ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 1800; i++) {
+      ctx.strokeStyle = 'rgba(60,64,67,' + random() * 0.035 + ')';
+      ctx.lineWidth = 0.3 + random() * 0.4;
+      const y = random() * 512;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(512, y + random() * 0.8);
+      ctx.stroke();
+    }
+  } else if (kind === 'subway') {
     ctx.fillStyle = '#c9c4ba';
     ctx.fillRect(0, 0, 512, 512);
     for (let row = 0; row < 4; row++)

@@ -2,6 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import {
+  openingConflicts,
+  presentationViews,
+  walkPosition,
+  backsplashRuns,
+} from '@/designer/render-planning';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { applianceDetails, metalPull } from './render-details';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -10,6 +20,8 @@ import { wallPanels, partitionPanels } from '@/designer/model';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Design } from '@/designer/model';
 import {
+  itemPolygon,
+  localToWorld,
   containsFootprint,
   cutPanels,
   footprint,
@@ -17,6 +29,8 @@ import {
   sinkHoles,
 } from '@/designer/model';
 import {
+  rectangleInside,
+  inside,
   wallSegments,
   roomOutline,
   ceilingAt,
@@ -54,6 +68,8 @@ export default function RenderView({
   const host = useRef<HTMLDivElement>(null);
   type View = NonNullable<Design['views']>[number];
   const actions = useRef<{
+    walk: (forward: number, side: number, turn?: number) => void;
+    open: (amount: number) => void;
     fit: () => void;
     save: (width: number, captureOnly?: boolean) => void;
     capture: () => Pick<View, 'position' | 'target'>;
@@ -66,6 +82,11 @@ export default function RenderView({
     position: THREE.Vector3;
     target: THREE.Vector3;
   } | null>(null);
+  const [quality, setQuality] = useState(false),
+    [walking, setWalking] = useState(false),
+    [opening, setOpening] = useState(0);
+  const openingRef = useRef(opening);
+  openingRef.current = opening;
   const [error, setError] = useState('');
   const [cutaway, setCutaway] = useState(true);
   const [interiors, setInteriors] = useState(false);
@@ -91,7 +112,9 @@ export default function RenderView({
     setError('');
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = quality
+      ? THREE.VSMShadowMap
+      : THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.95;
     renderer.domElement.setAttribute('aria-label', 'Rendered kitchen');
@@ -117,6 +140,17 @@ export default function RenderView({
     controls.minDistance = 15;
     controls.maxDistance = size * 6;
     const fit = () => {
+      if (walking) {
+        const p = presentationViews(design)[0];
+        if (p) {
+          camera.position.set(...p.position);
+          controls.target.set(...p.target);
+          camera.lookAt(controls.target);
+          controls.update();
+        }
+        return;
+      }
+
       controls.target.set(
         design.room.width / 2,
         design.room.height * 0.22,
@@ -140,6 +174,24 @@ export default function RenderView({
       controls.target.set(...design.views[0].target);
       controls.update();
     } else fit();
+    if (walking) {
+      const entry = presentationViews(design)[0];
+      const p =
+        walkPosition(design, camera.position.x, camera.position.z) ??
+        (entry
+          ? walkPosition(design, entry.position[0], entry.position[2])
+          : null);
+      if (p) {
+        camera.position.set(...p);
+        controls.target.set(
+          design.room.width / 2,
+          p[1],
+          design.room.depth * 0.15,
+        );
+      }
+      controls.enabled = false;
+      camera.lookAt(controls.target);
+    }
     scene.add(
       new THREE.HemisphereLight(
         lighting === 'warm' ? '#ffdfb4' : '#ffffff',
@@ -216,6 +268,9 @@ export default function RenderView({
       const texture = materialTexture(name);
       textures.push(texture);
       m.map = texture;
+      m.bumpMap = texture;
+      m.bumpScale = name === 'granite' ? 0.035 : 0.012;
+      m.roughness = name === 'granite' ? 0.32 : 0.2;
       stoneMaterials.set(name, m);
       return m;
     };
@@ -232,9 +287,21 @@ export default function RenderView({
       0.8,
       0.28,
     );
-    const windowGlass = material('#c5e0e5', 0.1, 0.12);
-    windowGlass.transparent = true;
-    windowGlass.opacity = 0.28;
+    const windowGlass = new THREE.MeshPhysicalMaterial({
+      color: '#d5e8e9',
+      roughness: 0.06,
+      transmission: 0.78,
+      thickness: 0.4,
+      ior: 1.5,
+      envMapIntensity: 1.2,
+    });
+    materials.push(windowGlass);
+    const brushed = materialTexture('metal');
+    textures.push(brushed);
+    steel.color.set('#ffffff');
+    steel.map = brushed;
+    steel.bumpMap = brushed;
+    steel.bumpScale = 0.008;
     const floorMaterial = material('#ffffff', 0, 0.7);
     floorMaterial.map = textures[2] ?? null;
 
@@ -348,6 +415,7 @@ export default function RenderView({
         nz: dx,
       });
     }
+    const movingFronts: { id: string; apply: (amount: number) => void }[] = [];
     const itemGroups: THREE.Group[] = [];
     for (const item of design.items) {
       const { finish, inset } = finishFor(item.finish ?? design.finish);
@@ -476,53 +544,6 @@ export default function RenderView({
         glow.position.set(0, -2, d / 2);
         group.add(glow);
       }
-      if (
-        (cabinet || ['range', 'dishwasher'].includes(item.kind)) &&
-        item.elevation === 0 &&
-        item.y <= 2 &&
-        item.rotation === 0 &&
-        design.room.walls.north &&
-        design.appearance?.backsplash &&
-        design.appearance.backsplash !== 'none'
-      ) {
-        const bottom = cabinet ? item.height + 1.5 : 36,
-          height = 18;
-        const openings = design.items
-          .filter(
-            (i) =>
-              (i.kind === 'window' || i.kind === 'door') &&
-              i.wall === 'north' &&
-              !i.opening,
-          )
-          .map((i) => ({
-            x: i.x - item.x,
-            y: i.elevation - bottom,
-            width: i.width,
-            height: i.height,
-          }));
-        const tile =
-          design.appearance.backsplash === 'subway'
-            ? material('#ffffff', 0.02, 0.3)
-            : stone;
-        if (design.appearance.backsplash === 'subway') {
-          const map = materialTexture('subway');
-          textures.push(map);
-          tile.map = map;
-          map.repeat.set(w / 24, height / 12);
-          tile.bumpMap = map;
-          tile.bumpScale = 0.03;
-        }
-        for (const panel of cutPanels(w, height, openings))
-          b(
-            panel.width,
-            panel.height,
-            0.3,
-            -w / 2 + panel.x + panel.width / 2,
-            bottom + panel.y + panel.height / 2,
-            -d / 2 + 0.18 - item.y,
-            tile,
-          );
-      }
       if (cabinet) {
         const diagonal =
             item.kind === 'corner' &&
@@ -572,12 +593,37 @@ export default function RenderView({
             -cut / 2 - 1,
             dark,
           );
+        if (design.appearance?.staging && item.assemblyId && item.y > 30) {
+          for (const sign of [-1, 1]) {
+            const p = localToWorld(item, sign < 0 ? -0.2 : w + 0.2, d / 2);
+            const neighbor = design.items.some(
+              (other) =>
+                other.id !== item.id &&
+                other.elevation === item.elevation &&
+                inside(p, itemPolygon(other)),
+            );
+            if (!neighbor)
+              b(
+                0.125,
+                h - toe,
+                d,
+                sign * (w / 2 + 0.0625),
+                (h + toe) / 2,
+                0,
+                finish,
+              );
+          }
+        }
         const details = item.details ?? {
           shelves: 2,
           interior: 'shelves',
           molding: false,
         };
-        for (let shelf = 1; shelf <= details.shelves; shelf++) {
+        for (
+          let shelf = 1;
+          shelf <= (resolvedFront(item) === 'drawers' ? 0 : details.shelves);
+          shelf++
+        ) {
           const y = toe + ((h - toe) * shelf) / (details.shelves + 1);
           if (details.interior === 'lazy_susan') {
             const shelfMesh = new THREE.Mesh(
@@ -620,6 +666,7 @@ export default function RenderView({
         if (!interiors && item.kind !== 'corner')
           for (let col = 0; col < columns; col++)
             for (let row = 0; row < rows; row++) {
+              const childStart = group.children.length;
               const pw = w / columns - 0.6,
                 ph = (h - toe) / rows - 0.6,
                 x = -w / 2 + ((col + 0.5) * w) / columns,
@@ -669,6 +716,44 @@ export default function RenderView({
                 style === 'drawers',
                 hardware,
               );
+              if (style === 'drawers') {
+                b(
+                  Math.max(0.2, pw - 2),
+                  0.5,
+                  Math.max(0.2, d - 4),
+                  x,
+                  y - ph / 2 + 1,
+                  1,
+                  inset,
+                );
+                for (const sign of [-1, 1])
+                  b(
+                    0.5,
+                    Math.max(1, ph * 0.55),
+                    Math.max(0.2, d - 4),
+                    x + sign * (pw / 2 - 1),
+                    y - ph * 0.15,
+                    1,
+                    inset,
+                  );
+              }
+              const parts = group.children.slice(childStart);
+              const pivot = new THREE.Group();
+              const right = columns === 2 ? col === 1 : !!item.mirrored;
+              if (style !== 'drawers')
+                pivot.position.set(x + (right ? pw / 2 : -pw / 2), 0, d / 2);
+              group.add(pivot);
+              for (const part of parts) pivot.attach(part);
+              movingFronts.push({
+                id: item.id,
+                apply: (amount) => {
+                  const value = !selected || selected === item.id ? amount : 0;
+                  if (style === 'drawers')
+                    pivot.position.z = value * Math.max(1, d - 4) * 0.75;
+                  else
+                    pivot.rotation.y = (right ? 1 : -1) * value * Math.PI * 0.5;
+                },
+              });
             }
         if (diagonal) {
           cornerShelf(h, finish);
@@ -727,6 +812,53 @@ export default function RenderView({
       }
     }
 
+    if (
+      design.appearance?.backsplash &&
+      design.appearance.backsplash !== 'none'
+    ) {
+      for (const run of backsplashRuns(design)) {
+        const group = new THREE.Group();
+        group.position.set(run.x, 0, run.z);
+        group.rotation.y = run.rotation;
+        scene.add(group);
+        const tile =
+          design.appearance.backsplash === 'subway'
+            ? material('#ffffff', 0.02, 0.35)
+            : stoneFor(design.appearance.countertop);
+        if (design.appearance.backsplash === 'subway') {
+          const map = materialTexture('subway');
+          textures.push(map);
+          tile.map = map;
+          map.repeat.set(run.width / 24, 1.5);
+          tile.bumpMap = map;
+          tile.bumpScale = 0.03;
+        }
+        const panels = cutPanels(run.width, run.height, run.holes);
+        for (const p of panels)
+          box(
+            group,
+            p.width,
+            p.height,
+            0.3,
+            p.x + p.width / 2,
+            run.bottom + p.y + p.height / 2,
+            0.18,
+            tile,
+          );
+        if (design.appearance.staging) {
+          const p = panels.find((p) => p.width >= 14 && p.height >= 12);
+          if (p) {
+            const x = p.x + p.width * 0.6,
+              y = run.bottom + p.y + 6;
+            box(group, 2.7, 4.3, 0.25, x, y, 0.55, wall);
+            for (const yy of [-0.65, 0.65])
+              for (const xx of [-0.3, 0.3])
+                box(group, 0.12, 0.4, 0.15, x + xx, y + yy, 0.72, dark);
+          }
+        }
+      }
+    }
+    for (const front of movingFronts) front.apply(openingRef.current / 100);
     if (design.appearance?.pendants) {
       const island = design.items
         .filter(
@@ -800,6 +932,84 @@ export default function RenderView({
         scene.add(bowl);
       }
     }
+    if (design.appearance?.staging) {
+      const island = design.items
+        .filter(
+          (i) =>
+            (i.kind === 'countertop' || i.kind === 'island') &&
+            i.y > 30 &&
+            i.width >= 48,
+        )
+        .sort((a, b) => b.width - a.width)[0];
+      if (island) {
+        const f = footprint(island),
+          z = island.y + f.depth + 13,
+          seat = material('#c3ad8b', 0, 0.9);
+        for (const fraction of [0.25, 0.75]) {
+          const x = island.x + f.width * fraction;
+          const blocked = design.items.some((i) => {
+            const b = footprint(i);
+            return (
+              i.elevation < 28 &&
+              i.x < x + 8 &&
+              i.x + b.width > x - 8 &&
+              i.y < z + 8 &&
+              i.y + b.depth > z - 8
+            );
+          });
+          if (!blocked && rectangleInside(design.room, x - 8, z - 8, 16, 16)) {
+            const stool = new THREE.Group();
+            stool.position.set(x, 0, z);
+            scene.add(stool);
+            box(stool, 14, 2, 14, 0, 25, 0, seat);
+            for (const xx of [-5, 5])
+              for (const zz of [-5, 5]) box(stool, 1, 24, 1, xx, 12, zz, dark);
+            box(stool, 11, 0.5, 0.5, 0, 9, 5, dark);
+            box(stool, 14, 10, 1, 0, 31, 6, seat);
+          }
+        }
+      }
+      const counter = design.items.find(
+        (i) => i.kind === 'countertop' && i.width >= 24 && i.y < 3,
+      );
+      if (counter) {
+        const top = counter.elevation + counter.height,
+          wood = finishFor('oak').finish,
+          ceramic = material('#e7e0d2', 0, 0.65);
+        box(
+          scene,
+          10,
+          0.65,
+          7,
+          counter.x + counter.width * 0.4,
+          top + 0.35,
+          counter.y + 10,
+          wood,
+        );
+        const pot = new THREE.Mesh(
+          new THREE.CylinderGeometry(2.4, 1.8, 4, 24),
+          ceramic,
+        );
+        pot.position.set(counter.x + 5, top + 2, counter.y + 5);
+        pot.castShadow = true;
+        scene.add(pot);
+        const green = material('#54724b', 0, 0.9);
+        for (let i = 0; i < 9; i++) {
+          const leaf = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 10, 8),
+            green,
+          );
+          leaf.scale.set(0.6, 3, 0.35);
+          leaf.rotation.z = Math.sin(i) * 0.6;
+          leaf.position.set(
+            counter.x + 5 + Math.sin(i) * 1.5,
+            top + 6 + Math.cos(i),
+            counter.y + 5 + Math.cos(i) * 1.5,
+          );
+          scene.add(leaf);
+        }
+      }
+    }
     for (const id of new Set([
       ...(selectedIds ?? []),
       ...(selected ? [selected] : []),
@@ -811,6 +1021,103 @@ export default function RenderView({
         materials.push(outline.material as THREE.Material);
       }
     }
+    const composer = quality ? new EffectComposer(renderer) : null;
+    const ao = quality ? new SSAOPass(scene, camera, 512, 512) : null;
+    const output = quality ? new OutputPass() : null;
+    if (composer && ao && output) {
+      ao.kernelRadius = 12;
+      ao.minDistance = 0.002;
+      ao.maxDistance = 0.06;
+      composer.addPass(new RenderPass(scene, camera));
+      composer.addPass(ao);
+      composer.addPass(output);
+    }
+    let postWidth = 0,
+      postHeight = 0;
+    const step = (forward: number, side: number, turn = 0) => {
+      const direction = camera.getWorldDirection(new THREE.Vector3());
+      direction.y = 0;
+      direction.normalize();
+      if (turn) {
+        direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), turn);
+        controls.target.copy(camera.position).addScaledVector(direction, 60);
+      } else {
+        const lateral = new THREE.Vector3().crossVectors(
+          direction,
+          new THREE.Vector3(0, 1, 0),
+        );
+        const next = camera.position
+          .clone()
+          .addScaledVector(direction, forward * 6)
+          .addScaledVector(lateral, side * 6);
+        const p = walkPosition(design, next.x, next.z);
+        if (!p) return;
+        const delta = new THREE.Vector3(...p).sub(camera.position);
+        camera.position.set(...p);
+        controls.target.add(delta);
+      }
+      camera.lookAt(controls.target);
+      render();
+      callbacks.current.onCamera?.({
+        position: [camera.position.x, camera.position.y, camera.position.z],
+        target: [controls.target.x, controls.target.y, controls.target.z],
+      });
+    };
+    const key = (e: KeyboardEvent) => {
+      if (!walking) return;
+      const moves: Record<string, [number, number, number?]> = {
+        w: [1, 0],
+        s: [-1, 0],
+        a: [0, -1],
+        d: [0, 1],
+        ArrowUp: [1, 0],
+        ArrowDown: [-1, 0],
+        ArrowLeft: [0, 0, 0.12],
+        ArrowRight: [0, 0, -0.12],
+      };
+      const move = moves[e.key];
+      if (move) {
+        e.preventDefault();
+        step(...move);
+      }
+    };
+    renderer.domElement.tabIndex = 0;
+    renderer.domElement.addEventListener('keydown', key);
+    let look: { x: number; y: number; direction: THREE.Vector3 } | null = null;
+    const lookDown = (e: PointerEvent) => {
+      if (walking && e.button === 0) {
+        renderer.domElement.focus();
+        renderer.domElement.setPointerCapture(e.pointerId);
+        look = {
+          x: e.clientX,
+          y: e.clientY,
+          direction: camera.getWorldDirection(new THREE.Vector3()),
+        };
+      }
+    };
+    const lookMove = (e: PointerEvent) => {
+      if (!look) return;
+      const spherical = new THREE.Spherical().setFromVector3(look.direction);
+      spherical.theta -= (e.clientX - look.x) * 0.005;
+      spherical.phi = Math.max(
+        0.3,
+        Math.min(Math.PI - 0.3, spherical.phi + (e.clientY - look.y) * 0.005),
+      );
+      controls.target
+        .copy(camera.position)
+        .add(
+          new THREE.Vector3().setFromSpherical(spherical).multiplyScalar(60),
+        );
+      camera.lookAt(controls.target);
+      render();
+    };
+    const lookEnd = () => {
+      look = null;
+    };
+    renderer.domElement.addEventListener('pointerdown', lookDown);
+    renderer.domElement.addEventListener('pointermove', lookMove);
+    renderer.domElement.addEventListener('pointerup', lookEnd);
+    renderer.domElement.addEventListener('pointercancel', lookEnd);
     let press: { x: number; y: number } | null = null;
     const pointerDown = (e: PointerEvent) => {
       press = e.button === 0 ? { x: e.clientX, y: e.clientY } : null;
@@ -848,7 +1155,17 @@ export default function RenderView({
           !cutaway ||
           (camera.position.x - w.x) * w.nx + (camera.position.z - w.z) * w.nz >=
             0;
-      renderer.render(scene, camera);
+      if (composer && ao) {
+        const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+        if (size.x !== postWidth || size.y !== postHeight) {
+          postWidth = size.x;
+          postHeight = size.y;
+          composer.setPixelRatio(1);
+          composer.setSize(size.x, size.y);
+          ao.setSize(Math.min(1280, size.x), Math.min(1280, size.y));
+        }
+        composer.render();
+      } else renderer.render(scene, camera);
     };
     controls.addEventListener('change', render);
     const resize = () => {
@@ -877,6 +1194,11 @@ export default function RenderView({
       }),
     );
     actions.current = {
+      walk: step,
+      open: (amount) => {
+        for (const front of movingFronts) front.apply(amount / 100);
+        render();
+      },
       fit,
       capture: () => ({
         position: [camera.position.x, camera.position.y, camera.position.z],
@@ -915,6 +1237,14 @@ export default function RenderView({
         target: controls.target.clone(),
       };
       observer.disconnect();
+      renderer.domElement.removeEventListener('keydown', key);
+      renderer.domElement.removeEventListener('pointerdown', lookDown);
+      renderer.domElement.removeEventListener('pointermove', lookMove);
+      renderer.domElement.removeEventListener('pointerup', lookEnd);
+      renderer.domElement.removeEventListener('pointercancel', lookEnd);
+      ao?.dispose();
+      output?.dispose();
+      composer?.dispose();
       controls.dispose();
       actions.current = null;
       renderer.domElement.removeEventListener('webglcontextlost', lost);
@@ -934,10 +1264,71 @@ export default function RenderView({
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [design, cutaway, interiors, showCeiling, selected, selectedIds]);
+  }, [
+    design,
+    cutaway,
+    interiors,
+    showCeiling,
+    selected,
+    selectedIds,
+    quality,
+    walking,
+  ]);
   return (
     <div className="designer-render">
       <div className="designer-row render-controls">
+        <label>
+          <input
+            type="checkbox"
+            checked={quality}
+            onChange={(e) => setQuality(e.target.checked)}
+          />{' '}
+          High quality shadows
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={walking}
+            onChange={(e) => setWalking(e.target.checked)}
+          />{' '}
+          Eye-level walkthrough
+        </label>
+        <label>
+          Front opening (%)
+          <input
+            aria-label="Front opening (%)"
+            type="range"
+            min="0"
+            max="100"
+            value={opening}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              setOpening(value);
+              actions.current?.open(value);
+            }}
+          />
+        </label>
+        <select
+          aria-label="Presentation camera angle"
+          defaultValue=""
+          onChange={(e) => {
+            const view = presentationViews(design).find(
+              (v) => v.id === e.target.value,
+            );
+            if (view) {
+              setWalking(false);
+              actions.current?.load(view);
+              onCamera?.(view);
+            }
+          }}
+        >
+          <option value="">Choose presentation angle</option>
+          {presentationViews(design).map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.name}
+            </option>
+          ))}
+        </select>
         <label>
           <input
             type="checkbox"
@@ -997,6 +1388,57 @@ export default function RenderView({
           Cutaway walls
         </label>
       </div>
+      {walking && (
+        <div className="walk-controls designer-row">
+          <button onClick={() => actions.current?.walk(1, 0)}>
+            Walk forward
+          </button>
+          <button onClick={() => actions.current?.walk(-1, 0)}>
+            Walk back
+          </button>
+          <button onClick={() => actions.current?.walk(0, -1)}>
+            Step left
+          </button>
+          <button onClick={() => actions.current?.walk(0, 1)}>
+            Step right
+          </button>
+          <button onClick={() => actions.current?.walk(0, 0, 0.2)}>
+            Look left
+          </button>
+          <button onClick={() => actions.current?.walk(0, 0, -0.2)}>
+            Look right
+          </button>
+          <span>
+            Drag to look. Focus the canvas and use WASD / arrow keys. Movement
+            stays inside the room outline.
+          </span>
+        </div>
+      )}
+      {opening > 0 && (
+        <p className="front-opening-note" role="status">
+          Opening {selected ? 'selected cabinet' : 'all straight cabinet'}{' '}
+          fronts: {opening}%. Corner fronts are fixed. Use Layout checks for
+          installation clearance review.
+        </p>
+      )}
+      {opening > 0 && (
+        <div className="opening-conflicts" role="status">
+          {openingConflicts(design, opening, selected).length ? (
+            <ul>
+              {openingConflicts(design, opening, selected)
+                .slice(0, 6)
+                .map((message, i) => (
+                  <li key={i}>{message}</li>
+                ))}
+            </ul>
+          ) : (
+            <p>
+              No object intersections found in the approximate front-opening
+              envelope.
+            </p>
+          )}
+        </div>
+      )}
       <div className="camera-controls designer-row">
         <input
           aria-label="Camera view name"
