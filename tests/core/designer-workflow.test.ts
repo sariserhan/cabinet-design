@@ -226,7 +226,7 @@ test('presentation cameras, room-boundary walking and open-front conflict checks
     { ...fromObject('custom_cabinet'), x: 0, y: 0 },
     { ...fromObject('custom_cabinet'), x: 0, y: 40 },
   ];
-  assert.equal(presentationViews(d).length, 4);
+  assert.equal(presentationViews(d).length, 5);
   assert.deepEqual(walkPosition(d, 60, 80), [60, 64, 80]);
   assert.equal(walkPosition(d, -1, 80), null);
   assert.equal(openingConflicts(d, 0).length, 0);

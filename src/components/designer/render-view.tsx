@@ -21,6 +21,8 @@ import { applianceDetails, metalPull } from './render-details';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { apronHeight, closeupViews } from '@/designer/refinements';
 import { materialTexture, surfaceDetail } from './render-textures';
+import { addWindowLighting } from './render-lighting';
+import { photoSnapshot, renderPhoto } from './photo-render';
 import { wallPanels, partitionPanels } from '@/designer/model';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Design } from '@/designer/model';
@@ -77,6 +79,7 @@ export default function RenderView({
     () => materialVariant(sourceDesign, variant),
     [sourceDesign, variant],
   );
+  const designVersion = useMemo(() => JSON.stringify(design), [design]);
   const [speed, setSpeed] = useState(30);
   const speedRef = useRef(speed);
   speedRef.current = speed;
@@ -89,6 +92,12 @@ export default function RenderView({
   type View = NonNullable<Design['views']>[number];
   const actions = useRef<{
     expose: (value: number) => void;
+    lens: (value: number) => void;
+    snapshot: () => {
+      snapshot: ReturnType<typeof photoSnapshot>;
+      camera: THREE.PerspectiveCamera;
+      exposure: number;
+    };
     walk: (forward: number, side: number, turn?: number) => void;
     open: (amount: number) => void;
     fit: () => void;
@@ -104,6 +113,77 @@ export default function RenderView({
     target: THREE.Vector3;
     walking: boolean;
   } | null>(null);
+  const [lens, setLens] = useState(45);
+  const lensRef = useRef(lens);
+  lensRef.current = lens;
+  useEffect(() => {
+    actions.current?.lens(lens);
+  }, [lens]);
+  const [photoSamples, setPhotoSamples] = useState(64);
+  const [photoDenoise, setPhotoDenoise] = useState(true);
+  const [photoProgress, setPhotoProgress] = useState<number | null>(null);
+  const [photoMessage, setPhotoMessage] = useState('');
+  const [photoResult, setPhotoResult] = useState<{
+    url: string;
+    name: string;
+    designVersion: string;
+  } | null>(null);
+  const photoJob = useRef<AbortController | null>(null);
+  useEffect(
+    () => () => {
+      photoJob.current?.abort();
+      photoJob.current = null;
+    },
+    [],
+  );
+  async function startPhoto(preview = false) {
+    if (!actions.current || photoJob.current) return;
+    const job = new AbortController();
+    photoJob.current = job;
+    setPhotoProgress(0);
+    setPhotoResult(null);
+    setPhotoMessage('Preparing geometry and lighting…');
+    const name = `${design.name.replace(/[^a-z0-9-]/gi, '-').slice(0, 80) || 'kitchen'}-${preview ? 'photo-preview' : 'photo'}.png`;
+    try {
+      const captured = actions.current.snapshot();
+      const samples = preview ? 8 : photoSamples;
+      const url = await renderPhoto(captured.snapshot, captured.camera, {
+        width: preview ? 640 : exportWidth,
+        samples,
+        exposure: captured.exposure,
+        denoise: photoDenoise,
+        signal: job.signal,
+        onProgress: (n) => {
+          if (photoJob.current === job) {
+            setPhotoProgress(n / samples);
+            setPhotoMessage(`Rendering ${n} of ${samples} samples`);
+          }
+        },
+      });
+      if (photoJob.current === job) {
+        setPhotoResult({ url, name, designVersion });
+        setPhotoMessage(
+          preview
+            ? 'Preview ready. Final quality uses more samples to reduce noise.'
+            : 'Photo render ready.',
+        );
+      }
+    } catch (e) {
+      if (photoJob.current === job)
+        setPhotoMessage(
+          job.signal.aborted
+            ? 'Photo render cancelled.'
+            : e instanceof Error
+              ? e.message
+              : 'Photo render failed.',
+        );
+    } finally {
+      if (photoJob.current === job) {
+        photoJob.current = null;
+        setPhotoProgress(null);
+      }
+    }
+  }
   const [exposure, setExposure] = useState(1);
   const exposureRef = useRef(exposure);
   exposureRef.current = exposure;
@@ -156,7 +236,7 @@ export default function RenderView({
       environment = pmrem.fromScene(environmentScene, 0.04);
     scene.environment = environment.texture;
     scene.environmentIntensity =
-      design.appearance?.lightingProfile === 'task' ? 0.2 : 0.55;
+      design.appearance?.lightingProfile === 'task' ? 0.2 : 0.35;
     environmentScene.dispose();
     pmrem.dispose();
     const lighting = design.appearance?.lighting ?? 'daylight';
@@ -169,8 +249,9 @@ export default function RenderView({
       design.room.height,
     );
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, size * 30);
+    camera.setFocalLength(lensRef.current);
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.maxPolarAngle = Math.PI / 2 - 0.015;
+    controls.maxPolarAngle = Math.PI / 2;
     controls.minDistance = 15;
     controls.maxDistance = size * 6;
     const fit = () => {
@@ -245,7 +326,7 @@ export default function RenderView({
             ? 0.28
             : lighting === 'studio'
               ? 0.65
-              : 0.48,
+              : 0.28,
       ),
     );
     const sun = new THREE.DirectionalLight(
@@ -275,6 +356,7 @@ export default function RenderView({
     });
     sun.shadow.normalBias = 0.3;
     scene.add(sun, sun.target);
+    addWindowLighting(scene, design, sun);
     const fillLight = new THREE.DirectionalLight(
       '#d6e7ff',
       design.appearance?.lightingProfile === 'task'
@@ -325,7 +407,7 @@ export default function RenderView({
         { linen: '#ece7dc', oak: '#ffffff', slate: '#414d57' }[name],
       );
       const inset = material(
-        { linen: '#d9d3c6', oak: '#ead5b5', slate: '#34404a' }[name],
+        { linen: '#ece7dc', oak: '#ffffff', slate: '#414d57' }[name],
       );
       for (const surface of [finish, inset]) {
         surface.roughness = name === 'oak' ? 0.48 : 0.36;
@@ -353,6 +435,7 @@ export default function RenderView({
       const texture = materialTexture(name);
       textures.push(texture);
       m.map = texture;
+      m.userData.textureInches = [72, 36];
       m.bumpMap = detailMaps.stone;
       m.roughnessMap = detailMaps.stone;
       m.bumpScale = name === 'granite' ? 0.035 : 0.012;
@@ -433,10 +516,27 @@ export default function RenderView({
         for (let i = 0; i < uv.count; i++) {
           const vertical = Math.abs(normal.getY(i)) < 0.5;
           const scaleX = Math.abs(normal.getX(i)) > 0.5 ? d : w;
+          const u = uv.getX(i),
+            v = uv.getY(i);
+          if (vertical && w > h * 3 && h < 4) {
+            // Rails and shelf edges run across the cabinet; stiles run upright.
+            uv.setXY(i, (v * h) / 24, (u * scaleX) / 36);
+          } else uv.setXY(i, (u * scaleX) / 24, (v * (vertical ? h : d)) / 36);
+        }
+      }
+      const textureInches = m.userData.textureInches as
+        [number, number] | undefined;
+      if (textureInches) {
+        const uv = mesh.geometry.getAttribute('uv'),
+          pos = mesh.geometry.getAttribute('position'),
+          normal = mesh.geometry.getAttribute('normal');
+        for (let i = 0; i < uv.count; i++) {
+          const nx = Math.abs(normal.getX(i)),
+            ny = Math.abs(normal.getY(i));
           uv.setXY(
             i,
-            (uv.getX(i) * scaleX) / 24,
-            (uv.getY(i) * (vertical ? h : d)) / 36,
+            (nx > 0.7 ? pos.getZ(i) + z : pos.getX(i) + x) / textureInches[0],
+            (ny > 0.7 ? pos.getZ(i) + z : pos.getY(i) + y) / textureInches[1],
           );
         }
       }
@@ -619,7 +719,7 @@ export default function RenderView({
         continue;
       }
       if (item.kind === 'window' || item.kind === 'door') {
-        b(
+        const pane = b(
           w - 2,
           h - 2,
           1,
@@ -628,6 +728,7 @@ export default function RenderView({
           0,
           item.kind === 'window' ? windowGlass : finish,
         );
+        if (item.kind === 'window') pane.castShadow = false;
         for (const x of [-w / 2 + 1, w / 2 - 1]) b(2, h, d, x, h / 2, 0, wall);
         for (const y of [1, h - 1]) b(w, 2, d, 0, y, 0, wall);
         if (item.kind === 'window') {
@@ -788,8 +889,8 @@ export default function RenderView({
             Math.max(0.2, d - cut - 4),
             0,
             toe / 2,
-            -cut / 2 - 1,
-            dark,
+            -cut / 2 - 2,
+            finish,
           );
         if (design.appearance?.staging && item.assemblyId && item.y > 30) {
           for (const sign of [-1, 1]) {
@@ -866,8 +967,8 @@ export default function RenderView({
           for (let col = 0; col < columns; col++)
             for (let row = 0; row < rows; row++) {
               const childStart = group.children.length;
-              const pw = w / columns - 0.6,
-                ph = (frontHeight - toe) / rows - 0.6,
+              const pw = w / columns - 0.125,
+                ph = (frontHeight - toe) / rows - 0.125,
                 x = -w / 2 + ((col + 0.5) * w) / columns,
                 y = toe + ((row + 0.5) * (frontHeight - toe)) / rows;
               b(pw, ph, 0.75, x, y, d / 2, inset);
@@ -1077,7 +1178,7 @@ export default function RenderView({
           );
           textures.push(map);
           tile.map = map;
-          map.repeat.set(run.width / 24, 1.5);
+          tile.userData.textureInches = [12, 12];
           tile.bumpMap = map;
           tile.bumpScale = 0.03;
         }
@@ -1296,6 +1397,34 @@ export default function RenderView({
         const outline = new THREE.BoxHelper(target, 0x087984);
         scene.add(outline);
         materials.push(outline.material as THREE.Material);
+      }
+    }
+    let roomReflection: THREE.WebGLRenderTarget | undefined;
+    if (quality) {
+      const cube = new THREE.WebGLCubeRenderTarget(128, {
+        type: THREE.HalfFloatType,
+      });
+      const probe = new THREE.CubeCamera(0.5, size * 10, cube);
+      const location = walkEntry(design) ?? [
+        design.room.width / 2,
+        design.room.height * 0.7,
+        design.room.depth / 2,
+      ];
+      probe.position.set(...location);
+      probe.update(renderer, scene);
+      const generator = new THREE.PMREMGenerator(renderer);
+      roomReflection = generator.fromCubemap(cube.texture);
+      generator.dispose();
+      cube.dispose();
+      for (const m of [
+        steel,
+        hardware,
+        glass,
+        windowGlass,
+        ...stoneMaterials.values(),
+      ]) {
+        m.envMap = roomReflection.texture;
+        m.envMapIntensity = 0.75;
       }
     }
     const composer = quality ? new EffectComposer(renderer) : null;
@@ -1544,6 +1673,7 @@ export default function RenderView({
       if (!width || !height) return;
       renderer.setSize(width, height);
       camera.aspect = width / height;
+      camera.setFocalLength(lensRef.current);
       camera.updateProjectionMatrix();
       render();
     };
@@ -1565,6 +1695,19 @@ export default function RenderView({
       }),
     );
     actions.current = {
+      lens: (value) => {
+        camera.setFocalLength(value);
+        camera.updateProjectionMatrix();
+        render();
+      },
+      snapshot: () => {
+        render();
+        return {
+          snapshot: photoSnapshot(scene),
+          camera: camera.clone(),
+          exposure: renderer.toneMappingExposure,
+        };
+      },
       expose: (value) => {
         renderer.toneMappingExposure = value;
         render();
@@ -1615,6 +1758,8 @@ export default function RenderView({
       },
     };
     return () => {
+      photoJob.current?.abort();
+      roomReflection?.dispose();
       cameraState.current = {
         position: camera.position.clone(),
         target: controls.target.clone(),
@@ -1639,6 +1784,12 @@ export default function RenderView({
       renderer.domElement.removeEventListener('pointerdown', pointerDown);
       renderer.domElement.removeEventListener('pointerup', pointerUp);
       scene.traverse((object) => {
+        if (
+          object instanceof THREE.DirectionalLight ||
+          object instanceof THREE.PointLight ||
+          object instanceof THREE.SpotLight
+        )
+          object.shadow.dispose();
         if (
           object instanceof THREE.Mesh ||
           object instanceof THREE.LineSegments
@@ -1717,7 +1868,19 @@ export default function RenderView({
         <details className="render-menu">
           <summary>Camera & walk</summary>
           <div className="render-menu-content designer-row">
-            {' '}
+            <label>
+              Camera lens
+              <select
+                aria-label="Camera focal length"
+                value={lens}
+                onChange={(e) => setLens(Number(e.target.value))}
+              >
+                <option value={28}>28 mm · wide room</option>
+                <option value={35}>35 mm · interior</option>
+                <option value={45}>45 mm · natural</option>
+                <option value={60}>60 mm · detail</option>
+              </select>
+            </label>{' '}
             <select
               aria-label="Presentation camera angle"
               defaultValue=""
@@ -1803,9 +1966,10 @@ export default function RenderView({
               <input
                 type="checkbox"
                 checked={quality}
+                aria-label="High quality shadows"
                 onChange={(e) => setQuality(e.target.checked)}
               />{' '}
-              High quality shadows
+              High quality shadows & room reflections
             </label>
             <label>
               <input
@@ -1915,6 +2079,7 @@ export default function RenderView({
                 value={exportWidth}
                 onChange={(e) => setExportWidth(Number(e.target.value))}
               >
+                <option value={1280}>1280 px · web</option>
                 <option value={1920}>1920 px</option>
                 <option value={3840}>3840 px</option>
               </select>
@@ -1925,6 +2090,87 @@ export default function RenderView({
             >
               Download PNG
             </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={photoDenoise}
+                onChange={(e) => setPhotoDenoise(e.target.checked)}
+              />{' '}
+              Reduce photo noise
+            </label>
+            <label>
+              Photo quality
+              <select
+                aria-label="Photo quality"
+                value={photoSamples}
+                onChange={(e) => setPhotoSamples(Number(e.target.value))}
+              >
+                <option value={32}>32 samples · quicker</option>
+                <option value={64}>64 samples · balanced</option>
+                <option value={128}>128 samples · cleaner</option>
+              </select>
+            </label>
+            <button
+              disabled={photoProgress !== null || !!error}
+              onClick={() => void startPhoto(true)}
+            >
+              Preview photo render
+            </button>
+            <button
+              disabled={photoProgress !== null || !!error}
+              onClick={() => void startPhoto()}
+            >
+              Render final photo
+            </button>
+            {photoProgress !== null && (
+              <>
+                <progress
+                  aria-label="Photo render progress"
+                  max={1}
+                  value={photoProgress}
+                />
+                <button onClick={() => photoJob.current?.abort()}>
+                  Cancel photo render
+                </button>
+              </>
+            )}
+            <p role="status">{photoMessage}</p>
+            <p>
+              Photo rendering traces bounced light and kitchen reflections. It
+              can take several minutes. Use Show ceiling for an enclosed
+              interior; the current camera and cutaway settings are captured.
+            </p>
+            {photoResult && (
+              <div>
+                {photoResult.designVersion !== designVersion && (
+                  <p>
+                    Design changed. Render a new photo before adding it to this
+                    presentation.
+                  </p>
+                )}
+                <a href={photoResult.url} download={photoResult.name}>
+                  Download photo PNG
+                </a>
+                {onCapture && (
+                  <button
+                    disabled={photoResult.designVersion !== designVersion}
+                    onClick={() => onCapture(photoResult.url)}
+                  >
+                    Use photo in presentation
+                  </button>
+                )}
+                <img
+                  src={photoResult.url}
+                  alt="Completed kitchen photo render"
+                  style={{
+                    display: 'block',
+                    maxWidth: '100%',
+                    height: 'auto',
+                    marginTop: 12,
+                  }}
+                />
+              </div>
+            )}
           </div>
         </details>
       </div>

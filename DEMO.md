@@ -481,3 +481,7 @@ The deployed backend rejects unauthorized and stale writes correctly. Its expect
 Render now uses separate linear surface-detail maps for paint, wood, stone and brushed metal, satin cabinet coatings, polished nonmetallic stone and subtle floorboard color variation. Lighting & scene includes an Exposure slider and Reset exposure. Exposure is a session presentation control and applies to PNG exports; it does not change the saved design's finishes. High quality shadows adds softer shadows and contact shading, with the shading buffer preserving the viewport/export aspect ratio. Keep that option off for faster editing on slower devices.
 
 These are real-time material approximations, not measured manufacturer finishes or a path-traced lighting simulation.
+
+### Final photo rendering
+
+Open Render → Export image → Preview photo render for a quick draft, or Render final photo for 32/64/128 samples. The completed image appears inline with Download photo PNG and, where available, Use photo in presentation. See [RENDERING.md](RENDERING.md) for lighting, camera lenses, room reflections, cancellation and device limits.

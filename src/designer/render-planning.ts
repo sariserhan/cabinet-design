@@ -28,7 +28,22 @@ export function presentationViews(
   };
   const target = island ? center(island) : ([w / 2, 36, d / 2] as const);
   const detail = sink ? center(sink) : target;
+  const standing = walkPosition(design, w * 0.5, d * 0.88);
   return [
+    ...(standing
+      ? [
+          {
+            id: 'preset-level',
+            name: 'Level interior · straight verticals',
+            position: standing,
+            target: [w * 0.5, standing[1], d * 0.15] as [
+              number,
+              number,
+              number,
+            ],
+          },
+        ]
+      : []),
     {
       id: 'preset-entrance',
       name: 'Entrance view',

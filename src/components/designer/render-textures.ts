@@ -148,19 +148,37 @@ export function materialTexture(
         random() * 2 + 0.3,
       );
     }
-    if (kind === 'marble')
-      for (let i = 0; i < 9; i++) {
-        ctx.beginPath();
-        let x = random() * 512;
-        ctx.moveTo(x, 0);
-        for (let y = 0; y <= 512; y += 8) {
-          x += Math.sin(y / 45 + i) * 3 + random() * 8 - 4;
-          ctx.lineTo(x, y);
+    if (kind === 'marble') {
+      // Broad translucent mineral bands with fine branching veins, not parallel stripes.
+      for (let i = 0; i < 5; i++) {
+        const start = -180 + i * 170;
+        for (const [width, opacity] of [
+          [24, 0.025],
+          [9, 0.04],
+          [1.3, 0.2],
+        ]) {
+          ctx.beginPath();
+          ctx.moveTo(start, -20);
+          ctx.bezierCurveTo(
+            start + 170,
+            130,
+            start - 80,
+            280,
+            start + 230,
+            540,
+          );
+          ctx.lineWidth = width ?? 1;
+          ctx.strokeStyle = `rgba(112,112,105,${opacity})`;
+          ctx.stroke();
         }
-        ctx.lineWidth = 0.4 + random() * 2;
-        ctx.strokeStyle = 'rgba(108,110,111,.32)';
+        ctx.beginPath();
+        ctx.moveTo(start + 80, 220);
+        ctx.bezierCurveTo(start + 130, 310, start + 230, 240, start + 330, 350);
+        ctx.lineWidth = 0.6;
+        ctx.strokeStyle = 'rgba(130,126,114,.18)';
         ctx.stroke();
       }
+    }
   }
   const map = new THREE.CanvasTexture(canvas);
   map.colorSpace = THREE.SRGBColorSpace;
