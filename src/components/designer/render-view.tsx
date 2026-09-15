@@ -14,6 +14,8 @@ import {
   materialVariant,
   backsplashRuns,
 } from '@/designer/render-planning';
+import { bestCamera } from '@/designer/experience';
+import { SurfaceEditor, type SurfaceTarget } from './experience-tools';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { applianceDetails, metalPull } from './render-details';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -66,6 +68,10 @@ export default function RenderView({
   design: Design;
   onChange: (design: Design) => void;
 }) {
+  const [surfaceTarget, setSurfaceTarget] = useState<{
+    target: SurfaceTarget;
+    itemId?: string;
+  } | null>(null);
   const [variant, setVariant] = useState('original');
   const design = useMemo(
     () => materialVariant(sourceDesign, variant),
@@ -76,6 +82,7 @@ export default function RenderView({
   speedRef.current = speed;
   const callbacks = useRef({ onCamera, onCapture, onSelect });
   callbacks.current = { onCamera, onCapture, onSelect };
+  const pendingCamera = useRef<CameraView | null>(null);
   const externalCamera = useRef(cameraView);
   externalCamera.current = cameraView;
   const host = useRef<HTMLDivElement>(null);
@@ -130,9 +137,7 @@ export default function RenderView({
     setError('');
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = quality
-      ? THREE.VSMShadowMap
-      : THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = quality ? THREE.VSMShadowMap : THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.95;
     renderer.domElement.setAttribute('aria-label', 'Rendered kitchen');
@@ -179,7 +184,12 @@ export default function RenderView({
         .add(new THREE.Vector3(size * 1.1, size, size * 1.3));
       controls.update();
     };
-    if (externalCamera.current) {
+    if (pendingCamera.current) {
+      camera.position.set(...pendingCamera.current.position);
+      controls.target.set(...pendingCamera.current.target);
+      pendingCamera.current = null;
+      controls.update();
+    } else if (externalCamera.current) {
       camera.position.set(...externalCamera.current.position);
       controls.target.set(...externalCamera.current.target);
       controls.update();
@@ -407,6 +417,8 @@ export default function RenderView({
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
+    floor.userData.surface = 'floor';
+    const surfaceObjects: THREE.Object3D[] = [floor];
     if (showCeiling)
       for (const region of ceilingRegions(design.room)) {
         const geometry = new THREE.ShapeGeometry(
@@ -514,7 +526,7 @@ export default function RenderView({
             y,
             p.y + p.height / 2 - d / 2 - back,
             stone,
-          );
+          ).userData.surface = 'countertop';
       };
       if (item.kind === 'countertop') {
         surface(h / 2, h);
@@ -992,7 +1004,13 @@ export default function RenderView({
         )
           b(w, 0.6, d, 0, h - 0.3, 0, finish);
       } else {
-        applianceDetails(group, item, b, steel, dark, glass);
+        applianceDetails(group, item, b, steel, dark, glass, (apply) =>
+          movingFronts.push({
+            id: item.id,
+            apply: (amount) =>
+              apply(!selected || selected === item.id ? amount : 0),
+          }),
+        );
       }
     }
 
@@ -1002,6 +1020,8 @@ export default function RenderView({
     ) {
       for (const run of backsplashRuns(design)) {
         const group = new THREE.Group();
+        group.userData.surface = 'backsplash';
+        surfaceObjects.push(group);
         group.position.set(run.x, 0, run.z);
         group.rotation.y = run.rotation;
         scene.add(group);
@@ -1422,17 +1442,37 @@ export default function RenderView({
         ),
         camera,
       );
-      const hit = ray.intersectObjects(itemGroups, true).find((h) => {
-        let o: THREE.Object3D | null = h.object;
-        while (o) {
-          if (!o.visible) return false;
-          o = o.parent;
-        }
-        return true;
-      });
+      const hit = ray
+        .intersectObjects([...itemGroups, ...surfaceObjects], true)
+        .find((h) => {
+          let o: THREE.Object3D | null = h.object;
+          while (o) {
+            if (!o.visible) return false;
+            o = o.parent;
+          }
+          return true;
+        });
       let object: THREE.Object3D | null = hit?.object ?? null;
-      while (object && !object.userData.itemId) object = object.parent;
-      callbacks.current.onSelect?.(object?.userData.itemId ?? null);
+      while (object && !object.userData.itemId && !object.userData.surface)
+        object = object.parent;
+      let owner: THREE.Object3D | null = object;
+      while (owner && !owner.userData.itemId) owner = owner.parent;
+      const id = owner?.userData.itemId as string | undefined;
+      const item = design.items.find((i) => i.id === id);
+      if (callbacks.current.onSelect) {
+        const target =
+          object?.userData.surface ??
+          (item?.kind === 'countertop'
+            ? 'countertop'
+            : item &&
+                ['cabinet', 'custom_cabinet', 'island', 'corner'].includes(
+                  item.kind,
+                )
+              ? 'cabinet'
+              : null);
+        setSurfaceTarget(target ? { target, itemId: id } : null);
+      }
+      callbacks.current.onSelect?.(id ?? null);
     };
     renderer.domElement.addEventListener('pointerdown', pointerDown);
     renderer.domElement.addEventListener('pointerup', pointerUp);
@@ -1577,6 +1617,55 @@ export default function RenderView({
   ]);
   return (
     <div className="designer-render">
+      {onSelect && (
+        <p className="render-edit-hint">
+          Click a cabinet, worktop, floor or backsplash to change its finish.
+        </p>
+      )}
+      {surfaceTarget && onSelect && (
+        <SurfaceEditor
+          design={sourceDesign}
+          {...surfaceTarget}
+          onChange={onChange}
+          onClose={() => setSurfaceTarget(null)}
+        />
+      )}
+      <div className="render-quick-actions designer-row">
+        <button
+          onClick={() => {
+            setWalking(false);
+            setCutaway(true);
+            setShowCeiling(false);
+            const v = bestCamera(design);
+            if (walking || !cutaway || showCeiling) pendingCamera.current = v;
+            actions.current?.load(v);
+            callbacks.current.onCamera?.(v);
+          }}
+        >
+          Best kitchen view
+        </button>
+        <button
+          onClick={() => {
+            const v = closeupViews(design)[0];
+            if (v) {
+              if (walking) pendingCamera.current = v;
+              setWalking(false);
+              actions.current?.load(v);
+              callbacks.current.onCamera?.(v);
+            }
+          }}
+        >
+          Worktop close-up
+        </button>
+        <button
+          onClick={() => {
+            setOpening(opening ? 0 : 100);
+            actions.current?.open(opening ? 0 : 100);
+          }}
+        >
+          {opening ? 'Close doors & drawers' : 'Open doors & drawers'}
+        </button>
+      </div>
       <div className="designer-row render-controls">
         <details className="render-menu">
           <summary>Camera & walk</summary>
@@ -1818,9 +1907,9 @@ export default function RenderView({
       )}
       {opening > 0 && (
         <p className="front-opening-note" role="status">
-          Opening {selected ? 'selected cabinet' : 'all straight cabinet'}{' '}
-          fronts: {opening}%. Corner fronts are fixed. Use Layout checks for
-          installation clearance review.
+          Opening {selected ? 'selected object' : 'cabinet and refrigerator'}{' '}
+          fronts: {opening}%. Refrigerator doors are included; corner fronts are
+          fixed. Use Layout checks for installation clearance review.
         </p>
       )}
       {opening > 0 && (

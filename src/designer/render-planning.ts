@@ -232,15 +232,29 @@ export function openingConflicts(
   return design.items.flatMap((item) => {
     if (
       (selected && item.id !== selected) ||
-      !['cabinet', 'custom_cabinet', 'island'].includes(item.kind)
+      !['cabinet', 'custom_cabinet', 'island', 'refrigerator'].includes(
+        item.kind,
+      )
     )
       return [];
-    const style = resolvedFront(item),
-      reach =
+    const style =
+        item.kind === 'refrigerator'
+          ? ['double', 'french'].includes(item.refrigeratorStyle ?? '')
+            ? 'double'
+            : 'single'
+          : resolvedFront(item),
+      doorReach =
         style === 'drawers'
           ? (Math.max(1, item.depth - 4) * 0.75 * amount) / 100
           : (style === 'double' ? item.width / 2 : item.width) *
-            Math.sin(((amount / 100) * Math.PI) / 2);
+            Math.sin(((amount / 100) * Math.PI) / 2),
+      reach =
+        item.kind === 'refrigerator' && item.refrigeratorStyle === 'french'
+          ? Math.max(
+              doorReach,
+              (Math.max(1, item.depth - 4) * 0.75 * amount) / 100,
+            )
+          : doorReach;
     const center = localToWorld(item, item.width / 2, item.depth + reach / 2),
       size = footprint({ ...item, depth: reach });
     const zone = {

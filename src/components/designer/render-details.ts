@@ -47,60 +47,80 @@ export function applianceDetails(
   steel: THREE.Material,
   dark: THREE.Material,
   glass: THREE.Material,
+  register?: (apply: (amount: number) => void) => void,
 ) {
   const { width: w, height: h, depth: d } = item;
-  b(w, h, Math.max(1, d - 1), 0, h / 2, -0.5, dark);
-  b(w - 1, 2, 0.6, 0, 1, d / 2, dark);
   const face = d / 2 - 0.1;
-  for (let x = -w / 2 + 2; x < w / 2 - 1; x += 2)
-    b(0.75, 1, 0.15, x, 1, d / 2 + 0.1, steel);
   if (item.kind === 'refrigerator') {
-    if (item.refrigeratorStyle === 'single') {
-      b(w - 0.6, h - 2.6, 1, 0, h / 2, face, steel);
+    // Open carcass with shelves, so doors reveal an interior rather than a solid block.
+    b(w, h, 1, 0, h / 2, -d / 2, steel);
+    for (const x of [-w / 2 + 0.5, w / 2 - 0.5]) b(1, h, d, x, h / 2, 0, steel);
+    for (const y of [1, h - 1]) b(w, 1, d, 0, y, 0, steel);
+    for (const y of [h * 0.25, h * 0.48, h * 0.7])
+      b(w - 3, 0.5, d - 4, 0, y, -1, steel);
+    const door = (
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      right: boolean,
+      drawer = false,
+    ) => {
+      const start = group.children.length;
+      b(width, height, 1, x, y, face, steel);
       metalPull(
         group,
-        (item.mirrored ? 1 : -1) * (w / 2 - 2.5),
-        h * 0.6,
+        drawer ? x : x + (right ? -1 : 1) * (width / 2 - 2),
+        drawer ? y + height / 2 - 3 : y,
         face + 1.1,
-        18,
-        false,
+        drawer ? width - 5 : Math.min(18, height - 4),
+        drawer,
         steel,
       );
-      return;
-    }
-    if (
+      const parts = group.children.slice(start),
+        pivot = new THREE.Group();
+      if (!drawer)
+        pivot.position.set(x + (right ? width / 2 : -width / 2), 0, face);
+      group.add(pivot);
+      for (const part of parts) pivot.attach(part);
+      register?.((amount) => {
+        if (drawer) pivot.position.z = amount * (d - 4) * 0.75;
+        else pivot.rotation.y = (right ? 1 : -1) * amount * Math.PI * 0.5;
+      });
+    };
+    if (item.refrigeratorStyle === 'single')
+      door(0, h / 2, w - 0.6, h - 2.6, !item.mirrored);
+    else if (
       item.refrigeratorStyle === 'double' ||
       item.refrigeratorStyle === 'french'
     ) {
       const bottom = item.refrigeratorStyle === 'french' ? h * 0.28 : 2;
-      for (const sign of [-1, 1]) {
-        b(
-          w / 2 - 0.5,
-          h - bottom - 0.5,
-          1,
+      for (const sign of [-1, 1])
+        door(
           (sign * w) / 4,
           (h + bottom) / 2,
-          face,
-          steel,
+          w / 2 - 0.5,
+          h - bottom - 0.5,
+          sign === 1,
         );
-        metalPull(group, sign * 2, h * 0.65, face + 1.1, 18, false, steel);
-      }
-      b(0.3, h - bottom, 1.2, 0, (h + bottom) / 2, face, dark);
-      if (item.refrigeratorStyle === 'french') {
-        b(w - 0.6, bottom - 2.5, 1, 0, bottom / 2, face, steel);
-        b(w - 0.6, 0.3, 1.2, 0, bottom, face, dark);
-        metalPull(group, 0, bottom - 4, face + 1.1, w - 6, true, steel);
-      }
-      return;
+      if (item.refrigeratorStyle === 'french')
+        door(0, bottom / 2, w - 0.6, bottom - 2.5, false, true);
+    } else {
+      door(0, h * 0.865, w - 0.6, h * 0.27 - 0.35, !item.mirrored);
+      door(
+        0,
+        1.3 + (h * 0.73 - 2.6) / 2,
+        w - 0.6,
+        h * 0.73 - 2.6,
+        !item.mirrored,
+      );
     }
-    // Legacy appliances retain their top-freezer configuration.
-    b(w - 0.6, h * 0.27 - 0.35, 1, 0, h * 0.865, face, steel);
-    b(w - 0.6, h * 0.73 - 2.6, 1, 0, 1.3 + (h * 0.73 - 2.6) / 2, face, steel);
-    b(w - 0.8, 0.25, 1.1, 0, h * 0.73, face, dark);
-    metalPull(group, -w / 2 + 2.5, h * 0.83, face + 1.1, 8, false, steel);
-    metalPull(group, -w / 2 + 2.5, h * 0.59, face + 1.1, 16, false, steel);
     return;
   }
+  b(w, h, Math.max(1, d - 1), 0, h / 2, -0.5, dark);
+  b(w - 1, 2, 0.6, 0, 1, d / 2, dark);
+  for (let x = -w / 2 + 2; x < w / 2 - 1; x += 2)
+    b(0.75, 1, 0.15, x, 1, d / 2 + 0.1, steel);
   if (item.kind === 'dishwasher') {
     b(w - 0.5, h - 3, 0.8, 0, (h + 1) / 2, face, steel);
     b(w - 1, 1.5, 0.3, 0, h - 2, face + 0.5, dark);

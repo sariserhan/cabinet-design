@@ -12,6 +12,7 @@ import { lockViolation } from '@/designer/studio-tools';
 import { KitchenActions } from './kitchen-actions';
 import { QuickInspector, FitAndOverhang } from './refinement-tools';
 import { placementBlock } from '@/designer/refinements';
+import { SmartPlacement, DesignRecovery, Showroom } from './experience-tools';
 import { LightingComparison } from './demo-readiness';
 import { PresentationTour } from './presentation-tour';
 import type { CameraView } from './render-view';
@@ -189,6 +190,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     window.addEventListener('keydown', escape);
     return () => window.removeEventListener('keydown', escape);
   }, []);
+  const [showroom, setShowroom] = useState(false);
   const [moveTogether, setMoveTogether] = useState(true);
   const [versionChoice, setVersionChoice] = useState('');
   const [libraryTab, setLibraryTab] = useState<'cabinets' | 'objects'>(
@@ -743,8 +745,17 @@ function Editor({ ownerId }: { ownerId: string }) {
   }
   return (
     <div
-      className={`designer-app ${libraryCollapsed ? 'library-collapsed' : ''} ${inspectorCollapsed ? 'inspector-collapsed' : ''} ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''}`}
+      className={`designer-app ${libraryCollapsed ? 'library-collapsed' : ''} ${inspectorCollapsed ? 'inspector-collapsed' : ''} ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''} ${showroom ? 'has-showroom' : ''}`}
     >
+      {showroom && (
+        <Showroom
+          key={design.id}
+          design={design}
+          before={before?.id === design.id ? before : null}
+          onChange={(next) => commit(() => next)}
+          onExit={() => setShowroom(false)}
+        />
+      )}
       {presenting && (
         <PresentationTour
           design={design}
@@ -782,6 +793,14 @@ function Editor({ ownerId }: { ownerId: string }) {
       <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
+        <button
+          onClick={() => {
+            setShowroom(true);
+            setPresenting(false);
+          }}
+        >
+          Open showroom
+        </button>
         <button
           className="designer-primary"
           title="Present the current kitchen"
@@ -954,6 +973,31 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         )}
       </div>
+      <DesignRecovery
+        key={`recovery-${design.id}`}
+        design={design}
+        ownerId={ownerId}
+        past={history.past}
+        onRestore={(next) => {
+          setHistory((h) =>
+            h
+              ? {
+                  past: [...h.past, h.current].slice(-60),
+                  current: next,
+                  future: [],
+                }
+              : h,
+          );
+          setSelected(null);
+          setSelection([]);
+          setStatus('Design restored. Undo returns to the previous version.');
+        }}
+      />
+      <SmartPlacement
+        design={design}
+        selected={selected}
+        onChange={(next) => commit(() => next, true)}
+      />
       <SampleStory design={design} onChange={(next) => commit(() => next)} />
       <ObjectManager
         design={design}
