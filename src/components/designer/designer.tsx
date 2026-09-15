@@ -12,6 +12,7 @@ import { lockViolation } from '@/designer/studio-tools';
 import { KitchenActions } from './kitchen-actions';
 import { QuickInspector, FitAndOverhang } from './refinement-tools';
 import { placementBlock } from '@/designer/refinements';
+import { LightingComparison } from './demo-readiness';
 import { PresentationTour } from './presentation-tour';
 import type { CameraView } from './render-view';
 import { PlacementAssist } from './placement-assist';
@@ -246,7 +247,10 @@ function Editor({ ownerId }: { ownerId: string }) {
           );
         }
         setLastSession(initial);
-      } else setShowStart(true);
+      } else {
+        setWalkStep(0);
+        setShowGallery(true);
+      }
       const raw = localStorage.getItem(storageKey + ':saved');
       if (raw) {
         const list: unknown = JSON.parse(raw);
@@ -694,14 +698,17 @@ function Editor({ ownerId }: { ownerId: string }) {
     setInspectorCollapsed(step === 0 || step === 3 || step === 4);
     setLibraryCollapsed(true);
     if (step === 0) {
-      startDesign(polishedSample());
-      setMode('render');
+      setShowGallery(true);
+      setMode('2d');
     }
     if (step === 1) {
+      setShowGallery(false);
       setMode('render');
       setInspectorTab('materials');
     }
     if (step === 2) {
+      setLibraryCollapsed(false);
+      setLibraryTab('objects');
       setMode('2d');
       setInspectorTab('design');
       setSelected(
@@ -1259,23 +1266,33 @@ function Editor({ ownerId }: { ownerId: string }) {
               }}
             />
           ) : mode === 'client' ? (
-            <ClientPresentation key={JSON.stringify(design)} design={design} />
-          ) : mode === 'render' ? (
-            <RenderView
-              cameraView={presenting ? presentationCamera : undefined}
-              key={design.id}
+            <ClientPresentation
+              key={JSON.stringify(design)}
               design={design}
-              selected={selected}
-              selectedIds={selection}
-              onSelect={(id) => {
-                setSelected(id);
-                if (id) {
-                  setInspectorCollapsed(false);
-                  setInspectorTab('design');
-                }
-              }}
-              onChange={(next) => commit(() => next)}
+              ownerId={ownerId}
             />
+          ) : mode === 'render' ? (
+            <>
+              <LightingComparison
+                key={`lighting-${design.id}`}
+                design={design}
+              />
+              <RenderView
+                cameraView={presenting ? presentationCamera : undefined}
+                key={design.id}
+                design={design}
+                selected={selected}
+                selectedIds={selection}
+                onSelect={(id) => {
+                  setSelected(id);
+                  if (id) {
+                    setInspectorCollapsed(false);
+                    setInspectorTab('design');
+                  }
+                }}
+                onChange={(next) => commit(() => next)}
+              />
+            </>
           ) : (
             <Preview
               design={design}

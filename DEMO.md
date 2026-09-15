@@ -263,3 +263,13 @@ Upper-cabinet door pulls and knobs sit near the bottom edge in Render; the 3D pr
 **Show this kitchen** presents the current design without replacing it. Use **Reset demo** or the sample gallery to load a different kitchen.
 
 Validation: 144 core and 16 backend tests, lint, TypeScript, benchmark artifact integrity and production build pass. Browser rehearsal covers collision rejection, quick edit/lock controls, sink mounts, individual overhangs, material swatches, linked full-screen comparison, close-up tours, current-design preservation, reload persistence and mobile layout. The three sample images were regenerated from the updated renderer.
+
+## Demo walkthrough, wall runs and presentation covers
+
+- A fresh browser opens **Choose a sample kitchen** and the five-step **Demo walkthrough**. The walkthrough guides sample selection, a material change, object placement, before/after comparison and presentation export, with a suggested three-minute script. Reopening it preserves the current design until you choose another sample.
+- While dragging in the plan, green means ready, amber means review a layout warning, and red means the move is blocked. An explanation appears before release; invalid cabinet/appliance moves remain rejected.
+- **Build your kitchen faster → Fill a wall with cabinets** previews 9–36 inch base cabinets along a selected straight wall, reserving exterior door/window widths and avoiding existing objects. Optional countertops, toe kicks and exposed end panels are added where space permits. Apply is undoable and respects the 100-object demo limit.
+- **Render → Compare daytime, evening & task lighting** shows three actual rendered previews with a shared camera. These comparisons do not change the saved lighting settings.
+- **Client presentation / PDF** supports a project title, client name, description and uploaded PNG/JPEG/WebP logo. Cover details save locally per user and design. The downloaded ZIP includes an offline presentation with embedded imagery, a separate logo PNG, floor plan, demo quote and editable design. Capture an updated view after editing the kitchen.
+
+Validation: 148 core and 16 backend tests, lint, TypeScript, benchmark integrity and production build. Browser rehearsal covers fresh-start walkthrough, material editing, wall-run preview/apply/Undo, blocked drag feedback, three distinct lighting previews without design mutation, branded export, cover persistence and mobile layout. The downloaded presentation was also opened offline with its logo and render intact.

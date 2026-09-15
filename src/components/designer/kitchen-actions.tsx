@@ -7,6 +7,7 @@ import {
   appliancePackage,
   cornerOption,
 } from '@/designer/kitchen-actions';
+import { WallRunBuilder } from './demo-readiness';
 import { MiniPlan } from './workflow-tools';
 export function KitchenActions({
   design,
@@ -36,6 +37,7 @@ export function KitchenActions({
   return (
     <details className="kitchen-actions">
       <summary>Build your kitchen faster</summary>
+      <WallRunBuilder design={design} onChange={onChange} />
       <div className="kitchen-action-grid">
         <section>
           <h3>Change layout</h3>

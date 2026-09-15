@@ -214,6 +214,7 @@ export const designSchema = z
         backsplash: z
           .enum(['none', 'subway', 'slab', 'mosaic', 'stacked'])
           .optional(),
+        lightingProfile: z.enum(['day', 'evening', 'task']).optional(),
         flooring: z.enum(['oak', 'walnut', 'tile', 'slate']).optional(),
         hardware: z.enum(['steel', 'brass', 'black']).optional(),
         pendants: z.boolean().optional(),

@@ -218,12 +218,24 @@ export default function RenderView({
       new THREE.HemisphereLight(
         lighting === 'warm' ? '#ffdfb4' : '#ffffff',
         '#a39a8c',
-        lighting === 'studio' ? 0.65 : 0.48,
+        design.appearance?.lightingProfile === 'task'
+          ? 0.12
+          : design.appearance?.lightingProfile === 'evening'
+            ? 0.28
+            : lighting === 'studio'
+              ? 0.65
+              : 0.48,
       ),
     );
     const sun = new THREE.DirectionalLight(
       lighting === 'warm' ? '#ffcb91' : '#fff4dd',
-      lighting === 'studio' ? 2.2 : 3.2,
+      design.appearance?.lightingProfile === 'task'
+        ? 0.08
+        : design.appearance?.lightingProfile === 'evening'
+          ? 0.5
+          : lighting === 'studio'
+            ? 2.2
+            : 3.2,
     );
     sun.position.set(-size * 0.4, size * 2, size * 0.8);
     sun.target.position.set(design.room.width / 2, 0, design.room.depth / 2);
@@ -243,7 +255,13 @@ export default function RenderView({
     scene.add(sun, sun.target);
     const fillLight = new THREE.DirectionalLight(
       '#d6e7ff',
-      lighting === 'studio' ? 0.7 : 0.25,
+      design.appearance?.lightingProfile === 'task'
+        ? 0.03
+        : design.appearance?.lightingProfile === 'evening'
+          ? 0.1
+          : lighting === 'studio'
+            ? 0.7
+            : 0.25,
     );
     fillLight.position.set(size, size, -size);
     scene.add(fillLight);
@@ -615,7 +633,12 @@ export default function RenderView({
         if (item.kind === 'molding') b(w, 0.7, d + 1, 0, h - 0.35, 0.5, finish);
         continue;
       }
-      if (cabinet && item.elevation >= 48 && item.category === 'wall_cabinet') {
+      if (
+        cabinet &&
+        design.appearance?.underCabinet &&
+        item.elevation >= 48 &&
+        item.category === 'wall_cabinet'
+      ) {
         const led = material('#fff2d8');
         led.emissive.set('#ffd4a0');
         led.emissiveIntensity = 2;

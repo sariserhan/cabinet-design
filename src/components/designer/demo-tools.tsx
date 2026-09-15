@@ -315,7 +315,13 @@ export function ShortcutHelp() {
     </details>
   );
 }
-export function ClientPresentation({ design }: { design: Design }) {
+export function ClientPresentation({
+  design,
+  ownerId,
+}: {
+  design: Design;
+  ownerId: string;
+}) {
   const [captures, setCaptures] = useState<{ url: string; name: string }[]>([]);
   useEffect(() => {
     if (!isPreparedSample(design)) return;
@@ -346,6 +352,78 @@ export function ClientPresentation({ design }: { design: Design }) {
     [client, setClient] = useState(design.quote?.customer ?? ''),
     [notes, setNotes] = useState(''),
     [preview, setPreview] = useState(false);
+  const [title, setTitle] = useState(design.name),
+    [logo, setLogo] = useState(''),
+    [coverReady, setCoverReady] = useState(false),
+    [coverError, setCoverError] = useState('');
+  const coverKey = `kitchen-cover:${ownerId}:${design.id}`;
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(coverKey) || 'null');
+      if (stored) {
+        if (typeof stored.title === 'string')
+          setTitle(stored.title.slice(0, 120));
+        if (typeof stored.client === 'string')
+          setClient(stored.client.slice(0, 200));
+        if (typeof stored.notes === 'string')
+          setNotes(stored.notes.slice(0, 3000));
+        if (
+          typeof stored.logo === 'string' &&
+          /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(stored.logo) &&
+          stored.logo.length < 700000
+        )
+          setLogo(stored.logo);
+      }
+    } catch {
+      setCoverError('Saved cover could not be loaded. You can enter it again.');
+    }
+    setCoverReady(true);
+  }, [coverKey]);
+  useEffect(() => {
+    if (!coverReady) return;
+    try {
+      localStorage.setItem(
+        coverKey,
+        JSON.stringify({ title, client, notes, logo }),
+      );
+    } catch {
+      setCoverError(
+        'Cover changes could not be saved in this browser. Download the presentation to keep them.',
+      );
+    }
+  }, [coverReady, coverKey, title, client, notes, logo]);
+  async function uploadLogo(file: File | undefined) {
+    if (!file) return;
+    if (
+      !['image/png', 'image/jpeg', 'image/webp'].includes(file.type) ||
+      file.size > 2 * 1024 * 1024
+    ) {
+      setCoverError('Choose a PNG, JPEG or WebP logo under 2 MB.');
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    try {
+      const image = new Image();
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(Error('Image could not be read'));
+        image.src = url;
+      });
+      const scale = Math.min(1, 600 / image.width, 200 / image.height),
+        canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw Error('Image conversion unavailable');
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      setLogo(canvas.toDataURL('image/png'));
+      setCoverError('');
+    } catch {
+      setCoverError('Logo could not be read. Try another image.');
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
   const packageRef = useRef<HTMLElement>(null);
   const [bundleError, setBundleError] = useState('');
   function downloadBundle() {
@@ -354,7 +432,7 @@ export function ClientPresentation({ design }: { design: Design }) {
       if (!article) return;
       const encode = (s: string) => new TextEncoder().encode(s);
       const html =
-        '<!doctype html><html><head><meta charset="utf-8"><title>Kitchen presentation</title><style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px;color:#243e49}img,svg{max-width:100%;height:auto}svg{max-height:550px}table{border-collapse:collapse;width:100%}td{padding:8px;border-bottom:1px solid #ddd}figure{margin:20px 0}dt{font-weight:bold}dd{margin-bottom:12px}@media print{.client-sheet{break-before:page}}</style></head><body>' +
+        '<!doctype html><html><head><meta charset="utf-8"><title>Kitchen presentation</title><style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px;color:#243e49}img,svg{max-width:100%;height:auto}svg{max-height:550px}table{border-collapse:collapse;width:100%}td{padding:8px;border-bottom:1px solid #ddd}figure{margin:20px 0}dt{font-weight:bold}dd{margin-bottom:12px}.cover-logo{max-width:240px;max-height:100px;object-fit:contain}.cover-kicker{letter-spacing:.15em;font-size:12px;color:#52716c}.proposal-notes{white-space:pre-wrap}@media print{.client-sheet{break-before:page}}</style></head><body>' +
         article.outerHTML +
         '</body></html>';
       const files = [
@@ -376,6 +454,13 @@ export function ClientPresentation({ design }: { design: Design }) {
           ),
         })),
       ];
+      if (logo)
+        files.push({
+          name: 'logo.png',
+          data: Uint8Array.from(atob(logo.split(',')[1] ?? ''), (v) =>
+            v.charCodeAt(0),
+          ),
+        });
       const csv = [
         ['DEMO PRICING — NOT A MANUFACTURER QUOTE'],
         ['SKU', 'Description', 'Price'],
@@ -420,6 +505,40 @@ export function ClientPresentation({ design }: { design: Design }) {
         </p>
         <div className="proposal-fields">
           <label>
+            Project title
+            <input
+              aria-label="Presentation project title"
+              value={title}
+              maxLength={120}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </label>
+          <label>
+            Company logo
+            <input
+              aria-label="Presentation logo"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={(e) => {
+                void uploadLogo(e.target.files?.[0]);
+                e.target.value = '';
+              }}
+            />
+          </label>
+          {logo && (
+            <div>
+              <img
+                className="cover-logo"
+                src={logo}
+                alt="Company logo preview"
+              />
+              <button onClick={() => setLogo('')}>
+                Remove presentation logo
+              </button>
+            </div>
+          )}
+          {coverError && <p role="alert">{coverError}</p>}
+          <label>
             Client name
             <input
               aria-label="Presentation client name"
@@ -447,8 +566,9 @@ export function ClientPresentation({ design }: { design: Design }) {
             />
           </label>
           <p>
-            Client details and captured views stay in this presentation until
-            you leave or change the design.
+            Cover details and the resized logo are saved in this browser for
+            this project and included in downloads. Captured views stay only
+            while this presentation is open.
           </p>
         </div>
         <RenderView
@@ -520,7 +640,9 @@ export function ClientPresentation({ design }: { design: Design }) {
         aria-label="Client PDF preview"
       >
         <section className="client-sheet">
-          <h1>{design.name}</h1>
+          {logo && <img className="cover-logo" src={logo} alt="Company logo" />}
+          <p className="cover-kicker">KITCHEN DESIGN CONCEPT</p>
+          <h1>{title.trim() || design.name}</h1>
           <p>{client || 'Kitchen design proposal'}</p>
           <p>Concept presentation · {new Date().toLocaleDateString()}</p>
           {captures.map((capture, i) => (
@@ -617,24 +739,24 @@ export function DemoWalkthrough({
 }) {
   const steps = [
     [
-      'Explore the sample',
-      'The sample is ready. Orbit the kitchen to show the overall layout.',
+      'Choose a kitchen · 30 seconds',
+      'Choose an apartment, family or premium kitchen from the gallery. Then select Next step.',
     ],
     [
-      'Change the style',
-      'Choose a coordinated style in Materials, then try an individual cabinet finish.',
+      'Change a finish · 45 seconds',
+      'Use a material swatch in Properties. Watch the kitchen update, then select Next step.',
     ],
     [
-      'Move a cabinet',
-      'Drag the selected cabinet in the plan. Watch the alignment guides and conflict outline; Undo restores it.',
+      'Place an object · 45 seconds',
+      'Choose an object from the library and drag it into an open area. Green means ready, red means blocked; the message explains why. Undo restores your edit.',
     ],
     [
-      'Compare alternatives',
-      'Save the current design as an alternative, change it, then enable linked rendered views to compare.',
+      'Compare the result · 30 seconds',
+      'Review the before/after snapshot and demo price difference. Full-screen comparison uses linked cameras.',
     ],
     [
-      'Export the proposal',
-      'Capture and name a view, enter the client details, preview the proposal, then print to PDF.',
+      'Present and download · 30 seconds',
+      'Capture a view, add a client name, project title and logo, then download the presentation package or print to PDF.',
     ],
   ];
   return (

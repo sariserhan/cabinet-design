@@ -13,14 +13,10 @@ import { roomOutline, roomEdges } from '@/designer/room';
 import { resizeFromPoint } from '@/designer/studio-tools';
 import { snapPlacement, clearanceZones } from '@/designer/editing';
 import type { DropItem } from '@/designer/editing';
-import {
-  fromObject,
-  fromProduct,
-  itemPolygon,
-  warnings,
-} from '@/designer/model';
+import { fromObject, fromProduct, itemPolygon } from '@/designer/model';
 import { placementAt } from '@/designer/editing';
 import { activeDrop, parseDrop } from '@/designer/drop';
+import { placementFeedback } from '@/designer/demo-readiness';
 import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
 
@@ -270,6 +266,16 @@ export function PlanCanvas({
       onSelect(item.id);
     }
   }
+  const moving =
+    ghost ?? (drag ? design.items.find((i) => i.id === drag.id) : undefined);
+  const liveFeedback = moving
+    ? placementFeedback(
+        design,
+        ghost ?? { ...moving, x: drag?.x ?? moving.x, y: drag?.y ?? moving.y },
+        !!ghost,
+        moveTogether,
+      )
+    : null;
   return (
     <div
       className={`plan-scroll ${panMode || space ? 'pan-tool' : ''} ${isPanning ? 'is-panning' : ''}`}
@@ -688,30 +694,19 @@ export function PlanCanvas({
               x: drag?.x ?? base.x,
               y: drag?.y ?? base.y,
             };
-            const preview = ghost
-              ? { ...design, items: [...design.items, candidate] }
-              : !moveTogether
-                ? {
-                    ...design,
-                    items: design.items.map((i) =>
-                      i.id === candidate.id ? candidate : i,
-                    ),
-                  }
-                : updateAssembly(design, candidate.id, {
-                    x: candidate.x,
-                    y: candidate.y,
-                  });
-            const issues = warnings(preview).filter(
-              (i) =>
-                i.itemIds.includes(candidate.id) &&
-                /^(outside|overlap|ceiling|swing|sink|opening|wall|clearance)-/.test(
-                  i.id,
-                ),
-            );
             const f = footprint(candidate),
-              color = issues.length ? '#bf413b' : '#087984';
+              color =
+                liveFeedback?.state === 'blocked'
+                  ? '#bf413b'
+                  : liveFeedback?.state === 'review'
+                    ? '#a76b12'
+                    : '#087984';
             return (
-              <g pointerEvents="none" data-testid="placement-preview">
+              <g
+                pointerEvents="none"
+                data-testid="placement-preview"
+                data-state={liveFeedback?.state}
+              >
                 <path
                   d={`M0 ${candidate.y} H${room.width} M${candidate.x} 0 V${room.depth} M0 ${candidate.y + f.depth} H${room.width} M${candidate.x + f.width} 0 V${room.depth}`}
                   stroke="#168b95"
@@ -728,7 +723,7 @@ export function PlanCanvas({
                   stroke={color}
                   strokeWidth="1"
                 />
-                {ghost && (
+                {(ghost || drag) && (
                   <text
                     x={candidate.x}
                     y={candidate.y - 5}
@@ -738,14 +733,22 @@ export function PlanCanvas({
                     strokeWidth="1"
                     paintOrder="stroke"
                   >
-                    {candidate.sku} ·{' '}
-                    {issues.length ? issues[0]?.message : 'Ready to place'}
+                    {candidate.sku} · {liveFeedback?.message.slice(0, 90)}
                   </text>
                 )}
               </g>
             );
           })()}
       </svg>
+      {liveFeedback && (
+        <p
+          className={`placement-feedback ${liveFeedback.state}`}
+          role="status"
+          aria-label="Placement feedback"
+        >
+          {liveFeedback.message}
+        </p>
+      )}
       {dimension && (
         <div
           className="dimension-editor"
