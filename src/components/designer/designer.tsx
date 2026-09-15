@@ -322,6 +322,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         );
       }
   }, [before, storageKey]);
+  const [recordsEpoch, setRecordsEpoch] = useState(0);
   const design = history?.current;
   useEffect(() => setSelection([]), [design?.id]);
   useEffect(() => {
@@ -935,7 +936,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         </a>
       </nav>
       <ProjectHub
-        key={`hub:${design.id}`}
+        key={`hub:${design.id}:${recordsEpoch}`}
         selectedIds={selection.length ? selection : selected ? [selected] : []}
         onApply={(next) => commit(() => next, true)}
         onLocate={(id) => {
@@ -947,6 +948,14 @@ function Editor({ ownerId }: { ownerId: string }) {
         }}
         design={design}
         ownerId={ownerId}
+        onSharedLoad={(next) => {
+          setHistory({ past: [], current: next, future: [] });
+          setSelected(null);
+          setSelection([]);
+          setBefore(next);
+          setRecordsEpoch((v) => v + 1);
+          setStatus('Shared project revision loaded locally.');
+        }}
         onRestore={(next) => {
           setHistory({ past: [], current: next, future: [] });
           setSelected(null);
@@ -961,7 +970,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         onDemo={() => walkthroughStep(0)}
       />
       <PurchasingWorkspace
-        key={`purchasing:${design.id}`}
+        key={`purchasing:${design.id}:${recordsEpoch}`}
         ownerId={ownerId}
         design={design}
         onLocate={(id) => {
@@ -973,7 +982,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         }}
       />
       <ProjectWorkflow
-        key={`workflow:${design.id}`}
+        key={`workflow:${design.id}:${recordsEpoch}`}
         design={design}
         ownerId={ownerId}
         onLocate={(id) => {

@@ -40,6 +40,26 @@ export const projectStage = v.union(
 );
 export default defineSchema({
   ...authTables,
+  sharedProjects: defineTable({
+    ownerId: v.id('users'),
+    designId: v.string(),
+    name: v.string(),
+    revision: v.number(),
+    updatedAt: v.number(),
+    updatedBy: v.id('users'),
+  }).index('by_ownerId', ['ownerId']),
+  sharedProjectMembers: defineTable({
+    sharedId: v.id('sharedProjects'),
+    userId: v.id('users'),
+    role: v.union(v.literal('editor'), v.literal('viewer')),
+  })
+    .index('by_sharedId_and_userId', ['sharedId', 'userId'])
+    .index('by_userId', ['userId']),
+  sharedProjectChunks: defineTable({
+    sharedId: v.id('sharedProjects'),
+    part: v.number(),
+    content: v.string(),
+  }).index('by_sharedId_and_part', ['sharedId', 'part']),
   projects: defineTable({
     clientName: v.optional(v.string()),
     workflowStatus: v.optional(projectStage),

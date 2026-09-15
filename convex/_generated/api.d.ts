@@ -18,6 +18,7 @@ import type * as http from "../http.js";
 import type * as projects from "../projects.js";
 import type * as recordHelpers from "../recordHelpers.js";
 import type * as review from "../review.js";
+import type * as sharedProjects from "../sharedProjects.js";
 import type * as supplierPricing from "../supplierPricing.js";
 import type * as testing from "../testing.js";
 import type * as versions from "../versions.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   projects: typeof projects;
   recordHelpers: typeof recordHelpers;
   review: typeof review;
+  sharedProjects: typeof sharedProjects;
   supplierPricing: typeof supplierPricing;
   testing: typeof testing;
   versions: typeof versions;

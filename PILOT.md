@@ -76,3 +76,12 @@ Synthetic browser QA exercises offline reloads and report transfer. A real insta
 - Record a real warranty and follow-up visit, assign a replacement part and attach evidence. Export/restore a complete backup and reconcile all records and attached assembly templates.
 
 Automated tests use synthetic specifications and QR decoding. Real manufacturer verification, physical label printing/camera scanning, reachable production hosting and actual supplier/installer acceptance remain field-pilot tasks.
+
+## Guided operations acceptance
+
+- Navigate every stage with keyboard and phone-width controls. Check the counts after a catalog update, missing delivery, unresolved service request and completed installation task.
+- Prepare actual earlier/current manufacturer snapshots. Check exact version/SKU matching, dimensional and compatibility changes, partial-snapshot omissions, and affected-project scope. Review the source before applying any change.
+- Preview an out-of-room or overlap fix. Check assembly integrity, locks, no added warnings, stale-preview rejection and Undo. Recheck utility requirements and client approval after moving items.
+- Create a task chain tied to delivered items and site resolutions. Verify pending/damaged items block completion, received items release it, and invalidating an earlier completed task blocks later work. Reconcile expected/planned dates with the installer.
+- Run one real kitchen from measured survey through installation. Record actual work and rework separately, quote revisions, installation issues and the three most useful improvements. Keep synthetic rehearsals clearly labeled. An estimated baseline is not proof of time saved.
+- After approved backend deployment, use separate owner/editor/viewer accounts and two devices to verify shared load/publish, simultaneous-edit rejection, membership revocation, source/approval re-verification, backup recovery, and storage/quota errors. The local backend tests cover permissions and revisions; this live device acceptance remains pending deployment.

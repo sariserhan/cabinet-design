@@ -1,5 +1,10 @@
 import { z } from 'zod';
 import {
+  operationsSchema,
+  emptyOperations,
+  parseOperations,
+} from './project-operations';
+import {
   productSupportSchema,
   parseSupport,
   emptySupport,
@@ -34,6 +39,7 @@ export const projectBackupSchema = z.object({
   organization: directoryEntrySchema,
   priceBook: priceBookSchema.optional(),
   support: productSupportSchema.optional(),
+  operations: operationsSchema.optional(),
 });
 export type ProjectBackup = z.infer<typeof projectBackupSchema>;
 export function parseProjectBackup(
@@ -61,6 +67,9 @@ export function parseProjectBackup(
   b.support = b.support
     ? parseSupport(JSON.stringify(b.support), id, trustedLocal)
     : emptySupport(id);
+  b.operations = b.operations
+    ? parseOperations(JSON.stringify(b.operations), id)
+    : emptyOperations(id);
   return b;
 }
 export function collectProjectBackup(
@@ -112,6 +121,11 @@ export function collectProjectBackup(
       closeout,
       organization,
       support,
+      operations: parseOperations(
+        storage.getItem(`kitchen-operations:${ownerId}:${design.id}`) ??
+          JSON.stringify(emptyOperations(design.id)),
+        design.id,
+      ),
       ...(restored && !design.supplierBookId
         ? { priceBook: JSON.parse(restored) }
         : priceBook
@@ -157,6 +171,7 @@ export function restoreProjectCopy(
     b.purchasing.baselineReference = remap(b.purchasing.baselineReference);
   b.closeout = { ...b.closeout, designId: newId };
   if (b.support) b.support = { ...b.support, designId: newId };
+  if (b.operations) b.operations = { ...b.operations, designId: newId };
   b.organization = { ...b.organization, archived: false, status: 'draft' };
   delete b.organization.indexedRevision;
   return parseProjectBackup(JSON.stringify(b));

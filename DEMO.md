@@ -407,3 +407,37 @@ Designer skip links focus the overview, canvas or item controls. Tab lists suppo
 - **Aftercare, warranties & service visits:** record supplied warranty dates/terms, serials, contacts and replacement parts. Track assigned service requests, visit dates, status, notes and up to eight compact photos. Unresolved cases appear in Project overview. Export aftercare records or the complete project backup. Warranty dates describe entered records, not a determination of supplier coverage.
 
 Product support records are browser-local and limited to 1 MB per project (100 rules, 20 measured runs, 100 warranties, 60 service cases, 20 attached assemblies). They are included in complete backups and restored under the new project ID; imported source-review claims are cleared. Shared assembly libraries allow 20 templates of up to 40 items. Field packages are capped at 2.3 MB; use **Export field package for these labels** for a single purchase if the full package is too large. These tools do not send supplier orders or synchronize support records to the cloud.
+
+## Guided workflow, catalog changes and project operations
+
+**Project workspace** provides Measure → Design → Approve → Order → Install → Aftercare navigation. Stage buttons show outstanding recorded checks and open the relevant tools, including nested panels. Design counts include saved catalog impacts; installation counts include unfinished tasks and completed tasks whose prerequisites now require rechecking. Counts do not establish manufacturer or installation certification.
+
+### Catalog update impact
+
+Download the snapshot template and prepare two source-backed JSON snapshots with the same `catalogKey` (manufacturer/series), their actual source revisions and references, and unique SKUs. Set the earlier `versionId` to the catalog version referenced by the design items. Each product records width, depth, height and a compatibility statement or rule revision. `complete: false` means an omitted SKU is unknown, not discontinued. Each snapshot is limited to 600 KB and 2,000 SKUs.
+
+Import the earlier and updated snapshots, then save the comparison. It shows changed dimensions/compatibility, earlier and updated values, affected project/item identities, and a Locate button for the current design. **Scan saved cloud projects** includes up to the latest 50 account projects plus the current unsaved design; repeat the scan after cloud edits. The export records scan scope and source references. No catalog, design, rule, or approval is automatically changed. Imported specifications still require human source verification.
+
+### Suggested layout fixes
+
+Choose an overlap or outside-room warning and click **Find a suggested move**. A bounded search proposes a nearby translation, preserving dimensions, linked assemblies, and recorded utility positions. Locked objects, openings, columns, beams and partitions are not moved. A proposal must resolve the selected warning without introducing any new modeled warning. Unsupported or unsolved cases direct users to manual editing. Review both plans, then Apply; Undo restores the original. Design changes invalidate an outstanding preview. Recheck installer requirements and obtain revised design approval after changing the layout.
+
+### Installation sequence
+
+Add a named task with assignee, planned date, required delivered items, required site resolutions and earlier tasks. Missing, pending or damaged deliveries block completion. A prerequisite task must be completed with its own prerequisites satisfied; changing a delivery back to damaged flags completed work for recheck and blocks downstream work. The task shows the latest recorded expected delivery among selected items and whether the planned date is overdue. Dates do not imply an automatic scheduling promise. Remove dependent tasks first before removing their prerequisite. Export the sequence with its calculated readiness.
+
+### Pilot outcomes
+
+Name a pilot and label it Synthetic rehearsal or Real project observations. Record dated stage observations, work minutes excluding rework, separate rework minutes, quote revision counts, installation issue counts and feedback. Totals compare with an optional manually entered baseline; positive differences mean fewer minutes than that baseline. This is observational tracking, not a causal savings claim or human catalog verification. Export outcomes, or include them in the complete project backup. Limits: 200 observations and 60 installation tasks per project.
+
+### Shared project records
+
+The shared-records UI and backend are implemented and tested locally. The backend deployment has not been approved, so live sharing currently shows an unavailable message. After deployment:
+
+1. Export a local backup, then **Create shared project** to publish a complete snapshot. Up to 20 shared projects per owner, 6 MB UTF-8 per snapshot. Records are split into bounded database documents and committed atomically.
+2. A teammate provides their account ID, shown in their shared-records panel. The owner grants Viewer or Editor access. Viewers can read/export; editors can publish; only the owner manages membership. No invitation message is sent.
+3. On another device, **Refresh shared projects → Review shared revision → Load shared revision locally**. Review the target project before replacing its local records. Source-review, client-approval and completion claims are cleared on transfer and need re-verification. Shared supplier prices remain a reference; import/select an account supplier list for new quotes.
+4. Edit locally, then **Publish local records**. Publishing requires the revision that was loaded. A stale save is rejected; export local work, load the new revision, reconcile, and publish again. Refreshing the list does not change the editing revision. Transfers are explicit; local work is never silently overwritten.
+5. The owner can change or revoke member access. Revocation blocks subsequent server access but cannot recall copies already downloaded.
+
+Shared snapshots include the design and project side records; they are separate from existing owner-only cloud design saves and review links. Shared loads refresh local purchasing/history panels. Shared membership and revision bindings are not included in portable backups. Project operations use a browser-local record capped at 1.5 MB, included in complete backups and remapped when restoring a separate copy. Export before clearing browser storage.

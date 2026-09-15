@@ -33,6 +33,16 @@ import {
   parseSupport,
   type ProductSupport,
 } from '@/designer/product-support';
+import { SharedProjectRecords } from './shared-project-records';
+import { GuidedWorkspace, SuggestedFixes } from './project-guidance';
+import { InstallationSequence } from './installation-sequence';
+import { PilotOutcomes } from './pilot-outcomes';
+import { CatalogImpactTools } from './catalog-impact-tools';
+import {
+  emptyOperations,
+  parseOperations,
+  type Operations,
+} from '@/designer/project-operations';
 import { CloseoutTools } from './closeout-tools';
 export function openProjectTool(label: string) {
   const target =
@@ -41,7 +51,11 @@ export function openProjectTool(label: string) {
       : Array.from(document.querySelectorAll('details')).find(
           (d) => d.querySelector(':scope > summary')?.textContent === label,
         );
-  if (target instanceof HTMLDetailsElement) target.open = true;
+  let ancestor: Element | null = target ?? null;
+  while (ancestor) {
+    if (ancestor instanceof HTMLDetailsElement) ancestor.open = true;
+    ancestor = ancestor.parentElement;
+  }
   target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const focus =
     target instanceof HTMLDetailsElement
@@ -53,6 +67,7 @@ export function ProjectHub({
   design,
   ownerId,
   onRestore,
+  onSharedLoad,
   onApply,
   selectedIds,
   onLocate,
@@ -60,6 +75,7 @@ export function ProjectHub({
   design: Design;
   ownerId: string;
   onRestore: (d: Design) => void;
+  onSharedLoad: (d: Design) => void;
   onApply: (d: Design) => void;
   selectedIds: string[];
   onLocate: (id: string) => void;
@@ -132,6 +148,23 @@ export function ProjectHub({
     setBundle({ ...bundle, support: checked });
     projectDataChanged();
   }
+  function saveOperations(next: Operations) {
+    if (!bundle) throw Error('Project records are not loaded.');
+    const key = `kitchen-operations:${ownerId}:${design.id}`;
+    const current = parseOperations(
+      localStorage.getItem(key) ?? JSON.stringify(emptyOperations(design.id)),
+      design.id,
+    );
+    if (
+      canonical(current) !==
+      canonical(bundle.operations ?? emptyOperations(design.id))
+    )
+      throw Error('Operations changed in another tab. Refresh before editing.');
+    const checked = parseOperations(JSON.stringify(next), design.id);
+    localStorage.setItem(key, JSON.stringify(checked));
+    setBundle({ ...bundle, operations: checked });
+    projectDataChanged();
+  }
   function restore() {
     if (!pending) return;
     try {
@@ -160,6 +193,11 @@ export function ProjectHub({
         [`kitchen-directory:${ownerId}`, JSON.stringify(updatedDirectory)],
         [`kitchen-studio:${ownerId}:draft`, JSON.stringify(b.design)],
       ];
+      if (b.operations)
+        entries.push([
+          `kitchen-operations:${ownerId}:${id}`,
+          JSON.stringify(b.operations),
+        ]);
       if (b.support)
         entries.push([
           `kitchen-product-support:${ownerId}:${id}`,
@@ -196,6 +234,7 @@ export function ProjectHub({
           Refresh project overview
         </button>
       </header>
+      {bundle && <GuidedWorkspace bundle={bundle} onOpen={openProjectTool} />}
       {summary && (
         <>
           <p>
@@ -226,9 +265,10 @@ export function ProjectHub({
         <p>
           One file includes the current design, selections, site photos, local
           revision history, purchasing and supplier records, closeout,
-          organization, product checks, aftercare, project assembly templates
-          and a supplier price reference. Cloud-only revisions and catalog
-          source documents are not included.
+          organization, product checks, aftercare, project assembly templates,
+          installation sequences, catalog comparisons, pilot observations and a
+          supplier price reference. Cloud-only revisions and catalog source
+          documents are not included.
         </p>
         <div className="designer-row">
           <button
@@ -308,6 +348,80 @@ export function ProjectHub({
       </details>
       {bundle && (
         <>
+          <SharedProjectRecords
+            ownerId={ownerId}
+            bundle={bundle}
+            getCurrent={() =>
+              collectProjectBackup(localStorage, ownerId, design, book)
+            }
+            onLoad={(incoming, binding) => {
+              const b = parseProjectBackup(JSON.stringify(incoming));
+              const id = b.design.id;
+              delete b.design.supplierBookId;
+              const entries: [string, string | null][] = [
+                [`kitchen-shared:${ownerId}:${id}`, JSON.stringify(binding)],
+                [
+                  `kitchen-purchasing:${ownerId}:${id}`,
+                  JSON.stringify(b.purchasing),
+                ],
+                [
+                  `kitchen-closeout:${ownerId}:${id}`,
+                  JSON.stringify(b.closeout),
+                ],
+                [
+                  `kitchen-product-support:${ownerId}:${id}`,
+                  JSON.stringify(b.support ?? emptySupport(id)),
+                ],
+                [
+                  `kitchen-operations:${ownerId}:${id}`,
+                  JSON.stringify(b.operations ?? emptyOperations(id)),
+                ],
+                [
+                  `kitchen-project-history:${ownerId}:${id}`,
+                  JSON.stringify({
+                    format: 'kitchen-milestones-v1',
+                    designId: id,
+                    entries: b.history,
+                  }),
+                ],
+                [`kitchen-studio:${ownerId}:draft`, JSON.stringify(b.design)],
+              ];
+              const directory = directorySchema.parse(
+                JSON.parse(
+                  localStorage.getItem(`kitchen-directory:${ownerId}`) ?? '{}',
+                ),
+              );
+              entries.push([
+                `kitchen-directory:${ownerId}`,
+                JSON.stringify(
+                  directorySchema.parse({ ...directory, [id]: b.organization }),
+                ),
+              ]);
+              entries.push([
+                `kitchen-restored-price:${ownerId}:${id}`,
+                b.priceBook ? JSON.stringify(b.priceBook) : null,
+              ]);
+              writeLocalBatch(localStorage, entries);
+              onSharedLoad(b.design);
+              projectDataChanged();
+            }}
+          />
+          <SuggestedFixes design={design} onApply={onApply} />
+          <CatalogImpactTools
+            design={design}
+            value={bundle.operations ?? emptyOperations(design.id)}
+            onChange={saveOperations}
+            onLocate={onLocate}
+          />
+          <InstallationSequence
+            bundle={bundle}
+            value={bundle.operations ?? emptyOperations(design.id)}
+            onChange={saveOperations}
+          />
+          <PilotOutcomes
+            value={bundle.operations ?? emptyOperations(design.id)}
+            onChange={saveOperations}
+          />
           <ProductChecks
             design={design}
             value={bundle.support ?? emptySupport(design.id)}
