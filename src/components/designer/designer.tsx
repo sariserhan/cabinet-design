@@ -1720,6 +1720,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                 design={design}
               />
               <RenderView
+                ownerId={ownerId}
                 cameraView={presenting ? presentationCamera : undefined}
                 key={design.id}
                 design={design}

@@ -38,6 +38,14 @@ export function metalPull(
       z - 0.5,
     );
     group.add(post);
+    const mount = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.34, 0.34, 0.12, 16),
+      metal,
+    );
+    mount.rotation.x = Math.PI / 2;
+    mount.position.copy(post.position);
+    mount.position.z -= 0.46;
+    group.add(mount);
   }
 }
 export function applianceDetails(
@@ -67,7 +75,12 @@ export function applianceDetails(
       drawer = false,
     ) => {
       const start = group.children.length;
+      b(width - 0.15, height - 0.15, 0.25, x, y, face - 0.62, dark);
       b(width, height, 1, x, y, face, steel);
+      if (!drawer && height > 35 && width > 15) {
+        b(3.5, 5, 0.12, x, y + height * 0.16, face + 0.55, glass);
+        b(2, 0.12, 0.15, x, y + height * 0.16 + 1, face + 0.65, steel);
+      }
       metalPull(
         group,
         drawer ? x : x + (right ? -1 : 1) * (width / 2 - 2),

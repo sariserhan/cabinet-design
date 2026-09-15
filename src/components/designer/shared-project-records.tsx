@@ -12,6 +12,7 @@ import { downloadJson } from './business-tools';
 const content = (b: ProjectBackup) => {
   const shared = { ...b, createdAt: '' };
   delete shared.trades;
+  delete shared.presentationScenes;
   return canonical(shared);
 };
 type Row = {
@@ -90,6 +91,7 @@ export function SharedProjectRecords({
     if (!create && !binding) throw Error('Load a shared revision first.');
     const current = { ...latest.current() };
     delete current.trades;
+    delete current.presentationScenes;
     const oldRaw = localStorage.getItem(key);
     if (
       !create &&

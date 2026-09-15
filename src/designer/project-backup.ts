@@ -1,3 +1,8 @@
+import {
+  presentationScenesSchema,
+  parsePresentationScenes,
+  emptyPresentationScenes,
+} from './render-settings';
 import { tradesSchema, parseTrades, emptyTrades } from './trade-estimates';
 import { z } from 'zod';
 import {
@@ -42,6 +47,7 @@ export const projectBackupSchema = z.object({
   support: productSupportSchema.optional(),
   operations: operationsSchema.optional(),
   trades: tradesSchema.optional(),
+  presentationScenes: presentationScenesSchema.optional(),
 });
 export type ProjectBackup = z.infer<typeof projectBackupSchema>;
 export function parseProjectBackup(
@@ -75,6 +81,9 @@ export function parseProjectBackup(
   b.trades = b.trades
     ? parseTrades(JSON.stringify(b.trades), id)
     : emptyTrades(id);
+  b.presentationScenes = b.presentationScenes
+    ? parsePresentationScenes(JSON.stringify(b.presentationScenes), id)
+    : emptyPresentationScenes(id);
   return b;
 }
 export function collectProjectBackup(
@@ -126,6 +135,11 @@ export function collectProjectBackup(
       closeout,
       organization,
       support,
+      presentationScenes: parsePresentationScenes(
+        storage.getItem(`kitchen-scenes:${ownerId}:${design.id}`) ??
+          JSON.stringify(emptyPresentationScenes(design.id)),
+        design.id,
+      ),
       trades: parseTrades(
         storage.getItem(`kitchen-trades:${ownerId}:${design.id}`) ??
           JSON.stringify(emptyTrades(design.id)),
@@ -182,6 +196,8 @@ export function restoreProjectCopy(
   b.closeout = { ...b.closeout, designId: newId };
   if (b.support) b.support = { ...b.support, designId: newId };
   if (b.operations) b.operations = { ...b.operations, designId: newId };
+  if (b.presentationScenes)
+    b.presentationScenes = { ...b.presentationScenes, designId: newId };
   if (b.trades) {
     b.trades = { ...b.trades, designId: newId };
     for (const state of Object.values(b.trades.trades)) delete state.saved;

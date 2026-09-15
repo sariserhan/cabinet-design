@@ -212,6 +212,11 @@ export function ProjectHub({
           `kitchen-operations:${ownerId}:${id}`,
           JSON.stringify(b.operations),
         ]);
+      if (b.presentationScenes)
+        entries.push([
+          `kitchen-scenes:${ownerId}:${id}`,
+          JSON.stringify(b.presentationScenes),
+        ]);
       if (b.trades)
         entries.push([
           `kitchen-trades:${ownerId}:${id}`,

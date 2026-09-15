@@ -1,0 +1,146 @@
+[
+  {
+    "file": "wood-diffuse.jpg",
+    "source": "https://polyhaven.com/a/kitchen_wood",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/kitchen_wood/kitchen_wood_diff_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "6d0170f1ab1b9353aab6f0382a7753026e32a5b58f779651cd05a91618dfcdab",
+    "bytes": 879137
+  },
+  {
+    "file": "wood-rough.jpg",
+    "source": "https://polyhaven.com/a/kitchen_wood",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/kitchen_wood/kitchen_wood_rough_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "38044a0b781b2d3219804bc045fc0d226bae33060cc18bb13355fb578ee98c73",
+    "bytes": 875985
+  },
+  {
+    "file": "wood-nor_gl.jpg",
+    "source": "https://polyhaven.com/a/kitchen_wood",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/kitchen_wood/kitchen_wood_nor_gl_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "30d6c1f3f7ad9e6a0e216393d9ee9a489f3b8a6efd9d85237f639e9bfde4cae5",
+    "bytes": 666833
+  },
+  {
+    "file": "grain-diffuse.jpg",
+    "source": "https://polyhaven.com/a/fine_grained_wood",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fine_grained_wood/fine_grained_wood_col_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "d171f45ef01bc6e239b00dfaa4961bcd27f7d8e93e3962da3bd3d0ce703d802c",
+    "bytes": 336305
+  },
+  {
+    "file": "grain-rough.jpg",
+    "source": "https://polyhaven.com/a/fine_grained_wood",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fine_grained_wood/fine_grained_wood_rough_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "f281f682e62fe322303dfeaa13dac18b5cb9e113617fe0aca43605b49161d82b",
+    "bytes": 215155
+  },
+  {
+    "file": "grain-nor_gl.jpg",
+    "source": "https://polyhaven.com/a/fine_grained_wood",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fine_grained_wood/fine_grained_wood_nor_gl_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "ba95eadc009818e161d0f753191f1bacc3fc861e593be0bc6d82b437f9ec8044",
+    "bytes": 193626
+  },
+  {
+    "file": "tile-diffuse.jpg",
+    "source": "https://polyhaven.com/a/interior_tiles",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/interior_tiles/interior_tiles_diff_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "f267c4357e629f5ca2ab86f30da4fb0ae8c655a566cec6d81278df8d78dcca4a",
+    "bytes": 694562
+  },
+  {
+    "file": "tile-rough.jpg",
+    "source": "https://polyhaven.com/a/interior_tiles",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/interior_tiles/interior_tiles_rough_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "478b5cad03a064b9b25369223f8334d26c1bdc2cba08e3398c16234a4b2a1aaf",
+    "bytes": 521038
+  },
+  {
+    "file": "tile-nor_gl.jpg",
+    "source": "https://polyhaven.com/a/interior_tiles",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/interior_tiles/interior_tiles_nor_gl_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "fdfb9fe192d438176508290fe873e181d88c5e6444a43bbab2ec156c9a78aa33",
+    "bytes": 414639
+  },
+  {
+    "file": "sky-hdri.hdr",
+    "source": "https://polyhaven.com/a/garden_nook",
+    "download": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/garden_nook_1k.hdr",
+    "license": "CC0-1.0",
+    "sha256": "f8c7970483be873487fabc0f07891be7e1551220dba911ea9dadd56f8a336a00",
+    "bytes": 1836222
+  },
+  {
+    "file": "stool/stool.gltf",
+    "source": "https://polyhaven.com/a/metal_stool_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/metal_stool_01/metal_stool_01_1k.gltf",
+    "license": "CC0-1.0",
+    "sha256": "e69a99778cacbbf0a2447971d8917a2463b411cdd2a50ff2c53c2230b4c43881",
+    "bytes": 2790
+  },
+  {
+    "file": "stool/textures/metal_stool_01_nor_gl_1k.jpg",
+    "source": "https://polyhaven.com/a/metal_stool_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/metal_stool_01/metal_stool_01_nor_gl_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "55d71cb01dd9afba245d4513728ce0cde8b112d5a7e1695a68578445c7b02b82",
+    "bytes": 667394
+  },
+  {
+    "file": "stool/textures/metal_stool_01_diff_1k.jpg",
+    "source": "https://polyhaven.com/a/metal_stool_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/metal_stool_01/metal_stool_01_diff_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "d11949df1f0c59b5a85145395703a2aa7617e76b80759a5ef80b09e1798acb3d",
+    "bytes": 617390
+  },
+  {
+    "file": "stool/textures/metal_stool_01_arm_1k.jpg",
+    "source": "https://polyhaven.com/a/metal_stool_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/metal_stool_01/metal_stool_01_arm_1k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "eb13e80e9fe232d022b4136e817d4590a7279d8da327d35e525e1aa4cf30e334",
+    "bytes": 783046
+  },
+  {
+    "file": "stool/metal_stool_01.bin",
+    "source": "https://polyhaven.com/a/metal_stool_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/metal_stool_01/metal_stool_01.bin",
+    "license": "CC0-1.0",
+    "sha256": "a57dae498990e7b56cba33b64721d1d0b940ca6352248de149740cd4678d451d",
+    "bytes": 216340
+  },
+  {
+    "file": "stone-rough.jpg",
+    "source": "https://ambientcg.com/view?id=Marble012",
+    "download": "https://ambientcg.com/get?file=Marble012_1K-JPG.zip",
+    "license": "CC0-1.0",
+    "sha256": "f7afd636d6cca0b470549959c514976186df58ac1013016b6c3919910a6d3a04",
+    "bytes": 535814
+  },
+  {
+    "file": "stone-normal.jpg",
+    "source": "https://ambientcg.com/view?id=Marble012",
+    "download": "https://ambientcg.com/get?file=Marble012_1K-JPG.zip",
+    "license": "CC0-1.0",
+    "sha256": "2e9a56525ffbb7e80854b19985a5c921f91192698ea337f4834192479ba0063b",
+    "bytes": 342955
+  },
+  {
+    "file": "stone-color.jpg",
+    "source": "https://ambientcg.com/view?id=Marble012",
+    "download": "https://ambientcg.com/get?file=Marble012_1K-JPG.zip",
+    "license": "CC0-1.0",
+    "sha256": "a34b55c889c6b3819d2c351b6409bfd0baf0a0a55b073441850627dfebcdcd1e",
+    "bytes": 1220876
+  }
+]
