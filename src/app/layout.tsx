@@ -1,4 +1,5 @@
 import './globals.css';
+import './(workspace)/designer/designer.css';
 import type { ReactNode } from 'react';
 import { ConvexAuthNextjsServerProvider } from '@convex-dev/auth/nextjs/server';
 import { Providers } from '@/components/providers';

@@ -21,9 +21,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 const navigation = [
   ['/designer', 'Designer', PencilRuler],
+  ['/projects', 'Projects', History],
   ['/catalog', 'Catalog', Library],
   ['/documents', 'Documents', FileText],
   ['/review', 'Review', CheckSquare],
+  ['/readiness', 'Readiness', ListChecks],
   ['/rules', 'Rules', ListChecks],
   ['/versions', 'Versions', History],
   ['/benchmarks', 'Benchmarks', ChartNoAxesCombined],

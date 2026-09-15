@@ -939,3 +939,148 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 
 .experience-panel{padding:12px 16px;margin:8px 0;border:1px solid #d3dfdc;border-radius:10px;background:#f6f9f8}.experience-panel summary{font-weight:650;cursor:pointer}.experience-panel li{margin:10px 0}.experience-panel li button{margin-left:8px}.surface-editor{padding:12px;background:#e9f3f0;border:1px solid #9dbeb4;border-radius:10px;margin:8px 0}.surface-editor button[aria-pressed=true]{background:#164e48;color:white}.render-quick-actions{margin:8px 0}.render-edit-hint{font-size:13px;color:#48605b}.has-showroom > :not(.showroom){display:none!important}.showroom{position:fixed;inset:0;z-index:1000;overflow:auto;padding:24px;background:#f7f5f0;color:#203d38}.showroom header{display:flex;align-items:center;justify-content:space-between;gap:20px}.showroom header p{letter-spacing:.15em;font-size:12px}.showroom h2{font-size:28px;margin:6px 0}.showroom-finishes{display:flex;gap:12px;margin:14px 0}.showroom-finishes button{display:flex;align-items:center;gap:10px;min-width:120px;padding:12px;text-transform:capitalize}.showroom-finishes span{width:36px;height:36px;border-radius:50%;border:1px solid #87938b}.showroom-finishes [aria-pressed=true]{outline:2px solid #21796d}.showroom .render-controls,.showroom .camera-controls,.showroom .render-hint,.showroom .render-quick-actions{display:none}.showroom .render-stage{height:65vh;min-height:400px}@media(max-width:700px){.showroom{padding:14px}.showroom header{display:block}.showroom-finishes button{min-width:0;flex:1;padding:8px}.showroom-finishes{gap:7px}.showroom-finishes span{width:22px;height:22px}.experience-panel li button{margin:4px}.showroom .render-stage{min-height:320px}}@media print{.experience-panel,.surface-editor,.render-quick-actions,.render-edit-hint{display:none!important}}
 .surface-editor{position:sticky;top:8px;z-index:3}.lighting-grid .render-quick-actions,.is-presenting .render-quick-actions,.is-presenting .render-edit-hint,.is-presenting .surface-editor{display:none}
+
+
+/* Project workflows reuse the studio's compact, readable controls. */
+.business-panel {
+  margin: 10px 0;
+  padding: 14px 18px;
+  border: 1px solid #b8c9c5;
+  border-radius: 10px;
+  background: #fff;
+  color: #243d39;
+}
+.business-panel summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+.business-panel p {
+  margin: 10px 0;
+  max-width: 100ch;
+}
+.business-panel label,
+.client-review label {
+  display: grid;
+  gap: 5px;
+  margin: 10px 0;
+}
+.business-panel input:not([type='checkbox']),
+.business-panel select,
+.business-panel textarea,
+.client-review input:not([type='checkbox']),
+.client-review textarea {
+  border: 1px solid #899d97;
+  padding: 8px;
+  border-radius: 5px;
+  max-width: 100%;
+  min-width: 0;
+  background: white;
+  color: #203b34;
+}
+.business-panel button,
+.client-review button {
+  border: 1px solid #6f8a81;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 4px 5px 4px 0;
+  background: #eff6f2;
+  color: #183d31;
+  cursor: pointer;
+}
+.business-panel button:disabled,
+.client-review button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.business-panel a,
+.client-review a {
+  color: #116344;
+  text-decoration: underline;
+  margin: 0 8px;
+}
+.business-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 18px;
+}
+.business-grid article,
+.business-grid section {
+  min-width: 0;
+}
+.business-grid svg {
+  width: 100%;
+  max-height: 340px;
+}
+.business-table {
+  overflow-x: auto;
+}
+.business-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.business-table th,
+.business-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #c8d4d0;
+}
+.client-review {
+  max-width: 1200px;
+  margin: auto;
+  padding: 24px;
+  color: #203b34;
+  background: #f6f8f4;
+  min-height: 100vh;
+}
+.client-review h1 {
+  font-size: 30px;
+  font-weight: 700;
+}
+.client-review h2 {
+  font-size: 21px;
+  margin: 18px 0 10px;
+}
+.client-review textarea {
+  min-height: 100px;
+}
+.client-review article {
+  padding: 12px 0;
+  border-bottom: 1px solid #c8d4d0;
+}
+@media (max-width: 600px) {
+  .business-panel {
+    padding: 12px;
+  }
+  .client-review {
+    padding: 16px;
+  }
+  .business-panel .designer-row {
+    flex-wrap: wrap;
+  }
+  .business-panel select {
+    width: 100%;
+  }
+}
+.client-review label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.client-review input[type="checkbox"] {
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.project-stage-card { display: grid; gap: 5px; text-align: left; padding: 18px; border: 1px solid #a9c1b5; border-radius: 10px; color: #234538; background: #f5f9f5; cursor: pointer; }
+.project-stage-card strong { font-size: 28px; }
+.project-stage-card[aria-pressed="true"] { background: #dceee4; border-color: #226849; }
+.project-card { padding: 16px; border: 1px solid #bccdc3; border-radius: 9px; background: #fafcf9; }
+.project-card h2 { font-size: 20px; font-weight: 650; overflow-wrap: anywhere; }
+.measurement-plan svg { width: 100%; max-height: 380px; }
+.business-panel textarea { min-height: 90px; width: 100%; }
+.business-panel label:has(>input[type="checkbox"]) { display: flex; align-items: flex-start; gap: 8px; }
+.business-panel label>input[type="checkbox"] { margin-top: 4px; }
+.quote-document { margin: 12px 0; border-top: 1px solid #c4d4c9; padding-top: 14px; }
+.client-review select { max-width: 100%; min-width: 0; padding: 8px; border: 1px solid #789286; border-radius: 5px; background: #fff; }
+.client-review svg [role="button"]:focus { outline: none; }
+.client-review svg [role="button"]:focus polygon { stroke: #0b5c43; stroke-width: 3px; }

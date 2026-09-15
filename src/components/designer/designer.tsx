@@ -7,6 +7,9 @@ import {
   SurfaceEditor,
   ReadinessCheck,
 } from './studio-panels';
+import { MeasurementWizard } from './measurement-wizard';
+import { CloudProjects } from './cloud-projects';
+import { AlternativeLayouts, SupplierQuotes } from './business-tools';
 import { ElevationView } from './elevation-view';
 import { lockViolation } from '@/designer/studio-tools';
 import { KitchenActions } from './kitchen-actions';
@@ -271,6 +274,35 @@ function Editor({ ownerId }: { ownerId: string }) {
       setBefore(baseline?.id === initial.id ? baseline : initial);
     } catch {
       setBefore(initial);
+    }
+    try {
+      const pending = sessionStorage.getItem(`kitchen-open:${ownerId}`);
+      if (pending) {
+        const request = JSON.parse(pending);
+        const opened = designSchema.parse(request.design);
+        if (
+          typeof request.projectId !== 'string' ||
+          !Number.isInteger(request.revision)
+        )
+          throw Error('Invalid cloud open request');
+        localStorage.setItem(
+          `kitchen-cloud:${ownerId}:${opened.id}`,
+          JSON.stringify({
+            projectId: request.projectId,
+            revision: request.revision,
+          }),
+        );
+        sessionStorage.removeItem(`kitchen-open:${ownerId}`);
+        setHistory({ past: [initial], current: opened, future: [] });
+        setBefore(opened);
+        setShowGallery(false);
+        setWalkStep(null);
+        return;
+      }
+    } catch {
+      setStorageError(
+        'Could not open the cloud project. Your local draft was retained.',
+      );
     }
     setHistory({ past: [], current: initial, future: [] });
   }, [storageKey]);
@@ -875,6 +907,51 @@ function Editor({ ownerId }: { ownerId: string }) {
           </button>
         </div>
       </header>
+      <CloudProjects
+        onLocate={(id) => {
+          setSelected(id);
+          setMode('2d');
+        }}
+        key={design.id}
+        design={design}
+        ownerId={ownerId}
+        onOpen={(next) => {
+          setHistory((h) =>
+            h
+              ? {
+                  past: [...h.past, h.current].slice(-60),
+                  current: next,
+                  future: [],
+                }
+              : { past: [], current: next, future: [] },
+          );
+          setSelected(null);
+          setBefore(next);
+        }}
+      />
+      <MeasurementWizard
+        key={`measure:${design.id}`}
+        design={design}
+        onApply={(next) => {
+          setHistory((h) =>
+            h
+              ? {
+                  past: [...h.past, h.current].slice(-60),
+                  current: next,
+                  future: [],
+                }
+              : { past: [], current: next, future: [] },
+          );
+          setSelected(null);
+          setMode('2d');
+          setBefore(next);
+        }}
+      />
+      <AlternativeLayouts
+        design={design}
+        onChange={(next) => commit(() => next, true)}
+      />
+      <SupplierQuotes design={design} onChange={(next) => commit(() => next)} />
       <ShortcutHelp />
       <details className="project-controls">
         <summary>Project files & examples</summary>

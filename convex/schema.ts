@@ -32,8 +32,74 @@ export const stats = v.object({
   rejected: v.number(),
   autoApproved: v.number(),
 });
+export const projectStage = v.union(
+  v.literal('draft'),
+  v.literal('awaiting_feedback'),
+  v.literal('approved'),
+  v.literal('ordered'),
+);
 export default defineSchema({
   ...authTables,
+  projects: defineTable({
+    clientName: v.optional(v.string()),
+    workflowStatus: v.optional(projectStage),
+    metadataRevision: v.optional(v.number()),
+    ownerId: v.id('users'),
+    name: v.string(),
+    designJson: v.string(),
+    revision: v.number(),
+    updatedAt: v.number(),
+  }).index('by_ownerId', ['ownerId']),
+  projectBackups: defineTable({
+    ownerId: v.id('users'),
+    projectId: v.id('projects'),
+    name: v.string(),
+    designJson: v.string(),
+    revision: v.number(),
+    createdAt: v.number(),
+  }).index('by_projectId', ['projectId']),
+  projectReviews: defineTable({
+    ownerId: v.id('users'),
+    projectId: v.id('projects'),
+    tokenHash: v.string(),
+    name: v.string(),
+    revision: v.number(),
+    expiresAt: v.number(),
+    revoked: v.boolean(),
+    createdAt: v.number(),
+    responseCount: v.number(),
+    lastResponseAt: v.optional(v.number()),
+  })
+    .index('by_projectId', ['projectId'])
+    .index('by_tokenHash', ['tokenHash']),
+  reviewSnapshots: defineTable({
+    reviewId: v.id('projectReviews'),
+    designJson: v.string(),
+  }).index('by_reviewId', ['reviewId']),
+  projectResponses: defineTable({
+    itemId: v.optional(v.string()),
+    reviewId: v.id('projectReviews'),
+    name: v.string(),
+    text: v.string(),
+    kind: v.union(v.literal('comment'), v.literal('approval')),
+    createdAt: v.number(),
+    revision: v.number(),
+  }).index('by_reviewId', ['reviewId']),
+  supplierPriceBooks: defineTable({
+    ownerId: v.id('users'),
+    priceBookJson: v.string(),
+    revision: v.number(),
+  }).index('by_ownerId', ['ownerId']),
+  catalogClarifications: defineTable({
+    ownerId: v.id('users'),
+    recordId: v.id('records'),
+    versionId: v.id('versions'),
+    recordRevision: v.number(),
+    evidenceReference: v.string(),
+    evidenceText: v.string(),
+    status: v.literal('pending'),
+    createdAt: v.number(),
+  }).index('by_recordId', ['recordId']),
   documents: defineTable({
     ownerId: v.id('users'),
     name: v.string(),

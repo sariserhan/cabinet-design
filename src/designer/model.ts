@@ -1,3 +1,4 @@
+import { surveySchema } from './measurement-schema';
 import { installationIssues, profileFor } from './installation';
 import { z } from 'zod';
 import {
@@ -133,6 +134,8 @@ export const itemSchema = z.object({
 export const designSchema = z
   .object({
     format: z.literal('kitchen-studio-v1'),
+    measurements: surveySchema.optional(),
+    supplierBookId: z.string().max(100).optional(),
     sampleKey: z.enum(['apartment', 'family', 'premium']).optional(),
     id: z.string().min(1).max(100),
     name: z.string().trim().min(1).max(100),
@@ -235,6 +238,20 @@ export const designSchema = z
         installation: z.number().min(0).max(1000000),
         delivery: z.number().min(0).max(1000000),
         discount: z.number().min(0).max(100),
+      })
+      .optional(),
+    quoteDocument: z
+      .object({
+        company: z.string().max(160),
+        contact: z.string().max(500),
+        number: z.string().max(80),
+        terms: z.string().max(4000),
+        validUntil: z.string().max(10),
+        logo: z
+          .string()
+          .max(45000)
+          .regex(/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/)
+          .optional(),
       })
       .optional(),
     orders: z

@@ -57,7 +57,8 @@ export function ReviewWorkspace({
     router = useRouter();
   const requested = search.get('version');
   const version =
-    data?.versions.find((v) => v._id === requested) ?? defaultCatalog(data?.versions);
+    data?.versions.find((v) => v._id === requested) ??
+    defaultCatalog(data?.versions);
   return (
     <>
       <header className="page-header">
@@ -278,6 +279,9 @@ function RecordEditor({
   version: Doc<'versions'>;
 }) {
   const record = detail.record;
+  const clarifications = useQuery(api.catalogReadiness.clarifications, {
+    recordId: record._id,
+  });
   const initial = recordDataSchema.parse(JSON.parse(record.payloadJson));
   const [payload, setPayload] = useState<RecordData>(initial),
     [reason, setReason] = useState(''),
@@ -350,6 +354,26 @@ function RecordEditor({
                 : record.reviewStatus.replace('_', ' ')}
             </Badge>
           </div>
+          {!!clarifications?.length && (
+            <details className="rounded-lg border p-3">
+              <summary>
+                Pending manufacturer evidence ({clarifications.length})
+              </summary>
+              <p>
+                Check the original source and correct the record before
+                approval. These submissions have not been verified.
+              </p>
+              {clarifications.map((entry) => (
+                <article key={entry._id}>
+                  <strong>{entry.evidenceReference}</strong>
+                  <p className="whitespace-pre-wrap">{entry.evidenceText}</p>
+                  <small>
+                    Submitted for record revision {entry.recordRevision}
+                  </small>
+                </article>
+              ))}
+            </details>
+          )}
           {record.blockers.length ? (
             <Alert variant="destructive">
               <AlertTitle>Approval blocked</AlertTitle>
