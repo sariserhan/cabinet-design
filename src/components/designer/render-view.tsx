@@ -23,6 +23,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Design } from '@/designer/model';
 import {
   itemPolygon,
+  isUpperCabinet,
   localToWorld,
   containsFootprint,
   cutPanels,
@@ -763,18 +764,22 @@ export default function RenderView({
                   : columns === 2
                     ? x + (col === 0 ? 1 : -1) * (pw / 2 - 2)
                     : x + (item.mirrored ? -1 : 1) * (pw / 2 - 2);
+              const handleY =
+                isUpperCabinet(item) && style !== 'drawers'
+                  ? y - ph / 2 + Math.min(5, ph / 2)
+                  : y + ph / 2 - 5;
               if (design.appearance?.handleStyle === 'knob') {
                 const knob = new THREE.Mesh(
                   new THREE.SphereGeometry(0.75, 12, 8),
                   hardware,
                 );
-                knob.position.set(hx, y + ph / 2 - 5, d / 2 + 1);
+                knob.position.set(hx, handleY, d / 2 + 1);
                 group.add(knob);
               } else if (design.appearance?.handleStyle !== 'none')
                 metalPull(
                   group,
                   hx,
-                  y + ph / 2 - 5,
+                  handleY,
                   d / 2 + 1.5,
                   5,
                   style === 'drawers',

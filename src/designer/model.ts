@@ -638,6 +638,13 @@ export function turnCabinet(item: Cabinet, degrees: 90 | 180): Cabinet {
     rotation: ((item.rotation + degrees) % 360) as Cabinet['rotation'],
   };
 }
+export function isUpperCabinet(item: Cabinet) {
+  return (
+    ['cabinet', 'custom_cabinet', 'corner'].includes(item.kind) &&
+    (item.category === 'wall_cabinet' ||
+      (item.elevation >= 40 && item.height <= 48))
+  );
+}
 export function frontHandle(item: Cabinet): { x: number; y: number } {
   const along = item.width * (item.mirrored ? 0.2 : 0.8);
   switch (item.rotation) {

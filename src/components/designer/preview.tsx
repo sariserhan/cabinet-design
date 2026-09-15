@@ -10,6 +10,7 @@ import type { PointerEvent } from 'react';
 import { RotateCcw, RotateCw, Hand, Plus, Minus, Maximize } from 'lucide-react';
 import {
   resolvedFront,
+  isUpperCabinet,
   finishes,
   cutPanels,
   sinkHoles,
@@ -408,12 +409,12 @@ export function Preview({
                 local(
                   item.width * (item.mirrored ? 0.2 : 0.8),
                   item.depth + 0.15,
-                  item.height * 0.55,
+                  isUpperCabinet(item) ? 3 : item.height * 0.55,
                 ),
                 local(
                   item.width * (item.mirrored ? 0.2 : 0.8),
                   item.depth + 0.15,
-                  item.height * 0.55 + 3,
+                  isUpperCabinet(item) ? 6 : item.height * 0.55 + 3,
                 ),
               ]
             : null,
