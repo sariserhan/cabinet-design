@@ -26,6 +26,8 @@ export type RenderActions = {
   walk: (forward: number, side: number, turn?: number) => void;
   open: (amount: number) => void;
   fit: () => void;
+  /** Draw one more frame, for a setting the scene does not rebuild for. */
+  refresh: () => void;
   save: (width: number, captureOnly?: boolean) => void;
   capture: () => Pick<View, 'position' | 'target'>;
   load: (view: CameraView) => void;

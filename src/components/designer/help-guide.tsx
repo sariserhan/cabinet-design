@@ -153,6 +153,18 @@ export function HelpGuide({
           </p>
         </section>
         <section>
+          <h3>Sizes on the drawing</h3>
+          <p>
+            <strong>Dimensions</strong> under the canvas draws the size of every
+            item, in the plan, the 3D preview and the Render view.{' '}
+            <strong>X</strong>, <strong>Y</strong> and <strong>Z</strong> switch
+            on and off separately: three numbers on every cabinet is unreadable,
+            and the axis you are checking is usually one of them. Beside the
+            switch are the totals - the room, and the extent the placed items
+            cover, which is rarely the same thing.
+          </p>
+        </section>
+        <section>
           <h3>The views</h3>
           <p>
             <strong>2D plan</strong> is the working view.{' '}

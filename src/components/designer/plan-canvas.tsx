@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { PointerEvent, KeyboardEvent } from 'react';
 import {
   footprint,
@@ -22,6 +22,8 @@ import { placementAt } from '@/designer/editing';
 import { activeDrop, parseDrop } from '@/designer/drop';
 import { placementFeedback } from '@/designer/demo-readiness';
 import { annotationLabel, inchLabel } from '@/designer/annotations';
+import { itemDimensionText } from '@/designer/dimension-overlay';
+import type { DimensionAxes } from '@/designer/dimension-overlay';
 import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
 
@@ -47,6 +49,8 @@ type Props = {
   /** Result of a band sweep; an empty list clears the selection. */
   onMarquee: (ids: string[], additive: boolean) => void;
   onMoveMany: (ids: string[], dx: number, dy: number) => void;
+  /** Sizes drawn on every item, and which of them to draw. */
+  dimensions: { on: boolean; axes: DimensionAxes };
   /** Placing a note or a dimension instead of selecting and panning. */
   annotate: 'note' | 'dimension' | null;
   selectedAnnotation: string | null;
@@ -74,6 +78,7 @@ export function PlanCanvas({
   onToggle,
   onMarquee,
   onMoveMany,
+  dimensions,
   annotate,
   onAnnotate,
   selectedAnnotation,
@@ -200,6 +205,33 @@ export function PlanCanvas({
   } | null>(null);
   const { room } = design,
     padding = 28;
+  // Items stack: a cabinet, the countertop over it, a wall cabinet above.
+  // All three labels land on one point unless they are moved apart, so
+  // each one that would collide drops below the last.
+  const labelOffsets = useMemo(() => {
+    const taken: { x: number; y: number }[] = [];
+    const offsets = new Map<string, number>();
+    for (const item of design.items) {
+      if (item.hidden) continue;
+      const f = footprint(item),
+        x = item.x + f.width / 2,
+        y = item.y + f.depth / 2;
+      // A wall cabinet and the base below it are only six inches apart in
+      // plan, which is closer than two lines of text, so the spacing is
+      // set by the text rather than by the geometry.
+      let offset = 0;
+      while (
+        offset < 36 &&
+        taken.some(
+          (t) => Math.abs(t.x - x) < 16 && Math.abs(t.y - (y + offset)) < 7,
+        )
+      )
+        offset += 7;
+      taken.push({ x, y: y + offset });
+      offsets.set(item.id, offset);
+    }
+    return offsets;
+  }, [design.items]);
   function coordinates(event: { clientX: number; clientY: number }) {
     const root = svg.current,
       matrix = root?.getScreenCTM();
@@ -792,6 +824,22 @@ export function PlanCanvas({
                       />
                     );
                   })()}
+                {dimensions.on && !active && (
+                  <text
+                    data-testid="item-dimensions"
+                    pointerEvents="none"
+                    x={b.width / 2}
+                    y={b.depth / 2 + 1.2 + (labelOffsets.get(item.id) ?? 0)}
+                    textAnchor="middle"
+                    fontSize="3"
+                    fill="#41545e"
+                    stroke="white"
+                    strokeWidth="0.8"
+                    paintOrder="stroke"
+                  >
+                    {itemDimensionText(item, dimensions.axes)}
+                  </text>
+                )}
                 {active && (
                   <text
                     role="button"

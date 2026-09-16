@@ -48,6 +48,11 @@ import {
   jobItemList,
 } from '../../src/designer/job-rooms';
 import { quoteTotals } from '../../src/designer/quote';
+import {
+  itemDimensionText,
+  designDimensionSummary,
+  allAxes,
+} from '../../src/designer/dimension-overlay';
 const drawingOptions = () =>
   drawingOptionsSchema.parse({
     company: 'Dealer',
@@ -779,4 +784,49 @@ test('a job adds up the rooms it covers without merging them', () => {
   const restored = parseDesign(JSON.stringify(kitchen));
   assert.equal(restored.job?.room, 'Kitchen');
   assert.equal(restored.room.width, kitchen.room.width);
+});
+test('dimension labels name the axis unless all three are shown', () => {
+  const item = {
+    ...fromObject('custom_cabinet'),
+    id: 'b',
+    width: 24,
+    depth: 24,
+    height: 34.5,
+  };
+  assert.equal(itemDimensionText(item, allAxes), '24" × 24" × 34-1/2"');
+  // One number on its own has to say which way it is measured.
+  assert.equal(
+    itemDimensionText(item, { x: false, y: false, z: true }),
+    'H 34-1/2"',
+  );
+  assert.equal(
+    itemDimensionText(item, { x: true, y: false, z: true }),
+    'W 24" · H 34-1/2"',
+  );
+  assert.equal(itemDimensionText(item, { x: false, y: false, z: false }), '');
+
+  const d = newDesign();
+  d.room = {
+    width: 144,
+    depth: 120,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  d.items = [
+    { ...item, id: 'a', x: 0, y: 0 },
+    { ...item, id: 'c', x: 60, y: 0, height: 30, elevation: 54 },
+    { ...item, id: 'hidden', x: 0, y: 80, hidden: true, width: 200 },
+  ];
+  const summary = designDimensionSummary(d);
+  assert.equal(summary.room, 'W 144" · D 120" · H 96"');
+  // The extent of what is placed, not the room, and not counting what is
+  // hidden from view.
+  assert.equal(summary.count, 2);
+  assert.equal(summary.extent.width, 84);
+  assert.equal(summary.extent.height, 84);
+  assert.equal(
+    designDimensionSummary(d, { x: true, y: false, z: false }).items,
+    'W 84"',
+  );
 });

@@ -411,6 +411,67 @@ test('a design can be made a room of a job, and stays one', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('dimensions can be shown in every view, one axis at a time', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(6000);
+  await page.getByRole('button', { name: /2D plan/i }).click();
+
+  await page.getByLabel('Dimensions', { exact: true }).check();
+  const planLabels = page.locator('[data-testid="item-dimensions"]');
+  await expect
+    .poll(() => planLabels.count(), { timeout: 20_000 })
+    .toBeGreaterThan(5);
+  await expect(planLabels.first()).toHaveText(/\d+" × \d+" × /);
+
+  // The totals are the room and the extent the placed items cover, which
+  // is not the room.
+  const summary = page.locator('.dimension-summary');
+  await expect(summary).toContainText('Room W 240" · D 192" · H 108"');
+  await expect(summary).toContainText('items over');
+
+  // One axis at a time: with only Z left, each number says which way it is
+  // measured, because 34-1/2" alone does not.
+  await page.getByLabel('Show X dimensions').uncheck();
+  await page.getByLabel('Show Y dimensions').uncheck();
+  await expect(planLabels.first()).toHaveText(/^H \d/, { timeout: 20_000 });
+  await expect(summary).toHaveText(/^Room H 108"/);
+  await page.getByLabel('Show X dimensions').check();
+  await page.getByLabel('Show Y dimensions').check();
+
+  await page.getByRole('button', { name: /3D preview/i }).click();
+  await expect
+    .poll(() => page.locator('[data-testid="preview-dimensions"]').count(), {
+      timeout: 30_000,
+    })
+    .toBeGreaterThan(5);
+
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  await expect(page.locator('.render-stage canvas')).toBeVisible({
+    timeout: 60_000,
+  });
+  // Projected onto the scene from the camera, so they follow it.
+  await expect
+    .poll(() => page.locator('.render-dimensions span').count(), {
+      timeout: 90_000,
+    })
+    .toBeGreaterThan(5);
+
+  await page.getByLabel('Dimensions', { exact: true }).uncheck();
+  await expect
+    .poll(() => page.locator('.render-dimensions span').count(), {
+      timeout: 30_000,
+    })
+    .toBe(0);
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

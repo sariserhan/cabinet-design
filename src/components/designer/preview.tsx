@@ -17,15 +17,20 @@ import {
 } from '@/designer/model';
 import { roomOutline, wallSegments } from '@/designer/room';
 import type { Cabinet, Design } from '@/designer/model';
+import { footprint } from '@/designer/model';
+import { itemDimensionText } from '@/designer/dimension-overlay';
+import type { DimensionAxes } from '@/designer/dimension-overlay';
 type Vec = [number, number, number];
 export function Preview({
   design,
   selected,
   onSelect,
+  dimensions,
 }: {
   design: Design;
   selected: string | null;
   onSelect: (id: string) => void;
+  dimensions?: { on: boolean; axes: DimensionAxes };
 }) {
   const [angle, setAngle] = useState(0);
   const [panMode, setPanMode] = useState(false),
@@ -602,6 +607,38 @@ export function Preview({
             )}
           </g>
         ))}
+        {dimensions?.on &&
+          design.items
+            .filter((i) => !i.hidden)
+            .map((item) => {
+              const label = itemDimensionText(item, dimensions.axes);
+              if (!label) return null;
+              // Over the middle of the item, at the height of its top, so
+              // the number sits on the thing it measures.
+              const f = footprint(item);
+              const [x, y] = point([
+                item.x + f.width / 2,
+                item.y + f.depth / 2,
+                item.elevation + item.height,
+              ]);
+              return (
+                <text
+                  key={`size-${item.id}`}
+                  data-testid="preview-dimensions"
+                  x={x}
+                  y={y - 2}
+                  textAnchor="middle"
+                  fontSize="4"
+                  fill="#41545e"
+                  stroke="white"
+                  strokeWidth="1.1"
+                  paintOrder="stroke"
+                  pointerEvents="none"
+                >
+                  {label}
+                </text>
+              );
+            })}
       </svg>
       <p className="preview-caption">
         Drag to {panMode ? 'pan' : 'orbit'} · schematic 3D · illustrative fronts

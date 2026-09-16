@@ -95,6 +95,9 @@ import {
 import { InstallationSheets } from './advanced-options';
 import { roomEdges, rectangleInside } from '@/designer/room';
 import { newAnnotation } from '@/designer/annotations';
+import { DimensionToggles } from './dimension-toggles';
+import { allAxes, designDimensionSummary } from '@/designer/dimension-overlay';
+import type { DimensionAxes } from '@/designer/dimension-overlay';
 
 const RenderView = dynamic(() => import('./render-view'), {
   ssr: false,
@@ -122,6 +125,12 @@ function Editor({ ownerId }: { ownerId: string }) {
   const [workspaceStage, setWorkspaceStage] =
     useState<WorkspaceStage>('Design');
   const [annotate, setAnnotate] = useState<'note' | 'dimension' | null>(null);
+  // Sizes drawn on the views, and which of the three to draw. Off by
+  // default: a plan with three numbers on every cabinet is unreadable.
+  const [dimensions, setDimensions] = useState<{
+    on: boolean;
+    axes: DimensionAxes;
+  }>({ on: false, axes: allAxes });
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(
     null,
   );
@@ -324,6 +333,18 @@ function Editor({ ownerId }: { ownerId: string }) {
   // Recomputed only when the design itself changes, not on every panel toggle
   // or keystroke elsewhere in the editor.
   const issues = useMemo(() => (design ? warnings(design) : []), [design]);
+  const dimensionSummary = useMemo(
+    () =>
+      design
+        ? designDimensionSummary(design, dimensions.axes)
+        : {
+            room: '',
+            items: '',
+            count: 0,
+            extent: { width: 0, depth: 0, height: 0 },
+          },
+    [design, dimensions.axes],
+  );
   const setInspectorPanel = useCallback(
     (patch: Partial<InspectorPanelState>) => {
       if ('inspectorTab' in patch && patch.inspectorTab !== undefined)
@@ -1788,6 +1809,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                     : '',
                 );
               }}
+              dimensions={dimensions}
               annotate={annotate}
               selectedAnnotation={selectedAnnotation}
               onSelectAnnotation={(id) => {
@@ -1844,6 +1866,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                 design={design}
                 selected={selected}
                 selectedIds={selection}
+                dimensions={dimensions}
                 onToggle={(id) =>
                   setSelection((ids) =>
                     ids.includes(id)
@@ -1884,6 +1907,7 @@ function Editor({ ownerId }: { ownerId: string }) {
               design={design}
               selected={selected}
               onSelect={setSelected}
+              dimensions={dimensions}
             />
           )}
           {mode === '2d' && (
@@ -1895,6 +1919,18 @@ function Editor({ ownerId }: { ownerId: string }) {
             />
           )}
           <div className="designer-canvas-footer">
+            <DimensionToggles
+              on={dimensions.on}
+              axes={dimensions.axes}
+              onChange={(next) =>
+                setDimensions((current) => ({ ...current, ...next }))
+              }
+              summary={`Room ${dimensionSummary.room}${
+                dimensionSummary.count
+                  ? ` · ${dimensionSummary.count} items over ${dimensionSummary.items}`
+                  : ''
+              }`}
+            />
             <span>
               {mode === '2d'
                 ? 'Drag empty space to pan · Space + drag anywhere · Shift + drag to select several · Shift + click to add one · arrow keys: 1″ / Shift: 6″'

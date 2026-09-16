@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { setTextureAnisotropy } from './render-textures';
+import { itemDimensionText } from '@/designer/dimension-overlay';
+import type { DimensionAxes } from '@/designer/dimension-overlay';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
@@ -76,6 +78,7 @@ export default function RenderView({
   onCapture,
   selected,
   selectedIds,
+  dimensions,
   onSelect,
   onToggle,
   onMoveItem,
@@ -85,6 +88,8 @@ export default function RenderView({
   ownerId?: string;
   selected?: string | null;
   selectedIds?: string[];
+  /** Sizes drawn over the scene, and which of the three to draw. */
+  dimensions?: { on: boolean; axes: DimensionAxes };
   onSelect?: (id: string | null) => void;
   onToggle?: (id: string) => void;
   /** Commits a drag in the 3D view, using the same rules as the 2D plan. */
@@ -195,6 +200,10 @@ export default function RenderView({
   // first attempt. Kept across scene rebuilds: the answer is about the
   // device, and re-testing it on every edit would cost a slow frame each
   // time on exactly the machines that cannot spare one.
+  // Read inside the render loop, so toggling an axis does not rebuild the
+  // scene to change a number.
+  const dimensionsRef = useRef(dimensions);
+  dimensionsRef.current = dimensions;
   const refineAllowed = useRef(true);
   const pendingCamera = useRef<CameraView | null>(null);
   const externalCamera = useRef(cameraView);
@@ -237,6 +246,9 @@ export default function RenderView({
   });
   const exposureRef = useRef(exposure);
   exposureRef.current = exposure;
+  useEffect(() => {
+    actions.current?.refresh();
+  }, [dimensions]);
   useEffect(() => {
     actions.current?.expose(exposure);
   }, [exposure]);
@@ -371,6 +383,13 @@ export default function RenderView({
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.setAttribute('aria-label', 'Rendered kitchen');
     container.appendChild(renderer.domElement);
+    // Sizes are HTML over the canvas rather than geometry in the scene:
+    // text in a scene has to be re-made whenever it changes, and would be
+    // lit and occluded like everything else in it.
+    const labelLayer = document.createElement('div');
+    labelLayer.className = 'render-dimensions';
+    container.appendChild(labelLayer);
+    const labelNodes = new Map<string, HTMLSpanElement>();
     const scene = new THREE.Scene();
     const pmrem = new THREE.PMREMGenerator(renderer),
       environmentScene = new RoomEnvironment(),
@@ -1000,6 +1019,60 @@ export default function RenderView({
         }
         composer.render();
       } else renderer.render(scene, camera);
+      drawDimensions();
+    };
+    const projected = new THREE.Vector3();
+    /** Put a size over the top centre of each item, or clear them away. */
+    const drawDimensions = () => {
+      const settings = dimensionsRef.current;
+      const size = renderer.getSize(new THREE.Vector2());
+      const wanted = new Set<string>();
+      // Two labels on one spot read as neither, so each that would land on
+      // a placed one rises above it, and none goes off the edge.
+      const taken: { x: number; y: number }[] = [];
+      if (settings?.on)
+        for (const item of design.items) {
+          if (item.hidden) continue;
+          const label = itemDimensionText(item, settings.axes);
+          if (!label) continue;
+          const f = footprint(item);
+          projected
+            .set(
+              item.x + f.width / 2,
+              item.elevation + item.height,
+              item.y + f.depth / 2,
+            )
+            .project(camera);
+          // Behind the camera, so there is nothing to label.
+          if (projected.z > 1) continue;
+          wanted.add(item.id);
+          let node = labelNodes.get(item.id);
+          if (!node) {
+            node = document.createElement('span');
+            labelLayer.appendChild(node);
+            labelNodes.set(item.id, node);
+          }
+          node.textContent = label;
+          const x = Math.min(
+            Math.max((projected.x * 0.5 + 0.5) * size.x, 60),
+            size.x - 60,
+          );
+          let y = (-projected.y * 0.5 + 0.5) * size.y;
+          for (
+            let tries = 0;
+            tries < 8 &&
+            taken.some((t) => Math.abs(t.x - x) < 90 && Math.abs(t.y - y) < 15);
+            tries++
+          )
+            y -= 15;
+          taken.push({ x, y });
+          node.style.transform = `translate(-50%,-100%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+        }
+      for (const [id, node] of labelNodes)
+        if (!wanted.has(id)) {
+          node.remove();
+          labelNodes.delete(id);
+        }
     };
     controls.addEventListener('change', render);
     const resize = () => {
@@ -1066,6 +1139,7 @@ export default function RenderView({
         targetOpening = amount;
       },
       fit,
+      refresh: () => render(),
       capture: () => ({
         position: [camera.position.x, camera.position.y, camera.position.z],
         target: [controls.target.x, controls.target.y, controls.target.z],
@@ -1142,6 +1216,8 @@ export default function RenderView({
       renderer.domElement.removeEventListener('pointermove', lookMove);
       renderer.domElement.removeEventListener('pointerup', lookEnd);
       renderer.domElement.removeEventListener('pointercancel', lookEnd);
+      labelLayer.remove();
+      labelNodes.clear();
       ao?.dispose();
       settlePass.dispose();
       renderPass.dispose();

@@ -1073,6 +1073,41 @@ body:has(.is-presenting) .demo-banner {
 .start-guide input {
   width: 130px;
 }
+.render-stage {
+  position: relative;
+}
+.render-dimensions {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.render-dimensions span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 86%);
+  color: #23343c;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.dimension-toggles {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.dimension-toggles label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.dimension-summary {
+  color: var(--studio-muted);
+}
 .job-rooms {
   padding: 4px 20px 16px;
   font-size: 13px;
