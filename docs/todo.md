@@ -73,6 +73,42 @@ started. What is left is ranked by how much it changes the picture.
       make the opposite decision on a machine with a GPU, where it should
       refine every time the camera stops.
 
+## Product features
+
+Gaps in what the designer can express, rather than in how it runs. Each was
+checked against the model on 2026-09-16.
+
+- [ ] **Clearance between runs, not just around items.** Every item carries
+      its own envelope and the plan warns when one is blocked, but nothing
+      measures the gap between two facing runs, the walkway past an island,
+      or the distance between the sink, the hob and the fridge. That is the
+      first thing an experienced designer looks at and the app is silent on
+      it. Build it as named, configurable distances with the source written
+      beside them, so it reports "39 inches against your 42 inch setting"
+      rather than implying a code ruling the repository has not verified.
+- [ ] **More than one room in a project.** `design.room` is a single room, so
+      a job that covers a kitchen, a vanity and a laundry needs three
+      unrelated designs with three quotes. The catalog already carries a
+      `vanity` category and the model already has a washing machine, so the
+      gap is structural rather than missing parts: rooms, per-room geometry
+      and a quote that adds up across them.
+- [ ] **Annotations and designer-placed dimensions.** Items take a note, but
+      there is no way to put a dimension string, an arrow or a "verify on
+      site" callout on the plan itself. Drawing packages go out without the
+      one thing every set of drawings has.
+- [ ] **Trim as runs rather than pieces.** Crown, light rail and toe kick are
+      individual objects placed by hand; nothing follows a row of cabinets,
+      mitres at a corner or stops at a wall. Fillers and scribes are the same
+      story. Until a run is a run, elevations and the item list both under-
+      report what the job needs.
+- [ ] **Soffits and bulkheads.** The model has columns, beams and partitions
+      but no soffit, which is in a large share of real kitchens and changes
+      what wall cabinets can go where.
+- [ ] **A plan and elevation DXF.** The DXF writer already exists for
+      machining parts. Pointing it at the plan and the elevations would give
+      a contractor or an architect something they can open, which today they
+      cannot.
+
 ## Catalog — on hold
 
 Held at the owner's request on 2026-09-16. Recorded so the findings are not
@@ -121,7 +157,8 @@ rather than a width, which is exactly the point - a script cannot settle it.
 
 ## Engineering
 
-Measured on 2026-09-16. What is already sound and does not need work: no
+Deferred by the owner on 2026-09-16 in favour of product features; recorded
+so the survey does not have to be repeated. Measured on 2026-09-16. What is already sound and does not need work: no
 dependency vulnerabilities, no `any` or `@ts-expect-error` escapes in the
 source, and the accessibility basics hold - every one of 201 buttons has a
 name, every one of 177 form controls has a label, no image lacks alt text.
