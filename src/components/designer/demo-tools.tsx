@@ -755,10 +755,10 @@ export function DemoWalkthrough({
     ],
   ];
   return (
-    <section className="demo-walkthrough" aria-label="Demo walkthrough">
+    <section className="demo-walkthrough" aria-label="Guided tour">
       <div>
         <strong>
-          Demo walkthrough · {step + 1} / {steps.length} · {steps[step]?.[0]}
+          Guided tour · {step + 1} / {steps.length} · {steps[step]?.[0]}
         </strong>
         <p>{steps[step]?.[1]}</p>
       </div>
@@ -769,9 +769,9 @@ export function DemoWalkthrough({
         {step < steps.length - 1 ? (
           <button onClick={() => onStep(step + 1)}>Next step</button>
         ) : (
-          <button onClick={onClose}>Finish walkthrough</button>
+          <button onClick={onClose}>Finish tour</button>
         )}
-        <button onClick={onClose}>Close walkthrough</button>
+        <button onClick={onClose}>Close tour</button>
       </div>
     </section>
   );

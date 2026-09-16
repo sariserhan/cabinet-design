@@ -86,8 +86,8 @@ export function HelpGuide({
             in any order; the design stays open.
           </p>
           <p>
-            New to it? Use <strong>Choose a sample kitchen</strong> under
-            Examples &amp; presentation tools to start from a finished room
+            New to it? Use <strong>Sample kitchens</strong> under{' '}
+            <strong>Examples &amp; tools</strong> to start from a finished room
             instead of an empty one.
           </p>
         </section>

@@ -161,7 +161,7 @@ export function DesignerMoreTools({
             setSelected(id);
             setMode('2d');
             document
-              .querySelector('.canvas-panel-controls')
+              .querySelector('.canvas-bar')
               ?.scrollIntoView({ behavior: 'smooth' });
           }}
         />
@@ -174,14 +174,14 @@ export function DesignerMoreTools({
             setSelected(id);
             setMode('2d');
             document
-              .querySelector('.canvas-panel-controls')
+              .querySelector('.canvas-bar')
               ?.scrollIntoView({ behavior: 'smooth' });
           }}
           onNavigate={(stage, target) => {
             if (stage === 'Design') {
               setMode('2d');
               document
-                .querySelector('.canvas-panel-controls')
+                .querySelector('.canvas-bar')
                 ?.scrollIntoView({ behavior: 'smooth' });
               return;
             }

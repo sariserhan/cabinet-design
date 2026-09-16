@@ -8,10 +8,34 @@
      controls below the canvas reachable without hunting for them. */
   --stage-height: clamp(490px, calc(100vh - 430px), 820px);
   --render-stage-height: clamp(570px, calc(100vh - 390px), 900px);
+  /* The small system this file was missing. Everything new is written in
+     these; the older rules are converted as they are touched, rather than
+     in one sweep that would touch every screen at once. */
   --studio-ink: #20333f;
   --studio-muted: #667883;
   --studio-line: #dce4e8;
   --studio-accent: #147d88;
+  /* Surfaces */
+  --surface: #fff;
+  --surface-sunken: #f4f8fa;
+  --surface-raised: #eaf3f4;
+  /* Meaning, so a colour says one thing: teal is "this is the current
+     choice", never decoration. */
+  --selected-bg: var(--studio-accent);
+  --selected-ink: #fff;
+  --focus-ring: #0f6c76;
+  /* Type scale */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-lg: 15px;
+  --text-xl: 18px;
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 10px;
+  --space-4: 14px;
+  --space-5: 20px;
   color: var(--studio-ink);
   background: #fff;
   font-size: 13px;
@@ -1377,10 +1401,6 @@ body:has(.is-presenting) .demo-banner {
   color: #506874;
   font-size: 13px;
 }
-.canvas-panel-controls {
-  padding: 8px 12px;
-  border-bottom: 1px solid #dce5e9;
-}
 .library-collapsed .designer-library-column,
 .inspector-collapsed .designer-inspector {
   display: none;
@@ -1452,7 +1472,7 @@ body:has(.is-presenting) .demo-banner {
   }
 }
 @media print {
-  .canvas-panel-controls,
+  .canvas-bar,
   .demo-walkthrough {
     display: none !important;
   }
@@ -1468,7 +1488,7 @@ body:has(.is-presenting) .demo-banner {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-.is-presenting .canvas-panel-controls,
+.is-presenting .canvas-bar,
 .is-presenting .demo-walkthrough,
 .is-presenting .project-controls,
 .is-presenting .start-guide {
@@ -1578,15 +1598,6 @@ body:has(.is-presenting) .demo-banner {
 }
 .swatch-slate {
   background: linear-gradient(130deg, #40535c, #24333c);
-}
-.save-status {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: 12px;
-  padding: 8px 16px;
-  background: #edf5f0;
 }
 .is-presenting .save-status {
   display: none;
@@ -3511,7 +3522,7 @@ body:has(.is-presenting) .demo-banner {
     display: block;
     margin: 4px 0 0 16px;
   }
-  .canvas-panel-controls button {
+  .canvas-bar button {
     min-height: 40px;
   }
 }
@@ -3623,4 +3634,85 @@ body:has(.canvas-expanded) {
     position: static;
     overflow: visible;
   }
+}
+
+/* One toolbar above the canvas, in groups, replacing three rows of
+   identical buttons. Order: what you are looking at, what you are doing
+   with it, history, zoom, and the panels pushed to the far end. */
+.canvas-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--studio-line);
+  background: var(--surface-sunken);
+}
+.canvas-bar > * {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+/* Pushed to the far end where there is room, and simply next in line where
+   there is not - on a phone this group is wider than the screen. */
+.canvas-panels {
+  margin-left: auto;
+}
+@media (max-width: 760px) {
+  .canvas-panels {
+    margin-left: 0;
+  }
+}
+/* The view you are in is a choice among five, so it reads as one control
+   rather than five buttons that happen to sit together. */
+.designer-app .canvas-views button {
+  border-radius: 0;
+  margin-left: -1px;
+}
+.designer-app .canvas-views button:first-child {
+  border-radius: 5px 0 0 5px;
+  margin-left: 0;
+}
+.designer-app .canvas-views button:last-child {
+  border-radius: 0 5px 5px 0;
+}
+.designer-app .canvas-views button[aria-pressed='true'],
+.designer-app .canvas-instruments button[aria-pressed='true'] {
+  background: var(--selected-bg);
+  border-color: var(--selected-bg);
+  color: var(--selected-ink);
+  position: relative;
+  z-index: 1;
+}
+/* Tools are icons: a row of four words competes with the five view names
+   beside it, and these are used by pointing rather than by reading. */
+.designer-app .canvas-instruments button.tool {
+  padding: 5px 7px;
+}
+.designer-app .canvas-panels button {
+  font-size: var(--text-sm);
+  color: var(--studio-muted);
+  border-color: transparent;
+  background: transparent;
+}
+.designer-app .canvas-panels button:hover:not(:disabled) {
+  background: var(--surface-raised);
+  border-color: var(--studio-line);
+  color: var(--studio-ink);
+}
+.designer-app .canvas-zoom-group .designer-zoom {
+  min-width: 38px;
+}
+.save-status {
+  font-size: var(--text-sm);
+  color: var(--studio-muted);
+  white-space: nowrap;
+}
+
+/* The stage hint is one line of guidance, not a paragraph of its own. */
+.studio-workflow .stage-hint {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  color: var(--studio-muted);
 }

@@ -1130,70 +1130,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         >
           <CircleQuestionMark size={16} /> Help
         </button>
-        <details className="studio-extras">
-          <summary>Examples & presentation tools</summary>
-          <div className="designer-row">
-            {' '}
-            <button
-              onClick={() => {
-                setShowroom(true);
-                setPresenting(false);
-              }}
-            >
-              Open showroom
-            </button>
-            <button
-              className="designer-primary"
-              title="Present the current kitchen"
-              onClick={() => {
-                setWorkspaceStage('Design');
-                setMode('render');
-                setPresentationCamera(design.views?.[0]);
-                setPresenting(true);
-              }}
-            >
-              Show this kitchen
-            </button>
-            <button onClick={() => walkthroughStep(0)}>Demo walkthrough</button>
-            <button
-              onClick={() => {
-                setWorkspaceStage('Design');
-                setMode('compare');
-                setLibraryCollapsed(true);
-                setInspectorCollapsed(true);
-              }}
-            >
-              Compare options
-            </button>
-            <button onClick={() => setShowStart((v) => !v)}>Start here</button>
-            <button onClick={() => setShowGallery((v) => !v)}>
-              Choose a sample kitchen
-            </button>
-            <button
-              onClick={() => {
-                setShowStart(false);
-                setWorkspaceStage('Design');
-                setMode('client');
-              }}
-            >
-              Client presentation / PDF
-            </button>
-            <button onClick={() => startDesign(polishedSample())}>
-              Reset demo
-            </button>
-            <button
-              onClick={() => {
-                setWorkspaceStage('Design');
-                setMode('render');
-                setPresenting(true);
-              }}
-            >
-              Present
-            </button>
-          </div>
-        </details>
         <label className="project-name">
-          Project name
           <input
             aria-label="Project name"
             value={design.name}
@@ -1204,6 +1141,13 @@ function Editor({ ownerId }: { ownerId: string }) {
           />
         </label>
         <div className="designer-row">
+          <span className="save-status" role="status">
+            {saveState === 'saving'
+              ? 'Saving…'
+              : saveState === 'error'
+                ? 'Not saved'
+                : `Saved · ${savedAt}`}
+          </span>
           <button
             onClick={() => {
               setWorkspaceStage('Present');
@@ -1226,6 +1170,82 @@ function Editor({ ownerId }: { ownerId: string }) {
           >
             <FolderOpen size={16} /> Open design
           </button>
+          <details className="studio-extras">
+            <summary>Examples &amp; tools</summary>
+            <div className="designer-row">
+              {' '}
+              <button
+                onClick={() => {
+                  setShowroom(true);
+                  setPresenting(false);
+                }}
+              >
+                Showroom
+              </button>
+              <button
+                className="designer-primary"
+                title="Present the current kitchen"
+                onClick={() => {
+                  setWorkspaceStage('Design');
+                  setMode('render');
+                  setPresentationCamera(design.views?.[0]);
+                  setPresenting(true);
+                }}
+              >
+                Present full screen
+              </button>
+              <button onClick={() => walkthroughStep(0)}>Guided tour</button>
+              <button
+                onClick={() => {
+                  setWorkspaceStage('Design');
+                  setMode('compare');
+                  setLibraryCollapsed(true);
+                  setInspectorCollapsed(true);
+                }}
+              >
+                Compare options
+              </button>
+              <button onClick={() => setShowStart((v) => !v)}>
+                Getting started
+              </button>
+              <button onClick={() => setShowGallery((v) => !v)}>
+                Sample kitchens
+              </button>
+              <button
+                onClick={() => {
+                  setShowStart(false);
+                  setWorkspaceStage('Design');
+                  setMode('client');
+                }}
+              >
+                Client pack / PDF
+              </button>
+              {lastSession && (
+                <button
+                  onClick={() => {
+                    commit(() => structuredClone(lastSession));
+                    setStatus(
+                      'Restored the design from the start of this session. Undo is available.',
+                    );
+                  }}
+                >
+                  Restore last session
+                </button>
+              )}
+              <button onClick={() => startDesign(polishedSample())}>
+                Reload sample kitchen
+              </button>
+              <button
+                onClick={() => {
+                  setWorkspaceStage('Design');
+                  setMode('render');
+                  setPresenting(true);
+                }}
+              >
+                Present
+              </button>
+            </div>
+          </details>
         </div>
       </header>
       <section className="studio-workflow" aria-label="Kitchen design workflow">
@@ -1268,7 +1288,7 @@ function Editor({ ownerId }: { ownerId: string }) {
             ),
           )}
         </nav>
-        <p>
+        <p className="stage-hint">
           {
             {
               Room: 'Measure the room and place its doors, windows and services.',
@@ -1334,27 +1354,6 @@ function Editor({ ownerId }: { ownerId: string }) {
           ownerId={ownerId}
         />
       </section>
-      <div className="save-status" role="status">
-        <span>
-          {saveState === 'saving'
-            ? 'Saving changes…'
-            : saveState === 'error'
-              ? 'Changes not saved'
-              : `Saved in this browser · ${savedAt}`}
-        </span>
-        {lastSession && (
-          <button
-            onClick={() => {
-              commit(() => structuredClone(lastSession));
-              setStatus(
-                'Restored the design from the start of this session. Undo is available.',
-              );
-            }}
-          >
-            Restore last session
-          </button>
-        )}
-      </div>
       <nav className="designer-skip-links" aria-label="Designer shortcuts">
         <a
           href="#project-dashboard"
@@ -1392,35 +1391,6 @@ function Editor({ ownerId }: { ownerId: string }) {
           Skip to item controls
         </a>
       </nav>
-      <DesignerMoreTools
-        design={design}
-        ownerId={ownerId}
-        version={version}
-        templateRaw={templateRaw}
-        selected={selected}
-        setSelected={setSelected}
-        openId={openId}
-        setOpenId={setOpenId}
-        saved={saved}
-        past={history?.past ?? []}
-        setHistory={setHistory}
-        selection={selection}
-        setSelection={setSelection}
-        setInspectorCollapsed={setInspectorCollapsed}
-        setMode={setMode}
-        setBefore={setBefore}
-        setWorkspaceStage={setWorkspaceStage}
-        recordsEpoch={recordsEpoch}
-        setRecordsEpoch={setRecordsEpoch}
-        setStatus={setStatus}
-        commit={commit}
-        example={example}
-        open={open}
-        importFile={importFile}
-        walkthroughStep={walkthroughStep}
-        onHelp={() => setShowHelp(true)}
-        file={file}
-      />
       {(status || storageError || history.error) && (
         <div
           role="status"
@@ -1476,71 +1446,32 @@ function Editor({ ownerId }: { ownerId: string }) {
           id="design-workspace"
           tabIndex={-1}
         >
-          <div className="canvas-panel-controls designer-row">
-            <button
-              aria-pressed={!libraryCollapsed}
-              onClick={() => {
-                setLibraryCollapsed((v) => !v);
-                if (
-                  libraryCollapsed &&
-                  window.matchMedia('(max-width: 700px)').matches
-                )
-                  requestAnimationFrame(() =>
-                    document
-                      .querySelector('.designer-library-column')
-                      ?.scrollIntoView({ behavior: 'smooth' }),
-                  );
+          {item && (
+            <QuickInspector
+              design={design}
+              item={item}
+              ids={selection}
+              onPatch={(patch) => {
+                if (item) updateItem(item.id, patch);
               }}
-            >
-              {libraryCollapsed ? 'Show library' : 'Hide library'}
-            </button>
-            <button
-              aria-pressed={!inspectorCollapsed}
-              onClick={() => setInspectorCollapsed((v) => !v)}
-            >
-              {inspectorCollapsed ? 'Show properties' : 'Hide properties'}
-            </button>
-            <button
-              onClick={() => {
-                const collapse = !(libraryCollapsed && inspectorCollapsed);
-                setLibraryCollapsed(collapse);
-                setInspectorCollapsed(collapse);
-              }}
-            >
-              {libraryCollapsed && inspectorCollapsed
-                ? 'Restore panels'
-                : 'Focus canvas'}
-            </button>
-            <button
-              aria-pressed={canvasExpanded}
-              onClick={() => setCanvasExpanded((v) => !v)}
-              title="Fill the window with the canvas. Press Escape to exit."
-            >
-              {canvasExpanded ? 'Exit full canvas' : 'Enlarge canvas'}
-            </button>
-          </div>
-          <QuickInspector
-            design={design}
-            item={item}
-            ids={selection}
-            onPatch={(patch) => {
-              if (item) updateItem(item.id, patch);
-            }}
-            onChange={(next) => commit(() => next)}
-          />
-          <div className="designer-tools">
-            <div className="designer-row">
+              onChange={(next) => commit(() => next)}
+            />
+          )}
+          <div className="canvas-bar">
+            <div className="canvas-views" role="group" aria-label="View">
               <button
                 aria-pressed={mode === '2d'}
+                aria-label="2D plan"
                 onClick={() => setMode('2d')}
               >
-                <LayoutGrid size={16} /> 2D plan
+                <LayoutGrid size={16} /> 2D
               </button>
               <button
                 aria-pressed={mode === '3d'}
+                aria-label="3D preview"
                 onClick={() => setMode('3d')}
               >
-                <Box size={16} /> 3D preview
+                <Box size={16} /> 3D
               </button>
               <button
                 aria-pressed={mode === 'render'}
@@ -1550,21 +1481,23 @@ function Editor({ ownerId }: { ownerId: string }) {
               </button>
               <button
                 aria-pressed={mode === 'elevation'}
+                aria-label="Wall elevations"
                 onClick={() => setMode('elevation')}
               >
-                Wall elevations
+                Elevations
               </button>
               <button
                 aria-pressed={mode === 'quote'}
+                aria-label="Quote / order"
                 onClick={() => {
                   setWorkspaceStage('Quote');
                   setMode('quote');
                 }}
               >
-                Quote / order
+                Quote
               </button>
             </div>
-            <div className="designer-row">
+            <div className="canvas-history" role="group" aria-label="History">
               <button
                 aria-label="Undo"
                 disabled={!history.past.length}
@@ -1601,116 +1534,134 @@ function Editor({ ownerId }: { ownerId: string }) {
               >
                 <Redo2 size={16} />
               </button>
-              {mode === '2d' && (
-                <>
-                  <button
-                    aria-pressed={!panMode && !annotate}
-                    onClick={() => {
-                      setPanMode(false);
-                      setAnnotate(null);
-                    }}
-                  >
-                    <MousePointer2 size={15} /> Select
-                  </button>
-                  <button
-                    aria-pressed={panMode}
-                    onClick={() => {
-                      setPanMode(true);
-                      setAnnotate(null);
-                    }}
-                  >
-                    <Hand size={15} /> Pan
-                  </button>
-                  <button
-                    aria-pressed={annotate === 'note'}
-                    title="Click the plan to leave a note on the drawing"
-                    onClick={() => {
-                      setPanMode(false);
-                      setAnnotate(annotate === 'note' ? null : 'note');
-                    }}
-                  >
-                    <MessageSquare size={15} /> Note
-                  </button>
-                  <button
-                    aria-pressed={annotate === 'dimension'}
-                    title="Drag across the plan to dimension it"
-                    onClick={() => {
-                      setPanMode(false);
-                      setAnnotate(
-                        annotate === 'dimension' ? null : 'dimension',
-                      );
-                    }}
-                  >
-                    <Ruler size={15} /> Dimension
-                  </button>
-                  <button
-                    aria-label="Zoom out"
-                    disabled={zoom <= 0.5}
-                    onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}
-                  >
-                    <Minus size={15} />
-                  </button>
-                  <button
-                    aria-label="Zoom in"
-                    disabled={zoom >= 4}
-                    onClick={() => setZoom(Math.min(4, zoom + 0.25))}
-                  >
-                    <Plus size={15} />
-                  </button>
-                  <span className="designer-zoom">
-                    {Math.round(zoom * 100)}%
-                  </span>
-                  <button
-                    onClick={() => {
-                      setZoom(1);
-                      setFitRevision((n) => n + 1);
-                    }}
-                  >
-                    <Maximize size={15} /> Fit
-                  </button>
-                </>
-              )}
+            </div>
+            {mode === '2d' && (
+              <div
+                className="canvas-instruments"
+                role="group"
+                aria-label="Tools"
+              >
+                <button
+                  className="tool"
+                  aria-label="Select"
+                  title="Select and move items"
+                  aria-pressed={!panMode && !annotate}
+                  onClick={() => {
+                    setPanMode(false);
+                    setAnnotate(null);
+                  }}
+                >
+                  <MousePointer2 size={16} />
+                </button>
+                <button
+                  className="tool"
+                  aria-label="Pan"
+                  title="Drag the plan, including over cabinets"
+                  aria-pressed={panMode}
+                  onClick={() => {
+                    setPanMode(true);
+                    setAnnotate(null);
+                  }}
+                >
+                  <Hand size={16} />
+                </button>
+                <button
+                  className="tool"
+                  aria-label="Note"
+                  aria-pressed={annotate === 'note'}
+                  title="Click the plan to leave a note on the drawing"
+                  onClick={() => {
+                    setPanMode(false);
+                    setAnnotate(annotate === 'note' ? null : 'note');
+                  }}
+                >
+                  <MessageSquare size={16} />
+                </button>
+                <button
+                  className="tool"
+                  aria-label="Dimension"
+                  aria-pressed={annotate === 'dimension'}
+                  title="Drag across the plan to dimension it"
+                  onClick={() => {
+                    setPanMode(false);
+                    setAnnotate(annotate === 'dimension' ? null : 'dimension');
+                  }}
+                >
+                  <Ruler size={16} />
+                </button>
+              </div>
+            )}
+            {mode === '2d' && (
+              <div className="canvas-zoom-group" role="group" aria-label="Zoom">
+                <button
+                  aria-label="Zoom out"
+                  disabled={zoom <= 0.5}
+                  onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}
+                >
+                  <Minus size={15} />
+                </button>
+                <button
+                  aria-label="Zoom in"
+                  disabled={zoom >= 4}
+                  onClick={() => setZoom(Math.min(4, zoom + 0.25))}
+                >
+                  <Plus size={15} />
+                </button>
+                <span className="designer-zoom">{Math.round(zoom * 100)}%</span>
+                <button
+                  onClick={() => {
+                    setZoom(1);
+                    setFitRevision((n) => n + 1);
+                  }}
+                >
+                  <Maximize size={15} /> Fit
+                </button>
+              </div>
+            )}
+            <div className="canvas-panels" role="group" aria-label="Panels">
+              <button
+                aria-pressed={!libraryCollapsed}
+                onClick={() => {
+                  setLibraryCollapsed((v) => !v);
+                  if (
+                    libraryCollapsed &&
+                    window.matchMedia('(max-width: 700px)').matches
+                  )
+                    requestAnimationFrame(() =>
+                      document
+                        .querySelector('.designer-library-column')
+                        ?.scrollIntoView({ behavior: 'smooth' }),
+                    );
+                }}
+              >
+                {libraryCollapsed ? 'Show library' : 'Hide library'}
+              </button>
+              <button
+                aria-pressed={!inspectorCollapsed}
+                onClick={() => setInspectorCollapsed((v) => !v)}
+              >
+                {inspectorCollapsed ? 'Show properties' : 'Hide properties'}
+              </button>
+              <button
+                onClick={() => {
+                  const collapse = !(libraryCollapsed && inspectorCollapsed);
+                  setLibraryCollapsed(collapse);
+                  setInspectorCollapsed(collapse);
+                }}
+              >
+                {libraryCollapsed && inspectorCollapsed
+                  ? 'Restore panels'
+                  : 'Focus canvas'}
+              </button>
+              <button
+                aria-pressed={canvasExpanded}
+                onClick={() => setCanvasExpanded((v) => !v)}
+                title="Fill the window with the canvas. Press Escape to exit."
+              >
+                {canvasExpanded ? 'Exit full canvas' : 'Enlarge canvas'}
+              </button>
             </div>
           </div>
-          {mode === '2d' && (
-            <details className="canvas-edit-tools">
-              <summary>
-                Editing tools <span>Arrange, repeat &amp; place items</span>
-              </summary>
-              {mode === '2d' && (
-                <EverydayEditing
-                  key={`quick:${design.id}`}
-                  design={design}
-                  selectedIds={
-                    selection.length ? selection : selected ? [selected] : []
-                  }
-                  onApply={(next) => commit(() => next, true)}
-                  onLocate={(id) => {
-                    setWorkspaceStage('Design');
-                    setSelected(id);
-                    setSelection([]);
-                  }}
-                />
-              )}
-              {mode === '2d' && (
-                <KitchenActions
-                  key={design.id}
-                  design={design}
-                  ids={
-                    selection.length ? selection : selected ? [selected] : []
-                  }
-                  onChange={(next) => commit(() => next)}
-                />
-              )}
-              {mode === '2d' && (
-                <PlacementAssist
-                  design={design}
-                  selected={selected}
-                  onChange={(next) => commit(() => next)}
-                />
-              )}
-            </details>
-          )}
           {mode === 'compare' ? (
             <CompareOptions
               before={before?.id === design.id ? before : null}
@@ -1911,6 +1862,45 @@ function Editor({ ownerId }: { ownerId: string }) {
             />
           )}
           {mode === '2d' && (
+            <details className="canvas-edit-tools">
+              <summary>
+                Editing tools <span>Arrange, repeat &amp; place items</span>
+              </summary>
+              {mode === '2d' && (
+                <EverydayEditing
+                  key={`quick:${design.id}`}
+                  design={design}
+                  selectedIds={
+                    selection.length ? selection : selected ? [selected] : []
+                  }
+                  onApply={(next) => commit(() => next, true)}
+                  onLocate={(id) => {
+                    setWorkspaceStage('Design');
+                    setSelected(id);
+                    setSelection([]);
+                  }}
+                />
+              )}
+              {mode === '2d' && (
+                <KitchenActions
+                  key={design.id}
+                  design={design}
+                  ids={
+                    selection.length ? selection : selected ? [selected] : []
+                  }
+                  onChange={(next) => commit(() => next)}
+                />
+              )}
+              {mode === '2d' && (
+                <PlacementAssist
+                  design={design}
+                  selected={selected}
+                  onChange={(next) => commit(() => next)}
+                />
+              )}
+            </details>
+          )}
+          {mode === '2d' && (
             <SelectionTools
               design={design}
               ids={selection}
@@ -2014,6 +2004,35 @@ function Editor({ ownerId }: { ownerId: string }) {
           rotate={rotate}
         />
       </div>
+      <DesignerMoreTools
+        design={design}
+        ownerId={ownerId}
+        version={version}
+        templateRaw={templateRaw}
+        selected={selected}
+        setSelected={setSelected}
+        openId={openId}
+        setOpenId={setOpenId}
+        saved={saved}
+        past={history?.past ?? []}
+        setHistory={setHistory}
+        selection={selection}
+        setSelection={setSelection}
+        setInspectorCollapsed={setInspectorCollapsed}
+        setMode={setMode}
+        setBefore={setBefore}
+        setWorkspaceStage={setWorkspaceStage}
+        recordsEpoch={recordsEpoch}
+        setRecordsEpoch={setRecordsEpoch}
+        setStatus={setStatus}
+        commit={commit}
+        example={example}
+        open={open}
+        importFile={importFile}
+        walkthroughStep={walkthroughStep}
+        onHelp={() => setShowHelp(true)}
+        file={file}
+      />
     </div>
   );
 }
