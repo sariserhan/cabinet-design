@@ -39,6 +39,7 @@ import { RoomEditor } from './room-editor';
 import { RoomPhoto, SurfaceEditor } from './studio-panels';
 import { Numeric } from './designer-widgets';
 import type { ViewMode } from './designer-state';
+import { defaultSpacing, spacingFindings } from '@/designer/spacing';
 
 /** The inspector's own disclosure state, held by Editor. */
 export type InspectorPanelState = {
@@ -96,6 +97,11 @@ export function DesignerInspector({
   rotate: (degrees?: 90 | 180) => void;
 }) {
   const { inspectorTab, moveTogether, showClearance } = panel;
+  // Absent on a design that has never set them, which is most of them.
+  const spacing = design.spacing ?? defaultSpacing;
+  const spacingIssues = spacingFindings(design, spacing);
+  const setSpacing = (patch: Partial<typeof spacing>) =>
+    commit((d) => ({ ...d, spacing: { ...spacing, ...patch } }));
   return (
     <aside className="designer-inspector">
       <h2>Properties</h2>
@@ -634,6 +640,59 @@ export function DesignerInspector({
               : 'Add cabinets to check the layout.'}
           </p>
         )}
+        <h4>Clear floor and work centres</h4>
+        <div className="designer-row spacing-settings">
+          <label>
+            Aisle
+            <input
+              type="number"
+              min={12}
+              max={120}
+              step={1}
+              value={spacing.aisle}
+              onChange={(e) =>
+                setSpacing({ aisle: Number(e.target.value) || spacing.aisle })
+              }
+            />
+          </label>
+          <label>
+            Work centres total
+            <input
+              type="number"
+              min={24}
+              max={600}
+              step={1}
+              value={spacing.triangleMax}
+              onChange={(e) =>
+                setSpacing({
+                  triangleMax: Number(e.target.value) || spacing.triangleMax,
+                })
+              }
+            />
+          </label>
+        </div>
+        {spacingIssues.length ? (
+          <ul>
+            {spacingIssues.map((finding) => (
+              <li key={finding.id}>
+                <button
+                  onClick={() => {
+                    setSelected(finding.itemIds[0] ?? null);
+                    editor.setMode('2d');
+                    editor.setFitRevision((n) => n + 1);
+                  }}
+                >
+                  {finding.message}
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="layout-clear">
+            Nothing measures under the distances set above.
+          </p>
+        )}
+        <p className="designer-muted">{spacing.source}</p>
         <p className="designer-muted">
           Checks use design geometry and recorded service data. Field and
           manufacturer review remain required.

@@ -168,6 +168,19 @@ export const designSchema = z
     selectionBoard: selectionBoardSchema.optional(),
     siteTasks: siteTasksSchema.optional(),
     supplierBookId: z.string().max(100).optional(),
+    /**
+     * Distances this project is checked against, and where they came from.
+     * Absent means the workspace defaults; see `spacing.ts`.
+     */
+    spacing: z
+      .object({
+        aisle: dimension.min(12).max(120),
+        legMin: dimension.min(12).max(240),
+        legMax: dimension.min(12).max(400),
+        triangleMax: dimension.min(24).max(600),
+        source: z.string().trim().max(300),
+      })
+      .optional(),
     sampleKey: z.enum(['apartment', 'family', 'premium']).optional(),
     id: z.string().min(1).max(100),
     name: z.string().trim().min(1).max(100),

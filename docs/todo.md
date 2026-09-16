@@ -78,14 +78,10 @@ started. What is left is ranked by how much it changes the picture.
 Gaps in what the designer can express, rather than in how it runs. Each was
 checked against the model on 2026-09-16.
 
-- [ ] **Clearance between runs, not just around items.** Every item carries
-      its own envelope and the plan warns when one is blocked, but nothing
-      measures the gap between two facing runs, the walkway past an island,
-      or the distance between the sink, the hob and the fridge. That is the
-      first thing an experienced designer looks at and the app is silent on
-      it. Build it as named, configurable distances with the source written
-      beside them, so it reports "39 inches against your 42 inch setting"
-      rather than implying a code ruling the repository has not verified.
+- [x] **Clearance between runs, not just around items.** Done on 2026-09-16:
+      `src/designer/spacing.ts` measures the floor between facing runs and
+      the three work-centre legs, against project settings that carry their
+      own source line, surfaced in Layout checks.
 - [ ] **More than one room in a project.** `design.room` is a single room, so
       a job that covers a kitchen, a vanity and a laundry needs three
       unrelated designs with three quotes. The catalog already carries a

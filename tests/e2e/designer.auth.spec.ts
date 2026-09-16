@@ -170,6 +170,40 @@ test('the canvas grows with the window on every screen size', async ({
   await page.setViewportSize({ width: 1280, height: 900 });
 });
 
+test('clear floor and work centres are measured against the project settings', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(6000);
+  const checks = page.locator('.designer-checks');
+  await expect(checks).toContainText('Clear floor and work centres');
+
+  // Cabinets standing shoulder to shoulder in one run leave a gap too, and
+  // reporting it as an aisle is the mistake this panel is easiest to get
+  // wrong: at the default distance this kitchen has no aisle finding at all.
+  await expect(checks).not.toContainText('of floor between');
+
+  // Raising the setting past the width of the room makes the same geometry
+  // report, which is what shows the number is doing the work.
+  const aisle = checks.getByLabel('Aisle');
+  await aisle.fill('120');
+  await aisle.blur();
+  await expect(checks).toContainText('of floor between', { timeout: 20_000 });
+  await expect(checks).toContainText('against the 120"');
+
+  await aisle.fill('42');
+  await aisle.blur();
+  await expect(checks).not.toContainText('of floor between', {
+    timeout: 20_000,
+  });
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

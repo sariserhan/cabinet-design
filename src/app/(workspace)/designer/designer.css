@@ -1073,6 +1073,23 @@ body:has(.is-presenting) .demo-banner {
 .start-guide input {
   width: 130px;
 }
+.spacing-settings {
+  margin: 6px 0 8px;
+  gap: 12px;
+}
+.spacing-settings label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.spacing-settings input {
+  width: 62px;
+}
+.designer-checks h4 {
+  margin: 14px 0 2px;
+  font-size: 12px;
+}
 .shortcut-help-link {
   align-self: flex-start;
   margin-top: 4px;

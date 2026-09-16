@@ -20,6 +20,7 @@ import {
   marqueeSelection,
 } from '../../src/designer/editing';
 import { previewEverydayEdit } from '../../src/designer/everyday-editing';
+import { spacingFindings, defaultSpacing } from '../../src/designer/spacing';
 import { parseDrop } from '../../src/designer/drop';
 import {
   machiningParts,
@@ -433,4 +434,95 @@ test('deleting a selection takes its linked parts and refuses a locked member', 
     () => previewEverydayEdit(d, ['base'], { kind: 'delete' }),
     /Unlock/,
   );
+});
+test('spacing reports the floor between facing runs and the work centres', () => {
+  const d = newDesign();
+  d.room = {
+    width: 180,
+    depth: 144,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  const base = (id: string, x: number, y: number) => ({
+    ...fromObject('custom_cabinet'),
+    id,
+    x,
+    y,
+    width: 36,
+    depth: 24,
+    height: 34.5,
+  });
+  // Two runs facing each other across 30 inches of floor.
+  d.items = [base('north-run', 20, 0), base('south-run', 20, 54)];
+  const tight = spacingFindings(d);
+  assert.equal(tight.length, 1);
+  assert.equal(tight[0]?.kind, 'aisle');
+  assert.equal(tight[0]?.measured, 30);
+  assert.deepEqual(tight[0]?.itemIds.sort(), ['north-run', 'south-run']);
+  assert.match(tight[0]?.message ?? '', /30" of floor/);
+
+  // Pulling them apart past the setting clears it.
+  d.items[1] = { ...base('south-run', 20, 66) };
+  assert.deepEqual(spacingFindings(d), []);
+
+  // A corner touch is not two runs facing each other, however close.
+  d.items = [base('along-north', 0, 0), base('along-west', 40, 26)];
+  assert.deepEqual(spacingFindings(d), []);
+
+  // Two cabinets shoulder to shoulder in one run leave the same measurable
+  // gap, but nobody stands in it: that is a filler to order, not an aisle.
+  d.items = [base('run-left', 0, 0), base('run-right', 38, 0)];
+  assert.deepEqual(spacingFindings(d), []);
+
+  // The same two turned to face each other across that gap is an aisle.
+  // Rotation 270 faces +x and 90 faces -x, so this pair opens onto the gap
+  // while the back-to-back pair below does not.
+  d.items = [
+    { ...base('faces-east', 0, 0), rotation: 270 },
+    { ...base('faces-west', 38, 0), rotation: 90 },
+  ];
+  assert.equal(spacingFindings(d).length, 1);
+  d.items = [
+    { ...base('backs-west', 0, 0), rotation: 90 },
+    { ...base('backs-east', 38, 0), rotation: 270 },
+  ];
+  assert.deepEqual(spacingFindings(d), []);
+
+  // The setting is what it is compared against, so a project that works to
+  // a narrower aisle reports nothing.
+  d.items = [base('north-run', 20, 0), base('south-run', 20, 54)];
+  assert.deepEqual(spacingFindings(d, { ...defaultSpacing, aisle: 30 }), []);
+});
+test('work centres are measured only when all three are present', () => {
+  const d = newDesign();
+  d.room = {
+    width: 240,
+    depth: 200,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  const sink = { ...fromObject('sink'), id: 'sink', x: 0, y: 0 };
+  const range = { ...fromObject('range'), id: 'range', x: 150, y: 0 };
+  d.items = [sink, range];
+  assert.deepEqual(
+    spacingFindings(d).filter((f) => f.kind === 'triangle'),
+    [],
+  );
+
+  // Placed far apart on purpose: the legs and the total both exceed the
+  // settings, and each one says what it measured against what it was given.
+  d.items = [
+    sink,
+    range,
+    { ...fromObject('refrigerator'), id: 'fridge', x: 0, y: 150 },
+  ];
+  const legs = spacingFindings(d).filter((f) => f.kind === 'triangle');
+  assert.ok(legs.length >= 2);
+  const total = legs.find((f) => f.id === 'triangle-total');
+  assert.ok(total);
+  assert.ok(total.measured > 312);
+  assert.equal(total.required, 312);
+  assert.deepEqual(total.itemIds.sort(), ['fridge', 'range', 'sink']);
 });
