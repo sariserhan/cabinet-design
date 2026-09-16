@@ -57,6 +57,10 @@ Designs are stored as JSON per project: up to 400 objects and 6 MB, with anythin
 
 Drawing packages, dealer CSVs and quotes are coordination drafts. Verify site measurements, appliance specifications, service locations, manufacturer options and source records before ordering or installation.
 
+## What is next
+
+[docs/todo.md](docs/todo.md) holds the backlog: account email through Resend and the verification, recovery and throttling that depend on it; correcting stale claims and widening CI; and the three items that are blocked on a person rather than on code.
+
 ## Validation
 
 ```sh
