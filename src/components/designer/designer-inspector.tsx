@@ -32,6 +32,20 @@ import { RoomPhoto, SurfaceEditor } from './studio-panels';
 import { Numeric } from './designer-widgets';
 import type { ViewMode } from './designer-state';
 
+/** The inspector's own disclosure state, held by Editor. */
+export type InspectorPanelState = {
+  inspectorTab: string;
+  moveTogether: boolean;
+  showClearance: boolean;
+};
+
+/** Editor actions the inspector fires but does not own. */
+export type EditorCommands = {
+  setFitRevision: Dispatch<SetStateAction<number>>;
+  setMode: Dispatch<SetStateAction<ViewMode>>;
+  setStatus: Dispatch<SetStateAction<string>>;
+};
+
 type Commit = (
   change: (current: Design) => Design,
   protectPlacement?: boolean,
@@ -51,15 +65,9 @@ export function DesignerInspector({
   setSelected,
   selection,
   setSelection,
-  inspectorTab,
-  setInspectorTab,
-  moveTogether,
-  setMoveTogether,
-  showClearance,
-  setShowClearance,
-  setFitRevision,
-  setMode,
-  setStatus,
+  panel,
+  setPanel,
+  editor,
   commit,
   updateItem,
   rotate,
@@ -72,19 +80,14 @@ export function DesignerInspector({
   setSelected: Dispatch<SetStateAction<string | null>>;
   selection: string[];
   setSelection: Dispatch<SetStateAction<string[]>>;
-  inspectorTab: string;
-  setInspectorTab: Dispatch<SetStateAction<string>>;
-  moveTogether: boolean;
-  setMoveTogether: Dispatch<SetStateAction<boolean>>;
-  showClearance: boolean;
-  setShowClearance: Dispatch<SetStateAction<boolean>>;
-  setFitRevision: Dispatch<SetStateAction<number>>;
-  setMode: Dispatch<SetStateAction<ViewMode>>;
-  setStatus: Dispatch<SetStateAction<string>>;
+  panel: InspectorPanelState;
+  setPanel: (patch: Partial<InspectorPanelState>) => void;
+  editor: EditorCommands;
   commit: Commit;
   updateItem: (id: string, patch: Partial<Cabinet>) => void;
   rotate: (degrees?: 90 | 180) => void;
 }) {
+  const { inspectorTab, moveTogether, showClearance } = panel;
   return (
     <aside className="designer-inspector">
       <h2>Properties</h2>
@@ -116,7 +119,7 @@ export function DesignerInspector({
             key={tab}
             role="tab"
             aria-selected={inspectorTab === tab}
-            onClick={() => setInspectorTab(tab)}
+            onClick={() => setPanel({ inspectorTab: tab })}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
@@ -192,7 +195,7 @@ export function DesignerInspector({
               <button
                 onClick={() => {
                   setSelection(assemblyMembers(design, item.id));
-                  setMoveTogether(true);
+                  setPanel({ moveTogether: true });
                 }}
               >
                 Select whole assembly / island
@@ -369,7 +372,7 @@ export function DesignerInspector({
                 design={design}
                 item={item}
                 moveTogether={moveTogether}
-                onMoveTogether={setMoveTogether}
+                onMoveTogether={(next) => setPanel({ moveTogether: next })}
                 onChange={(next) => commit(() => next)}
               />
             )}
@@ -393,7 +396,7 @@ export function DesignerInspector({
                   const copy = { ...item, id: crypto.randomUUID() },
                     space = findSpace(copy, design);
                   if (!space) {
-                    setStatus('No free space for a duplicate.');
+                    editor.setStatus('No free space for a duplicate.');
                     return;
                   }
                   commit((d) => ({
@@ -586,8 +589,8 @@ export function DesignerInspector({
             type="checkbox"
             checked={showClearance}
             onChange={(e) => {
-              setShowClearance(e.target.checked);
-              setMode('2d');
+              setPanel({ showClearance: e.target.checked });
+              editor.setMode('2d');
             }}
           />{' '}
           Show clearance zones
@@ -599,9 +602,9 @@ export function DesignerInspector({
                 <button
                   onClick={() => {
                     setSelected(issue.itemIds[0] ?? null);
-                    setMode('2d');
-                    setShowClearance(true);
-                    setFitRevision((n) => n + 1);
+                    editor.setMode('2d');
+                    setPanel({ showClearance: true });
+                    editor.setFitRevision((n) => n + 1);
                   }}
                 >
                   {issue.message}

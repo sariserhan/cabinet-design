@@ -1,6 +1,9 @@
 'use client';
 import { download } from './designer-widgets';
-import { DesignerInspector } from './designer-inspector';
+import {
+  DesignerInspector,
+  type InspectorPanelState,
+} from './designer-inspector';
 import { DesignerMoreTools } from './designer-tools';
 import type { History, WorkspaceStage } from './designer-state';
 import { sourceLink } from '@/designer/design-decisions';
@@ -21,7 +24,7 @@ import { LightingComparison } from './demo-readiness';
 import { PresentationTour } from './presentation-tour';
 import type { CameraView } from './render-view';
 import { PlacementAssist } from './placement-assist';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useQuery } from 'convex/react';
@@ -273,6 +276,21 @@ function Editor({ ownerId }: { ownerId: string }) {
   // Recomputed only when the design itself changes, not on every panel toggle
   // or keystroke elsewhere in the editor.
   const issues = useMemo(() => (design ? warnings(design) : []), [design]);
+  const setInspectorPanel = useCallback(
+    (patch: Partial<InspectorPanelState>) => {
+      if ('inspectorTab' in patch && patch.inspectorTab !== undefined)
+        setInspectorTab(patch.inspectorTab);
+      if ('moveTogether' in patch && patch.moveTogether !== undefined)
+        setMoveTogether(patch.moveTogether);
+      if ('showClearance' in patch && patch.showClearance !== undefined)
+        setShowClearance(patch.showClearance);
+    },
+    [],
+  );
+  const editorCommands = useMemo(
+    () => ({ setFitRevision, setMode, setStatus }),
+    [],
+  );
   currentDesign.current = design;
   useEffect(
     () => () => {
@@ -1577,15 +1595,9 @@ function Editor({ ownerId }: { ownerId: string }) {
           setSelected={setSelected}
           selection={selection}
           setSelection={setSelection}
-          inspectorTab={inspectorTab}
-          setInspectorTab={setInspectorTab}
-          moveTogether={moveTogether}
-          setMoveTogether={setMoveTogether}
-          showClearance={showClearance}
-          setShowClearance={setShowClearance}
-          setFitRevision={setFitRevision}
-          setMode={setMode}
-          setStatus={setStatus}
+          panel={{ inspectorTab, moveTogether, showClearance }}
+          setPanel={setInspectorPanel}
+          editor={editorCommands}
           commit={commit}
           updateItem={updateItem}
           rotate={rotate}

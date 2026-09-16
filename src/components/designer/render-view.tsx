@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -8,6 +8,11 @@ import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { loadRenderAssets, type RenderAssets } from './render-assets';
 import { createPalette } from './render-materials';
+import {
+  initialViewState,
+  type UpdateView,
+  type ViewState,
+} from './render-state';
 import { buildKitchenScene } from './render-scene';
 import { RenderControls, type RenderActions } from './render-controls';
 import { imageBalance } from '@/designer/image-quality';
@@ -63,25 +68,36 @@ export default function RenderView({
     target: SurfaceTarget;
     itemId?: string;
   } | null>(null);
-  const [variant, setVariant] = useState('original');
-  const [lightingOverride, setLightingOverride] = useState<
-    RenderSettings['lighting'] | null
-  >(null);
-  const [lightingProfileOverride, setLightingProfileOverride] = useState<
-    RenderSettings['lightingProfile'] | null
-  >(null);
-  const [environmentKind, setEnvironmentKind] =
-    useState<RenderSettings['environment']>('garden');
-  const [scanned, setScanned] = useState(true);
+  // One object instead of seventeen hooks; see render-state.ts. Destructured so
+  // the rest of this component still reads each field by name.
+  const [view, setView] = useState<ViewState>(initialViewState);
+  const update = useCallback<UpdateView>(
+    (patch) => setView((current) => ({ ...current, ...patch })),
+    [],
+  );
+  const {
+    variant,
+    lightingOverride,
+    lightingProfileOverride,
+    environmentKind,
+    scanned,
+    whiteBalance,
+    autoBalance,
+    adaptive,
+    exportWidth,
+    lens,
+    exposure,
+    quality,
+    walking,
+    opening,
+    cutaway,
+    interiors,
+    showCeiling,
+  } = view;
   const [assets, setAssets] = useState<RenderAssets | null>(null);
   const [assetError, setAssetError] = useState('');
-  const [whiteBalance, setWhiteBalance] = useState<[number, number, number]>([
-    1, 1, 1,
-  ]);
   const whiteBalanceRef = useRef(whiteBalance);
   whiteBalanceRef.current = whiteBalance;
-  const [autoBalance, setAutoBalance] = useState(true);
-  const [adaptive, setAdaptive] = useState(true);
   const [sceneRevision, setSceneRevision] = useState(0);
   const sceneReady = useRef<((error?: Error) => void) | null>(null);
   const [batchBusy, setBatchBusy] = useState(false);
@@ -132,14 +148,12 @@ export default function RenderView({
   const host = useRef<HTMLDivElement>(null);
   const actions = useRef<RenderActions | null>(null);
   const [viewName, setViewName] = useState('Camera view'),
-    [exportWidth, setExportWidth] = useState(1920),
     [viewId, setViewId] = useState('');
   const cameraState = useRef<{
     position: THREE.Vector3;
     target: THREE.Vector3;
     walking: boolean;
   } | null>(null);
-  const [lens, setLens] = useState(45);
   const lensRef = useRef(lens);
   lensRef.current = lens;
   useEffect(() => {
@@ -167,7 +181,6 @@ export default function RenderView({
     autoBalance,
     adaptive,
   });
-  const [exposure, setExposure] = useState(1);
   const exposureRef = useRef(exposure);
   exposureRef.current = exposure;
   useEffect(() => {
@@ -176,9 +189,6 @@ export default function RenderView({
   useEffect(() => {
     actions.current?.balance(whiteBalance);
   }, [whiteBalance]);
-  const [quality, setQuality] = useState(false),
-    [walking, setWalking] = useState(false),
-    [opening, setOpening] = useState(0);
   const conflicts = useMemo(
     () => openingConflicts(design, opening, selected),
     [design, opening, selected],
@@ -186,9 +196,6 @@ export default function RenderView({
   const openingRef = useRef(opening);
   openingRef.current = opening;
   const [error, setError] = useState('');
-  const [cutaway, setCutaway] = useState(true);
-  const [interiors, setInteriors] = useState(false);
-  const [showCeiling, setShowCeiling] = useState(false);
   const settings: RenderSettings = {
     lens,
     exposure,
@@ -215,23 +222,23 @@ export default function RenderView({
   const applyScene = (scene: PresentationScene) => {
     pendingCamera.current = scene;
     const v = scene.settings;
-    setLens(v.lens);
-    setExposure(v.exposure);
-    setWhiteBalance(v.whiteBalance);
-    setEnvironmentKind(v.environment);
-    setScanned(v.scanned);
-    setAutoBalance(v.autoBalance);
-    setAdaptive(v.adaptive);
+    update({ lens: v.lens });
+    update({ exposure: v.exposure });
+    update({ whiteBalance: v.whiteBalance });
+    update({ environmentKind: v.environment });
+    update({ scanned: v.scanned });
+    update({ autoBalance: v.autoBalance });
+    update({ adaptive: v.adaptive });
     setPhotoDenoise(v.denoise);
-    setQuality(v.quality);
-    setShowCeiling(v.ceiling);
-    setCutaway(v.cutaway);
-    setVariant(v.variant);
-    setLightingOverride(v.lighting);
-    setLightingProfileOverride(v.lightingProfile);
-    setInteriors(v.interiors);
-    setWalking(false);
-    setOpening(v.opening);
+    update({ quality: v.quality });
+    update({ showCeiling: v.ceiling });
+    update({ cutaway: v.cutaway });
+    update({ variant: v.variant });
+    update({ lightingOverride: v.lighting });
+    update({ lightingProfileOverride: v.lightingProfile });
+    update({ interiors: v.interiors });
+    update({ walking: false });
+    update({ opening: v.opening });
     setSceneRevision((n) => n + 1);
   };
   const renderSavedScene = async (
@@ -928,9 +935,9 @@ export default function RenderView({
         <div className="render-quick-actions designer-row">
           <button
             onClick={() => {
-              setWalking(false);
-              setCutaway(true);
-              setShowCeiling(false);
+              update({ walking: false });
+              update({ cutaway: true });
+              update({ showCeiling: false });
               const v = bestCamera(design);
               if (walking || !cutaway || showCeiling) pendingCamera.current = v;
               actions.current?.load(v);
@@ -944,7 +951,7 @@ export default function RenderView({
               const v = closeupViews(design)[0];
               if (v) {
                 if (walking) pendingCamera.current = v;
-                setWalking(false);
+                update({ walking: false });
                 actions.current?.load(v);
                 callbacks.current.onCamera?.(v);
               }
@@ -954,7 +961,7 @@ export default function RenderView({
           </button>
           <button
             onClick={() => {
-              setOpening(opening ? 0 : 100);
+              update({ opening: opening ? 0 : 100 });
               actions.current?.open(opening ? 0 : 100);
             }}
           >
@@ -962,6 +969,8 @@ export default function RenderView({
           </button>
         </div>
         <RenderControls
+          view={view}
+          update={update}
           actions={actions}
           photoJob={photoJob}
           design={design}
@@ -972,25 +981,6 @@ export default function RenderView({
           onChange={onChange}
           onCamera={onCamera}
           onCapture={onCapture}
-          adaptive={adaptive}
-          setAdaptive={setAdaptive}
-          autoBalance={autoBalance}
-          setAutoBalance={setAutoBalance}
-          cutaway={cutaway}
-          setCutaway={setCutaway}
-          environmentKind={environmentKind}
-          setEnvironmentKind={setEnvironmentKind}
-          exportWidth={exportWidth}
-          setExportWidth={setExportWidth}
-          exposure={exposure}
-          setExposure={setExposure}
-          interiors={interiors}
-          setInteriors={setInteriors}
-          lens={lens}
-          setLens={setLens}
-          setLightingOverride={setLightingOverride}
-          opening={opening}
-          setOpening={setOpening}
           photoDenoise={photoDenoise}
           setPhotoDenoise={setPhotoDenoise}
           photoMessage={photoMessage}
@@ -998,18 +988,6 @@ export default function RenderView({
           photoResult={photoResult}
           photoSamples={photoSamples}
           setPhotoSamples={setPhotoSamples}
-          quality={quality}
-          setQuality={setQuality}
-          scanned={scanned}
-          setScanned={setScanned}
-          showCeiling={showCeiling}
-          setShowCeiling={setShowCeiling}
-          variant={variant}
-          setVariant={setVariant}
-          walking={walking}
-          setWalking={setWalking}
-          whiteBalance={whiteBalance}
-          setWhiteBalance={setWhiteBalance}
         />
         {walking && (
           <div className="walk-controls designer-row">
