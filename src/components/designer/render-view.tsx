@@ -55,6 +55,7 @@ export default function RenderView({
   selected,
   selectedIds,
   onSelect,
+  onToggle,
   onMoveItem,
   editLocked,
   onEditLockChange,
@@ -63,6 +64,7 @@ export default function RenderView({
   selected?: string | null;
   selectedIds?: string[];
   onSelect?: (id: string | null) => void;
+  onToggle?: (id: string) => void;
   /** Commits a drag in the 3D view, using the same rules as the 2D plan. */
   onMoveItem?: (id: string, x: number, y: number) => void;
   /** While locked, dragging is refused; clicking still selects. */
@@ -155,6 +157,7 @@ export default function RenderView({
     onCamera,
     onCapture,
     onSelect,
+    onToggle,
     onMoveItem,
     editLocked,
   });
@@ -162,6 +165,7 @@ export default function RenderView({
     onCamera,
     onCapture,
     onSelect,
+    onToggle,
     onMoveItem,
     editLocked,
   };
@@ -823,6 +827,12 @@ export default function RenderView({
       while (owner && !owner.userData.itemId) owner = owner.parent;
       const id = owner?.userData.itemId as string | undefined;
       const item = design.items.find((i) => i.id === id);
+      // Shift adds the item to the selection rather than replacing it, the
+      // same gesture as the plan, so a group can be built while orbiting.
+      if (e.shiftKey && id && callbacks.current.onToggle) {
+        callbacks.current.onToggle(id);
+        return;
+      }
       if (callbacks.current.onSelect) {
         const target =
           object?.userData.surface ??

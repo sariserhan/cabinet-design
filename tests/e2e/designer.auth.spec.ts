@@ -99,7 +99,9 @@ test('each door style rebuilds the scene and keeps it drawing', async ({
   for (const option of ['slab', 'raised', 'shaker']) {
     await style.selectOption(option);
     // A door builder that throws leaves the stage blank or raises its alert.
-    await expect(page.locator('.designer-render [role="alert"]')).toHaveCount(0);
+    await expect(page.locator('.designer-render [role="alert"]')).toHaveCount(
+      0,
+    );
     await expect
       .poll(() => canvasColours(page, '.render-stage'), { timeout: 60_000 })
       .toBeGreaterThan(3);
@@ -137,7 +139,9 @@ test('saved designs persist in IndexedDB and survive a reload', async ({
   expect(stored).toContain(name);
 
   await page.reload();
-  await expect(page.getByLabel('Project name')).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByLabel('Project name')).toBeVisible({
+    timeout: 60_000,
+  });
   await expect(page.getByRole('option', { name })).toBeAttached({
     timeout: 30_000,
   });
@@ -271,6 +275,150 @@ test('an item can be nudged, rotated, dragged in 3D and deleted', async ({
   expect(afterLock.length).toBe(deleted.length);
   expect(changed(deleted, afterLock, 'x')).toBe(false);
   expect(changed(deleted, afterLock, 'rotation')).toBe(false);
+
+  expect(pageErrors).toEqual([]);
+});
+
+test('a band selects several items, which then move, turn and delete as one', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  /** The saved draft: what any selection gesture ultimately has to change. */
+  async function items() {
+    const rows = await page.evaluate(() => {
+      const key = Object.keys(localStorage).filter((k) =>
+        k.endsWith(':draft'),
+      )[0];
+      const value = key ? localStorage.getItem(key) : null;
+      if (!value) return null;
+      return (
+        JSON.parse(value) as {
+          items: { id: string; x: number; y: number; rotation: number }[];
+        }
+      ).items.map((i) => ({ id: i.id, x: i.x, y: i.y, rotation: i.rotation }));
+    });
+    expect(rows, 'expected a saved draft to read').not.toBeNull();
+    return rows ?? [];
+  }
+
+  /** Plan inches to viewport pixels, the mapping the canvas itself uses. */
+  async function at(x: number, y: number) {
+    const point = await page.evaluate(
+      ([ux, uy]) => {
+        const svg = document.querySelector<SVGSVGElement>('.plan-svg');
+        const matrix = svg?.getScreenCTM();
+        if (!svg || !matrix || ux === undefined || uy === undefined)
+          return null;
+        const p = svg.createSVGPoint();
+        p.x = ux;
+        p.y = uy;
+        const t = p.matrixTransform(matrix);
+        return { x: t.x, y: t.y };
+      },
+      [x, y],
+    );
+    expect(point, 'expected the plan to be on screen').not.toBeNull();
+    return point ?? { x: 0, y: 0 };
+  }
+
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(6000);
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  await page.locator('.plan-svg').scrollIntoViewIfNeeded();
+
+  // A band around the island, in room inches rather than screen fractions, so
+  // the test says which items it means: the three island cabinets and the
+  // countertop over them, clear of the perimeter run.
+  const from = await at(60, 90),
+    to = await at(165, 150);
+  await page.keyboard.down('Shift');
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  for (let step = 1; step <= 10; step++)
+    await page.mouse.move(
+      from.x + ((to.x - from.x) * step) / 10,
+      from.y + ((to.y - from.y) * step) / 10,
+    );
+  await page.mouse.up();
+  await page.keyboard.up('Shift');
+
+  // The band is drawn only while the pointer is down.
+  await expect(page.locator('[data-testid="selection-band"]')).toHaveCount(0);
+  const banner = page.locator('.designer-message');
+  await expect(banner).toContainText(/\d+ items selected/, { timeout: 20_000 });
+  const count = Number(
+    (await banner.textContent())?.match(/(\d+) items selected/)?.[1] ?? 0,
+  );
+  expect(count).toBeGreaterThan(1);
+
+  // Every selected item moves by the same amount, which is what makes this a
+  // group move rather than a nudge of whichever item had focus.
+  // Dragging one member carries the rest: the whole point of selecting a
+  // group before moving it. Snapping decides the exact distance, so what
+  // matters is that every member travels the same way.
+  const grabbed = await items();
+  const grab = await at(112, 115),
+    drop = await at(132, 115);
+  await page.mouse.move(grab.x, grab.y);
+  await page.mouse.down();
+  for (let step = 1; step <= 10; step++)
+    await page.mouse.move(grab.x + ((drop.x - grab.x) * step) / 10, grab.y);
+  await page.mouse.up();
+  await expect(banner).toContainText(/items moved/, { timeout: 20_000 });
+  await expect
+    .poll(
+      async () => {
+        const after = await items();
+        const deltas = after
+          .map((row, index) => row.x - (grabbed[index]?.x ?? 0))
+          .filter((d) => d !== 0);
+        return deltas.length > 1 && new Set(deltas).size === 1
+          ? deltas.length
+          : 0;
+      },
+      { timeout: 30_000 },
+    )
+    .toBeGreaterThan(1);
+
+  // The draft is saved on a debounce, so each step polls the stored design
+  // instead of reading it the moment the status line changes.
+  const before = await items();
+  await page.keyboard.press('ArrowRight');
+  await expect(banner).toContainText(/items moved/, { timeout: 20_000 });
+  await expect
+    .poll(
+      async () =>
+        (await items()).filter(
+          (row, index) => row.x - (before[index]?.x ?? 0) === 1,
+        ).length,
+      { timeout: 30_000 },
+    )
+    .toBeGreaterThan(1);
+  const moved = await items();
+  expect(moved.filter((row, i) => row.y !== before[i]?.y)).toHaveLength(0);
+
+  await page.keyboard.press('r');
+  await expect(banner).toContainText(/turned 90° as one group/, {
+    timeout: 20_000,
+  });
+  await expect
+    .poll(
+      async () =>
+        (await items()).filter((row, i) => row.rotation !== moved[i]?.rotation)
+          .length,
+      { timeout: 30_000 },
+    )
+    .toBeGreaterThan(1);
+  const turned = await items();
+
+  await page.keyboard.press('Delete');
+  await expect(banner).toContainText(/items deleted/, { timeout: 20_000 });
+  await expect
+    .poll(async () => (await items()).length, { timeout: 30_000 })
+    .toBeLessThan(turned.length);
 
   expect(pageErrors).toEqual([]);
 });

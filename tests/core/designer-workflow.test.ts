@@ -17,7 +17,9 @@ import {
   snapPlacement,
   duplicateOption,
   clearanceZones,
+  marqueeSelection,
 } from '../../src/designer/editing';
+import { previewEverydayEdit } from '../../src/designer/everyday-editing';
 import { parseDrop } from '../../src/designer/drop';
 import {
   machiningParts,
@@ -293,4 +295,142 @@ test('material previews preserve layout, camera and lighting without mutating th
   assert.equal(variant.items[0]?.x, d.items[0]?.x);
   assert.equal(JSON.stringify(d), json);
   assert.equal(materialVariant(d, 'original'), d);
+});
+test('a selection band takes what it touches, and leaves hidden items and wall openings behind', () => {
+  const d = newDesign();
+  d.room = {
+    width: 144,
+    depth: 120,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  const run = [0, 24, 48].map((x, n) => ({
+    ...fromObject('custom_cabinet'),
+    id: `run-${n}`,
+    x,
+    y: 0,
+    width: 24,
+    depth: 24,
+  }));
+  d.items = [
+    ...run,
+    { ...fromObject('custom_cabinet'), id: 'far', x: 100, y: 80 },
+    { ...fromObject('custom_cabinet'), id: 'unseen', x: 0, y: 0, hidden: true },
+    {
+      ...fromObject('window'),
+      id: 'glass',
+      x: 0,
+      y: 0,
+      wall: 'north' as const,
+    },
+  ];
+  // A band that only clips the first two cabinets takes exactly those two: it
+  // touches the second rather than enclosing it, and never reaches the third.
+  assert.deepEqual(
+    marqueeSelection(d, { x: -5, y: -5, width: 35, depth: 30 }),
+    ['run-0', 'run-1'],
+  );
+  // The same band over the whole wall still refuses the window and the item
+  // that is not on screen.
+  assert.deepEqual(
+    marqueeSelection(d, { x: -5, y: -5, width: 140, depth: 30 }),
+    ['run-0', 'run-1', 'run-2'],
+  );
+  assert.deepEqual(
+    marqueeSelection(d, { x: 200, y: 200, width: 10, depth: 10 }),
+    [],
+  );
+});
+test('a turned selection keeps its arrangement and stays one run', () => {
+  const d = newDesign();
+  d.room = {
+    width: 144,
+    depth: 120,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  d.items = [0, 24].map((x, n) => ({
+    ...fromObject('custom_cabinet'),
+    id: `run-${n}`,
+    x: x + 12,
+    y: 12,
+    width: 24,
+    depth: 24,
+    wall: 'north' as const,
+  }));
+  const turned = previewEverydayEdit(d, ['run-0', 'run-1'], {
+    kind: 'rotate',
+    degrees: 90,
+  }).design;
+  const [a, b] = turned.items;
+  assert.ok(a && b);
+  // Turning each cabinet about its own centre would leave both at the same
+  // place; turning the pair about their shared centre stacks them instead,
+  // and the run keeps its length in the other direction.
+  assert.equal(a.rotation, 90);
+  assert.equal(b.rotation, 90);
+  assert.equal(a.x, b.x);
+  assert.equal(Math.abs(a.y - b.y), 24);
+  assert.equal(a.wall, null);
+  // A half turn applied twice is a full circle: the pair comes back exactly
+  // where it started, which a per-item rotation would not do.
+  let back = d;
+  for (let turn = 0; turn < 2; turn++)
+    back = previewEverydayEdit(back, ['run-0', 'run-1'], {
+      kind: 'rotate',
+      degrees: 180,
+    }).design;
+  assert.deepEqual(
+    back.items.map((i) => [i.id, i.x, i.y, i.rotation]),
+    [
+      ['run-0', 12, 12, 0],
+      ['run-1', 36, 12, 0],
+    ],
+  );
+  assert.throws(
+    () =>
+      previewEverydayEdit(d, ['run-0', 'run-1'], {
+        kind: 'rotate',
+        degrees: 45,
+      }),
+    /90, 180 or 270/,
+  );
+});
+test('deleting a selection takes its linked parts and refuses a locked member', () => {
+  const d = newDesign();
+  d.items = [
+    {
+      ...fromObject('custom_cabinet'),
+      id: 'base',
+      x: 0,
+      y: 0,
+      assemblyId: 'pair',
+    },
+    {
+      ...fromObject('countertop'),
+      id: 'top',
+      x: 0,
+      y: 0,
+      elevation: 34.5,
+      assemblyId: 'pair',
+    },
+    { ...fromObject('custom_cabinet'), id: 'other', x: 60, y: 0 },
+  ];
+  // The countertop was never selected, but it belongs to the cabinet, so it
+  // goes with it rather than being left floating.
+  const removed = previewEverydayEdit(d, ['base'], { kind: 'delete' });
+  assert.deepEqual(
+    removed.design.items.map((i) => i.id),
+    ['other'],
+  );
+  assert.equal(removed.addedItems, -2);
+  const top = d.items[1];
+  assert.ok(top);
+  d.items[1] = { ...top, locked: true };
+  assert.throws(
+    () => previewEverydayEdit(d, ['base'], { kind: 'delete' }),
+    /Unlock/,
+  );
 });

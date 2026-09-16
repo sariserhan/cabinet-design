@@ -11,7 +11,11 @@ import {
 } from '@/designer/model';
 import { roomOutline, roomEdges } from '@/designer/room';
 import { resizeFromPoint } from '@/designer/studio-tools';
-import { snapPlacement, clearanceZones } from '@/designer/editing';
+import {
+  snapPlacement,
+  clearanceZones,
+  marqueeSelection,
+} from '@/designer/editing';
 import type { DropItem } from '@/designer/editing';
 import { fromObject, fromProduct, itemPolygon } from '@/designer/model';
 import { placementAt } from '@/designer/editing';
@@ -39,6 +43,9 @@ type Props = {
   moveTogether: boolean;
   selectedIds: string[];
   onToggle: (id: string) => void;
+  /** Result of a band sweep; an empty list clears the selection. */
+  onMarquee: (ids: string[], additive: boolean) => void;
+  onMoveMany: (ids: string[], dx: number, dy: number) => void;
   showClearance: boolean;
   onDropItem: (item: DropItem, point: { x: number; y: number }) => void;
 };
@@ -55,6 +62,8 @@ export function PlanCanvas({
   moveTogether,
   selectedIds,
   onToggle,
+  onMarquee,
+  onMoveMany,
   showClearance,
   onDropItem,
   onResize,
@@ -145,6 +154,19 @@ export function PlanCanvas({
     dy: number;
     x: number;
     y: number;
+    // Where the grabbed item started, so a group drag can apply the same
+    // shift to everything else in the selection.
+    ox: number;
+    oy: number;
+    group: string[];
+  } | null>(null);
+  // A rubber-band selection in progress, in plan inches.
+  const [band, setBand] = useState<{
+    x0: number;
+    y0: number;
+    x: number;
+    y: number;
+    additive: boolean;
   } | null>(null);
   const { room } = design,
     padding = 28;
@@ -165,7 +187,14 @@ export function PlanCanvas({
       onToggle(item.id);
       return;
     }
-    onSelect(item.id);
+    // Grabbing an item that is part of a multi-selection drags the whole
+    // selection, so a run of cabinets can be moved without regrouping it.
+    // Grabbing anything else selects it, which drops the old selection.
+    const group =
+      selectedIds.length > 1 && selectedIds.includes(item.id)
+        ? selectedIds
+        : [];
+    if (!group.length) onSelect(item.id);
     if (item.locked) return;
     event.currentTarget.focus();
     const p = coordinates(event);
@@ -176,10 +205,23 @@ export function PlanCanvas({
       dy: p.y - item.y,
       x: item.x,
       y: item.y,
+      ox: item.x,
+      oy: item.y,
+      group,
     });
   }
   function startPan(event: PointerEvent<SVGSVGElement>) {
     if (event.button !== 0 && event.button !== 1) return;
+    // Shift and drag across empty floor sweeps up everything the band
+    // touches. Plain dragging still pans, which is what the canvas has
+    // always done and what the footer tells people.
+    if (event.shiftKey && !panMode && !space && event.button === 0) {
+      const p = coordinates(event);
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setBand({ x0: p.x, y0: p.y, x: p.x, y: p.y, additive: true });
+      return;
+    }
     const matrix = svg.current?.getScreenCTM()?.inverse();
     if (!matrix) return;
     event.preventDefault();
@@ -194,6 +236,11 @@ export function PlanCanvas({
     setIsPanning(true);
   }
   function move(event: PointerEvent) {
+    if (band) {
+      const p = coordinates(event);
+      setBand({ ...band, x: p.x, y: p.y });
+      return;
+    }
     const camera = panning.current;
     if (camera) {
       const dx = event.clientX - camera.clientX,
@@ -216,17 +263,54 @@ export function PlanCanvas({
     if (!drag) return;
     const item = design.items.find((i) => i.id === drag.id);
     if (!item) return;
+    // Items travelling with the grab keep their distance from it, so they are
+    // not snapping targets - only the ones staying put are.
+    const against = drag.group.length
+      ? {
+          ...design,
+          items: design.items.filter((i) => !drag.group.includes(i.id)),
+        }
+      : design;
     const p = coordinates(event),
       position = snapPlacement(
         item,
-        design,
+        against,
         p.x - drag.dx,
         p.y - drag.dy,
         snap,
       );
     setDrag({ ...drag, ...position });
   }
-  function end() {
+  function end(event?: PointerEvent) {
+    // A press on empty floor that never became a pan is a click on nothing,
+    // which clears the selection. Without this there is no way to leave a
+    // multi-selection except by picking another item.
+    const camera = panning.current;
+    if (
+      camera &&
+      event &&
+      Math.hypot(
+        event.clientX - camera.clientX,
+        event.clientY - camera.clientY,
+      ) <= 3
+    ) {
+      onSelect(null);
+      onMarquee([], false);
+    }
+    if (band) {
+      const rect = {
+        x: Math.min(band.x0, band.x),
+        y: Math.min(band.y0, band.y),
+        width: Math.abs(band.x - band.x0),
+        depth: Math.abs(band.y - band.y0),
+      };
+      setBand(null);
+      // A shift-click that never moved is a toggle, not an empty band; it is
+      // handled on the item itself, so nothing to do when the band is a dot.
+      if (rect.width > 0.5 || rect.depth > 0.5)
+        onMarquee(marqueeSelection(design, rect), band.additive);
+      return;
+    }
     if (resize) {
       onResize(resize.item.id, resize.patch.width, resize.patch.depth, {
         x: resize.patch.x,
@@ -237,7 +321,16 @@ export function PlanCanvas({
     panning.current = null;
     setIsPanning(false);
     if (drag) {
-      onMove(drag.id, drag.x, drag.y);
+      const moved = drag.x !== drag.ox || drag.y !== drag.oy;
+      if (drag.group.length && moved)
+        onMoveMany(drag.group, drag.x - drag.ox, drag.y - drag.oy);
+      else if (drag.group.length) {
+        // Pressing a member of a group without dragging it is a plain click:
+        // it picks that one item, the only way back to a single selection
+        // without first clicking empty floor.
+        onMarquee([], false);
+        onSelect(drag.id);
+      } else onMove(drag.id, drag.x, drag.y);
       setDrag(null);
     }
   }
@@ -252,6 +345,14 @@ export function PlanCanvas({
     if (dir && !item.locked) {
       event.preventDefault();
       const step = event.shiftKey ? 6 : 1;
+      // Arrow keys reach the focused item before the whole-design shortcut
+      // does, so the group case has to be handled here too - otherwise
+      // nudging a multi-selection from the plan would move one item out of
+      // the run it belongs to.
+      if (selectedIds.length > 1 && selectedIds.includes(item.id)) {
+        onMoveMany(selectedIds, dir[0] * step, dir[1] * step);
+        return;
+      }
       const p = snapPosition(
         item,
         room,
@@ -332,6 +433,7 @@ export function PlanCanvas({
         onPointerCancel={() => {
           setDrag(null);
           setResize(null);
+          setBand(null);
           panning.current = null;
           setIsPanning(false);
         }}
@@ -480,7 +582,13 @@ export function PlanCanvas({
                 ? { ...original, ...resize.patch }
                 : drag?.id === original.id
                   ? { ...original, x: drag.x, y: drag.y }
-                  : original;
+                  : drag?.group.includes(original.id)
+                    ? {
+                        ...original,
+                        x: original.x + drag.x - drag.ox,
+                        y: original.y + drag.y - drag.oy,
+                      }
+                    : original;
             const b = footprint(item),
               active = selected === item.id || selectedIds.includes(item.id),
               warning = warningIds.has(item.id);
@@ -655,6 +763,21 @@ export function PlanCanvas({
           >
             Add a cabinet from the library to begin
           </text>
+        )}
+        {band && (
+          <rect
+            data-testid="selection-band"
+            pointerEvents="none"
+            x={Math.min(band.x0, band.x)}
+            y={Math.min(band.y0, band.y)}
+            width={Math.abs(band.x - band.x0)}
+            height={Math.abs(band.y - band.y0)}
+            fill="#087984"
+            fillOpacity=".08"
+            stroke="#087984"
+            strokeWidth=".5"
+            strokeDasharray="2 1.5"
+          />
         )}
         {drag &&
           (() => {

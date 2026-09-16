@@ -6,6 +6,8 @@ import {
   updateAssembly,
   localToWorld,
   clearanceDefaults,
+  isOpening,
+  itemPolygon,
 } from './model';
 import { roomEdges } from './room';
 import { attachToWall } from './model';
@@ -316,4 +318,60 @@ export function finishAssembly(
         : i,
     ),
   };
+}
+
+/**
+ * Do two convex polygons share any area?
+ *
+ * The separating-axis test: if any edge normal of either shape separates
+ * their projections, they are apart. Touching edges count as a hit, which is
+ * what a selection band should do - a cabinet the band just reaches is one
+ * the person meant to catch.
+ */
+function convexOverlap(
+  a: { x: number; y: number }[],
+  b: { x: number; y: number }[],
+) {
+  for (const poly of [a, b])
+    for (let i = 0; i < poly.length; i++) {
+      const p = poly[i],
+        q = poly[(i + 1) % poly.length];
+      if (!p || !q) continue;
+      const nx = -(q.y - p.y),
+        ny = q.x - p.x;
+      const pa = a.map((v) => v.x * nx + v.y * ny),
+        pb = b.map((v) => v.x * nx + v.y * ny);
+      if (
+        Math.min(...pa) > Math.max(...pb) ||
+        Math.min(...pb) > Math.max(...pa)
+      )
+        return false;
+    }
+  return true;
+}
+
+/**
+ * The items a rubber-band rectangle picks up, in plan inches.
+ *
+ * Anything the band touches counts, rather than only what it encloses, so a
+ * sweep across a run of cabinets takes the whole run. Two kinds stay out of
+ * it: hidden items, which are not on screen to be aimed at, and wall
+ * openings, which belong to their wall - dragging a band along a wall should
+ * collect the cabinets in front of it, not the window behind them.
+ */
+export function marqueeSelection(
+  design: Design,
+  rect: { x: number; y: number; width: number; depth: number },
+) {
+  const band = [
+    { x: rect.x, y: rect.y },
+    { x: rect.x + rect.width, y: rect.y },
+    { x: rect.x + rect.width, y: rect.y + rect.depth },
+    { x: rect.x, y: rect.y + rect.depth },
+  ];
+  return design.items
+    .filter(
+      (i) => !i.hidden && !isOpening(i) && convexOverlap(itemPolygon(i), band),
+    )
+    .map((i) => i.id);
 }

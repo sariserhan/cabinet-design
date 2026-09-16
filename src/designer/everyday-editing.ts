@@ -4,11 +4,14 @@ import {
   warnings,
   isOpening,
   itemPolygon,
+  footprint,
 } from './model';
 import { captureAssembly, placeAssembly } from './assembly-library';
 import { canonical } from './installer-handoff';
 export type EditRequest =
   | { kind: 'move'; x: number; y: number }
+  | { kind: 'rotate'; degrees: number }
+  | { kind: 'delete' }
   | {
       kind: 'repeat';
       direction: 'right' | 'left' | 'down' | 'up';
@@ -48,7 +51,10 @@ export function previewEverydayEdit(
   if (!members.length) throw Error('Select at least one item.');
   if (members.some((i) => i.locked))
     throw Error('Unlock every selected or linked item first.');
-  if (members.some(isOpening) && request.kind !== 'finish')
+  if (
+    members.some(isOpening) &&
+    (request.kind === 'move' || request.kind === 'rotate')
+  )
     throw Error('Use the room tools to move wall openings.');
   const ids = new Set(members.map((i) => i.id));
   let next: Design;
@@ -73,6 +79,49 @@ export function previewEverydayEdit(
             }
           : i,
       ),
+    });
+  } else if (request.kind === 'rotate') {
+    // A run of cabinets turned as a group has to stay a run: each item turns
+    // about the centre of the whole selection, not about its own centre,
+    // which would scatter the items across each other.
+    if (![90, 180, 270].includes(request.degrees))
+      throw Error('Turn a selection by 90, 180 or 270 degrees.');
+    const points = members.flatMap(itemPolygon),
+      cx =
+        (Math.min(...points.map((p) => p.x)) +
+          Math.max(...points.map((p) => p.x))) /
+        2,
+      cy =
+        (Math.min(...points.map((p) => p.y)) +
+          Math.max(...points.map((p) => p.y))) /
+        2;
+    const angle = (request.degrees * Math.PI) / 180,
+      cos = Math.cos(angle),
+      sin = Math.sin(angle),
+      round = (v: number) => Math.round(v * 1e6) / 1e6;
+    next = designSchema.parse({
+      ...d,
+      items: d.items.map((i) => {
+        if (!ids.has(i.id)) return i;
+        const f = footprint(i),
+          ix = i.x + f.width / 2,
+          iy = i.y + f.depth / 2,
+          rotation = (i.rotation + request.degrees) % 360,
+          turned = footprint({ ...i, rotation });
+        return {
+          ...i,
+          rotation,
+          x: round(cx + (ix - cx) * cos - (iy - cy) * sin - turned.width / 2),
+          y: round(cy + (ix - cx) * sin + (iy - cy) * cos - turned.depth / 2),
+          wall: null,
+          wallSegment: null,
+        };
+      }),
+    });
+  } else if (request.kind === 'delete') {
+    next = designSchema.parse({
+      ...d,
+      items: d.items.filter((i) => !ids.has(i.id)),
     });
   } else if (request.kind === 'repeat') {
     if (

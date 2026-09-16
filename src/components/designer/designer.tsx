@@ -76,6 +76,8 @@ import { PrintPackage } from './print-package';
 import { QuotePanel } from './demo-options';
 import { SelectionTools, CompareOptions } from './workflow-tools';
 import { snapPlacement, duplicateOption } from '@/designer/editing';
+import { previewEverydayEdit } from '@/designer/everyday-editing';
+import type { EditRequest } from '@/designer/everyday-editing';
 import { DemoWalkthrough, StartGuide, ClientPresentation } from './demo-tools';
 import { placementAt } from '@/designer/editing';
 import { polishedSample } from '@/designer/sample';
@@ -468,6 +470,37 @@ function Editor({ ownerId }: { ownerId: string }) {
     );
   }
   /**
+   * Apply one edit to every item in a multi-selection.
+   *
+   * This runs the same guards as the editing panel rather than a second set:
+   * linked parts travel with what they are attached to, one locked member
+   * refuses the whole change, and a move that would push something out of the
+   * room is reported instead of applied. `describe` receives the number of
+   * items that actually took part, which includes those linked parts.
+   */
+  function editSelection(
+    ids: string[],
+    request: EditRequest,
+    describe: (count: number) => string,
+  ) {
+    if (!design) return false;
+    try {
+      const preview = previewEverydayEdit(design, ids, request);
+      if (preview.blocked) {
+        setStatus(
+          preview.added[0]?.message ?? 'That change would break the layout.',
+        );
+        return false;
+      }
+      commit(() => preview.design, request.kind !== 'delete');
+      setStatus(describe(preview.members));
+      return true;
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Change not applied.');
+      return false;
+    }
+  }
+  /**
    * Whole-design shortcuts for the selected item: move, rotate and delete.
    *
    * The 2D plan already moves a focused item with the arrow keys, so events
@@ -493,8 +526,16 @@ function Editor({ ownerId }: { ownerId: string }) {
       if (mode !== '2d' && mode !== 'render') return;
       // The 3D view can be locked so a stray key while orbiting changes nothing.
       if (mode === 'render' && renderLocked) return;
-      const current = design?.items.find((i) => i.id === selected);
+      // A multi-selection takes precedence over the single item the
+      // inspector is showing, so the keys act on what the canvas has
+      // highlighted. One selected item keeps the original single-item path,
+      // which preserves wall attachment and snapping.
+      const ids = (
+        selection.length ? selection : selected ? [selected] : []
+      ).filter((id) => design?.items.some((i) => i.id === id));
+      const current = design?.items.find((i) => i.id === ids[0]);
       if (!design || !current) return;
+      const group = ids.length > 1;
       const steps: Record<string, [number, number]> = {
         ArrowLeft: [-1, 0],
         ArrowRight: [1, 0],
@@ -507,6 +548,14 @@ function Editor({ ownerId }: { ownerId: string }) {
         if (target?.closest('.plan-scroll')) return;
         e.preventDefault();
         const distance = e.shiftKey ? 6 : 1;
+        if (group) {
+          editSelection(
+            ids,
+            { kind: 'move', x: step[0] * distance, y: step[1] * distance },
+            (n) => `${n} items moved. Undo restores them.`,
+          );
+          return;
+        }
         const moved = snapPosition(
           current,
           design.room,
@@ -519,6 +568,19 @@ function Editor({ ownerId }: { ownerId: string }) {
       }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
+        if (group) {
+          if (
+            editSelection(
+              ids,
+              { kind: 'delete' },
+              (n) => `${n} items deleted. Undo restores them.`,
+            )
+          ) {
+            setSelection([]);
+            setSelected(null);
+          }
+          return;
+        }
         commit((d) => ({
           ...d,
           items: d.items.filter((i) => i.id !== current.id),
@@ -530,6 +592,14 @@ function Editor({ ownerId }: { ownerId: string }) {
       if (e.key === 'r' || e.key === 'R') {
         e.preventDefault();
         const degrees = e.shiftKey ? 180 : 90;
+        if (group) {
+          editSelection(
+            ids,
+            { kind: 'rotate', degrees },
+            (n) => `${n} items turned ${degrees}° as one group.`,
+          );
+          return;
+        }
         const turned = turnCabinet(current, degrees);
         updateItem(current.id, {
           rotation: turned.rotation,
@@ -540,7 +610,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     };
     window.addEventListener('keydown', shortcut);
     return () => window.removeEventListener('keydown', shortcut);
-  }, [design, selected, snap, moveTogether, mode, renderLocked]);
+  }, [design, selected, selection, snap, moveTogether, mode, renderLocked]);
   function add(
     product: Product,
     versionId: string,
@@ -1578,6 +1648,29 @@ function Editor({ ownerId }: { ownerId: string }) {
                   ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
                 )
               }
+              onMarquee={(ids, additive) => {
+                const next = additive
+                  ? [...new Set([...selection, ...ids])]
+                  : ids;
+                setSelection(next);
+                // The inspector follows the band, so a swept group opens on
+                // one of its own items rather than whatever was selected
+                // before the sweep.
+                if (next.length) setSelected(next[0] ?? null);
+                else setSelected(null);
+                setStatus(
+                  next.length > 1
+                    ? `${next.length} items selected. Drag one to move them all; arrows, R and Delete apply to the group.`
+                    : '',
+                );
+              }}
+              onMoveMany={(ids, dx, dy) =>
+                editSelection(
+                  ids,
+                  { kind: 'move', x: dx, y: dy },
+                  (n) => `${n} items moved. Undo restores them.`,
+                )
+              }
               showClearance={showClearance}
               onDropItem={(payload, point) => {
                 if (payload.kind === 'object')
@@ -1604,6 +1697,13 @@ function Editor({ ownerId }: { ownerId: string }) {
                 design={design}
                 selected={selected}
                 selectedIds={selection}
+                onToggle={(id) =>
+                  setSelection((ids) =>
+                    ids.includes(id)
+                      ? ids.filter((x) => x !== id)
+                      : [...ids, id],
+                  )
+                }
                 onSelect={(id) => {
                   setSelected(id);
                   if (id) {
@@ -1650,8 +1750,8 @@ function Editor({ ownerId }: { ownerId: string }) {
           <div className="designer-canvas-footer">
             <span>
               {mode === '2d'
-                ? 'Drag empty space to pan · Space + drag anywhere · arrow keys: 1″ / Shift: 6″'
-                : 'Rotate the view to inspect your layout'}
+                ? 'Drag empty space to pan · Space + drag anywhere · Shift + drag to select several · Shift + click to add one · arrow keys: 1″ / Shift: 6″'
+                : 'Rotate the view to inspect your layout · Shift + click to select several'}
             </span>
             <label>
               <input
