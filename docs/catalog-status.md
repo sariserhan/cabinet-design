@@ -29,7 +29,7 @@
 
 ## Known Issues
 
-- `OPENAI_API_KEY` is present in the local `.env.local`; `ANTHROPIC_API_KEY` is not. The key has not been exercised, so it is unverified whether it is valid or which models it can reach. No extraction run has been made against a provider. Provider tests use explicitly synthetic mocked responses; no live extraction success is claimed.
+- `OPENAI_API_KEY` is present in the local `.env.local`; `ANTHROPIC_API_KEY` is not. Checked on 2026-09-16 with a model listing, which sends no document content: the key is accepted and 124 models are reachable, including the gpt-5, gpt-4.1 and gpt-4o families. That establishes credential validity only. The model ID remains explicit operator configuration with no allowlist in code, and no extraction has run against a provider, so no accuracy, cost or model suitability is measured. Provider tests use explicitly synthetic mocked responses; no live extraction success is claimed.
 - Human-verified benchmark records: 0. The app and integrity checker never relabel automated annotations as human truth.
 - Source index labels are stale, including Base Cabinets index 27 versus actual printed 30 / physical PDF 51.
 - SK W39 lacks required skin dimensions in the draft; CM-1 lacks required profile geometry in the draft. These intentionally remain blocked pending source review.
