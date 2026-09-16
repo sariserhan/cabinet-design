@@ -1072,10 +1072,90 @@ body:has(.is-presenting) .demo-banner {
 .start-guide input {
   width: 130px;
 }
-.shortcut-help {
-  margin: 12px 20px;
-  max-width: 900px;
+.shortcut-help-link {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+/* The help overlay. A native dialog, so the browser draws the backdrop and
+   holds focus; these rules only size and dress it. */
+.help-guide {
+  /* The global reset zeroes every margin, which also removes the centring a
+     modal dialog would otherwise get for free. */
+  margin: auto;
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(80vh, 760px);
+  padding: 0;
+  border: 1px solid var(--studio-line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--studio-ink);
   font-size: 13px;
+  line-height: 1.55;
+  box-shadow: 0 18px 48px rgb(19 44 56 / 22%);
+  overflow: hidden;
+}
+.help-guide::backdrop {
+  background: rgb(19 44 56 / 42%);
+}
+.help-guide-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--studio-line);
+  background: #f4f9fa;
+  position: sticky;
+  top: 0;
+}
+.help-guide-head h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.help-guide-body {
+  padding: 4px 20px 20px;
+  overflow: auto;
+  max-height: calc(min(80vh, 760px) - 56px);
+}
+.help-guide-body h3 {
+  margin: 18px 0 4px;
+  font-size: 13px;
+  color: var(--studio-accent);
+}
+.help-guide-body p {
+  margin: 0 0 8px;
+}
+.help-guide-keys {
+  border-collapse: collapse;
+  margin: 4px 0 10px;
+  width: 100%;
+}
+.help-guide-keys th,
+.help-guide-keys td {
+  border-bottom: 1px solid var(--studio-line);
+  padding: 5px 8px 5px 0;
+  text-align: left;
+  font-weight: normal;
+  vertical-align: top;
+}
+.help-guide-keys th {
+  width: 190px;
+}
+.help-guide-keys kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid #cbd8de;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #f4f9fa;
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .help-guide-keys th {
+    width: 130px;
+  }
 }
 .client-presentation {
   padding: 20px;
@@ -1292,7 +1372,6 @@ body:has(.is-presenting) .demo-banner {
 .is-presenting .canvas-panel-controls,
 .is-presenting .demo-walkthrough,
 .is-presenting .project-controls,
-.is-presenting .shortcut-help,
 .is-presenting .start-guide {
   display: none !important;
 }

@@ -42,6 +42,7 @@ import {
   Maximize,
   Plus,
   Minus,
+  CircleQuestionMark,
 } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import type { Overview } from '@/lib/workspace-types';
@@ -79,6 +80,7 @@ import { snapPlacement, duplicateOption } from '@/designer/editing';
 import { previewEverydayEdit } from '@/designer/everyday-editing';
 import type { EditRequest } from '@/designer/everyday-editing';
 import { DemoWalkthrough, StartGuide, ClientPresentation } from './demo-tools';
+import { HelpGuide } from './help-guide';
 import { placementAt } from '@/designer/editing';
 import { polishedSample } from '@/designer/sample';
 import { normalizeOpenings, worldToLocal } from '@/designer/model';
@@ -117,17 +119,33 @@ function Editor({ ownerId }: { ownerId: string }) {
   const [workspaceStage, setWorkspaceStage] =
     useState<WorkspaceStage>('Design');
   const [showStart, setShowStart] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [inspectorTab, setInspectorTab] = useState('design'),
     [presenting, setPresenting] = useState(false),
     [selection, setSelection] = useState<string[]>([]),
     [showClearance, setShowClearance] = useState(false);
   useEffect(() => {
-    const escape = (e: globalThis.KeyboardEvent) => {
+    const keys = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') setPresenting(false);
+      // The conventional key for "how does this work", but not while someone
+      // is typing a project name or a note.
+      const target = e.target as HTMLElement | null;
+      if (
+        e.key === '?' &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !(
+          target?.isContentEditable ||
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName ?? '')
+        )
+      ) {
+        e.preventDefault();
+        setShowHelp(true);
+      }
     };
-    window.addEventListener('keydown', escape);
-    return () => window.removeEventListener('keydown', escape);
+    window.addEventListener('keydown', keys);
+    return () => window.removeEventListener('keydown', keys);
   }, []);
   useEffect(() => {
     const navigate = (event: Event) => {
@@ -1013,10 +1031,17 @@ function Editor({ ownerId }: { ownerId: string }) {
           onClose={() => setWalkStep(null)}
         />
       )}
+      <HelpGuide open={showHelp} onClose={() => setShowHelp(false)} />
       <PrintPackage design={design} />
       <InstallationSheets design={design} />
       <header className="designer-header">
         <h1>Kitchen designer</h1>
+        <button
+          className="designer-help-button"
+          onClick={() => setShowHelp(true)}
+        >
+          <CircleQuestionMark size={16} /> Help
+        </button>
         <details className="studio-extras">
           <summary>Examples & presentation tools</summary>
           <div className="designer-row">
@@ -1305,6 +1330,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         open={open}
         importFile={importFile}
         walkthroughStep={walkthroughStep}
+        onHelp={() => setShowHelp(true)}
         file={file}
       />
       {(status || storageError || history.error) && (

@@ -422,3 +422,35 @@ test('a band selects several items, which then move, turn and delete as one', as
 
   expect(pageErrors).toEqual([]);
 });
+
+test('Help opens a guide over the workspace and closes again', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  const guide = page.locator('dialog.help-guide');
+  await expect(guide).toBeHidden();
+
+  // In the header, not behind a collapsed section: the point of the change.
+  await page.getByRole('button', { name: 'Help', exact: true }).click();
+  await expect(guide).toBeVisible();
+  await expect(
+    guide.getByRole('heading', { name: 'How to use Kitchen Studio' }),
+  ).toBeVisible();
+  // A modal dialog, so the workspace behind it is inert.
+  expect(await guide.evaluate((node: HTMLDialogElement) => node.open)).toBe(
+    true,
+  );
+  await expect(guide).toContainText('Shift + click');
+  await expect(guide.locator('.help-guide-keys tr')).not.toHaveCount(0);
+
+  await page.keyboard.press('Escape');
+  await expect(guide).toBeHidden();
+
+  // The conventional shortcut reopens it without reaching for the button.
+  await page.keyboard.press('?');
+  await expect(guide).toBeVisible();
+  await guide.getByRole('button', { name: 'Close help' }).click();
+  await expect(guide).toBeHidden();
+
+  expect(pageErrors).toEqual([]);
+});

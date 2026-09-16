@@ -7,7 +7,6 @@ import { newDesign } from '@/designer/model';
 import { polishedSample } from '@/designer/sample';
 import { AlternativeLayouts } from './business-tools';
 import { CloudProjects } from './cloud-projects';
-import { ShortcutHelp } from './demo-tools';
 import { DesignDecisions } from './design-decisions';
 import { DesignRecovery, SmartPlacement } from './experience-tools';
 import { FirstUseGuide } from './first-use-guide';
@@ -55,6 +54,7 @@ export function DesignerMoreTools({
   open,
   importFile,
   walkthroughStep,
+  onHelp,
   file,
 }: {
   design: Design;
@@ -82,6 +82,7 @@ export function DesignerMoreTools({
   open: () => void;
   importFile: (imported: File) => Promise<void>;
   walkthroughStep: (step: number) => void;
+  onHelp: () => void;
   file: React.RefObject<HTMLInputElement | null>;
 }) {
   return (
@@ -262,7 +263,9 @@ export function DesignerMoreTools({
             setMode('2d');
           }}
         />
-        <ShortcutHelp />
+        <button className="shortcut-help-link" onClick={onHelp}>
+          Controls &amp; keyboard help
+        </button>
       </details>
       <details className="project-controls">
         <summary>Project files & examples</summary>

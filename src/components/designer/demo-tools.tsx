@@ -310,33 +310,6 @@ export function MaterialPresets({
   );
 }
 export const StartGuide = RoomSetup;
-export function ShortcutHelp() {
-  return (
-    <details className="shortcut-help">
-      <summary>Controls & keyboard help</summary>
-      <p>
-        Drag to move an item. Shift-click selects multiple items. Use the Pan
-        tool to move the plan and the zoom controls to adjust scale.
-      </p>
-      <p>
-        Above the workspace, Hide library and Hide properties widen the canvas,
-        Focus canvas hides both at once, and Enlarge canvas fills the window
-        with the workspace while keeping the editing tools available.
-      </p>
-      <p>
-        Focus an item with Tab, then use arrow keys to move it; Shift + arrow
-        moves 6 inches. Enter or Space selects it. Use Rotate, Flip, Duplicate,
-        Delete and Undo in the toolbar. Escape exits presentation mode and the
-        enlarged canvas.
-      </p>
-      <p>
-        If an item cannot be added, read the message above the workspace. Move
-        existing objects, enlarge the room, or use a smaller object. Red
-        outlines and Layout checks explain overlaps after placement.
-      </p>
-    </details>
-  );
-}
 export function ClientPresentation({
   design,
   ownerId,
