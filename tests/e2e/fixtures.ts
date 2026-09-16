@@ -14,10 +14,10 @@ export const test = base.extend<
   { signedIn: Page }
 >({
   signedIn: [
-    async ({ browser }, use) => {
+    async ({ browser }, use, workerInfo) => {
       const context = await browser.newContext();
       const page = await context.newPage();
-      await signInToDesigner(page);
+      await signInToDesigner(page, workerInfo.workerIndex);
       await use(page);
       await context.close();
     },

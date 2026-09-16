@@ -2,22 +2,34 @@ import { expect, type Page } from '@playwright/test';
 
 // Deliberately obvious as a test identity so it is recognisable in whatever
 // deployment it reaches. Override for a shared environment.
-const EMAIL = process.env.E2E_EMAIL ?? 'e2e-automation@example.test';
 const PASSWORD = process.env.E2E_PASSWORD ?? 'e2e-automation-pw-1';
+
+/**
+ * One account per worker. Convex Auth rotates refresh tokens, so two workers
+ * signing into the same account race and the loser is bounced back to the
+ * sign-in screen. Separate identities remove the race entirely.
+ */
+function emailFor(worker: number) {
+  const base = process.env.E2E_EMAIL ?? 'e2e-automation@example.test';
+  const [name, domain] = base.split('@');
+  return `${name}+w${worker}@${domain}`;
+}
 
 /**
  * Opens the designer as the end-to-end account, creating it on the first run.
  * Called once per worker by the `signedIn` fixture; see fixtures.ts for why a
  * saved storageState is not used.
  */
-export async function signInToDesigner(page: Page) {
+export async function signInToDesigner(page: Page, worker = 0) {
+  const EMAIL = emailFor(worker);
   await page.goto('/designer');
   // The shell renders this as soon as auth resolves, well before the designer
   // itself has mounted, which makes it the right signal for "am I signed in".
   const authed = page.getByRole('button', { name: 'Sign out' });
 
   const fill = async (withName: boolean) => {
-    if (withName) await page.getByLabel('Name').fill('E2E automation');
+    if (withName)
+      await page.getByLabel('Name').fill(`E2E automation ${worker}`);
     await page.getByLabel('Email').fill(EMAIL);
     await page.getByLabel('Password').fill(PASSWORD);
   };

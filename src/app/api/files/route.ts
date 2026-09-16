@@ -24,6 +24,16 @@ export async function POST(request: Request) {
   const bytes = await request.arrayBuffer();
   if (bytes.byteLength > 50 * 1024 * 1024)
     return new Response('PDF exceeds 50 MB', { status: 413 });
+  // A truncated body still hashes cleanly, so a short upload would be stored as
+  // a valid-looking source. Next's proxy buffer drops the tail silently when a
+  // body exceeds its limit, so compare against what the client said it sent and
+  // refuse anything incomplete rather than recording a corrupt document.
+  const declared = Number(request.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > 0 && bytes.byteLength < declared)
+    return new Response(
+      `Upload was truncated (${bytes.byteLength} of ${declared} bytes). Retry, and raise experimental.proxyClientMaxBodySize if this repeats.`,
+      { status: 400 },
+    );
   const url = new URL('/upload', process.env.NEXT_PUBLIC_CONVEX_SITE_URL);
   url.search = new URL(request.url).search;
   const upstream = await fetch(url, {
