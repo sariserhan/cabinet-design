@@ -301,6 +301,36 @@ test('a dimension and a note can be put on the plan and given words', async ({
 
   // Back to selecting, so the tool does not stay armed for the next test.
   await page.getByRole('button', { name: 'Select', exact: true }).click();
+
+  // Clicking one picks it up, and Delete removes it - the same as an item,
+  // rather than having to find it in a list.
+  await page.locator('[data-testid="plan-note"]').click();
+  await page.keyboard.press('Delete');
+  await expect(page.locator('[data-testid="plan-note"]')).toHaveCount(0, {
+    timeout: 20_000,
+  });
+
+  // The dimension is still there, and arrow keys move a selected one. The
+  // drawn line is what gets checked: the saved draft is debounced, and this
+  // is about the thing on screen anyway.
+  const drawnAt = () =>
+    page
+      .locator('[data-testid="plan-dimension"] path')
+      .first()
+      .getAttribute('d');
+  await page.locator('[data-testid="plan-dimension"]').click();
+  const placed = await drawnAt();
+  const startedAt = Number(placed?.match(/^M([\d.-]+)/)?.[1] ?? 0);
+  await page.keyboard.press('ArrowRight');
+  await expect
+    .poll(
+      async () => Number((await drawnAt())?.match(/^M([\d.-]+)/)?.[1] ?? 0),
+      {
+        timeout: 20_000,
+      },
+    )
+    .toBe(startedAt + 1);
+
   expect(pageErrors).toEqual([]);
 });
 

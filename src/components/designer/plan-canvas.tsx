@@ -49,6 +49,9 @@ type Props = {
   onMoveMany: (ids: string[], dx: number, dy: number) => void;
   /** Placing a note or a dimension instead of selecting and panning. */
   annotate: 'note' | 'dimension' | null;
+  selectedAnnotation: string | null;
+  onSelectAnnotation: (id: string | null) => void;
+  onMoveAnnotation: (id: string, dx: number, dy: number) => void;
   onAnnotate: (
     from: { x: number; y: number },
     to?: { x: number; y: number },
@@ -73,6 +76,9 @@ export function PlanCanvas({
   onMoveMany,
   annotate,
   onAnnotate,
+  selectedAnnotation,
+  onSelectAnnotation,
+  onMoveAnnotation,
   showClearance,
   onDropItem,
   onResize,
@@ -169,6 +175,14 @@ export function PlanCanvas({
     oy: number;
     group: string[];
   } | null>(null);
+  // A placed annotation being moved, and where it started.
+  const [noteDrag, setNoteDrag] = useState<{
+    id: string;
+    dx: number;
+    dy: number;
+    x: number;
+    y: number;
+  } | null>(null);
   // A dimension being dragged out, in plan inches.
   const [measure, setMeasure] = useState<{
     x0: number;
@@ -263,6 +277,11 @@ export function PlanCanvas({
     setIsPanning(true);
   }
   function move(event: PointerEvent) {
+    if (noteDrag) {
+      const p = coordinates(event);
+      setNoteDrag({ ...noteDrag, x: p.x - noteDrag.dx, y: p.y - noteDrag.dy });
+      return;
+    }
     if (measure) {
       const p = coordinates(event);
       setMeasure({ ...measure, x: p.x, y: p.y });
@@ -314,6 +333,14 @@ export function PlanCanvas({
     setDrag({ ...drag, ...position });
   }
   function end(event?: PointerEvent) {
+    if (noteDrag) {
+      const moved = noteDrag;
+      setNoteDrag(null);
+      const origin = (design.annotations ?? []).find((a) => a.id === moved.id);
+      if (origin && (origin.x !== moved.x || origin.y !== moved.y))
+        onMoveAnnotation(moved.id, moved.x - origin.x, moved.y - origin.y);
+      return;
+    }
     if (measure) {
       const from = { x: measure.x0, y: measure.y0 },
         to = { x: measure.x, y: measure.y };
@@ -475,6 +502,7 @@ export function PlanCanvas({
           setResize(null);
           setBand(null);
           setMeasure(null);
+          setNoteDrag(null);
           panning.current = null;
           setIsPanning(false);
         }}
@@ -805,17 +833,88 @@ export function PlanCanvas({
             Add a cabinet from the library to begin
           </text>
         )}
-        {(design.annotations ?? []).map((a) => {
-          const label = annotationLabel(a);
+        {(design.annotations ?? []).map((original) => {
+          // While one is being dragged it follows the pointer; the design
+          // only hears about it when the drag ends.
+          const a =
+            noteDrag?.id === original.id
+              ? {
+                  ...original,
+                  x: noteDrag.x,
+                  y: noteDrag.y,
+                  ...(original.x2 !== undefined && original.y2 !== undefined
+                    ? {
+                        x2: original.x2 + noteDrag.x - original.x,
+                        y2: original.y2 + noteDrag.y - original.y,
+                      }
+                    : {}),
+                }
+              : original;
+          const label = annotationLabel(a),
+            chosen = selectedAnnotation === a.id;
+          // Grabbing one both selects it and starts moving it, the same as
+          // an item: nobody should have to find a list to delete a note.
+          // Arrow keys reach whatever is focused inside the plan before the
+          // whole-design shortcut sees them, so a focused annotation has to
+          // handle its own nudge exactly as a focused item does.
+          const key = (event: KeyboardEvent<SVGGElement>) => {
+            const directions: Record<string, [number, number]> = {
+              ArrowLeft: [-1, 0],
+              ArrowRight: [1, 0],
+              ArrowUp: [0, -1],
+              ArrowDown: [0, 1],
+            };
+            const direction = directions[event.key];
+            if (direction) {
+              event.preventDefault();
+              const distance = event.shiftKey ? 6 : 1;
+              onSelectAnnotation(a.id);
+              onMoveAnnotation(
+                a.id,
+                direction[0] * distance,
+                direction[1] * distance,
+              );
+            }
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              onSelectAnnotation(a.id);
+            }
+          };
+          const grab = (event: PointerEvent<SVGGElement>) => {
+            if (event.button !== 0 || panMode || space || annotate) return;
+            event.stopPropagation();
+            const p = coordinates(event);
+            event.currentTarget.setPointerCapture(event.pointerId);
+            onSelectAnnotation(a.id);
+            setNoteDrag({
+              id: a.id,
+              dx: p.x - a.x,
+              dy: p.y - a.y,
+              x: a.x,
+              y: a.y,
+            });
+          };
           if (a.kind === 'note')
             return (
               <g
                 key={a.id}
                 className="plan-annotation"
                 data-testid="plan-note"
-                pointerEvents="none"
+                role="button"
+                tabIndex={0}
+                aria-label={`Note: ${label || 'empty'}`}
+                aria-pressed={chosen}
+                onPointerDown={grab}
+                onKeyDown={key}
               >
-                <circle cx={a.x} cy={a.y} r={1.8} fill="#a8621b" />
+                <circle
+                  cx={a.x}
+                  cy={a.y}
+                  r={chosen ? 2.6 : 1.8}
+                  fill="#a8621b"
+                  stroke={chosen ? '#087984' : 'none'}
+                  strokeWidth={chosen ? 0.8 : 0}
+                />
                 <text
                   x={a.x + 3}
                   y={a.y + 1.2}
@@ -842,13 +941,26 @@ export function PlanCanvas({
               key={a.id}
               className="plan-annotation"
               data-testid="plan-dimension"
-              pointerEvents="none"
+              role="button"
+              tabIndex={0}
+              aria-label={`Dimension: ${label}`}
+              aria-pressed={chosen}
+              onPointerDown={grab}
+              onKeyDown={key}
             >
+              {/* A hair line is hard to hit, so there is a wider invisible
+                  one over it to grab and click. */}
+              <path
+                d={`M${a.x} ${a.y} L${x2} ${y2}`}
+                fill="none"
+                stroke="transparent"
+                strokeWidth="4"
+              />
               <path
                 d={`M${a.x} ${a.y} L${x2} ${y2} M${a.x - tickX} ${a.y - tickY} L${a.x + tickX} ${a.y + tickY} M${x2 - tickX} ${y2 - tickY} L${x2 + tickX} ${y2 + tickY}`}
                 fill="none"
-                stroke="#7a4713"
-                strokeWidth=".5"
+                stroke={chosen ? '#087984' : '#7a4713'}
+                strokeWidth={chosen ? 0.9 : 0.5}
               />
               <text
                 x={midX}

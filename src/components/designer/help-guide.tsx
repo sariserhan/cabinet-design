@@ -8,7 +8,10 @@ const shortcuts: [string, string][] = [
   ['Shift + arrows', 'Move the selection six inches'],
   ['R', 'Turn 90°'],
   ['Shift + R', 'Turn 180°'],
-  ['Delete or Backspace', 'Remove the selection'],
+  [
+    'Delete or Backspace',
+    'Remove the selection, including a note or dimension',
+  ],
   ['Tab, then Enter', 'Step through items in the plan and select one'],
   ['Shift + click', 'Add an item to the selection, or take it out again'],
   ['Shift + drag', 'Sweep a band over several items in the plan'],

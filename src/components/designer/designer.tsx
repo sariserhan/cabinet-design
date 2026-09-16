@@ -122,6 +122,9 @@ function Editor({ ownerId }: { ownerId: string }) {
   const [workspaceStage, setWorkspaceStage] =
     useState<WorkspaceStage>('Design');
   const [annotate, setAnnotate] = useState<'note' | 'dimension' | null>(null);
+  const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(
+    null,
+  );
   const [showStart, setShowStart] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
@@ -490,6 +493,27 @@ function Editor({ ownerId }: { ownerId: string }) {
         patch.rotation !== undefined,
     );
   }
+  /** Shift a placed note or dimension, both ends of it if it has two. */
+  function moveAnnotation(id: string, dx: number, dy: number) {
+    commit((d) => ({
+      ...d,
+      annotations: (d.annotations ?? []).map((a) =>
+        a.id === id
+          ? {
+              ...a,
+              x: Math.round((a.x + dx) * 1000) / 1000,
+              y: Math.round((a.y + dy) * 1000) / 1000,
+              ...(a.x2 !== undefined && a.y2 !== undefined
+                ? {
+                    x2: Math.round((a.x2 + dx) * 1000) / 1000,
+                    y2: Math.round((a.y2 + dy) * 1000) / 1000,
+                  }
+                : {}),
+            }
+          : a,
+      ),
+    }));
+  }
   /**
    * Apply one edit to every item in a multi-selection.
    *
@@ -547,6 +571,43 @@ function Editor({ ownerId }: { ownerId: string }) {
       if (mode !== '2d' && mode !== 'render') return;
       // The 3D view can be locked so a stray key while orbiting changes nothing.
       if (mode === 'render' && renderLocked) return;
+      const steps: Record<string, [number, number]> = {
+        ArrowLeft: [-1, 0],
+        ArrowRight: [1, 0],
+        ArrowUp: [0, -1],
+        ArrowDown: [0, 1],
+      };
+      // A selected annotation answers first: it is what the person is
+      // holding, and it is deleted and nudged the same way an item is.
+      if (selectedAnnotation && design) {
+        const held = (design.annotations ?? []).find(
+          (a) => a.id === selectedAnnotation,
+        );
+        if (held) {
+          const step = steps[e.key];
+          if (step) {
+            if (target?.closest('.plan-scroll')) return;
+            e.preventDefault();
+            const distance = e.shiftKey ? 6 : 1;
+            moveAnnotation(held.id, step[0] * distance, step[1] * distance);
+            return;
+          }
+          if (e.key === 'Delete' || e.key === 'Backspace') {
+            e.preventDefault();
+            commit((d) => ({
+              ...d,
+              annotations: (d.annotations ?? []).filter(
+                (a) => a.id !== held.id,
+              ),
+            }));
+            setSelectedAnnotation(null);
+            setStatus(
+              `${held.kind === 'note' ? 'Note' : 'Dimension'} removed. Undo restores it.`,
+            );
+            return;
+          }
+        }
+      }
       // A multi-selection takes precedence over the single item the
       // inspector is showing, so the keys act on what the canvas has
       // highlighted. One selected item keeps the original single-item path,
@@ -557,12 +618,6 @@ function Editor({ ownerId }: { ownerId: string }) {
       const current = design?.items.find((i) => i.id === ids[0]);
       if (!design || !current) return;
       const group = ids.length > 1;
-      const steps: Record<string, [number, number]> = {
-        ArrowLeft: [-1, 0],
-        ArrowRight: [1, 0],
-        ArrowUp: [0, -1],
-        ArrowDown: [0, 1],
-      };
       const step = steps[e.key];
       if (step) {
         // The plan canvas handles its own focused item; do not move it twice.
@@ -631,7 +686,16 @@ function Editor({ ownerId }: { ownerId: string }) {
     };
     window.addEventListener('keydown', shortcut);
     return () => window.removeEventListener('keydown', shortcut);
-  }, [design, selected, selection, snap, moveTogether, mode, renderLocked]);
+  }, [
+    design,
+    selected,
+    selection,
+    selectedAnnotation,
+    snap,
+    moveTogether,
+    mode,
+    renderLocked,
+  ]);
   function add(
     product: Product,
     versionId: string,
@@ -1679,7 +1743,10 @@ function Editor({ ownerId }: { ownerId: string }) {
               moveTogether={moveTogether}
               design={design}
               selected={selected}
-              onSelect={setSelected}
+              onSelect={(id) => {
+                setSelected(id);
+                if (id) setSelectedAnnotation(null);
+              }}
               onMove={(id, x, y) => updateItem(id, { x, y })}
               onResize={(id, width, depth, position) =>
                 commit((d) =>
@@ -1722,6 +1789,16 @@ function Editor({ ownerId }: { ownerId: string }) {
                 );
               }}
               annotate={annotate}
+              selectedAnnotation={selectedAnnotation}
+              onSelectAnnotation={(id) => {
+                setSelectedAnnotation(id);
+                // One selection at a time, so Delete is never ambiguous.
+                if (id) {
+                  setSelected(null);
+                  setSelection([]);
+                }
+              }}
+              onMoveAnnotation={moveAnnotation}
               onAnnotate={(from, to) => {
                 const note = newAnnotation(annotate ?? 'note', from, to);
                 commit((d) => ({
