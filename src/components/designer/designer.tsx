@@ -457,6 +457,78 @@ function Editor({ ownerId }: { ownerId: string }) {
         patch.rotation !== undefined,
     );
   }
+  /**
+   * Whole-design shortcuts for the selected item: move, rotate and delete.
+   *
+   * The 2D plan already moves a focused item with the arrow keys, so events
+   * coming from inside it are left alone rather than applying the move twice.
+   * Everywhere else - most usefully the 3D view - the arrows work here.
+   *
+   * Locks are not checked here on purpose: commit() refuses a locked change
+   * centrally and reports it, so every route in gets the same answer.
+   */
+  useEffect(() => {
+    const shortcut = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.isContentEditable ||
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+      )
+        return;
+      // Only on the surfaces where an item is actually being edited. Elsewhere
+      // the arrow keys belong to the page, and a selection left over from
+      // earlier should not quietly turn scrolling into nudging.
+      if (mode !== '2d' && mode !== 'render') return;
+      const current = design?.items.find((i) => i.id === selected);
+      if (!design || !current) return;
+      const steps: Record<string, [number, number]> = {
+        ArrowLeft: [-1, 0],
+        ArrowRight: [1, 0],
+        ArrowUp: [0, -1],
+        ArrowDown: [0, 1],
+      };
+      const step = steps[e.key];
+      if (step) {
+        // The plan canvas handles its own focused item; do not move it twice.
+        if (target?.closest('.plan-scroll')) return;
+        e.preventDefault();
+        const distance = e.shiftKey ? 6 : 1;
+        const moved = snapPosition(
+          current,
+          design.room,
+          current.x + step[0] * distance,
+          current.y + step[1] * distance,
+          false,
+        );
+        updateItem(current.id, { x: moved.x, y: moved.y });
+        return;
+      }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        commit((d) => ({
+          ...d,
+          items: d.items.filter((i) => i.id !== current.id),
+        }));
+        setSelected(null);
+        setStatus(`${current.sku || 'Item'} deleted. Undo restores it.`);
+        return;
+      }
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        const degrees = e.shiftKey ? 180 : 90;
+        const turned = turnCabinet(current, degrees);
+        updateItem(current.id, {
+          rotation: turned.rotation,
+          ...snapPosition(turned, design.room, current.x, current.y, snap),
+        });
+        setStatus(`Rotated ${degrees}°.`);
+      }
+    };
+    window.addEventListener('keydown', shortcut);
+    return () => window.removeEventListener('keydown', shortcut);
+  }, [design, selected, snap, moveTogether, mode]);
   function add(
     product: Product,
     versionId: string,
@@ -1527,6 +1599,7 @@ function Editor({ ownerId }: { ownerId: string }) {
                     setInspectorTab('design');
                   }
                 }}
+                onMoveItem={(id, x, y) => updateItem(id, { x, y })}
                 onChange={(next) => commit(() => next)}
               />
             </>

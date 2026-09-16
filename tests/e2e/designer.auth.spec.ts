@@ -169,3 +169,83 @@ test('the flooring workspace offers the deduction the design can derive', async 
   });
   expect(pageErrors).toEqual([]);
 });
+
+test('an item can be nudged, rotated, dragged in 3D and deleted', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  type Row = { id: string; x: number; y: number; rotation: number };
+  /** The saved draft, which is what the shortcuts ultimately have to change. */
+  async function draft(): Promise<Row[]> {
+    const rows = await page.evaluate(() => {
+      const key = Object.keys(localStorage).filter((k) =>
+        k.endsWith(':draft'),
+      )[0];
+      const value = key ? localStorage.getItem(key) : null;
+      if (!value) return null;
+      const design = JSON.parse(value) as {
+        items: { id: string; x: number; y: number; rotation: number }[];
+      };
+      return design.items.map((i) => ({
+        id: i.id,
+        x: i.x,
+        y: i.y,
+        rotation: i.rotation,
+      }));
+    });
+    expect(rows, 'expected a saved draft to read').not.toBeNull();
+    return rows ?? [];
+  }
+  /** True when any row differs, which is all these assertions need to know. */
+  const changed = (before: Row[], after: Row[], field: keyof Row) =>
+    before.some((row, index) => after[index]?.[field] !== row[field]);
+
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(6000);
+
+  // Select in the 2D plan, where the target is unambiguous, then work in 3D so
+  // the shared shortcut layer is what is under test.
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  await page
+    .locator('g[aria-label*="placed object"]')
+    .first()
+    .click({ force: true });
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  const canvas = page.locator('.render-stage canvas');
+  await expect(canvas).toBeVisible({ timeout: 60_000 });
+  await page.waitForTimeout(6000);
+  // page.mouse works in viewport coordinates and does not scroll to the target.
+  await canvas.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(800);
+  const box = await canvas.boundingBox();
+  expect(box).not.toBeNull();
+  const { x, y, width, height } = box ?? { x: 0, y: 0, width: 0, height: 0 };
+
+  const start = await draft();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('r');
+  await page.waitForTimeout(7000);
+  const turned = await draft();
+  expect(changed(start, turned, 'rotation')).toBe(true);
+
+  // Dragging starts on a point known to sit on a base cabinet run.
+  const sx = x + width * 0.2,
+    sy = y + height * 0.75;
+  await page.mouse.move(sx, sy);
+  await page.mouse.down();
+  for (let i = 1; i <= 10; i++) await page.mouse.move(sx + i * 10, sy - i * 2);
+  await page.mouse.up();
+  await page.waitForTimeout(7000);
+  const dragged = await draft();
+  expect(changed(turned, dragged, 'x') || changed(turned, dragged, 'y')).toBe(
+    true,
+  );
+
+  await page.keyboard.press('Delete');
+  await page.waitForTimeout(7000);
+  expect((await draft()).length).toBe(dragged.length - 1);
+  expect(pageErrors).toEqual([]);
+});

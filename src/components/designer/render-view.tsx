@@ -36,6 +36,7 @@ import { addWindowLighting } from './render-lighting';
 import { photoSnapshot, renderPhoto } from './photo-render';
 import { usePhotoExport } from './use-photo-export';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { footprint } from '@/designer/model';
 import type { Design } from '@/designer/model';
 
 export type CameraView = {
@@ -53,11 +54,14 @@ export default function RenderView({
   selected,
   selectedIds,
   onSelect,
+  onMoveItem,
 }: {
   ownerId?: string;
   selected?: string | null;
   selectedIds?: string[];
   onSelect?: (id: string | null) => void;
+  /** Commits a drag in the 3D view, using the same rules as the 2D plan. */
+  onMoveItem?: (id: string, x: number, y: number) => void;
   cameraView?: CameraView;
   onCamera?: (view: CameraView) => void;
   onCapture?: (url: string) => void;
@@ -140,8 +144,8 @@ export default function RenderView({
   const [speed, setSpeed] = useState(30);
   const speedRef = useRef(speed);
   speedRef.current = speed;
-  const callbacks = useRef({ onCamera, onCapture, onSelect });
-  callbacks.current = { onCamera, onCapture, onSelect };
+  const callbacks = useRef({ onCamera, onCapture, onSelect, onMoveItem });
+  callbacks.current = { onCamera, onCapture, onSelect, onMoveItem };
   const pendingCamera = useRef<CameraView | null>(null);
   const externalCamera = useRef(cameraView);
   externalCamera.current = cameraView;
@@ -652,9 +656,114 @@ export default function RenderView({
     renderer.domElement.addEventListener('pointerup', lookEnd);
     renderer.domElement.addEventListener('pointercancel', lookEnd);
     let press: { x: number; y: number } | null = null;
+    /**
+     * Dragging an item in 3D.
+     *
+     * The pointer moves over a picture of the room, so "where is this now" has
+     * to be asked of a surface rather than of the screen. The item is dragged
+     * across a horizontal plane at its own base height: for a floor cabinet
+     * that is the floor, and for a wall cabinet the plane it already hangs on,
+     * so dragging never changes an item's elevation.
+     *
+     * Orbit and drag both start as a press on the canvas, so the drag only
+     * takes over once the pointer has travelled far enough to mean it, and it
+     * releases the camera controls for as long as it lasts.
+     */
+    const dragPlane = new THREE.Plane();
+    const dragPoint = new THREE.Vector3();
+    let drag: {
+      id: string;
+      group: THREE.Object3D;
+      offset: THREE.Vector3;
+      pointerId: number;
+    } | null = null;
+    const pickAt = (clientX: number, clientY: number) => {
+      const rect = renderer.domElement.getBoundingClientRect(),
+        ray = new THREE.Raycaster();
+      ray.setFromCamera(
+        new THREE.Vector2(
+          ((clientX - rect.left) / rect.width) * 2 - 1,
+          (-(clientY - rect.top) / rect.height) * 2 + 1,
+        ),
+        camera,
+      );
+      return ray;
+    };
     const pointerDown = (e: PointerEvent) => {
       press = e.button === 0 ? { x: e.clientX, y: e.clientY } : null;
+      if (walking || e.button !== 0 || !callbacks.current.onMoveItem) return;
+      const hit = pickAt(e.clientX, e.clientY)
+        .intersectObjects(itemGroups, true)
+        .find((h) => {
+          let o: THREE.Object3D | null = h.object;
+          while (o) {
+            if (!o.visible) return false;
+            o = o.parent;
+          }
+          return true;
+        });
+      let owner: THREE.Object3D | null = hit?.object ?? null;
+      while (owner && !owner.userData.itemId) owner = owner.parent;
+      const id = owner?.userData.itemId as string | undefined;
+      const item = id ? design.items.find((i) => i.id === id) : undefined;
+      if (!hit || !owner || !item || item.locked) return;
+      dragPlane.setFromNormalAndCoplanarPoint(
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, owner.position.y, 0),
+      );
+      // Where the item sits relative to the grab point, so it does not jump.
+      if (!pickAt(e.clientX, e.clientY).ray.intersectPlane(dragPlane, dragPoint))
+        return;
+      drag = {
+        id: item.id,
+        group: owner,
+        offset: owner.position.clone().sub(dragPoint),
+        pointerId: e.pointerId,
+      };
     };
+    const dragMove = (e: PointerEvent) => {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      if (
+        press &&
+        Math.hypot(e.clientX - press.x, e.clientY - press.y) <= 5
+      )
+        return;
+      if (controls.enabled) {
+        controls.enabled = false;
+        renderer.domElement.setPointerCapture(e.pointerId);
+      }
+      if (!pickAt(e.clientX, e.clientY).ray.intersectPlane(dragPlane, dragPoint))
+        return;
+      drag.group.position.x = dragPoint.x + drag.offset.x;
+      drag.group.position.z = dragPoint.z + drag.offset.z;
+      render();
+    };
+    const dragEnd = (e: PointerEvent) => {
+      if (!drag) return;
+      const finished = drag;
+      drag = null;
+      if (controls.enabled) return;
+      controls.enabled = true;
+      if (renderer.domElement.hasPointerCapture(e.pointerId))
+        renderer.domElement.releasePointerCapture(e.pointerId);
+      const item = design.items.find((i) => i.id === finished.id);
+      if (!item) return;
+      // The scene places a group at the middle of the item's footprint, so the
+      // stored corner is that centre less half the footprint.
+      const f = footprint(item);
+      callbacks.current.onMoveItem?.(
+        finished.id,
+        finished.group.position.x - f.width / 2,
+        finished.group.position.z - f.depth / 2,
+      );
+      // A refused move leaves the group where the pointer left it; the rebuild
+      // that follows any accepted change puts every group back where the design
+      // says it is.
+      press = null;
+    };
+    renderer.domElement.addEventListener('pointermove', dragMove);
+    renderer.domElement.addEventListener('pointerup', dragEnd);
+    renderer.domElement.addEventListener('pointercancel', dragEnd);
     const pointerUp = (e: PointerEvent) => {
       if (
         walking ||
@@ -849,6 +958,9 @@ export default function RenderView({
       renderer.domElement.removeEventListener('blur', clearKeys);
       observer.disconnect();
       renderer.domElement.removeEventListener('keydown', key);
+      renderer.domElement.removeEventListener('pointermove', dragMove);
+      renderer.domElement.removeEventListener('pointerup', dragEnd);
+      renderer.domElement.removeEventListener('pointercancel', dragEnd);
       renderer.domElement.removeEventListener('pointerdown', lookDown);
       renderer.domElement.removeEventListener('pointermove', lookMove);
       renderer.domElement.removeEventListener('pointerup', lookEnd);
@@ -1129,6 +1241,13 @@ export default function RenderView({
         <p className="render-hint">
           Drag to orbit · Right-drag to pan · Scroll to zoom · Two fingers to
           pan/zoom
+          {onMoveItem ? (
+            <>
+              <br />
+              Drag a cabinet to move it on its own level · Arrow keys nudge 1
+              in, Shift 6 in · R rotates 90°, Shift+R 180° · Delete removes
+            </>
+          ) : null}
           <br />
           Illustrative materials and models; dimensions follow your design.
         </p>
