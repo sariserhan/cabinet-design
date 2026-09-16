@@ -1,0 +1,12 @@
+#!/bin/sh
+# Local stand-in for CI: the test suite only protects you if something runs it.
+# Bypass deliberately with `git commit --no-verify`.
+set -e
+
+[ -d node_modules ] || {
+  echo "pre-commit: node_modules missing — skipping checks (run npm ci)"
+  exit 0
+}
+
+echo "pre-commit: npm run check"
+npm run check

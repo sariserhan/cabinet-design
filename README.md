@@ -65,7 +65,15 @@ npm run build
 npm run test:e2e  # Playwright; see below
 ```
 
-`npm run check` covers 251 semantic tests, 31 backend ownership/concurrency/audit tests, mocked provider contract tests, TypeScript, lint and draft-artifact integrity. These are software checks, not measured manufacturer-data accuracy.
+`npm run check` covers 252 semantic tests, 31 backend ownership/concurrency/audit tests, mocked provider contract tests, TypeScript, lint and draft-artifact integrity. These are software checks, not measured manufacturer-data accuracy.
+
+There is no hosted CI, so the checks run locally through git hooks. Install them once per clone:
+
+```sh
+npm run hooks:install
+```
+
+`pre-commit` runs `npm run check` (about 9s) and `pre-push` runs `npm run verify` (check plus the production build, about 13s), then the browser tests if an app is already serving on port 3000. Bypass either with `--no-verify` when you mean to.
 
 `npm run test:e2e` drives the signed-out surfaces — the installer workspace, the public catalog route and client-review token handling — against a running app. It attaches to a dev server already on port 3000, or starts one if none is up; set `E2E_BASE_URL` to test a deployment instead. The browser tests need Chromium's system libraries, which is a one-time `sudo npx playwright install-deps chromium`. Without them the two API-level tests still run and the four browser tests fail to launch.
 

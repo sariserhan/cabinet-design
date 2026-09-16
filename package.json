@@ -4,17 +4,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "tsx --test tests/core/*.test.ts",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.core.json --noEmit",
-    "lint": "eslint src convex tools/worker.ts tests/core tests/e2e playwright.config.ts",
-    "check:benchmark": "python3 tools/check_benchmark_packet.py",
-    "check": "npm run lint && npm run typecheck && npm test && npm run test:backend && npm run check:benchmark",
-    "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
+    "check": "npm run lint && npm run typecheck && npm test && npm run test:backend && npm run check:benchmark",
+    "check:benchmark": "python3 tools/check_benchmark_packet.py",
+    "dev": "next dev --hostname 127.0.0.1",
+    "hooks:install": "git config core.hooksPath .githooks",
+    "lint": "eslint src convex tools/worker.ts tests/core tests/e2e playwright.config.ts",
     "start": "next start --hostname 127.0.0.1",
-    "worker": "tsx --env-file=.env.local tools/worker.ts",
+    "test": "tsx --test tests/core/*.test.ts",
     "test:backend": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.core.json --noEmit",
+    "verify": "npm run check && npm run build",
+    "worker": "tsx --env-file=.env.local tools/worker.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",
