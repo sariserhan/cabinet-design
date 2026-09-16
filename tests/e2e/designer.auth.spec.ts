@@ -304,6 +304,50 @@ test('a dimension and a note can be put on the plan and given words', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('trim is added along the runs, once per run and not twice', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(6000);
+  // Loading a sample opens it in Render, where the editing tools are not
+  // mounted at all.
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+
+  const crowns = () =>
+    page.evaluate(() => {
+      const key = Object.keys(localStorage).filter((k) =>
+        k.endsWith(':draft'),
+      )[0];
+      const value = key ? localStorage.getItem(key) : null;
+      if (!value) return [];
+      return (
+        JSON.parse(value) as { items: { sku: string; elevation: number }[] }
+      ).items
+        .filter((i) => i.sku.startsWith('Crown '))
+        .map((i) => i.elevation);
+    });
+
+  await page.getByLabel('Trim to run').selectOption('crown');
+  await page.getByRole('button', { name: 'Add to runs' }).click();
+  // Sitting on top of the wall cabinets, one length per run.
+  await expect.poll(crowns, { timeout: 30_000 }).toEqual([84, 84, 84]);
+
+  // Again, because someone always clicks twice: it replaces rather than
+  // ordering the same trim a second time.
+  await page.getByRole('button', { name: 'Add to runs' }).click();
+  await page.waitForTimeout(4000);
+  await expect.poll(crowns, { timeout: 30_000 }).toEqual([84, 84, 84]);
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

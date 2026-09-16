@@ -40,6 +40,7 @@ import {
   drawingPackageHtml,
   drawingOptionsSchema,
 } from '../../src/designer/drawing-package';
+import { trimRunItems, applyTrimRuns } from '../../src/designer/trim-runs';
 const drawingOptions = () =>
   drawingOptionsSchema.parse({
     company: 'Dealer',
@@ -643,4 +644,77 @@ test('the drawing DXF carries the plan, every straight elevation and the notes',
 
   // The plan-only export stays what it was.
   assert.ok(!planDxf(d).includes('WALL 1 ELEVATION'));
+});
+test('trim follows a run, breaks at a gap and mitres at a corner', () => {
+  const d = newDesign();
+  d.room = {
+    width: 180,
+    depth: 150,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  const wall = (id: string, x: number, y: number, w: number, rotation = 0) => ({
+    ...fromObject('custom_cabinet'),
+    id,
+    sku: id,
+    x,
+    y,
+    width: w,
+    depth: 12,
+    height: 30,
+    elevation: 54,
+    rotation,
+  });
+  // Three cabinets meeting end to end, and a fourth on its own.
+  d.items = [
+    wall('a', 0, 0, 30),
+    wall('b', 30, 0, 24),
+    wall('c', 54, 0, 30),
+    wall('far', 120, 0, 30),
+  ];
+  const crown = trimRunItems(d, 'crown');
+  assert.deepEqual(
+    crown.items.map((i) => i.width),
+    [84, 30],
+  );
+  // One length for the run, not one per cabinet, and it sits on top of them.
+  assert.equal(crown.items[0]?.elevation, 84);
+  assert.equal(crown.mitres, 0);
+
+  // An L: each leg reaches out by the depth of the profile to meet at the
+  // corner, and that corner is one mitre rather than two.
+  d.items = [
+    wall('a', 0, 0, 30),
+    wall('b', 30, 0, 24),
+    wall('side', 0, 12, 36, 270),
+  ];
+  const turned = trimRunItems(d, 'crown');
+  assert.deepEqual(
+    turned.items.map((i) => i.width).sort((x, y) => x - y),
+    [39, 57],
+  );
+  assert.equal(turned.mitres, 1);
+
+  // Toe kick takes the floor cabinets instead, at the floor.
+  d.items = [
+    { ...wall('base', 0, 0, 36), elevation: 0, height: 34.5, depth: 24 },
+  ];
+  const kick = trimRunItems(d, 'toe_kick');
+  assert.equal(kick.items[0]?.elevation, 0);
+  assert.equal(kick.items[0]?.height, 4);
+  assert.match(kick.items[0]?.sku ?? '', /^Toe kick /);
+  assert.throws(() => applyTrimRuns(d, 'crown'), /wall cabinets/);
+
+  // Running it twice replaces rather than orders it twice.
+  const once = applyTrimRuns(d, 'toe_kick');
+  const twice = applyTrimRuns(once, 'toe_kick');
+  assert.equal(
+    once.items.filter((i) => i.kind === 'toe_kick').length,
+    twice.items.filter((i) => i.kind === 'toe_kick').length,
+  );
+  assert.equal(
+    parseDesign(JSON.stringify(twice)).items.length,
+    twice.items.length,
+  );
 });

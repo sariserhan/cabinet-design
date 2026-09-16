@@ -92,11 +92,12 @@ checked against the model on 2026-09-16.
       Note and Dimension tools above the plan, edited or removed in
       Properties, printed on the plan sheets. A dimension with nothing typed
       shows what it measures; typed words replace it.
-- [ ] **Trim as runs rather than pieces.** Crown, light rail and toe kick are
-      individual objects placed by hand; nothing follows a row of cabinets,
-      mitres at a corner or stops at a wall. Fillers and scribes are the same
-      story. Until a run is a run, elevations and the item list both under-
-      report what the job needs.
+- [x] **Trim as runs rather than pieces.** Done on 2026-09-16: Trim along
+      the runs, in the editing tools, groups cabinets into runs and adds one
+      length each for crown, light rail or toe kick, mitred where two runs
+      meet, with the run, length and mitre counts shown before applying.
+      Fillers and scribes are still placed by hand - the existing filler
+      suggestion covers the narrow-gap case.
 - [x] **Soffits and bulkheads.** Done on 2026-09-16: a `soffit` kind with a
       96 x 13 x 12 preset at 84 inches, treated as architecture rather than
       furniture everywhere the other structural kinds are.

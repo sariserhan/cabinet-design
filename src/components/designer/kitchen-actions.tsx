@@ -9,6 +9,8 @@ import {
 } from '@/designer/kitchen-actions';
 import { WallRunBuilder } from './demo-readiness';
 import { MiniPlan } from './workflow-tools';
+import { applyTrimRuns, trimSummary } from '@/designer/trim-runs';
+import type { TrimKind } from '@/designer/trim-runs';
 export function KitchenActions({
   design,
   ids,
@@ -24,7 +26,9 @@ export function KitchenActions({
     [corner, setCorner] = useState<'NW' | 'NE' | 'SW' | 'SE'>('NW'),
     [style, setStyle] = useState<'diagonal' | 'blind_left' | 'blind_right'>(
       'diagonal',
-    );
+    ),
+    [trim, setTrim] = useState<TrimKind>('crown');
+  const summary = trimSummary(design, trim);
   function apply(action: () => Design) {
     try {
       onChange(action());
@@ -87,6 +91,31 @@ export function KitchenActions({
           <button onClick={() => apply(() => completeRuns(design, ids))}>
             Complete selected cabinets
           </button>
+          <h3>Trim along the runs</h3>
+          <p>
+            One length per run rather than one per cabinet, mitred where two
+            runs meet. {summary.runs} run{summary.runs === 1 ? '' : 's'},{' '}
+            {Math.round(summary.length)}
+            &quot; in total, {summary.mitres} mitre
+            {summary.mitres === 1 ? '' : 's'}. Adding it again replaces what
+            this tool added before.
+          </p>
+          <div className="designer-row">
+            <select
+              aria-label="Trim to run"
+              value={trim}
+              onChange={(e) => setTrim(e.target.value as TrimKind)}
+            >
+              <option value="crown">Crown, on top of the wall cabinets</option>
+              <option value="light_rail">
+                Light rail, under the wall cabinets
+              </option>
+              <option value="toe_kick">Toe kick, at the floor</option>
+            </select>
+            <button onClick={() => apply(() => applyTrimRuns(design, trim))}>
+              Add to runs
+            </button>
+          </div>
           <h3>Appliance package</h3>
           <p>
             Add missing fridge, range, hood, dishwasher and sink using generic
