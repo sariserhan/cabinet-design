@@ -14,6 +14,7 @@ import type { Doc } from '../../../convex/_generated/dataModel';
 import type { RecordListRow } from '@/lib/workspace-types';
 import type { Product } from '@/designer/model';
 import { canPlace } from '@/designer/model';
+import Link from 'next/link';
 export function CabinetIcon({ wall = false }: { wall?: boolean }) {
   return (
     <svg width="42" height="50" viewBox="0 0 42 50" aria-hidden="true">
@@ -210,7 +211,17 @@ export function Library({
         {loadError && selectedCatalog ? (
           <p role="alert">{loadError}. Choose another catalog and retry.</p>
         ) : !activeVersionId ? (
-          <p>Load a catalog in Documents to start placing cabinets.</p>
+          <div className="empty-state">
+            <h2>No cabinets to place yet</h2>
+            <p>
+              Cabinets come from a compiled manufacturer catalog. The public
+              reference books above can be browsed straight away, or load your
+              own document to compile one.
+            </p>
+            <Link className="empty-state-action" href="/documents">
+              Go to Documents
+            </Link>
+          </div>
         ) : !result ? (
           <p>Loading cabinets…</p>
         ) : (

@@ -1154,7 +1154,8 @@ function Editor({ ownerId }: { ownerId: string }) {
               setMode('client');
             }}
           >
-            <Printer size={16} /> Drawings & item list
+            <Printer size={16} />{' '}
+            <span className="wide-only">Drawings &amp; item list</span>
           </button>
           <button className="designer-primary" onClick={save}>
             <Save size={16} /> Save design
@@ -1168,7 +1169,8 @@ function Editor({ ownerId }: { ownerId: string }) {
               document.getElementById('saved-designs')?.focus();
             }}
           >
-            <FolderOpen size={16} /> Open design
+            <FolderOpen size={16} />{' '}
+            <span className="wide-only">Open design</span>
           </button>
           <details className="studio-extras">
             <summary>Examples &amp; tools</summary>

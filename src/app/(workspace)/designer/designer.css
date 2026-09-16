@@ -19,10 +19,14 @@
   --surface: #fff;
   --surface-sunken: #f4f8fa;
   --surface-raised: #eaf3f4;
-  /* Meaning, so a colour says one thing: teal is "this is the current
-     choice", never decoration. */
+  /* Meaning, so a colour says one thing. Teal is "this is the current
+     choice" - the stage you are on, the view you are in, the tool you are
+     holding. The one primary action is ink, because an action and a state
+     are different things and sharing a colour made them look alike. */
   --selected-bg: var(--studio-accent);
   --selected-ink: #fff;
+  --primary-bg: var(--studio-ink);
+  --primary-ink: #fff;
   --focus-ring: #0f6c76;
   /* Type scale */
   --text-xs: 11px;
@@ -111,8 +115,8 @@
 .designer-header {
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 20px;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
   border-bottom: 1px solid var(--studio-line);
   flex-wrap: wrap;
 }
@@ -134,12 +138,12 @@
   flex-wrap: wrap;
 }
 .designer-app .designer-primary {
-  background: var(--studio-accent);
-  color: #fff;
-  border-color: var(--studio-accent);
+  background: var(--primary-bg);
+  color: var(--primary-ink);
+  border-color: var(--primary-bg);
 }
 .designer-app .designer-primary:hover {
-  background: #09626d;
+  background: #16262f;
 }
 .designer-projectbar {
   display: flex;
@@ -467,20 +471,8 @@
 .workspace:has(.designer-app) {
   grid-template-columns: 172px minmax(0, 1fr);
 }
-.workspace:has(.designer-app) > .sidebar {
-  background: #233440;
-  color: #ebf1f5;
-  border-right: 0;
-}
 .workspace:has(.designer-app) .sidebar .brand {
   font-size: 18px;
-}
-.workspace:has(.designer-app) .sidebar .nav-link:hover {
-  background: #304955;
-}
-.workspace:has(.designer-app) .sidebar .nav-link.active {
-  background: #24616c;
-  color: #fff;
 }
 .workspace:has(.designer-app) .demo-banner {
   font-size: 11px;
@@ -3047,7 +3039,7 @@ body:has(.is-presenting) .demo-banner {
 }
 /* Primary dealer workflow keeps project administration behind a disclosure. */
 .studio-workflow {
-  padding: 16px 20px;
+  padding: var(--space-2) var(--space-5);
   border-bottom: 1px solid var(--studio-line);
   background: #f7faf8;
 }
@@ -3065,8 +3057,8 @@ body:has(.is-presenting) .demo-banner {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px;
+  gap: 8px;
+  padding: var(--space-2) var(--space-3);
   font-weight: 600;
 }
 .studio-stages button span {
@@ -3713,6 +3705,46 @@ body:has(.canvas-expanded) {
 /* The stage hint is one line of guidance, not a paragraph of its own. */
 .studio-workflow .stage-hint {
   margin: var(--space-1) 0 0;
+  line-height: 1.35;
   font-size: var(--text-sm);
   color: var(--studio-muted);
+}
+
+/* A phone showed twenty pixels of drawing. The panels were not the cause -
+   they are already collapsed at this width - the header and the five stage
+   buttons were, wrapping into row after row before the canvas began. The
+   stages scroll sideways as one row instead, the title gives way to the
+   one in the sidebar, and the drawing comes before the panels for anyone
+   who opens them. */
+@media (max-width: 720px) {
+  /* Order alone, on the grid this already is. Switching it to flex was the
+     first attempt and it let a loaded kitchen push the page sideways: a
+     flex item does not shrink below its content, where this grid's
+     minmax(0, 1fr) column always could. */
+  .designer-center {
+    order: -1;
+    min-width: 0;
+  }
+  .designer-header h1 {
+    display: none;
+  }
+  .studio-stages {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .studio-stages button {
+    flex: 0 0 auto;
+  }
+  /* Four rows of header on a phone. The two secondary actions keep their
+     icons and their names for a screen reader, and lose the words that
+     were wrapping the row - both are reachable from the stages and from
+     the project tools as well. */
+  .wide-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }

@@ -22,7 +22,8 @@ export default function Catalog() {
   const data = raw ? (JSON.parse(raw) as Overview) : undefined;
   const [choice, setChoice] = useState('');
   const version =
-    data?.versions.find((v) => v._id === choice) ?? defaultCatalog(data?.versions);
+    data?.versions.find((v) => v._id === choice) ??
+    defaultCatalog(data?.versions);
   return (
     <>
       <header className="page-header">
@@ -44,10 +45,17 @@ export default function Catalog() {
         {version ? (
           <Browser key={version._id} version={version} />
         ) : (
-          <p>
-            Load a document and compile a representative subset to browse
-            products.
-          </p>
+          <div className="empty-state">
+            <h2>No catalog to browse yet</h2>
+            <p>
+              A catalog appears here once a manufacturer document has been
+              loaded and compiled into records. Nothing is browsable before
+              that, because there is nothing source-linked to show.
+            </p>
+            <Link className="empty-state-action" href="/documents">
+              Go to Documents
+            </Link>
+          </div>
         )}
       </div>
     </>
@@ -87,7 +95,11 @@ function Browser({ version }: { version: Doc<'versions'> }) {
     <>
       <section className="demo-guide" aria-label="Demo walkthrough">
         <h2>Explore the catalog</h2>
-        <p>Choose an example, then select Inspect PDF to compare its fields with the source page. Open Rules to explore availability and compatibility constraints.</p>
+        <p>
+          Choose an example, then select Inspect PDF to compare its fields with
+          the source page. Open Rules to explore availability and compatibility
+          constraints.
+        </p>
         <div className="toolbar">
           {[
             ['WBC2442', 'Cabinet dimensions'],
@@ -95,11 +107,27 @@ function Browser({ version }: { version: Doc<'versions'> }) {
             ['OLF330', 'An unresolved dimension'],
             ['', 'All products'],
           ].map(([sku, label]) => (
-            <button key={label} className="demo-example" type="button" onClick={() => {
-              setFilters({ query: sku ?? '', category: '', family: '', width: '', height: '', depth: '', minConfidence: '' });
-              setStatus('all');
-              setOffset(0);
-            }}>{label}{sku ? ` · ${sku}` : ''}</button>
+            <button
+              key={label}
+              className="demo-example"
+              type="button"
+              onClick={() => {
+                setFilters({
+                  query: sku ?? '',
+                  category: '',
+                  family: '',
+                  width: '',
+                  height: '',
+                  depth: '',
+                  minConfidence: '',
+                });
+                setStatus('all');
+                setOffset(0);
+              }}
+            >
+              {label}
+              {sku ? ` · ${sku}` : ''}
+            </button>
           ))}
         </div>
       </section>
