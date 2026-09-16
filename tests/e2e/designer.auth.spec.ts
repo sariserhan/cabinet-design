@@ -217,12 +217,23 @@ test('an item can be nudged, rotated, dragged in 3D and deleted', async ({
   const canvas = page.locator('.render-stage canvas');
   await expect(canvas).toBeVisible({ timeout: 60_000 });
   await page.waitForTimeout(6000);
-  // page.mouse works in viewport coordinates and does not scroll to the target.
+
+  // Locked is the default. Unlock first, prove editing works, then lock again
+  // and prove it stops. Done in that order because a drag attempt while locked
+  // is an orbit, which would move the camera off the point being aimed at.
+  await page.getByRole('button', { name: /Items locked/i }).click();
+  await expect(
+    page.getByRole('button', { name: /Items editable/i }),
+  ).toBeVisible();
+  // page.mouse works in viewport coordinates and does not scroll to its target,
+  // and the hint line changes height with the lock, so measure after unlocking.
   await canvas.scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
-  const box = await canvas.boundingBox();
-  expect(box).not.toBeNull();
-  const { x, y, width, height } = box ?? { x: 0, y: 0, width: 0, height: 0 };
+  const live = await canvas.boundingBox();
+  expect(live).not.toBeNull();
+  const open = live ?? { x: 0, y: 0, width: 0, height: 0 };
+  const sx = open.x + open.width * 0.2,
+    sy = open.y + open.height * 0.75;
 
   const start = await draft();
   await page.keyboard.press('ArrowRight');
@@ -232,8 +243,6 @@ test('an item can be nudged, rotated, dragged in 3D and deleted', async ({
   expect(changed(start, turned, 'rotation')).toBe(true);
 
   // Dragging starts on a point known to sit on a base cabinet run.
-  const sx = x + width * 0.2,
-    sy = y + height * 0.75;
   await page.mouse.move(sx, sy);
   await page.mouse.down();
   for (let i = 1; i <= 10; i++) await page.mouse.move(sx + i * 10, sy - i * 2);
@@ -246,6 +255,22 @@ test('an item can be nudged, rotated, dragged in 3D and deleted', async ({
 
   await page.keyboard.press('Delete');
   await page.waitForTimeout(7000);
-  expect((await draft()).length).toBe(dragged.length - 1);
+  const deleted = await draft();
+  expect(deleted.length).toBe(dragged.length - 1);
+
+  // Lock again: the same keys must now do nothing at all.
+  await page.getByRole('button', { name: /Items editable/i }).click();
+  await expect(
+    page.getByRole('button', { name: /Items locked/i }),
+  ).toBeVisible();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('r');
+  await page.keyboard.press('Delete');
+  await page.waitForTimeout(7000);
+  const afterLock = await draft();
+  expect(afterLock.length).toBe(deleted.length);
+  expect(changed(deleted, afterLock, 'x')).toBe(false);
+  expect(changed(deleted, afterLock, 'rotation')).toBe(false);
+
   expect(pageErrors).toEqual([]);
 });

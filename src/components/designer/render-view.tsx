@@ -36,6 +36,7 @@ import { addWindowLighting } from './render-lighting';
 import { photoSnapshot, renderPhoto } from './photo-render';
 import { usePhotoExport } from './use-photo-export';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Lock, LockOpen } from 'lucide-react';
 import { footprint } from '@/designer/model';
 import type { Design } from '@/designer/model';
 
@@ -55,6 +56,8 @@ export default function RenderView({
   selectedIds,
   onSelect,
   onMoveItem,
+  editLocked,
+  onEditLockChange,
 }: {
   ownerId?: string;
   selected?: string | null;
@@ -62,6 +65,10 @@ export default function RenderView({
   onSelect?: (id: string | null) => void;
   /** Commits a drag in the 3D view, using the same rules as the 2D plan. */
   onMoveItem?: (id: string, x: number, y: number) => void;
+  /** While locked, dragging is refused; clicking still selects. */
+  editLocked?: boolean;
+  /** Provided only where the lock is meant to be offered as a control. */
+  onEditLockChange?: (locked: boolean) => void;
   cameraView?: CameraView;
   onCamera?: (view: CameraView) => void;
   onCapture?: (url: string) => void;
@@ -144,8 +151,20 @@ export default function RenderView({
   const [speed, setSpeed] = useState(30);
   const speedRef = useRef(speed);
   speedRef.current = speed;
-  const callbacks = useRef({ onCamera, onCapture, onSelect, onMoveItem });
-  callbacks.current = { onCamera, onCapture, onSelect, onMoveItem };
+  const callbacks = useRef({
+    onCamera,
+    onCapture,
+    onSelect,
+    onMoveItem,
+    editLocked,
+  });
+  callbacks.current = {
+    onCamera,
+    onCapture,
+    onSelect,
+    onMoveItem,
+    editLocked,
+  };
   const pendingCamera = useRef<CameraView | null>(null);
   const externalCamera = useRef(cameraView);
   externalCamera.current = cameraView;
@@ -691,7 +710,13 @@ export default function RenderView({
     };
     const pointerDown = (e: PointerEvent) => {
       press = e.button === 0 ? { x: e.clientX, y: e.clientY } : null;
-      if (walking || e.button !== 0 || !callbacks.current.onMoveItem) return;
+      if (
+        walking ||
+        e.button !== 0 ||
+        !callbacks.current.onMoveItem ||
+        callbacks.current.editLocked
+      )
+        return;
       const hit = pickAt(e.clientX, e.clientY)
         .intersectObjects(itemGroups, true)
         .find((h) => {
@@ -1238,10 +1263,34 @@ export default function RenderView({
           ref={host}
           style={batchBusy ? { pointerEvents: 'none' } : undefined}
         />
+        {onEditLockChange ? (
+          <p className="render-lock">
+            <button
+              type="button"
+              aria-pressed={!editLocked}
+              onClick={() => onEditLockChange(!editLocked)}
+            >
+              {editLocked ? (
+                <>
+                  <Lock size={14} /> Items locked
+                </>
+              ) : (
+                <>
+                  <LockOpen size={14} /> Items editable
+                </>
+              )}
+            </button>
+            <span>
+              {editLocked
+                ? 'Clicking still selects, so finishes can be changed. Unlock to move items here.'
+                : 'Dragging and the item shortcuts are live in this view.'}
+            </span>
+          </p>
+        ) : null}
         <p className="render-hint">
           Drag to orbit · Right-drag to pan · Scroll to zoom · Two fingers to
           pan/zoom
-          {onMoveItem ? (
+          {onMoveItem && !editLocked ? (
             <>
               <br />
               Drag a cabinet to move it on its own level · Arrow keys nudge 1

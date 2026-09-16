@@ -726,6 +726,23 @@
   min-width: 0;
   background: #e9edf0;
 }
+.render-lock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+.render-lock button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+}
+.render-lock span {
+  color: #4d6560;
+}
 .render-stage {
   height: var(--render-stage-height);
   min-height: 350px;

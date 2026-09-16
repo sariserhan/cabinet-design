@@ -65,6 +65,7 @@ import {
   parseDesign,
   snapPosition,
   warnings,
+  MAX_DESIGN_ITEMS,
 } from '@/designer/model';
 import type { Cabinet, Design, Product, ObjectKind } from '@/designer/model';
 import { PlanCanvas } from './plan-canvas';
@@ -170,6 +171,9 @@ function Editor({ ownerId }: { ownerId: string }) {
       '2d' | '3d' | 'render' | 'quote' | 'compare' | 'client' | 'elevation'
     >('2d'),
     [snap, setSnap] = useState(true),
+    // The 3D view starts locked so orbiting a design cannot move it. Hydrated
+    // from the browser below, because the choice is remembered per account.
+    [renderLocked, setRenderLocked] = useState(true),
     [zoom, setZoom] = useState(1),
     [panMode, setPanMode] = useState(false),
     [fitRevision, setFitRevision] = useState(0),
@@ -193,6 +197,12 @@ function Editor({ ownerId }: { ownerId: string }) {
       setInspectorCollapsed(true);
     }
     recordStore.current ??= browserRecordStore();
+    try {
+      const remembered = localStorage.getItem(storageKey + ':render-lock');
+      if (remembered !== null) setRenderLocked(remembered === '1');
+    } catch {
+      // Blocked site data just means the safe default stands.
+    }
     let initial = newDesign();
     try {
       const draft = localStorage.getItem(storageKey + ':draft');
@@ -481,6 +491,8 @@ function Editor({ ownerId }: { ownerId: string }) {
       // the arrow keys belong to the page, and a selection left over from
       // earlier should not quietly turn scrolling into nudging.
       if (mode !== '2d' && mode !== 'render') return;
+      // The 3D view can be locked so a stray key while orbiting changes nothing.
+      if (mode === 'render' && renderLocked) return;
       const current = design?.items.find((i) => i.id === selected);
       if (!design || !current) return;
       const steps: Record<string, [number, number]> = {
@@ -528,7 +540,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     };
     window.addEventListener('keydown', shortcut);
     return () => window.removeEventListener('keydown', shortcut);
-  }, [design, selected, snap, moveTogether, mode]);
+  }, [design, selected, snap, moveTogether, mode, renderLocked]);
   function add(
     product: Product,
     versionId: string,
@@ -541,8 +553,8 @@ function Editor({ ownerId }: { ownerId: string }) {
       );
       return;
     }
-    if (design.items.length >= 100) {
-      setStatus('This demo supports up to 100 cabinets per design.');
+    if (design.items.length >= MAX_DESIGN_ITEMS) {
+      setStatus(`A design holds up to ${MAX_DESIGN_ITEMS} items.`);
       return;
     }
     const item = fromProduct(product, versionId),
@@ -571,8 +583,8 @@ function Editor({ ownerId }: { ownerId: string }) {
     option?: string,
   ) {
     if (!design) return;
-    if (design.items.length >= 100) {
-      setStatus('This demo supports 100 items per design.');
+    if (design.items.length >= MAX_DESIGN_ITEMS) {
+      setStatus(`A design holds up to ${MAX_DESIGN_ITEMS} items.`);
       return;
     }
     let next = fromObject(kind, option);
@@ -1600,6 +1612,23 @@ function Editor({ ownerId }: { ownerId: string }) {
                   }
                 }}
                 onMoveItem={(id, x, y) => updateItem(id, { x, y })}
+                editLocked={renderLocked}
+                onEditLockChange={(locked) => {
+                  setRenderLocked(locked);
+                  try {
+                    localStorage.setItem(
+                      storageKey + ':render-lock',
+                      locked ? '1' : '0',
+                    );
+                  } catch {
+                    // Not remembering the choice is not worth failing over.
+                  }
+                  setStatus(
+                    locked
+                      ? 'Items locked in the 3D view. Clicking still selects.'
+                      : 'Items editable in the 3D view. Drag, or use arrows, R and Delete.',
+                  );
+                }}
                 onChange={(next) => commit(() => next)}
               />
             </>

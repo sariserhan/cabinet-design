@@ -2,7 +2,14 @@
 
 import type { Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
-import { Copy, FlipHorizontal2, RotateCw, Trash2 } from 'lucide-react';
+import {
+  Copy,
+  FlipHorizontal2,
+  Lock,
+  LockOpen,
+  RotateCw,
+  Trash2,
+} from 'lucide-react';
 import type { Cabinet, Design } from '@/designer/model';
 import {
   attachToWall,
@@ -12,6 +19,7 @@ import {
   mirrorCabinet,
   objectOptionPatch,
   objectOptions,
+  MAX_DESIGN_ITEMS,
 } from '@/designer/model';
 import { roomEdges } from '@/designer/room';
 import { sourceLink } from '@/designer/design-decisions';
@@ -390,8 +398,15 @@ export function DesignerInspector({
                 <FlipHorizontal2 size={14} /> Flip left/right
               </button>
               <button
+                aria-pressed={!!item.locked}
+                onClick={() => updateItem(item.id, { locked: !item.locked })}
+              >
+                {item.locked ? <Lock size={14} /> : <LockOpen size={14} />}{' '}
+                {item.locked ? 'Locked' : 'Lock'}
+              </button>
+              <button
                 aria-label="Duplicate cabinet"
-                disabled={design.items.length >= 100}
+                disabled={design.items.length >= MAX_DESIGN_ITEMS}
                 onClick={() => {
                   const copy = { ...item, id: crypto.randomUUID() },
                     space = findSpace(copy, design);

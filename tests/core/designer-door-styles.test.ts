@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { doorFace, type DoorStyle } from '../../src/components/designer/render-details.js';
@@ -101,4 +102,21 @@ test('the front detail budget stays below the item ceiling', () => {
     FRONT_DETAIL_BUDGET < MAX_DESIGN_ITEMS,
     `budget ${FRONT_DETAIL_BUDGET} must be below the ${MAX_DESIGN_ITEMS} item ceiling`,
   );
+});
+
+test('the add limits track the item ceiling rather than a fixed number', () => {
+  // These were left at 100 when the ceiling moved, so a design could not grow
+  // past 100 items however large MAX_DESIGN_ITEMS said it could be.
+  const sources = [
+    'src/components/designer/designer.tsx',
+    'src/components/designer/designer-inspector.tsx',
+  ];
+  for (const file of sources) {
+    const text = readFileSync(new URL(`../../${file}`, import.meta.url), 'utf8');
+    assert.equal(
+      /items\.length >= 100\b/.test(text),
+      false,
+      `${file} still caps items at a hardcoded 100`,
+    );
+  }
 });
