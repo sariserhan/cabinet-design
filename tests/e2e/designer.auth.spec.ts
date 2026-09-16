@@ -204,6 +204,45 @@ test('clear floor and work centres are measured against the project settings', a
   expect(pageErrors).toEqual([]);
 });
 
+test('a soffit can be found in the library and placed', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page
+    .getByRole('button', { name: /^Objects$/ })
+    .click()
+    .catch(() => {});
+  await page.getByLabel('Search objects').fill('soffit');
+  await page.getByRole('button', { name: 'Add Soffit' }).click();
+
+  // Boxed in above the wall cabinets, which is the point of the thing.
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(() => {
+          const key = Object.keys(localStorage).filter((k) =>
+            k.endsWith(':draft'),
+          )[0];
+          const value = key ? localStorage.getItem(key) : null;
+          if (!value) return [];
+          return (
+            JSON.parse(value) as {
+              items: { kind: string; elevation: number }[];
+            }
+          ).items
+            .filter((i) => i.kind === 'soffit')
+            .map((i) => i.elevation);
+        }),
+      { timeout: 30_000 },
+    )
+    .toEqual([84]);
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

@@ -133,7 +133,11 @@ export function previewEverydayEdit(
       request.gap > 120
     )
       throw Error('Choose 1–8 copies and a gap from 0 to 120 inches.');
-    if (members.some((i) => ['column', 'beam', 'partition'].includes(i.kind)))
+    if (
+      members.some((i) =>
+        ['column', 'beam', 'soffit', 'partition'].includes(i.kind),
+      )
+    )
       throw Error(
         'Repeat cabinets or furniture; use room tools for architecture.',
       );

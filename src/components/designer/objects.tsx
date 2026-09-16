@@ -37,6 +37,7 @@ const icons = {
   toe_kick: LayoutPanelTop,
   column: LayoutPanelTop,
   beam: LayoutPanelTop,
+  soffit: LayoutPanelTop,
   partition: LayoutPanelTop,
 };
 export function ObjectsLibrary({

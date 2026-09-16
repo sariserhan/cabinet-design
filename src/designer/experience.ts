@@ -121,7 +121,9 @@ export function bestCamera(design: Design) {
   const items = design.items.filter(
     (i) =>
       !i.hidden &&
-      !['door', 'window', 'partition', 'beam', 'column'].includes(i.kind),
+      !['door', 'window', 'partition', 'beam', 'soffit', 'column'].includes(
+        i.kind,
+      ),
   );
   if (!items.length)
     return {

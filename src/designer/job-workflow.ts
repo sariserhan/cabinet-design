@@ -221,7 +221,8 @@ export function orderRows(d: Design) {
     ...d.items
       .filter(
         (i) =>
-          !isOpening(i) && !['partition', 'beam', 'column'].includes(i.kind),
+          !isOpening(i) &&
+          !['partition', 'beam', 'soffit', 'column'].includes(i.kind),
       )
       .map((i) => ({
         key: `product:${i.id}`,

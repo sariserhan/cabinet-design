@@ -71,6 +71,7 @@ export const itemSchema = z.object({
       'toe_kick',
       'column',
       'beam',
+      'soffit',
       'partition',
     ])
     .default('cabinet'),
@@ -819,6 +820,7 @@ export const objectPresets: {
       ['toe_kick', 'Toe kick', 60, 3, 4, 0],
       ['column', 'Column', 12, 12, 96, 0],
       ['beam', 'Ceiling beam', 120, 8, 10, 86],
+      ['soffit', 'Soffit', 96, 13, 12, 84],
       ['partition', 'Partition wall', 60, 4, 96, 0],
     ] as const
   ).map(([kind, name, width, depth, height, elevation]) => ({

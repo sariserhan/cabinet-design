@@ -97,9 +97,9 @@ checked against the model on 2026-09-16.
       mitres at a corner or stops at a wall. Fillers and scribes are the same
       story. Until a run is a run, elevations and the item list both under-
       report what the job needs.
-- [ ] **Soffits and bulkheads.** The model has columns, beams and partitions
-      but no soffit, which is in a large share of real kitchens and changes
-      what wall cabinets can go where.
+- [x] **Soffits and bulkheads.** Done on 2026-09-16: a `soffit` kind with a
+      96 x 13 x 12 preset at 84 inches, treated as architecture rather than
+      furniture everywhere the other structural kinds are.
 - [ ] **A plan and elevation DXF.** The DXF writer already exists for
       machining parts. Pointing it at the plan and the elevations would give
       a contractor or an architect something they can open, which today they

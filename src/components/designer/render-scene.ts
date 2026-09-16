@@ -351,6 +351,7 @@ export function buildKitchenScene(context: BuildContext) {
         'toe_kick',
         'column',
         'beam',
+        'soffit',
         'partition',
       ].includes(item.kind)
     ) {
@@ -361,7 +362,7 @@ export function buildKitchenScene(context: BuildContext) {
         0,
         h / 2,
         0,
-        ['column', 'partition'].includes(item.kind) ? wall : finish,
+        ['column', 'partition', 'soffit'].includes(item.kind) ? wall : finish,
       );
       if (item.kind === 'molding') b(w, 0.7, d + 1, 0, h - 0.35, 0.5, finish);
       continue;
