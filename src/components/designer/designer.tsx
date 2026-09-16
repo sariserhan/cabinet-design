@@ -98,6 +98,7 @@ import { newAnnotation } from '@/designer/annotations';
 import { DimensionToggles } from './dimension-toggles';
 import { allAxes, designDimensionSummary } from '@/designer/dimension-overlay';
 import type { DimensionAxes } from '@/designer/dimension-overlay';
+import { PlanImport } from './plan-import-tool';
 
 const RenderView = dynamic(() => import('./render-view'), {
   ssr: false,
@@ -1312,6 +1313,7 @@ function Editor({ ownerId }: { ownerId: string }) {
         aria-label="Room stage"
         data-workflow-stage="Room"
       >
+        <PlanImport design={design} onApply={(next) => commit(() => next)} />
         <MeasurementWizard
           expanded
           key={`measure:${design.id}`}

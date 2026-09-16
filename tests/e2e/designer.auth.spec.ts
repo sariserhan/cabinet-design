@@ -515,6 +515,48 @@ test('a project can be worked in millimetres', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('a room can be imported from an architect DXF', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.getByRole('button', { name: /^1\s*Room$/ }).click();
+  await page
+    .getByLabel('Plan DXF file')
+    .setInputFiles('tests/fixtures/plans/l-room-mm.dxf');
+
+  // Described before it is applied: 5000 x 4200 mm, six corners, and the
+  // units the file stated.
+  const result = page.locator('.plan-import-result');
+  await expect(result).toContainText('196-7/8" × 165-3/8"', {
+    timeout: 20_000,
+  });
+  await expect(result).toContainText('6 corners');
+  await expect(result).toContainText('file units mm');
+
+  await page.getByRole('button', { name: 'Use this room' }).click();
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(() => {
+          const key = Object.keys(localStorage).filter((k) =>
+            k.endsWith(':draft'),
+          )[0];
+          const value = key ? localStorage.getItem(key) : null;
+          if (!value) return null;
+          const room = (
+            JSON.parse(value) as {
+              room: { width: number; outline: unknown[] };
+            }
+          ).room;
+          return `${Math.round(room.width)}/${room.outline.length}`;
+        }),
+      { timeout: 30_000 },
+    )
+    .toBe('197/6');
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

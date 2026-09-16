@@ -59,6 +59,8 @@ import {
   lengthLabel,
   unitsOf,
 } from '../../src/designer/units';
+import { readPlanDxf, applyImportedPlan } from '../../src/designer/plan-import';
+import { designSchema } from '../../src/designer/model';
 const drawingOptions = () =>
   drawingOptionsSchema.parse({
     company: 'Dealer',
@@ -879,4 +881,164 @@ test('a project can be worked in millimetres while it is stored in inches', () =
   // The geometry is the same design either way.
   assert.equal(restored.room.width, 144);
   assert.equal(restored.items[0]?.height, 34.5);
+});
+test('a DXF plan gives up its room, and says what it could not', () => {
+  const dxf = (body: string, insunits = '4') =>
+    [
+      '0',
+      'SECTION',
+      '2',
+      'HEADER',
+      '9',
+      '$INSUNITS',
+      '70',
+      insunits,
+      '0',
+      'ENDSEC',
+      '0',
+      'SECTION',
+      '2',
+      'ENTITIES',
+      body,
+      '0',
+      'ENDSEC',
+      '0',
+      'EOF',
+    ].join('\n');
+  const ring = (points: [number, number][], closed = true) =>
+    [
+      '0',
+      'LWPOLYLINE',
+      '90',
+      String(points.length),
+      '70',
+      closed ? '1' : '0',
+      ...points.flatMap(([x, y]) => ['10', String(x), '20', String(y)]),
+    ].join('\n');
+
+  // A 4000 x 3000 mm room, offset from the origin as a real plan would be.
+  const room = readPlanDxf(
+    dxf(
+      ring([
+        [1000, 2000],
+        [5000, 2000],
+        [5000, 5000],
+        [1000, 5000],
+      ]),
+    ),
+  );
+  assert.equal(Math.round(room.width), 157);
+  assert.equal(Math.round(room.depth), 118);
+  assert.deepEqual(room.outline[0], { x: 0, y: 0 });
+  assert.equal(room.units, 'mm');
+
+  // The largest closed shape is the room; an island drawn inside it is not.
+  const withFurniture = readPlanDxf(
+    dxf(
+      ring([
+        [0, 0],
+        [4000, 0],
+        [4000, 3000],
+        [0, 3000],
+      ]) +
+        '\n' +
+        ring([
+          [1000, 1000],
+          [2000, 1000],
+          [2000, 2000],
+          [1000, 2000],
+        ]),
+    ),
+  );
+  assert.equal(Math.round(withFurniture.width), 157);
+  assert.match(withFurniture.notes.join(' '), /largest was taken/);
+
+  // Walls drawn as loose lines rather than one outline: the extent is
+  // taken as the room, and the note says that is a guess. A single line
+  // bounds nothing, and is refused instead.
+  const line = (x1: number, y1: number, x2: number, y2: number) =>
+    [
+      '0',
+      'LINE',
+      '10',
+      String(x1),
+      '20',
+      String(y1),
+      '11',
+      String(x2),
+      '21',
+      String(y2),
+    ].join('\n');
+  const loose = readPlanDxf(
+    dxf(
+      [
+        line(0, 0, 4000, 0),
+        line(4000, 0, 4000, 3000),
+        line(4000, 3000, 0, 3000),
+        line(0, 3000, 0, 0),
+      ].join('\n'),
+    ),
+  );
+  assert.equal(Math.round(loose.width), 157);
+  assert.equal(Math.round(loose.depth), 118);
+  assert.match(loose.notes.join(' '), /No closed outline/);
+  assert.throws(
+    () => readPlanDxf(dxf(line(0, 0, 4000, 0))),
+    /too small to be a room/,
+  );
+
+  // A file that says nothing about units is read as millimetres and says so.
+  const silent = readPlanDxf(
+    dxf(
+      ring([
+        [0, 0],
+        [4000, 0],
+        [4000, 3000],
+        [0, 3000],
+      ]),
+      '0',
+    ),
+  );
+  assert.equal(silent.units, 'unknown');
+  assert.match(silent.notes.join(' '), /does not say what its units are/);
+
+  // Refusals, rather than a room nobody can use.
+  assert.throws(() => readPlanDxf('not a drawing'), /does not read as a DXF/);
+  assert.throws(
+    () =>
+      readPlanDxf(
+        dxf(
+          ring([
+            [0, 0],
+            [100, 0],
+            [100, 100],
+            [0, 100],
+          ]),
+        ),
+      ),
+    /too small to be a room/,
+  );
+  assert.throws(
+    () =>
+      readPlanDxf(
+        dxf(
+          ring([
+            [0, 0],
+            [40000, 0],
+            [40000, 30000],
+            [0, 30000],
+          ]),
+        ),
+      ),
+    /larger than this designer holds/,
+  );
+
+  // Applying it changes the room and leaves the furniture alone.
+  const d = newDesign();
+  d.items = [{ ...fromObject('custom_cabinet'), id: 'keep', x: 4, y: 4 }];
+  const next = applyImportedPlan(d, room);
+  assert.equal(Math.round(next.room.width), 157);
+  assert.equal(next.items.length, 1);
+  assert.equal(next.items[0]?.x, 4);
+  assert.ok(designSchema.safeParse(next).success);
 });
