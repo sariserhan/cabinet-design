@@ -54,7 +54,7 @@ Open http://localhost:4001/designer. Keep the SSH terminal open. If you already 
 
 ## Storage and scope
 
-Edits automatically save a draft in this browser, separately for each signed-in account. Save design keeps named copies (up to 20). JSON export is the portable backup; browser storage does not sync to other devices and can be removed by clearing site data. Designs support up to 100 items and polygonal rooms with outer dimensions from 36 to 600 inches.
+Edits automatically save a draft in this browser, separately for each signed-in account. Save design keeps named copies, up to 200, in an IndexedDB database rather than localStorage, so the limit is disk space rather than a few megabytes. An existing list of saved designs migrates across on first load. If the browser refuses a database, saving falls back to localStorage and says so, because the much smaller quota then applies. JSON export remains the portable backup; browser storage still does not sync to other devices and can be removed by clearing site data. Designs support up to 800 items and polygonal rooms with outer dimensions from 36 to 600 inches. Above 400 items the 3D view draws plain fronts without hardware so the scene stays buildable; the 2D plan, quantities and drawings are unaffected.
 
 Under **Properties · Materials**, **Door style** switches every front between shaker (recessed panel), slab (flat overlay) and raised panel. The choice is illustrative geometry only: it does not select a manufacturer door program, and it never changes catalog dimensions.
 

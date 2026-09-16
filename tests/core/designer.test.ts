@@ -314,7 +314,9 @@ test('design checks scale with item count rather than quadratically', () => {
     for (let i = 0; i < 5; i++) warnings(design);
     return (performance.now() - started) / 5;
   };
-  const small = Math.max(time(build(100)), 0.05),
+  // Derived from the ceiling rather than fixed, so raising MAX_DESIGN_ITEMS
+  // keeps comparing four times the items instead of silently changing the ratio.
+  const small = Math.max(time(build(MAX_DESIGN_ITEMS / 4)), 0.05),
     large = time(build(MAX_DESIGN_ITEMS));
   // Four times the items. Near-linear work lands around 4x; the quadratic
   // version this replaced was about 12x. A generous bound keeps the test

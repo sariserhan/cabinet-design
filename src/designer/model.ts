@@ -135,10 +135,30 @@ export const itemSchema = z.object({
 });
 // One bound for how large a design may get, shared by the schema, the file
 // parser and the cloud store so the ceiling cannot drift between layers.
-// 400 items covers a large kitchen with headroom while keeping the pairwise
-// placement checks and the 3D scene interactive.
-export const MAX_DESIGN_ITEMS = 400;
-// Serialised designs are chunked above ~100 KB; 6 MB is the hard stop.
+// 400 covered one large kitchen. Whole-home cabinetry - kitchen, vanities,
+// laundry and built-ins, plus their worktops, fillers, trim and openings - runs
+// past that, so the ceiling is 800.
+//
+// The checks are not what bounds this. One warnings() pass costs about 1.8ms at
+// 100 items, 6.1ms at 400 and 24.5ms at 1200, growing near-linearly. The 3D
+// scene is the limit: it builds a mesh per part, and in the headless software
+// renderer the tests use, first paint took 17.9s at 400, 28.9s at 600 and 49.0s
+// at 800, while 1200 crashed the tab. Those absolute times are software
+// rasterisation rather than real hardware, but the crash is a real ceiling, so
+// the limit is set to the largest size actually observed to render.
+//
+// Going beyond this wants instanced or merged geometry, not a bigger number.
+export const MAX_DESIGN_ITEMS = 800;
+// Above this many items the 3D scene draws plain fronts without pulls. A shaker
+// front is ten boxes plus hardware, so a whole-home design would otherwise ask
+// for tens of thousands of meshes: measured in headless software rendering, 800
+// items took 41s to first paint and 1200 crashed the tab outright. Simplifying
+// costs detail nobody can resolve at that zoom, and keeps the scene buildable.
+export const FRONT_DETAIL_BUDGET = 400;
+// Serialised designs are chunked above ~100 KB; 6 MB is the hard stop. At about
+// 500 bytes an item a full design is nearer 600 KB, so this bounds hostile input
+// rather than real work. Saved designs are held in IndexedDB, not localStorage,
+// because a handful of them would otherwise exhaust a ~5 MB origin budget.
 export const MAX_DESIGN_TEXT = 6_000_000;
 export const designSchema = z
   .object({

@@ -17,11 +17,17 @@ export const test = base.extend<
     async ({ browser }, use, workerInfo) => {
       const context = await browser.newContext();
       const page = await context.newPage();
-      await signInToDesigner(page, workerInfo.workerIndex);
+      // parallelIndex, not workerIndex: the latter increments when a worker is
+      // replaced, so a single restart would sign up a brand new account through
+      // the slow creation path instead of reusing the one for this slot.
+      await signInToDesigner(page, workerInfo.parallelIndex);
       await use(page);
       await context.close();
     },
-    { scope: 'worker' },
+    // Sign-in has its own budget rather than borrowing the first test's 120s:
+    // its staged waits can exceed that on a cold or loaded dev server, and the
+    // failure then looks like whichever test happened to run first.
+    { scope: 'worker', timeout: 300_000 },
   ],
   designer: async ({ signedIn }, use) => {
     await signedIn.setViewportSize({ width: 1280, height: 900 });

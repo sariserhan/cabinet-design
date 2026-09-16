@@ -79,6 +79,12 @@ import { DemoWalkthrough, StartGuide, ClientPresentation } from './demo-tools';
 import { placementAt } from '@/designer/editing';
 import { polishedSample } from '@/designer/sample';
 import { normalizeOpenings, worldToLocal } from '@/designer/model';
+import {
+  MAX_SAVED_DESIGNS,
+  browserRecordStore,
+  loadSavedDesigns,
+  persistSavedDesigns,
+} from '@/designer/design-store';
 import { InstallationSheets } from './advanced-options';
 import { roomEdges, rectangleInside } from '@/designer/room';
 
@@ -178,12 +184,15 @@ function Editor({ ownerId }: { ownerId: string }) {
   const pendingDraft = useRef<(() => void) | null>(null);
   const importRequest = useRef(0);
   const currentDesign = useRef<Design | undefined>(undefined);
+  // Opened lazily so server rendering and blocked site data both stay safe.
+  const recordStore = useRef<ReturnType<typeof browserRecordStore>>(null);
   const storageKey = `kitchen-studio:${ownerId}`;
   useEffect(() => {
     if (window.matchMedia('(max-width: 700px)').matches) {
       setLibraryCollapsed(true);
       setInspectorCollapsed(true);
     }
+    recordStore.current ??= browserRecordStore();
     let initial = newDesign();
     try {
       const draft = localStorage.getItem(storageKey + ':draft');
@@ -202,22 +211,25 @@ function Editor({ ownerId }: { ownerId: string }) {
       } else {
         setWorkspaceStage('Room');
       }
-      const raw = localStorage.getItem(storageKey + ':saved');
-      if (raw) {
-        const list: unknown = JSON.parse(raw);
-        if (!Array.isArray(list) || list.length > 20)
-          throw Error('Invalid saved designs');
-        setSaved(
-          Array.from(
-            new Map(
-              list.map((d) => {
-                const parsed = designSchema.parse(d);
-                return [parsed.id, parsed] as const;
-              }),
-            ).values(),
+      // Saved designs live in IndexedDB; this migrates any localStorage list.
+      void loadSavedDesigns({
+        store: recordStore.current,
+        local: localStorage,
+        ownerId,
+        storageKey,
+      })
+        .then(({ designs, dropped }) => {
+          setSaved(designs);
+          if (dropped)
+            setStorageError(
+              `${dropped} saved design(s) could not be read and were left out. The rest are available.`,
+            );
+        })
+        .catch(() =>
+          setStorageError(
+            'Saved designs could not be loaded. You can still work and export a copy.',
           ),
         );
-      }
     } catch {
       setStorageError(
         'A saved design could not be loaded. You can still work and export a copy.',
@@ -633,14 +645,25 @@ function Editor({ ownerId }: { ownerId: string }) {
   function save() {
     if (!design) return;
     const next = [design, ...saved.filter((d) => d.id !== design.id)];
-    if (next.length > 20) {
+    if (next.length > MAX_SAVED_DESIGNS) {
       setStatus(
-        'You have 20 saved designs. Export this design or replace an existing one.',
+        `You have ${MAX_SAVED_DESIGNS} saved designs. Export this design or replace an existing one.`,
       );
       return;
     }
     try {
-      localStorage.setItem(storageKey + ':saved', JSON.stringify(next));
+      void persistSavedDesigns({
+        store: recordStore.current,
+        local: localStorage,
+        ownerId,
+        storageKey,
+        designs: next,
+      }).then(({ durable }) => {
+        if (!durable)
+          setStorageError(
+            'Saved to this browser without a database, so the space available is much smaller. Export a JSON copy.',
+          );
+      });
       setSaved(next);
       setOpenId(design.id);
       setStatus('Design saved in this browser.');
@@ -1409,15 +1432,18 @@ function Editor({ ownerId }: { ownerId: string }) {
                     design,
                     ...saved.filter((d) => d.id !== design.id),
                   ];
-                if (next.length > 20) {
+                if (next.length > MAX_SAVED_DESIGNS) {
                   setStatus('Saved design limit reached. Export a copy first.');
                   return;
                 }
                 try {
-                  localStorage.setItem(
-                    storageKey + ':saved',
-                    JSON.stringify(next),
-                  );
+                  void persistSavedDesigns({
+                    store: recordStore.current,
+                    local: localStorage,
+                    ownerId,
+                    storageKey,
+                    designs: next,
+                  });
                   setSaved(next);
                   commit(() => copy);
                   setSelected(null);

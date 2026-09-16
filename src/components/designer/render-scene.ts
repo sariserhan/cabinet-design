@@ -21,6 +21,7 @@ import {
   worldToLocal,
   containsFootprint,
   cutPanels,
+  FRONT_DETAIL_BUDGET,
   footprint,
   resolvedFront,
   sinkHoles,
@@ -166,6 +167,8 @@ export function buildKitchenScene(context: BuildContext) {
   }
   const movingFronts: { id: string; apply: (amount: number) => void }[] = [];
   const itemGroups: THREE.Group[] = [];
+  // One decision for the whole scene, so fronts cannot differ item to item.
+  const plainFronts = design.items.length > FRONT_DETAIL_BUDGET;
   for (const item of design.items.filter((i) => !i.hidden)) {
     const { finish, inset } = finishFor(item.finish ?? design.finish);
     const stone = stoneFor(
@@ -504,7 +507,7 @@ export function buildKitchenScene(context: BuildContext) {
               y = toe + ((row + 0.5) * (frontHeight - toe)) / rows;
             doorFace(
               b,
-              design.appearance?.doorStyle ?? 'shaker',
+              plainFronts ? 'slab' : (design.appearance?.doorStyle ?? 'shaker'),
               pw,
               ph,
               x,
@@ -524,7 +527,10 @@ export function buildKitchenScene(context: BuildContext) {
               isUpperCabinet(item) && style !== 'drawers'
                 ? y - ph / 2 + Math.min(5, ph / 2)
                 : y + ph / 2 - 5;
-            if (design.appearance?.handleStyle === 'knob') {
+            if (plainFronts) {
+              // Hardware is the other per-front mesh multiplier; at this size it
+              // is a few pixels, so it is dropped with the frame detail.
+            } else if (design.appearance?.handleStyle === 'knob') {
               const knob = new THREE.Mesh(
                 new THREE.SphereGeometry(0.75, 12, 8),
                 hardware,

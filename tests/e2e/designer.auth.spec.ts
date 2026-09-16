@@ -106,3 +106,40 @@ test('each door style rebuilds the scene and keeps it drawing', async ({
   }
   expect(pageErrors).toEqual([]);
 });
+
+test('saved designs persist in IndexedDB and survive a reload', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  const name = `Store check ${Date.now()}`;
+  await page.getByLabel('Project name').fill(name);
+  await page.getByRole('button', { name: /Save design/i }).click();
+  await expect(page.getByText(/Design saved in this browser/i)).toBeVisible({
+    timeout: 20_000,
+  });
+
+  // The whole point of the change: the list is a database record, not a
+  // localStorage string competing with every other record for ~5 MB.
+  const stored = await page.evaluate(
+    () =>
+      new Promise<string | null>((resolve) => {
+        const req = indexedDB.open('kitchen-studio', 1);
+        req.onsuccess = () => {
+          const tx = req.result.transaction('records', 'readonly');
+          const all = tx.objectStore('records').getAll();
+          all.onsuccess = () =>
+            resolve(all.result.length ? String(all.result[0]) : null);
+          all.onerror = () => resolve(null);
+        };
+        req.onerror = () => resolve(null);
+      }),
+  );
+  expect(stored).toContain(name);
+
+  await page.reload();
+  await expect(page.getByLabel('Project name')).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('option', { name })).toBeAttached({
+    timeout: 30_000,
+  });
+  expect(pageErrors).toEqual([]);
+});

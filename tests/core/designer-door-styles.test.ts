@@ -2,6 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { doorFace, type DoorStyle } from '../../src/components/designer/render-details.js';
+import {
+  FRONT_DETAIL_BUDGET,
+  MAX_DESIGN_ITEMS,
+} from '../../src/designer/model.js';
 
 type Part = { w: number; h: number; d: number; x: number; y: number; z: number };
 
@@ -88,4 +92,13 @@ test('narrow and short doors stay within their own outline', () => {
       }
     }
   }
+});
+
+test('the front detail budget stays below the item ceiling', () => {
+  // If these ever cross, the simplification never engages and the largest
+  // permitted design is the one that crashed the tab during measurement.
+  assert.ok(
+    FRONT_DETAIL_BUDGET < MAX_DESIGN_ITEMS,
+    `budget ${FRONT_DETAIL_BUDGET} must be below the ${MAX_DESIGN_ITEMS} item ceiling`,
+  );
 });
