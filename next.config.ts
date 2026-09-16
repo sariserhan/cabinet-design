@@ -8,8 +8,5 @@ const config: NextConfig = {
     // 50 MB ceiling the upload route and the Convex action already enforce.
     proxyClientMaxBodySize: '50mb',
   },
-  outputFileTracingIncludes: {
-    '/api/public-catalog-source': ['./sources/fabuwood-*/*.pdf'],
-  },
 };
 export default config;
