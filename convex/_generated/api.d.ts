@@ -13,6 +13,7 @@ import type * as aiReview from "../aiReview.js";
 import type * as auth from "../auth.js";
 import type * as bulkReview from "../bulkReview.js";
 import type * as catalogReadiness from "../catalogReadiness.js";
+import type * as designBlob from "../designBlob.js";
 import type * as documents from "../documents.js";
 import type * as http from "../http.js";
 import type * as projects from "../projects.js";
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   bulkReview: typeof bulkReview;
   catalogReadiness: typeof catalogReadiness;
+  designBlob: typeof designBlob;
   documents: typeof documents;
   http: typeof http;
   projects: typeof projects;
