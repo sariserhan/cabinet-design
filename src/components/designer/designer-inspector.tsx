@@ -40,7 +40,8 @@ import { RoomPhoto, SurfaceEditor } from './studio-panels';
 import { Numeric } from './designer-widgets';
 import type { ViewMode } from './designer-state';
 import { defaultSpacing, spacingFindings } from '@/designer/spacing';
-import { annotationLength, inchLabel } from '@/designer/annotations';
+import { annotationLength } from '@/designer/annotations';
+import { lengthLabel, unitsOf } from '@/designer/units';
 
 /** The inspector's own disclosure state, held by Editor. */
 export type InspectorPanelState = {
@@ -99,6 +100,7 @@ export function DesignerInspector({
 }) {
   const { inspectorTab, moveTogether, showClearance } = panel;
   // Absent on a design that has never set them, which is most of them.
+  const units = unitsOf(design);
   const spacing = design.spacing ?? defaultSpacing;
   const spacingIssues = spacingFindings(design, spacing);
   const setSpacing = (patch: Partial<typeof spacing>) =>
@@ -142,7 +144,24 @@ export function DesignerInspector({
       </div>
       <section hidden={inspectorTab !== 'design'}>
         <h3>Room</h3>
+        <label className="designer-numeric">
+          <span>Units</span>
+          <select
+            aria-label="Units"
+            value={units}
+            onChange={(e) =>
+              commit((d) => ({
+                ...d,
+                units: e.target.value === 'mm' ? 'mm' : 'in',
+              }))
+            }
+          >
+            <option value="in">Inches</option>
+            <option value="mm">Millimetres</option>
+          </select>
+        </label>
         <Numeric
+          units={units}
           label="Room width (in)"
           min={36}
           value={design.room.width}
@@ -151,6 +170,7 @@ export function DesignerInspector({
           }
         />
         <Numeric
+          units={units}
           label="Room depth (in)"
           min={36}
           value={design.room.depth}
@@ -159,6 +179,7 @@ export function DesignerInspector({
           }
         />
         <Numeric
+          units={units}
           label="Ceiling height (in)"
           min={36}
           value={design.room.height}
@@ -264,18 +285,21 @@ export function DesignerInspector({
             {item.kind !== 'cabinet' && (
               <>
                 <Numeric
+                  units={units}
                   label="Object width (in)"
                   min={1}
                   value={item.width}
                   onChange={(width) => updateItem(item.id, { width })}
                 />
                 <Numeric
+                  units={units}
                   label="Object depth (in)"
                   min={0.5}
                   value={item.depth}
                   onChange={(depth) => updateItem(item.id, { depth })}
                 />
                 <Numeric
+                  units={units}
                   label="Object height (in)"
                   min={0.5}
                   value={item.height}
@@ -331,18 +355,21 @@ export function DesignerInspector({
               </>
             )}
             <Numeric
+              units={units}
               label="X position (in)"
               max={1200}
               value={item.x}
               onChange={(x) => updateItem(item.id, { x })}
             />
             <Numeric
+              units={units}
               label="Y position (in)"
               max={1200}
               value={item.y}
               onChange={(y) => updateItem(item.id, { y })}
             />
             <Numeric
+              units={units}
               label="Elevation (in)"
               value={item.elevation}
               onChange={(elevation) => updateItem(item.id, { elevation })}
@@ -653,7 +680,7 @@ export function DesignerInspector({
                   placeholder={
                     a.kind === 'note'
                       ? 'What should the drawing say?'
-                      : inchLabel(annotationLength(a))
+                      : lengthLabel(annotationLength(a), unitsOf(design))
                   }
                   onChange={(e) =>
                     commit((d) => ({

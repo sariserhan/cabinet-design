@@ -1,6 +1,7 @@
 import type { Cabinet, Design } from './model';
 import { footprint, isOpening, itemBounds, localToWorld } from './model';
-import { inchLabel as inches } from './annotations';
+import { lengthLabel } from './units';
+import { unitsOf } from './units';
 
 /**
  * Distances a kitchen is checked against.
@@ -108,6 +109,7 @@ export function spacingFindings(
   design: Design,
   settings: SpacingSettings = design.spacing ?? defaultSpacing,
 ): SpacingFinding[] {
+  const inches = (value: number) => lengthLabel(value, unitsOf(design));
   const found: SpacingFinding[] = [];
   const obstacles = floorObstacles(design);
   const bounds = obstacles.map(itemBounds);

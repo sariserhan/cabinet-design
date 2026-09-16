@@ -1,25 +1,8 @@
 import type { Design } from './model';
+import { lengthLabel } from './units';
+import type { Units } from './units';
 
 export type Annotation = NonNullable<Design['annotations']>[number];
-
-/**
- * Inches the way a designer writes them: 41-1/2", not 41.5.
- *
- * Rounded to the nearest eighth, which is the smallest division these
- * drawings mark, and the same division the plan's own dimensions use.
- */
-export function inchLabel(value: number) {
-  const sign = value < 0 ? '-' : '',
-    size = Math.abs(value),
-    whole = Math.floor(size),
-    eighths = Math.round((size - whole) * 8);
-  if (eighths === 0) return `${sign}${whole}"`;
-  if (eighths === 8) return `${sign}${whole + 1}"`;
-  const fraction = ['', '1/8', '1/4', '3/8', '1/2', '5/8', '3/4', '7/8'][
-    eighths
-  ];
-  return `${sign}${whole}-${fraction}"`;
-}
 
 /** How long a dimension annotation is, or 0 for a note. */
 export function annotationLength(a: Annotation) {
@@ -35,9 +18,9 @@ export function annotationLength(a: Annotation) {
  * site" there means that to be read instead of the measurement, not beside
  * it. With nothing typed, the measurement speaks for itself.
  */
-export function annotationLabel(a: Annotation) {
+export function annotationLabel(a: Annotation, units: Units = 'in') {
   if (a.text) return a.text;
-  return a.kind === 'dimension' ? inchLabel(annotationLength(a)) : '';
+  return a.kind === 'dimension' ? lengthLabel(annotationLength(a), units) : '';
 }
 
 /** A new annotation, ready to be placed and then edited. */

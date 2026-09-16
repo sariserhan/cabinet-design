@@ -170,6 +170,11 @@ export const designSchema = z
     siteTasks: siteTasksSchema.optional(),
     supplierBookId: z.string().max(100).optional(),
     /**
+     * What the designer reads and types. Geometry is stored in inches
+     * whatever this says; see `units.ts`.
+     */
+    units: z.enum(['in', 'mm']).optional(),
+    /**
      * The job this design is a room of, when a job covers more than one.
      * A design still holds exactly one room; several designs sharing a job
      * id are its rooms, and their quotes add up. See `job-rooms.ts`.

@@ -472,6 +472,49 @@ test('dimensions can be shown in every view, one axis at a time', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('a project can be worked in millimetres', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  const width = page.getByLabel(/Room width/);
+  await page.getByLabel('Units', { exact: true }).selectOption('mm');
+
+  // The field and its label change together: 144 inches is 3658 mm.
+  await expect(width).toHaveValue('3658', { timeout: 20_000 });
+  await expect(
+    page.locator('.designer-numeric span').filter({ hasText: 'Room width' }),
+  ).toHaveText('Room width (mm)');
+  await expect(page.locator('.plan-svg')).toContainText('mm');
+
+  // Typing millimetres stores inches, because that is what a design is.
+  await width.fill('4000');
+  await width.blur();
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(() => {
+          const key = Object.keys(localStorage).filter((k) =>
+            k.endsWith(':draft'),
+          )[0];
+          const value = key ? localStorage.getItem(key) : null;
+          return value
+            ? Math.round(
+                (JSON.parse(value) as { room: { width: number } }).room.width *
+                  100,
+              ) / 100
+            : 0;
+        }),
+      { timeout: 30_000 },
+    )
+    .toBe(157.48);
+
+  await page.getByLabel('Units', { exact: true }).selectOption('in');
+  await expect(width).toHaveValue('157.48', { timeout: 20_000 });
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

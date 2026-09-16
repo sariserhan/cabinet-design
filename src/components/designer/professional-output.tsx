@@ -25,7 +25,8 @@ export function ProfessionalOutput({
       preparedBy: '',
       date: new Date().toISOString().slice(0, 10),
       purpose: 'Dealer review',
-      unit: 'in',
+      // A metric project should not have to say so twice.
+      unit: design.units ?? 'in',
       scale: 25,
       notes: '',
     }),

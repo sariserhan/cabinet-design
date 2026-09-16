@@ -53,6 +53,12 @@ import {
   designDimensionSummary,
   allAxes,
 } from '../../src/designer/dimension-overlay';
+import {
+  toDisplay,
+  fromDisplay,
+  lengthLabel,
+  unitsOf,
+} from '../../src/designer/units';
 const drawingOptions = () =>
   drawingOptionsSchema.parse({
     company: 'Dealer',
@@ -829,4 +835,48 @@ test('dimension labels name the axis unless all three are shown', () => {
     designDimensionSummary(d, { x: true, y: false, z: false }).items,
     'W 84"',
   );
+});
+test('a project can be worked in millimetres while it is stored in inches', () => {
+  const d = newDesign();
+  d.room = {
+    width: 144,
+    depth: 120,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  const item = {
+    ...fromObject('custom_cabinet'),
+    id: 'b',
+    x: 0,
+    y: 0,
+    width: 24,
+    depth: 24,
+    height: 34.5,
+  };
+  d.items = [item];
+
+  // What is typed and read changes; what is stored does not.
+  // Floating point, so within a thousandth of a millimetre.
+  assert.ok(Math.abs(toDisplay(24, 'mm') - 609.6) < 0.001);
+  assert.equal(fromDisplay(610, 'mm'), 610 / 25.4);
+  assert.equal(lengthLabel(24, 'in'), '24"');
+  assert.equal(lengthLabel(24, 'mm'), '610 mm');
+  assert.equal(lengthLabel(34.5, 'in'), '34-1/2"');
+  assert.equal(lengthLabel(34.5, 'mm'), '876 mm');
+
+  assert.equal(itemDimensionText(item, allAxes, 'in'), '24" × 24" × 34-1/2"');
+  assert.equal(
+    itemDimensionText(item, allAxes, 'mm'),
+    '610 mm × 610 mm × 876 mm',
+  );
+
+  d.units = 'mm';
+  assert.equal(unitsOf(d), 'mm');
+  assert.match(designDimensionSummary(d).room, /3658 mm/);
+  const restored = parseDesign(JSON.stringify(d));
+  assert.equal(restored.units, 'mm');
+  // The geometry is the same design either way.
+  assert.equal(restored.room.width, 144);
+  assert.equal(restored.items[0]?.height, 34.5);
 });

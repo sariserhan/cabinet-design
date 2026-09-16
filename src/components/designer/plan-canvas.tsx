@@ -21,7 +21,8 @@ import { fromObject, fromProduct, itemPolygon } from '@/designer/model';
 import { placementAt } from '@/designer/editing';
 import { activeDrop, parseDrop } from '@/designer/drop';
 import { placementFeedback } from '@/designer/demo-readiness';
-import { annotationLabel, inchLabel } from '@/designer/annotations';
+import { annotationLabel } from '@/designer/annotations';
+import { lengthLabel, unitsOf } from '@/designer/units';
 import { itemDimensionText } from '@/designer/dimension-overlay';
 import type { DimensionAxes } from '@/designer/dimension-overlay';
 import { ObjectPlan } from './objects';
@@ -204,7 +205,9 @@ export function PlanCanvas({
     additive: boolean;
   } | null>(null);
   const { room } = design,
-    padding = 28;
+    padding = 28,
+    units = unitsOf(design),
+    size = (value: number) => lengthLabel(value, units);
   // Items stack: a cabinet, the countertop over it, a wall cabinet above.
   // All three labels land on one point unless they are moved apart, so
   // each one that would collide drops below the last.
@@ -644,7 +647,9 @@ export function PlanCanvas({
           fontSize="4"
           fill="#243e49"
         >
-          {room.width}″ · {(room.width / 12).toFixed(1)} ft
+          {units === 'mm'
+            ? size(room.width)
+            : `${room.width}″ · ${(room.width / 12).toFixed(1)} ft`}
         </text>
         <text
           role="button"
@@ -664,7 +669,9 @@ export function PlanCanvas({
           fontSize="4"
           fill="#243e49"
         >
-          {room.depth}″ · {(room.depth / 12).toFixed(1)} ft
+          {units === 'mm'
+            ? size(room.depth)
+            : `${room.depth}″ · ${(room.depth / 12).toFixed(1)} ft`}
         </text>
         {[
           ...(drag && moveTogether
@@ -837,7 +844,7 @@ export function PlanCanvas({
                     strokeWidth="0.8"
                     paintOrder="stroke"
                   >
-                    {itemDimensionText(item, dimensions.axes)}
+                    {itemDimensionText(item, dimensions.axes, units)}
                   </text>
                 )}
                 {active && (
@@ -898,7 +905,7 @@ export function PlanCanvas({
                     : {}),
                 }
               : original;
-          const label = annotationLabel(a),
+          const label = annotationLabel(a, units),
             chosen = selectedAnnotation === a.id;
           // Grabbing one both selects it and starts moving it, the same as
           // an item: nobody should have to find a list to delete a note.
@@ -1044,9 +1051,7 @@ export function PlanCanvas({
               strokeWidth="0.9"
               paintOrder="stroke"
             >
-              {inchLabel(
-                Math.hypot(measure.x - measure.x0, measure.y - measure.y0),
-              )}
+              {size(Math.hypot(measure.x - measure.x0, measure.y - measure.y0))}
             </text>
           </g>
         )}

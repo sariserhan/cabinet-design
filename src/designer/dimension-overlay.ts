@@ -1,6 +1,7 @@
 import type { Cabinet, Design } from './model';
 import { itemPolygon } from './model';
-import { inchLabel } from './annotations';
+import { lengthLabel } from './units';
+import type { Units } from './units';
 
 /**
  * Which of the three dimensions to show.
@@ -29,14 +30,19 @@ export function anyAxis(axes: DimensionAxes) {
  * These are the item's own width, depth and height - what would be ordered
  * - rather than the footprint it occupies when turned.
  */
-export function itemDimensionText(item: Cabinet, axes: DimensionAxes) {
+export function itemDimensionText(
+  item: Cabinet,
+  axes: DimensionAxes,
+  units: Units = 'in',
+) {
+  const size = (value: number) => lengthLabel(value, units);
   if (!anyAxis(axes)) return '';
   if (axes.x && axes.y && axes.z)
-    return `${inchLabel(item.width)} × ${inchLabel(item.depth)} × ${inchLabel(item.height)}`;
+    return `${size(item.width)} × ${size(item.depth)} × ${size(item.height)}`;
   return [
-    axes.x ? `W ${inchLabel(item.width)}` : '',
-    axes.y ? `D ${inchLabel(item.depth)}` : '',
-    axes.z ? `H ${inchLabel(item.height)}` : '',
+    axes.x ? `W ${size(item.width)}` : '',
+    axes.y ? `D ${size(item.depth)}` : '',
+    axes.z ? `H ${size(item.height)}` : '',
   ]
     .filter(Boolean)
     .join(' · ');
@@ -66,11 +72,12 @@ export function designDimensionSummary(
         height: Math.max(...visible.map((i) => i.elevation + i.height)),
       }
     : { width: 0, depth: 0, height: 0 };
+  const units = design.units ?? 'in';
   const say = (w: number, d: number, h: number) =>
     [
-      axes.x ? `W ${inchLabel(w)}` : '',
-      axes.y ? `D ${inchLabel(d)}` : '',
-      axes.z ? `H ${inchLabel(h)}` : '',
+      axes.x ? `W ${lengthLabel(w, units)}` : '',
+      axes.y ? `D ${lengthLabel(d, units)}` : '',
+      axes.z ? `H ${lengthLabel(h, units)}` : '',
     ]
       .filter(Boolean)
       .join(' · ');
