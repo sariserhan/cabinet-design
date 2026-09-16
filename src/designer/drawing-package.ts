@@ -12,6 +12,7 @@ import { roomOutline, roomEdges, ceilingAt } from './room';
 import { canonical } from './installer-handoff';
 import { measurementStatus } from './project-workflow';
 import { itemConfiguration } from './supplier-pricing';
+import { annotationLabel } from './annotations';
 export const drawingOptionsSchema = z.object({
   company: z.string().trim().max(160),
   client: z.string().max(160),
@@ -259,6 +260,27 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
       body += `<polygon points="${p.map((p) => `${p.x},${p.y}`).join(' ')}" fill="${isOpening(i) ? '#e4edf2' : i.kind === 'countertop' ? '#eeeeee' : '#e8e3d8'}" fill-opacity="0.55"/>`;
       if (tx !== cx || ty !== cy) body += line(cx, cy, tx, ty);
       body += text(tx, ty, mark);
+    }
+    // What the designer marked by hand belongs on the sheet: a drawing that
+    // silently drops its own notes is worse than one without them.
+    for (const a of d.annotations ?? []) {
+      const label = annotationLabel(a);
+      if (a.kind === 'note') {
+        body += `<circle cx="${round(a.x)}" cy="${round(a.y)}" r="${round(font * 0.35)}" fill="#172e34"/>`;
+        if (label)
+          body += text(a.x + font * 0.7, a.y + font * 0.35, label, 'start');
+        continue;
+      }
+      const x2 = a.x2 ?? a.x,
+        y2 = a.y2 ?? a.y,
+        span = Math.hypot(x2 - a.x, y2 - a.y) || 1,
+        tickX = ((y2 - a.y) / span) * font * 0.45,
+        tickY = (-(x2 - a.x) / span) * font * 0.45;
+      body +=
+        line(a.x, a.y, x2, y2) +
+        line(a.x - tickX, a.y - tickY, a.x + tickX, a.y + tickY) +
+        line(x2 - tickX, y2 - tickY, x2 + tickX, y2 + tickY) +
+        text((a.x + x2) / 2, (a.y + y2) / 2 - font * 0.4, label);
     }
     body +=
       dimension(minX, maxX, maxY + pad * 0.55) +

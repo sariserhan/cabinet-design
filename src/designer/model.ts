@@ -170,6 +170,26 @@ export const designSchema = z
     siteTasks: siteTasksSchema.optional(),
     supplierBookId: z.string().max(100).optional(),
     /**
+     * Notes and dimensions the designer put on the plan themselves, in room
+     * inches. Separate from item notes: these belong to the drawing rather
+     * than to any one cabinet.
+     */
+    annotations: z
+      .array(
+        z.object({
+          id: z.string().min(1).max(100),
+          kind: z.enum(['note', 'dimension']),
+          x: z.number().finite().min(-600).max(1200),
+          y: z.number().finite().min(-600).max(1200),
+          /** The far end of a dimension; unused by a note. */
+          x2: z.number().finite().min(-600).max(1200).optional(),
+          y2: z.number().finite().min(-600).max(1200).optional(),
+          text: z.string().trim().max(200).default(''),
+        }),
+      )
+      .max(200)
+      .optional(),
+    /**
      * Distances this project is checked against, and where they came from.
      * Absent means the workspace defaults; see `spacing.ts`.
      */

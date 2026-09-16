@@ -88,10 +88,10 @@ checked against the model on 2026-09-16.
       `vanity` category and the model already has a washing machine, so the
       gap is structural rather than missing parts: rooms, per-room geometry
       and a quote that adds up across them.
-- [ ] **Annotations and designer-placed dimensions.** Items take a note, but
-      there is no way to put a dimension string, an arrow or a "verify on
-      site" callout on the plan itself. Drawing packages go out without the
-      one thing every set of drawings has.
+- [x] **Annotations and designer-placed dimensions.** Done on 2026-09-16:
+      Note and Dimension tools above the plan, edited or removed in
+      Properties, printed on the plan sheets. A dimension with nothing typed
+      shows what it measures; typed words replace it.
 - [ ] **Trim as runs rather than pieces.** Crown, light rail and toe kick are
       individual objects placed by hand; nothing follows a row of cabinets,
       mitres at a corner or stops at a wall. Fillers and scribes are the same

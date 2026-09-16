@@ -21,6 +21,7 @@ import { fromObject, fromProduct, itemPolygon } from '@/designer/model';
 import { placementAt } from '@/designer/editing';
 import { activeDrop, parseDrop } from '@/designer/drop';
 import { placementFeedback } from '@/designer/demo-readiness';
+import { annotationLabel, inchLabel } from '@/designer/annotations';
 import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
 
@@ -46,6 +47,12 @@ type Props = {
   /** Result of a band sweep; an empty list clears the selection. */
   onMarquee: (ids: string[], additive: boolean) => void;
   onMoveMany: (ids: string[], dx: number, dy: number) => void;
+  /** Placing a note or a dimension instead of selecting and panning. */
+  annotate: 'note' | 'dimension' | null;
+  onAnnotate: (
+    from: { x: number; y: number },
+    to?: { x: number; y: number },
+  ) => void;
   showClearance: boolean;
   onDropItem: (item: DropItem, point: { x: number; y: number }) => void;
 };
@@ -64,6 +71,8 @@ export function PlanCanvas({
   onToggle,
   onMarquee,
   onMoveMany,
+  annotate,
+  onAnnotate,
   showClearance,
   onDropItem,
   onResize,
@@ -160,6 +169,13 @@ export function PlanCanvas({
     oy: number;
     group: string[];
   } | null>(null);
+  // A dimension being dragged out, in plan inches.
+  const [measure, setMeasure] = useState<{
+    x0: number;
+    y0: number;
+    x: number;
+    y: number;
+  } | null>(null);
   // A rubber-band selection in progress, in plan inches.
   const [band, setBand] = useState<{
     x0: number;
@@ -212,6 +228,17 @@ export function PlanCanvas({
   }
   function startPan(event: PointerEvent<SVGSVGElement>) {
     if (event.button !== 0 && event.button !== 1) return;
+    // While a note or dimension tool is chosen, the canvas places one
+    // instead of panning: a note where it is clicked, a dimension between
+    // where the pointer goes down and where it comes up.
+    if (annotate && event.button === 0) {
+      const p = coordinates(event);
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+      if (annotate === 'note') onAnnotate(p);
+      else setMeasure({ x0: p.x, y0: p.y, x: p.x, y: p.y });
+      return;
+    }
     // Shift and drag across empty floor sweeps up everything the band
     // touches. Plain dragging still pans, which is what the canvas has
     // always done and what the footer tells people.
@@ -236,6 +263,11 @@ export function PlanCanvas({
     setIsPanning(true);
   }
   function move(event: PointerEvent) {
+    if (measure) {
+      const p = coordinates(event);
+      setMeasure({ ...measure, x: p.x, y: p.y });
+      return;
+    }
     if (band) {
       const p = coordinates(event);
       setBand({ ...band, x: p.x, y: p.y });
@@ -282,6 +314,14 @@ export function PlanCanvas({
     setDrag({ ...drag, ...position });
   }
   function end(event?: PointerEvent) {
+    if (measure) {
+      const from = { x: measure.x0, y: measure.y0 },
+        to = { x: measure.x, y: measure.y };
+      setMeasure(null);
+      // A click rather than a drag leaves nothing to measure.
+      if (Math.hypot(to.x - from.x, to.y - from.y) > 1) onAnnotate(from, to);
+      return;
+    }
     // A press on empty floor that never became a pan is a click on nothing,
     // which clears the selection. Without this there is no way to leave a
     // multi-selection except by picking another item.
@@ -434,6 +474,7 @@ export function PlanCanvas({
           setDrag(null);
           setResize(null);
           setBand(null);
+          setMeasure(null);
           panning.current = null;
           setIsPanning(false);
         }}
@@ -763,6 +804,91 @@ export function PlanCanvas({
           >
             Add a cabinet from the library to begin
           </text>
+        )}
+        {(design.annotations ?? []).map((a) => {
+          const label = annotationLabel(a);
+          if (a.kind === 'note')
+            return (
+              <g
+                key={a.id}
+                className="plan-annotation"
+                data-testid="plan-note"
+                pointerEvents="none"
+              >
+                <circle cx={a.x} cy={a.y} r={1.8} fill="#a8621b" />
+                <text
+                  x={a.x + 3}
+                  y={a.y + 1.2}
+                  fontSize="3.4"
+                  fill="#7a4713"
+                  stroke="white"
+                  strokeWidth="0.9"
+                  paintOrder="stroke"
+                >
+                  {label || 'Note'}
+                </text>
+              </g>
+            );
+          const x2 = a.x2 ?? a.x,
+            y2 = a.y2 ?? a.y,
+            midX = (a.x + x2) / 2,
+            midY = (a.y + y2) / 2;
+          // Ticks square to the run, so the ends read as ends.
+          const length = Math.hypot(x2 - a.x, y2 - a.y) || 1,
+            tickX = ((y2 - a.y) / length) * 2,
+            tickY = (-(x2 - a.x) / length) * 2;
+          return (
+            <g
+              key={a.id}
+              className="plan-annotation"
+              data-testid="plan-dimension"
+              pointerEvents="none"
+            >
+              <path
+                d={`M${a.x} ${a.y} L${x2} ${y2} M${a.x - tickX} ${a.y - tickY} L${a.x + tickX} ${a.y + tickY} M${x2 - tickX} ${y2 - tickY} L${x2 + tickX} ${y2 + tickY}`}
+                fill="none"
+                stroke="#7a4713"
+                strokeWidth=".5"
+              />
+              <text
+                x={midX}
+                y={midY - 2}
+                textAnchor="middle"
+                fontSize="3.4"
+                fill="#7a4713"
+                stroke="white"
+                strokeWidth="0.9"
+                paintOrder="stroke"
+              >
+                {label}
+              </text>
+            </g>
+          );
+        })}
+        {measure && (
+          <g pointerEvents="none">
+            <path
+              d={`M${measure.x0} ${measure.y0} L${measure.x} ${measure.y}`}
+              fill="none"
+              stroke="#a8621b"
+              strokeWidth=".5"
+              strokeDasharray="2 1.5"
+            />
+            <text
+              x={(measure.x0 + measure.x) / 2}
+              y={(measure.y0 + measure.y) / 2 - 2}
+              textAnchor="middle"
+              fontSize="3.4"
+              fill="#7a4713"
+              stroke="white"
+              strokeWidth="0.9"
+              paintOrder="stroke"
+            >
+              {inchLabel(
+                Math.hypot(measure.x - measure.x0, measure.y - measure.y0),
+              )}
+            </text>
+          </g>
         )}
         {band && (
           <rect

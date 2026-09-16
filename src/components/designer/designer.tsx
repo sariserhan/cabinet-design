@@ -33,6 +33,8 @@ import {
   Printer,
   Hand,
   MousePointer2,
+  MessageSquare,
+  Ruler,
   FolderOpen,
   Download,
   Undo2,
@@ -92,6 +94,7 @@ import {
 } from '@/designer/design-store';
 import { InstallationSheets } from './advanced-options';
 import { roomEdges, rectangleInside } from '@/designer/room';
+import { newAnnotation } from '@/designer/annotations';
 
 const RenderView = dynamic(() => import('./render-view'), {
   ssr: false,
@@ -118,6 +121,7 @@ function Editor({ ownerId }: { ownerId: string }) {
   >();
   const [workspaceStage, setWorkspaceStage] =
     useState<WorkspaceStage>('Design');
+  const [annotate, setAnnotate] = useState<'note' | 'dimension' | null>(null);
   const [showStart, setShowStart] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
@@ -1515,16 +1519,44 @@ function Editor({ ownerId }: { ownerId: string }) {
               {mode === '2d' && (
                 <>
                   <button
-                    aria-pressed={!panMode}
-                    onClick={() => setPanMode(false)}
+                    aria-pressed={!panMode && !annotate}
+                    onClick={() => {
+                      setPanMode(false);
+                      setAnnotate(null);
+                    }}
                   >
                     <MousePointer2 size={15} /> Select
                   </button>
                   <button
                     aria-pressed={panMode}
-                    onClick={() => setPanMode(true)}
+                    onClick={() => {
+                      setPanMode(true);
+                      setAnnotate(null);
+                    }}
                   >
                     <Hand size={15} /> Pan
+                  </button>
+                  <button
+                    aria-pressed={annotate === 'note'}
+                    title="Click the plan to leave a note on the drawing"
+                    onClick={() => {
+                      setPanMode(false);
+                      setAnnotate(annotate === 'note' ? null : 'note');
+                    }}
+                  >
+                    <MessageSquare size={15} /> Note
+                  </button>
+                  <button
+                    aria-pressed={annotate === 'dimension'}
+                    title="Drag across the plan to dimension it"
+                    onClick={() => {
+                      setPanMode(false);
+                      setAnnotate(
+                        annotate === 'dimension' ? null : 'dimension',
+                      );
+                    }}
+                  >
+                    <Ruler size={15} /> Dimension
                   </button>
                   <button
                     aria-label="Zoom out"
@@ -1687,6 +1719,19 @@ function Editor({ ownerId }: { ownerId: string }) {
                   next.length > 1
                     ? `${next.length} items selected. Drag one to move them all; arrows, R and Delete apply to the group.`
                     : '',
+                );
+              }}
+              annotate={annotate}
+              onAnnotate={(from, to) => {
+                const note = newAnnotation(annotate ?? 'note', from, to);
+                commit((d) => ({
+                  ...d,
+                  annotations: [...(d.annotations ?? []), note],
+                }));
+                setStatus(
+                  annotate === 'note'
+                    ? 'Note placed. Give it words in Properties.'
+                    : 'Dimension placed. Undo removes it.',
                 );
               }}
               onMoveMany={(ids, dx, dy) =>

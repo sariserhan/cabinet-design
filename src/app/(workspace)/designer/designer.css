@@ -1073,6 +1073,22 @@ body:has(.is-presenting) .demo-banner {
 .start-guide input {
   width: 130px;
 }
+.annotation-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 10px;
+  display: grid;
+  gap: 6px;
+}
+.annotation-list li {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.annotation-list input {
+  flex: 1;
+  min-width: 0;
+}
 .spacing-settings {
   margin: 6px 0 8px;
   gap: 12px;

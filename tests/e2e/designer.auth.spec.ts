@@ -243,6 +243,67 @@ test('a soffit can be found in the library and placed', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('a dimension and a note can be put on the plan and given words', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  const plan = page.locator('.plan-svg');
+  await plan.scrollIntoViewIfNeeded();
+
+  /** Plan inches to viewport pixels, the mapping the canvas itself uses. */
+  const at = async (x: number, y: number) => {
+    const point = await page.evaluate(
+      ([ux, uy]) => {
+        const svg = document.querySelector<SVGSVGElement>('.plan-svg');
+        const matrix = svg?.getScreenCTM();
+        if (!svg || !matrix || ux === undefined || uy === undefined)
+          return null;
+        const p = svg.createSVGPoint();
+        p.x = ux;
+        p.y = uy;
+        const t = p.matrixTransform(matrix);
+        return { x: t.x, y: t.y };
+      },
+      [x, y],
+    );
+    expect(point).not.toBeNull();
+    return point ?? { x: 0, y: 0 };
+  };
+
+  await page.getByRole('button', { name: 'Dimension' }).click();
+  const from = await at(20, 90),
+    to = await at(80, 90);
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  for (let step = 1; step <= 8; step++)
+    await page.mouse.move(from.x + ((to.x - from.x) * step) / 8, from.y);
+  await page.mouse.up();
+
+  // 60 inches dragged, so 60 inches drawn, without anyone typing it.
+  const drawn = page.locator('[data-testid="plan-dimension"]');
+  await expect(drawn).toHaveCount(1, { timeout: 20_000 });
+  await expect(drawn).toContainText('60"');
+
+  // Typed words replace the measurement on the drawing.
+  await page.getByLabel('Dimension text').fill('Verify before templating');
+  await expect(drawn).toContainText('Verify before templating', {
+    timeout: 20_000,
+  });
+
+  await page.getByRole('button', { name: 'Note' }).click();
+  const spot = await at(60, 120);
+  await page.mouse.click(spot.x, spot.y);
+  await expect(page.locator('[data-testid="plan-note"]')).toHaveCount(1, {
+    timeout: 20_000,
+  });
+
+  // Back to selecting, so the tool does not stay armed for the next test.
+  await page.getByRole('button', { name: 'Select' }).click();
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

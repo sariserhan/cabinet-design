@@ -40,6 +40,7 @@ import { RoomPhoto, SurfaceEditor } from './studio-panels';
 import { Numeric } from './designer-widgets';
 import type { ViewMode } from './designer-state';
 import { defaultSpacing, spacingFindings } from '@/designer/spacing';
+import { annotationLength, inchLabel } from '@/designer/annotations';
 
 /** The inspector's own disclosure state, held by Editor. */
 export type InspectorPanelState = {
@@ -638,6 +639,53 @@ export function DesignerInspector({
             {design.items.length
               ? 'No overlaps or boundary issues.'
               : 'Add cabinets to check the layout.'}
+          </p>
+        )}
+        <h4>Notes &amp; dimensions on the drawing</h4>
+        {(design.annotations ?? []).length ? (
+          <ul className="annotation-list">
+            {(design.annotations ?? []).map((a) => (
+              <li key={a.id}>
+                <input
+                  aria-label={`${a.kind === 'note' ? 'Note' : 'Dimension'} text`}
+                  value={a.text}
+                  maxLength={200}
+                  placeholder={
+                    a.kind === 'note'
+                      ? 'What should the drawing say?'
+                      : inchLabel(annotationLength(a))
+                  }
+                  onChange={(e) =>
+                    commit((d) => ({
+                      ...d,
+                      annotations: (d.annotations ?? []).map((other) =>
+                        other.id === a.id
+                          ? { ...other, text: e.target.value }
+                          : other,
+                      ),
+                    }))
+                  }
+                />
+                <button
+                  aria-label={`Remove ${a.kind}`}
+                  onClick={() =>
+                    commit((d) => ({
+                      ...d,
+                      annotations: (d.annotations ?? []).filter(
+                        (other) => other.id !== a.id,
+                      ),
+                    }))
+                  }
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="designer-muted">
+            Use Note or Dimension above the plan to mark the drawing. A
+            dimension with nothing typed shows what it measures.
           </p>
         )}
         <h4>Clear floor and work centres</h4>

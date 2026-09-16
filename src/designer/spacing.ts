@@ -1,5 +1,6 @@
 import type { Cabinet, Design } from './model';
 import { footprint, isOpening, itemBounds, localToWorld } from './model';
+import { inchLabel as inches } from './annotations';
 
 /**
  * Distances a kitchen is checked against.
@@ -41,24 +42,6 @@ export type SpacingFinding = {
   /** The setting it was compared against, in inches. */
   required: number;
 };
-
-/** Inches rendered the way a designer writes them: 41-1/2", not 41.5. */
-function inches(value: number) {
-  const whole = Math.floor(value),
-    eighths = Math.round((value - whole) * 8);
-  if (eighths === 0) return `${whole}"`;
-  if (eighths === 8) return `${whole + 1}"`;
-  const parts = [
-    [1, '1/8'],
-    [2, '1/4'],
-    [3, '3/8'],
-    [4, '1/2'],
-    [5, '5/8'],
-    [6, '3/4'],
-    [7, '7/8'],
-  ] as const;
-  return `${whole}-${parts.find(([n]) => n === eighths)?.[1]}"`;
-}
 
 /**
  * Items a person has to walk around.

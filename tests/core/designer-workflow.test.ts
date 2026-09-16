@@ -29,6 +29,28 @@ import {
   machiningDxf,
 } from '../../src/designer/machining';
 import { panelParts } from '../../src/designer/fabrication';
+import {
+  annotationLabel,
+  annotationLength,
+  newAnnotation,
+} from '../../src/designer/annotations';
+import {
+  drawingPackageHtml,
+  drawingOptionsSchema,
+} from '../../src/designer/drawing-package';
+const drawingOptions = () =>
+  drawingOptionsSchema.parse({
+    company: 'Dealer',
+    client: 'Client',
+    reference: 'JOB-1',
+    revision: 'A',
+    preparedBy: 'Designer',
+    date: '2026-09-16',
+    purpose: 'Dealer review',
+    unit: 'in',
+    scale: 50,
+    notes: '',
+  });
 test('snap finds item edges and excludes members of the same assembly', () => {
   const d = newDesign(),
     a = { ...fromObject('custom_cabinet'), x: 10, y: 10 },
@@ -525,4 +547,38 @@ test('work centres are measured only when all three are present', () => {
   assert.ok(total.measured > 312);
   assert.equal(total.required, 312);
   assert.deepEqual(total.itemIds.sort(), ['fridge', 'range', 'sink']);
+});
+test('annotations measure themselves, defer to typed text and reach the drawing', () => {
+  const d = newDesign();
+  const dimension = newAnnotation(
+    'dimension',
+    { x: 10, y: 10 },
+    { x: 46.375, y: 10 },
+  );
+  const note = newAnnotation('note', { x: 20, y: 40 });
+  d.annotations = [dimension, note];
+
+  // Nothing typed, so the dimension says what it measures, to the eighth.
+  assert.equal(annotationLength(dimension), 36.375);
+  assert.equal(annotationLabel(dimension), '36-3/8"');
+  assert.equal(annotationLabel(note), '');
+
+  // Typed text replaces the measurement rather than joining it: someone who
+  // writes "verify on site" means that instead.
+  assert.equal(
+    annotationLabel({ ...dimension, text: 'Verify on site' }),
+    'Verify on site',
+  );
+  assert.equal(annotationLength(note), 0);
+
+  // They survive the round trip the app saves through.
+  const restored = parseDesign(JSON.stringify(d));
+  assert.equal(restored.annotations?.length, 2);
+  assert.equal(restored.annotations?.[0]?.x2, 46.375);
+
+  // And they are drawn on the plan sheet, not only on screen.
+  d.annotations = [{ ...note, text: 'Verify riser before install' }];
+  d.items = [{ ...fromObject('custom_cabinet'), id: 'c1', x: 0, y: 0 }];
+  const html = drawingPackageHtml(d, drawingOptions());
+  assert.ok(html.includes('Verify riser before install'));
 });
