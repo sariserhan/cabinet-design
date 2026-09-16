@@ -139,6 +139,37 @@ test('enlarging the canvas keeps the tools and grows the stage', async ({
   await expect(page.locator('.designer-app.canvas-expanded')).toHaveCount(0);
 });
 
+test('the canvas grows with the window on every screen size', async ({
+  designer: page,
+}) => {
+  const height = async (size: { width: number; height: number }) => {
+    await page.setViewportSize(size);
+    await page.waitForTimeout(1200);
+    const box = await page.locator('.plan-scroll').boundingBox();
+    const sideways = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(sideways, 'the page must never scroll sideways').toBe(0);
+    return box?.height ?? 0;
+  };
+
+  // A short window keeps the height it always had; taller ones spend the
+  // extra on the drawing. The wide case is here because a width-based rule
+  // used to pin large screens to less canvas than a smaller window got.
+  const short = await height({ width: 1280, height: 800 });
+  const tall = await height({ width: 1280, height: 1100 });
+  const wide = await height({ width: 1680, height: 1440 });
+  const phone = await height({ width: 390, height: 844 });
+  expect(short).toBeGreaterThanOrEqual(480);
+  expect(tall).toBeGreaterThan(short);
+  expect(wide).toBeGreaterThan(tall);
+  expect(phone).toBeGreaterThan(400);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,

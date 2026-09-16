@@ -1,8 +1,13 @@
 .designer-app {
-  /* Default stage heights, reused as the floor in the enlarged view so that
-     expanding can never leave less canvas than the normal layout. */
-  --stage-height: 490px;
-  --render-stage-height: 570px;
+  /* Stage heights, reused as the floor in the enlarged view so that expanding
+     can never leave less canvas than the normal layout. They follow the window
+     rather than sitting at one size: the subtracted band is the header, the
+     workflow stages and the tool rows above the canvas, so a tall screen
+     spends its extra height on the drawing instead of on empty page. The floor
+     keeps a short window exactly where it was, and the ceiling leaves the
+     controls below the canvas reachable without hunting for them. */
+  --stage-height: clamp(490px, calc(100vh - 430px), 820px);
+  --render-stage-height: clamp(570px, calc(100vh - 390px), 900px);
   --studio-ink: #20333f;
   --studio-muted: #667883;
   --studio-line: #dce4e8;
@@ -410,7 +415,7 @@
   color: #96542c;
 }
 .preview-stage {
-  height: 490px;
+  height: var(--stage-height);
   position: relative;
   padding: 38px 10px 28px;
   background: #f2f7fa;
@@ -461,10 +466,6 @@
 @media (min-width: 1500px) {
   .designer-grid {
     grid-template-columns: 250px minmax(320px, 1fr) 250px;
-  }
-  .plan-scroll,
-  .preview-stage {
-    height: 560px;
   }
   .library-results {
     max-height: 900px;
@@ -535,10 +536,6 @@
     grid-template-columns: minmax(0, 1fr);
     padding: 16px;
   }
-  .plan-scroll,
-  .preview-stage {
-    height: 400px;
-  }
   .plan-svg {
     min-height: 400px !important;
   }
@@ -574,6 +571,10 @@
   color: #667883;
 }
 @media (max-width: 720px) {
+  .designer-app {
+    --stage-height: clamp(400px, calc(100vh - 330px), 620px);
+    --render-stage-height: clamp(420px, calc(100vh - 300px), 660px);
+  }
   .plan-svg {
     min-height: 0 !important;
   }
@@ -773,7 +774,7 @@
 }
 @media (max-width: 700px) {
   .render-stage {
-    height: 400px;
+    height: var(--render-stage-height);
   }
 }
 .demo-options {
@@ -1296,7 +1297,7 @@ body:has(.is-presenting) .demo-banner {
   grid-template-columns: minmax(0, 1fr);
 }
 .library-collapsed.inspector-collapsed .render-stage {
-  height: 65vh;
+  height: max(65vh, var(--render-stage-height));
   min-height: 380px;
 }
 .library-collapsed.inspector-collapsed .comparison-grid .render-stage {
