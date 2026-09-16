@@ -46,6 +46,39 @@ client anything.
       and today they are copied and pasted by hand. Sending one is the first
       non-auth use of Resend and the first thing a real pilot would want.
 
+## Rendering
+
+Antialiasing, texture anisotropy and the black-room bug in the quality path
+are fixed. What is left is ranked by how much it changes the picture.
+
+- [ ] **Accumulate samples while the camera is still.** The preview draws one
+      raster frame and stops, so its edges and contact shadows are only as
+      good as one sample. `TAARenderPass` ships with the installed three and
+      only runs while nothing moves, which costs nothing during interaction
+      and converges the still view towards the photo. Biggest gain for the
+      effort of the items here.
+- [ ] **Replace SSAO with GTAO.** Contact shading is what stops cabinets
+      looking like they float. Today it is `SSAOPass` at 512x512 and only
+      when High quality is on; `GTAOPass` is in the same installed package
+      and is both better grounded and cheaper at equal quality.
+- [ ] **Reconsider the tone curve.** Both paths use ACES Filmic, which warms
+      whites and desaturates strong colour - awkward for a product where a
+      client is judging a door finish. Three 0.186 also has `AgX` (gentler
+      highlight roll-off) and `Neutral` (Khronos PBR neutral, built to keep
+      material colour). Worth rendering the same kitchen three ways and
+      choosing deliberately.
+- [ ] **Bevel the door and drawer edges.** Every edge in the scene is a
+      perfect 90 degrees, so no edge ever catches a highlight, and that alone
+      reads as computer graphics. A 1-2 mm chamfer on fronts is the largest
+      single realism gain available, and the most geometry work.
+- [ ] **Supersample stills.** Presentation PNGs and saved scenes could render
+      at twice the requested size and downsample. It is a few lines, costs
+      nothing interactively, and sharpens exactly the images clients see.
+- [ ] **Look again at the appliance and worktop materials on a real GPU.**
+      Steel currently reflects the room probe as a flat pale grey rather than
+      reading as brushed metal. Judging this needs hardware rendering, which
+      is not available in the environment these notes were written in.
+
 ## Truth-up and coverage
 
 - [ ] **Correct the stale test counts.** [README](../README.md) says 252
