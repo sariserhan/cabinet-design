@@ -67,7 +67,9 @@ npm run test:e2e  # Playwright; see below
 
 `npm run check` covers 252 semantic tests, 31 backend ownership/concurrency/audit tests, mocked provider contract tests, TypeScript, lint and draft-artifact integrity. These are software checks, not measured manufacturer-data accuracy.
 
-There is no hosted CI, so the checks run locally through git hooks. Install them once per clone:
+CI runs `npm run check` and the production build on every push and pull request ([.github/workflows/ci.yml](.github/workflows/ci.yml)). This repository is public, so GitHub-hosted runners do not consume the account's included minutes. The browser specs are not run there: they need a live Convex deployment to sign in against, which would mean putting deployment credentials in CI for a public repository.
+
+The same checks also run locally through git hooks, which catch problems before a commit rather than after a push. Install them once per clone:
 
 ```sh
 npm run hooks:install

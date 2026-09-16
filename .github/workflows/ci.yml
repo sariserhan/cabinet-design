@@ -1,0 +1,40 @@
+name: CI
+
+# This repository is public, so GitHub-hosted runners do not consume the
+# account's included minutes.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - run: npm ci
+
+      # Lint, TypeScript, 252 semantic tests, 31 backend tests and the
+      # draft-artifact integrity check. None of these need credentials.
+      - run: npm run check
+
+      # providers.tsx throws at module scope without a Convex URL, so the build
+      # needs one. It is never contacted during a build, so a placeholder is
+      # enough and no real deployment is referenced here.
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_CONVEX_URL: https://placeholder.convex.cloud
+
+# The browser specs are deliberately not run here. They need a live Convex
+# deployment to sign in against, which would mean putting deployment
+# credentials in CI for a public repository. Run them locally with
+# `npm run test:e2e`; the pre-push hook does this automatically when an app is
+# already serving.

@@ -1,7 +1,6 @@
 #!/bin/sh
-# Nothing broken should reach the remote. Adds the production build to the
-# commit-time checks, and runs the browser tests when an app is already up.
-# Bypass deliberately with `git push --no-verify`.
+# Nothing broken should reach the remote. Bypass deliberately with
+# `git push --no-verify`.
 set -e
 
 [ -d node_modules ] || {
@@ -9,11 +8,15 @@ set -e
   exit 0
 }
 
-echo "pre-push: npm run verify"
-npm run verify
+echo "pre-push: npm run check"
+npm run check
 
-# The browser specs need a running app and deliberately do not start one here,
-# because Next 16 allows only one dev server per project directory.
+# Browser specs run against an app that is already serving; this does not start
+# one, because Next 16 allows only one dev server per project directory.
+#
+# They run BEFORE the production build on purpose: `next build` rewrites .next
+# underneath a running `next dev`, which intermittently breaks the very server
+# these tests are talking to.
 if curl -sf -o /dev/null --max-time 2 http://127.0.0.1:3000/installer; then
   echo "pre-push: app on :3000 — running browser tests"
   npx playwright test
@@ -21,3 +24,6 @@ else
   echo "pre-push: no app on :3000 — skipping browser tests"
   echo "          (start one with 'npm run dev', then 'npm run test:e2e')"
 fi
+
+echo "pre-push: npm run build"
+npm run build
