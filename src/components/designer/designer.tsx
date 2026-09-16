@@ -21,7 +21,7 @@ import { LightingComparison } from './demo-readiness';
 import { PresentationTour } from './presentation-tour';
 import type { CameraView } from './render-view';
 import { PlacementAssist } from './placement-assist';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useQuery } from 'convex/react';
@@ -270,6 +270,9 @@ function Editor({ ownerId }: { ownerId: string }) {
   }, [before, storageKey]);
   const [recordsEpoch, setRecordsEpoch] = useState(0);
   const design = history?.current;
+  // Recomputed only when the design itself changes, not on every panel toggle
+  // or keystroke elsewhere in the editor.
+  const issues = useMemo(() => (design ? warnings(design) : []), [design]);
   currentDesign.current = design;
   useEffect(
     () => () => {
@@ -665,7 +668,6 @@ function Editor({ ownerId }: { ownerId: string }) {
   if (!design || !history)
     return <div className="page-body">Loading saved designs…</div>;
   const item = design.items.find((i) => i.id === selected),
-    issues = warnings(design),
     warningIds = new Set(issues.flatMap((i) => i.itemIds));
   const bill = Array.from(
     design.items

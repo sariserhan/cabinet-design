@@ -11,6 +11,8 @@ import {
   parseDesign,
   canPlace,
   csvBill,
+  fromObject,
+  MAX_DESIGN_ITEMS,
 } from '../../src/designer/model';
 const product = {
   _id: 'cabinet-b24',
@@ -293,4 +295,32 @@ test('legacy imported designs receive rectangular rooms and no assembly', () => 
   assert.deepEqual(parsed.room.outline, []);
   assert.equal(parsed.items[0]?.assemblyId, null);
   assert.equal(parsed.items[0]?.frontStyle, 'auto');
+});
+
+test('design checks scale with item count rather than quadratically', () => {
+  const build = (n: number) => ({
+    ...newDesign(),
+    room: { ...newDesign().room, width: 600, depth: 600 },
+    items: Array.from({ length: n }, (_, i) => ({
+      ...fromObject('custom_cabinet'),
+      id: `i${i}`,
+      x: 12 + (i % 20) * 28,
+      y: 12 + Math.floor(i / 20) * 28,
+    })),
+  });
+  const time = (design: ReturnType<typeof build>) => {
+    warnings(design);
+    const started = performance.now();
+    for (let i = 0; i < 5; i++) warnings(design);
+    return (performance.now() - started) / 5;
+  };
+  const small = Math.max(time(build(100)), 0.05),
+    large = time(build(MAX_DESIGN_ITEMS));
+  // Four times the items. Near-linear work lands around 4x; the quadratic
+  // version this replaced was about 12x. A generous bound keeps the test
+  // meaningful without being machine-dependent.
+  assert.ok(
+    large / small < 8,
+    `warnings grew ${(large / small).toFixed(1)}x for 4x the items (${small.toFixed(2)}ms -> ${large.toFixed(2)}ms)`,
+  );
 });

@@ -424,6 +424,55 @@ export function objectTransform(item: Cabinet) {
   return `translate(${f.width / 2} ${f.depth / 2}) rotate(${item.rotation}) translate(${-item.width / 2} ${-item.depth / 2})`;
 }
 
+/**
+ * World-space bounds of an item, including its vertical extent.
+ *
+ * `overlaps` runs a full separating-axis test on two rotated footprints, which
+ * is far more work than most pairs need: in a real room the great majority are
+ * nowhere near each other. Comparing these boxes first rejects those pairs in a
+ * few comparisons. Disjoint boxes cannot have overlapping polygons, so this only
+ * ever skips work, never changes an answer. The slack keeps the test strictly
+ * more permissive than the epsilons inside `overlaps`.
+ */
+export type ItemBounds = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  minZ: number;
+  maxZ: number;
+};
+export function itemBounds(item: Cabinet): ItemBounds {
+  const polygon = itemPolygon(item);
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
+  for (const p of polygon) {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return {
+    minX,
+    maxX,
+    minY,
+    maxY,
+    minZ: item.elevation,
+    maxZ: item.elevation + item.height,
+  };
+}
+export function boundsApart(a: ItemBounds, b: ItemBounds, slack = 0.05) {
+  return (
+    a.maxX < b.minX - slack ||
+    b.maxX < a.minX - slack ||
+    a.maxY < b.minY - slack ||
+    b.maxY < a.minY - slack ||
+    a.maxZ < b.minZ - slack ||
+    b.maxZ < a.minZ - slack
+  );
+}
 export function overlaps(a: Cabinet, b: Cabinet) {
   if (
     a.elevation + a.height <= b.elevation + 0.01 ||
@@ -450,7 +499,14 @@ export function warnings(
   design: Design,
 ): { id: string; message: string; itemIds: string[] }[] {
   const result: ReturnType<typeof warnings> = [];
-  design.items.forEach((item, index) => {
+  // Room geometry and item polygons are the same for every item, so compute
+  // them once rather than per item inside the pairwise scan below.
+  const edges = roomEdges(design.room),
+    outline = roomOutline(design.room),
+    items = design.items,
+    polygons = items.map(itemPolygon),
+    bounds = items.map(itemBounds);
+  items.forEach((item, index) => {
     if (
       isOpening(item) &&
       !item.opening &&
@@ -462,9 +518,7 @@ export function warnings(
         itemIds: [item.id],
       });
     if (isOpening(item)) {
-      const edge = roomEdges(design.room).find(
-        (e) => e.index === item.wallSegment,
-      );
+      const edge = edges.find((e) => e.index === item.wallSegment);
       if (edge && item.width > edge.length + 0.01)
         result.push({
           id: `opening-size-${item.id}`,
@@ -510,7 +564,8 @@ export function warnings(
           itemIds: [item.id, hit.id],
         });
     }
-    if (!polygonInside(itemPolygon(item), roomOutline(design.room)))
+    const polygon = polygons[index] ?? itemPolygon(item);
+    if (!polygonInside(polygon, outline))
       result.push({
         id: `outside-${item.id}`,
         message: `${item.sku} extends beyond the room.`,
@@ -518,24 +573,27 @@ export function warnings(
       });
     if (
       item.elevation + item.height + (item.details?.molding ? 2.65 : 0) >
-      Math.min(
-        ...itemPolygon(item).map((p) => ceilingAt(design.room, p.x, p.y)),
-      ) +
-        0.01
+      Math.min(...polygon.map((p) => ceilingAt(design.room, p.x, p.y))) + 0.01
     )
       result.push({
         id: `ceiling-${item.id}`,
         message: `${item.sku} exceeds the ceiling height.`,
         itemIds: [item.id],
       });
-    design.items.slice(index + 1).forEach((other) => {
-      if (placementCollision(item, other))
+    // Index loop rather than slice(): slicing allocates a fresh array per item,
+    // which makes the pairwise scan quadratic in allocations as well as compares.
+    const box = bounds[index];
+    for (let j = index + 1; j < items.length; j++) {
+      const other = items[j],
+        otherBox = bounds[j];
+      if (box && otherBox && boundsApart(box, otherBox)) continue;
+      if (other && placementCollision(item, other))
         result.push({
           id: `overlap-${item.id}-${other.id}`,
           message: `${item.sku} overlaps ${other.sku}.`,
           itemIds: [item.id, other.id],
         });
-    });
+    }
   });
   return [
     ...result,
@@ -1187,6 +1245,10 @@ export function clearanceDefaults(item: Cabinet) {
 }
 export function clearanceWarnings(design: Design): ReturnType<typeof warnings> {
   const result: ReturnType<typeof warnings> = [];
+  // Five clearance envelopes are tested against every other item, so the room
+  // outline and the other items' bounds are computed once for the whole pass.
+  const outline = roomOutline(design.room),
+    bounds = design.items.map(itemBounds);
   for (const item of design.items) {
     const selected = item.clearance ?? clearanceDefaults(item),
       profile = profileFor(item),
@@ -1220,17 +1282,18 @@ export function clearanceWarnings(design: Design): ReturnType<typeof warnings> {
           x: center.x - f.width / 2,
           y: center.y - f.depth / 2,
         };
-      const hit = design.items.find(
-        (other) =>
-          other.id !== item.id && !isOpening(other) && overlaps(probe, other),
-      );
-      const outside = !polygonInside(
-        itemPolygon(probe),
-        roomOutline(design.room),
-      );
+      const probeBox = itemBounds(probe);
+      const hit = design.items.find((other, k) => {
+        const otherBox = bounds[k];
+        if (other.id === item.id || isOpening(other)) return false;
+        if (otherBox && boundsApart(probeBox, otherBox)) return false;
+        return overlaps(probe, other);
+      });
+      const probePolygon = itemPolygon(probe);
+      const outside = !polygonInside(probePolygon, outline);
       const ceiling =
         side === 'above' &&
-        itemPolygon(probe).some(
+        probePolygon.some(
           (p) => probe.elevation + height > ceilingAt(design.room, p.x, p.y),
         );
       if (hit || outside || ceiling)
