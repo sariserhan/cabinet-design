@@ -233,6 +233,11 @@ test('an item can be nudged, rotated, dragged in 3D and deleted', async ({
   designer: page,
   pageErrors,
 }) => {
+  // The slowest spec here by some way: it waits out a debounced save after
+  // each of eight edits, and every one of those frames is drawn by whatever
+  // WebGL the machine has - software, in a headless run, where a single
+  // frame of this scene costs a large fraction of a second.
+  test.setTimeout(300_000);
   type Row = { id: string; x: number; y: number; rotation: number };
   /** The saved draft, which is what the shortcuts ultimately have to change. */
   async function draft(): Promise<Row[]> {

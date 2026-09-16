@@ -5,7 +5,8 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { setTextureAnisotropy } from './render-textures';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { loadRenderAssets, type RenderAssets } from './render-assets';
 import { createPalette } from './render-materials';
@@ -45,6 +46,26 @@ export type CameraView = {
   position: [number, number, number];
   target: [number, number, number];
 };
+
+/**
+ * A rendered frame reduced to its final size.
+ *
+ * Drawing the oversized canvas into a smaller one averages each output pixel
+ * from several rendered ones, which is what removes the stair-stepping from
+ * an exported still. Falls back to the frame as rendered if a 2D context is
+ * refused, since a larger image beats no image.
+ */
+function downsample(source: HTMLCanvasElement, width: number, height: number) {
+  const target = document.createElement('canvas');
+  target.width = width;
+  target.height = height;
+  const ctx = target.getContext('2d');
+  if (!ctx) return source.toDataURL('image/png');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(source, 0, 0, width, height);
+  return target.toDataURL('image/png');
+}
 
 export default function RenderView({
   design: sourceDesign,
@@ -170,6 +191,11 @@ export default function RenderView({
     onMoveItem,
     editLocked,
   };
+  // Whether this machine can afford to refine a still view, learned from the
+  // first attempt. Kept across scene rebuilds: the answer is about the
+  // device, and re-testing it on every edit would cost a slow frame each
+  // time on exactly the machines that cannot spare one.
+  const refineAllowed = useRef(true);
   const pendingCamera = useRef<CameraView | null>(null);
   const externalCamera = useRef(cameraView);
   externalCamera.current = cameraView;
@@ -521,7 +547,19 @@ export default function RenderView({
         samples: 4,
       }),
     );
-    const ao = quality ? new SSAOPass(scene, camera, 512, 512) : null;
+    // Ground contact is what stops cabinets looking like they float. GTAO
+    // reads the room's own depth and normals rather than SSAO's screen-space
+    // guess, and its radius is in world units - inches here, so a quarter of
+    // an inch of shading would be invisible in a room this size.
+    const ao = quality ? new GTAOPass(scene, camera, 512, 512) : null;
+    ao?.updateGtaoMaterial({
+      radius: 8,
+      thickness: 4,
+      distanceExponent: 1,
+      scale: 1,
+      samples: 16,
+      screenSpaceRadius: false,
+    });
     const output = new OutputPass();
     const balancePass = new ShaderPass({
       uniforms: {
@@ -533,13 +571,27 @@ export default function RenderView({
       fragmentShader:
         'uniform sampler2D tDiffuse;uniform vec3 whiteBalance;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);gl_FragColor=vec4(c.rgb*whiteBalance,c.a);}',
     });
-    composer.addPass(new RenderPass(scene, camera));
-    if (ao) {
-      ao.kernelRadius = 12;
-      ao.minDistance = 0.002;
-      ao.maxDistance = 0.06;
-      composer.addPass(ao);
-    }
+    // Two ways to draw the scene, one enabled at a time. While anything is
+    // moving, the plain pass into the multisampled target keeps the view
+    // crisp for the cost of one frame. Once the camera settles, the TAA pass
+    // takes over and accumulates jittered samples of the same still frame,
+    // which resolves edges and contact shading far past what one sample can
+    // - and costs nothing while someone is actually working.
+    const renderPass = new RenderPass(scene, camera);
+    const settlePass = new TAARenderPass(scene, camera);
+    settlePass.unbiased = false;
+    settlePass.sampleLevel = 2;
+    settlePass.enabled = false;
+    // The pass documents this counter and drives its own behaviour from it,
+    // but the published types leave it out. It has to be readable here: a
+    // stale index makes the pass hand back the image it accumulated for a
+    // camera that has since moved.
+    const settleState = settlePass as TAARenderPass & {
+      accumulateIndex: number;
+    };
+    composer.addPass(renderPass);
+    composer.addPass(settlePass);
+    if (ao) composer.addPass(ao);
     composer.addPass(balancePass);
     composer.addPass(output);
     let postWidth = 0,
@@ -649,6 +701,40 @@ export default function RenderView({
         for (const front of movingFronts) front.apply(currentOpening / 100);
         render();
       }
+      // Nothing has changed for a moment, so spend the idle frames refining
+      // the one on screen. Each pass adds four jittered samples; at the full
+      // set of 32 the image stops improving and accumulating stops with it.
+      if (
+        !cameraTween &&
+        !(walking && held.size) &&
+        settleAfter &&
+        now >= settleAfter &&
+        canRefine()
+      ) {
+        if (refinedAt && now - refinedAt > 150) {
+          refineAllowed.current = false;
+          settleAfter = 0;
+        } else if (!settling) {
+          settling = true;
+          settlePass.enabled = true;
+          settlePass.accumulate = true;
+          renderPass.enabled = false;
+          // Refining is worth a couple of seconds and no more. A fast
+          // machine finishes the whole set inside that; a slow one - or
+          // software rendering, where a single frame can take seconds -
+          // takes what it can and gives the main thread back rather than
+          // locking the workspace up for a better-looking still frame.
+          settleUntil = now + 2000;
+        }
+        if (
+          canRefine() &&
+          settleState.accumulateIndex < 32 &&
+          now < settleUntil
+        ) {
+          refinedAt = now;
+          composer.render();
+        } else settleAfter = 0;
+      }
       frame = requestAnimationFrame(animate);
     };
     renderer.domElement.tabIndex = 0;
@@ -756,7 +842,9 @@ export default function RenderView({
         new THREE.Vector3(0, owner.position.y, 0),
       );
       // Where the item sits relative to the grab point, so it does not jump.
-      if (!pickAt(e.clientX, e.clientY).ray.intersectPlane(dragPlane, dragPoint))
+      if (
+        !pickAt(e.clientX, e.clientY).ray.intersectPlane(dragPlane, dragPoint)
+      )
         return;
       drag = {
         id: item.id,
@@ -767,16 +855,15 @@ export default function RenderView({
     };
     const dragMove = (e: PointerEvent) => {
       if (!drag || e.pointerId !== drag.pointerId) return;
-      if (
-        press &&
-        Math.hypot(e.clientX - press.x, e.clientY - press.y) <= 5
-      )
+      if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) <= 5)
         return;
       if (controls.enabled) {
         controls.enabled = false;
         renderer.domElement.setPointerCapture(e.pointerId);
       }
-      if (!pickAt(e.clientX, e.clientY).ray.intersectPlane(dragPlane, dragPoint))
+      if (
+        !pickAt(e.clientX, e.clientY).ray.intersectPlane(dragPlane, dragPoint)
+      )
         return;
       drag.group.position.x = dragPoint.x + drag.offset.x;
       drag.group.position.z = dragPoint.z + drag.offset.z;
@@ -865,7 +952,34 @@ export default function RenderView({
     };
     renderer.domElement.addEventListener('pointerdown', pointerDown);
     renderer.domElement.addEventListener('pointerup', pointerUp);
+    // Frames the settle pass has already accumulated, and when it may start.
+    // Anything that changes the picture resets both: an accumulation of a
+    // view that no longer exists would show as a smear.
+    let settleAfter = 0,
+      settling = false,
+      settleUntil = 0,
+      refinedAt = 0;
+    // Refining a still view is only worth doing where drawing is cheap.
+    // On software rendering one frame of this scene can cost the better
+    // part of a second, and spending more of them on a slightly cleaner
+    // picture would make the workspace feel stuck every time the pointer
+    // stopped. Timing the render call itself does not show this - WebGL
+    // returns as soon as the work is queued - so the gap between two
+    // animation frames is what gets measured, and a device that fails it is
+    // not asked again.
+    const canRefine = () => refineAllowed.current;
     const render = () => {
+      if (settling) {
+        settling = false;
+        settlePass.enabled = false;
+        settlePass.accumulate = false;
+        settleState.accumulateIndex = -1;
+        renderPass.enabled = true;
+      }
+      // Only the gap between two consecutive refinement frames says anything
+      // about what this device can afford; a gap that spans an edit does not.
+      refinedAt = 0;
+      settleAfter = performance.now() + 220;
       for (const w of walls)
         w.group.visible =
           !cutaway ||
@@ -975,12 +1089,25 @@ export default function RenderView({
         const oldSize = renderer.getSize(new THREE.Vector2()),
           oldRatio = renderer.getPixelRatio();
         try {
+          const height = Math.round(width / camera.aspect);
+          // Render twice the asked-for size and average it down. The extra
+          // samples land on the edges a client actually looks at, and the
+          // image costs one frame either way. Above 1920 the request is
+          // already beyond any screen, and doubling it risks the device's
+          // texture limit, so it is taken at face value.
+          const scale =
+            width <= 1920 && width * 2 <= renderer.capabilities.maxTextureSize
+              ? 2
+              : 1;
           renderer.setPixelRatio(1);
-          renderer.setSize(width, Math.round(width / camera.aspect), false);
+          renderer.setSize(width * scale, height * scale, false);
           render();
           const link = document.createElement('a');
           link.download = `${design.name.replace(/[^a-z0-9-]/gi, '-').slice(0, 80) || 'kitchen'}-render.png`;
-          link.href = renderer.domElement.toDataURL('image/png');
+          link.href =
+            scale === 1
+              ? renderer.domElement.toDataURL('image/png')
+              : downsample(renderer.domElement, width, height);
           if (captureOnly) callbacks.current.onCapture?.(link.href);
           else link.click();
         } catch {
@@ -1016,6 +1143,8 @@ export default function RenderView({
       renderer.domElement.removeEventListener('pointerup', lookEnd);
       renderer.domElement.removeEventListener('pointercancel', lookEnd);
       ao?.dispose();
+      settlePass.dispose();
+      renderPass.dispose();
       output?.dispose();
       balancePass.dispose();
       composer?.dispose();
