@@ -73,7 +73,42 @@ started. What is left is ranked by how much it changes the picture.
       make the opposite decision on a machine with a GPU, where it should
       refine every time the camera stops.
 
-## Truth-up and coverage
+## Catalog — on hold
+
+Held at the owner's request on 2026-09-16. Recorded so the findings are not
+re-derived later.
+
+Compiled products across the three public books: 2,397. Products Kitchen
+Studio can actually place: 177. The rest carry `dimensionStatus:
+unresolved`, and the reason is not the extractor being weak. Dimensions
+exist today only where a person put them there: Allure has a hand-built
+overlay from `artifacts/completion/working-catalog.json`, and Illume and
+Ovela have sixteen hardcoded cases each - four page numbers apiece with
+`assert` statements, in `tools/prepare_public_catalogs.py`.
+
+The books do not print widths in their tables. A base cabinet row reads
+`B12`, and the 12 is the width; the printed dimensions on those pages are
+the depth and the door heights. So resolving the other 2,220 products means
+reading the SKU, which this repository forbids until a person has validated
+that convention against the source - correctly, on today's evidence: a
+naive check across all three books, comparing a SKU's leading digits with a
+dimension printed directly beneath it, agrees 38 times and disagrees 40.
+Most of those disagreements look like the check pairing a height or a depth
+rather than a width, which is exactly the point - a script cannot settle it.
+
+- [ ] **Build the SKU convention review packet.** Group every place a SKU
+      appears beside printed dimensions by SKU family (`B`, `W`, `WBC`,
+      `MC`, `VSB` and the rest), with the page, the printed value and the
+      drawing each came from, so the question becomes "does `B__` mean
+      width in inches" answered per family with the proof in view, rather
+      than a read of 139 pages. The assistant can build the packet; the
+      ruling is a human attestation and the schema exists to keep it that
+      way.
+- [ ] **Resolve dimensions under the approved convention.** Only after the
+      ruling, and recorded with the convention as its provenance rather than
+      as a bare number.
+
+## Documentation accuracy
 
 - [ ] **Correct the stale test counts.** [README](../README.md) says 252
       semantic tests, [catalog status](catalog-status.md) says 71 core and 10
@@ -83,15 +118,50 @@ started. What is left is ranked by how much it changes the picture.
       only what was actually run, these are the exact claim that should not
       drift — so correct them and add a check that fails when they do, rather
       than correcting them by hand again next month.
-- [ ] **Run the signed-out browser specs in CI.** CI runs no browser coverage,
-      on the stated grounds that the specs need a Convex sign-in. That is true
-      only of the two `*.auth.spec.ts` files: `public-catalog`, `installer` and
-      `client-review` need no account and would give the public surfaces
-      continuous coverage.
-- [ ] **Fix the shared sign-in flakiness.** The signed-in specs bounce back to
-      the sign-in screen when several workers reuse one account, which took
-      three attempts to get a clean full-suite run today. A per-run identity or
-      a reused `storageState` would remove the race.
+
+## Engineering
+
+Measured on 2026-09-16. What is already sound and does not need work: no
+dependency vulnerabilities, no `any` or `@ts-expect-error` escapes in the
+source, and the accessibility basics hold - every one of 201 buttons has a
+name, every one of 177 form controls has a label, no image lacks alt text.
+
+- [ ] **Nothing watches production, because nothing reports.** There is no
+      error tracking and no runtime logging of any kind: a component that
+      throws in someone's browser, or a worker that dies mid-job, is
+      invisible unless a person happens to be looking. This is the largest
+      engineering gap on the list, and it gets worse the moment anyone other
+      than the author uses the app.
+- [ ] **No security headers on any response.** No Content-Security-Policy,
+      X-Frame-Options, Referrer-Policy or Permissions-Policy. The app renders
+      user-supplied names into printable exports and serves PDFs, and the
+      export escaping is tested, so this is defence in depth rather than a
+      known hole - but it is a few lines of configuration.
+- [ ] **CI runs no browser coverage.** Eighteen specs exist and none of them
+      run on a push. Only two of the five spec files need a Convex sign-in.
+- [ ] **The signed-in specs bounce off their own sign-in.** Convex Auth
+      rotates refresh tokens, so parallel workers sharing an account race and
+      lose. It produced six false failures in one day of work here, which is
+      the kind of flake that trains people to ignore a red run.
+- [ ] **The Convex layer is tested in patches.** Four backend test files
+      cover eleven of the twenty modules. The two absences that matter are
+      `designBlob`, which is where customers' designs are actually stored and
+      chunked, and `http`, whose routes refuse requests when `SITE_URL` is
+      missing rather than falling back - both are load-bearing and neither is
+      exercised.
+- [ ] **Two components are past the size where they can be reviewed.**
+      `designer.tsx` is 1,861 lines and `render-view.tsx` 1,460, both having
+      grown again this week. They have been split before; the state and the
+      effects inside them are what make each new change slower than the last.
+- [ ] **Nothing keeps dependencies current.** No Dependabot or Renovate, and
+      no audit step in CI. Today's audit is clean, which is the good moment
+      to add the thing that tells you when it stops being.
+- [ ] **`next-env.d.ts` flips between `next dev` and `next build`.** Whichever
+      ran last leaves the file pointing at its own types directory, so the
+      tree is dirty depending on what you did rather than what you changed.
+- [ ] **No throttle anywhere.** Sign-up is open and no Convex function limits
+      how often it can be called. Worth a limit per account and per address
+      before the app is somewhere a stranger can reach it.
 
 ## Blocked on you, not on code
 

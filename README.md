@@ -59,7 +59,7 @@ Drawing packages, dealer CSVs and quotes are coordination drafts. Verify site me
 
 ## What is next
 
-[docs/todo.md](docs/todo.md) holds the backlog: account email through Resend and the verification, recovery and throttling that depend on it; correcting stale claims and widening CI; and the three items that are blocked on a person rather than on code.
+[docs/todo.md](docs/todo.md) holds the backlog: account email through Resend and the verification and recovery that depend on it; the engineering gaps, led by the fact that nothing reports a runtime error today; what is left on rendering; the catalog dimension work and why it is held; and the three items blocked on a person rather than on code.
 
 ## Validation
 
