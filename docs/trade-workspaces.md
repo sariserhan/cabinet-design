@@ -15,7 +15,7 @@ Manufacturer guidance explains why slab size, design and seams need fabricator c
 ## Flooring
 
 - Start from the current polygonal room floor, or sum named measured rectangles.
-- Enter excluded area explicitly; cabinets and overlapping rectangles are not automatically deducted.
+- Enter excluded area explicitly; cabinets and overlapping rectangles are not automatically deducted. Where the design already knows the figure, the workspace offers it: the floor covered by everything standing on it for flooring and floor tile, and modelled doors and windows on the selected walls for painting. Selecting **Use N sq ft as the deduction** applies it. Nothing is deducted until you do, because whether flooring runs under cabinets, or a wall is painted behind them, is a job decision. The printed estimate records the derived figure and whether the entered deduction matches it.
 - Boxes = ceiling(net area × (1 + waste percentage / 100) / coverage per box).
 - Material charges use whole boxes; installation and preparation charges use net area. Transition lengths and charges are separate.
 - Laying direction/pattern is recorded; it does not automatically establish waste or generate individual plank cuts.
@@ -26,6 +26,7 @@ Manufacturer guidance explains why slab size, design and seams need fabricator c
 - Opening area is a suggestion. Enter applicable deductions for openings, cabinet coverage and other unpainted surfaces after reviewing the selected scope. Partition walls, trim and exterior faces are excluded.
 - Finish gallons = ceiling(net area × coats × (1 + allowance / 100) / coverage per gallon per coat). Primer gallons are calculated separately, without the finish allowance.
 - Installation rate is per net square foot for the complete entered coat scope, not per coat.
+- In a polygonal room a side can carry more than one wall segment. An opening records the side it is on, not the segment, so a suggested opening deduction for such a side covers every segment on it and says so.
 
 The initial 350 sq ft/gallon value is an editable starting assumption; product and surface conditions matter. [Sherwin-Williams coverage guidance](https://www.sherwin-williams.com/en-us/color/color-tools/paint-calculator).
 

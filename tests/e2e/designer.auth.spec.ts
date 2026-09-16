@@ -143,3 +143,29 @@ test('saved designs persist in IndexedDB and survive a reload', async ({
   });
   expect(pageErrors).toEqual([]);
 });
+
+test('the flooring workspace offers the deduction the design can derive', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(5000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Flooring', exact: true }).click();
+
+  const suggestion = page.locator('.trade-suggestion').first();
+  await expect(suggestion).toContainText(/sq ft of floor covered/i, {
+    timeout: 30_000,
+  });
+  // Offered, not applied, until the button is used.
+  await suggestion.getByRole('button').click();
+  await expect(suggestion).toContainText(/entered deduction matches it/i, {
+    timeout: 30_000,
+  });
+  expect(pageErrors).toEqual([]);
+});

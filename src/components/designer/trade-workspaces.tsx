@@ -161,6 +161,33 @@ export function TradeWorkspaces({
       />
     </label>
   );
+  /**
+   * Offers a deduction the design can derive, without applying it: whether the
+   * floor runs under the cabinets, or a wall is really painted behind them, is
+   * a job decision the estimate should not quietly make.
+   */
+  const suggestion = () => {
+    const found = result?.suggestedDeduction;
+    if (!found) return null;
+    const rounded = Math.round(found.area * 100) / 100;
+    const applied = Math.abs(input.deduction - found.area) < 0.01;
+    return (
+      <p className="trade-suggestion">
+        This design accounts for <strong>{rounded} sq ft</strong> of{' '}
+        {found.label}.{' '}
+        {applied ? (
+          'The entered deduction matches it.'
+        ) : (
+          <button type="button" onClick={() => patch({ deduction: rounded })}>
+            Use {rounded} sq ft as the deduction
+          </button>
+        )}
+        {found.ambiguous
+          ? ' A selected side has more than one wall segment, so this covers every segment on that side. Check it first.'
+          : ''}
+      </p>
+    );
+  };
   const text = (
     field: 'product' | 'supplier' | 'reference' | 'edgeProfile',
     label: string,
@@ -391,6 +418,7 @@ export function TradeWorkspaces({
             )}
             <div className="trade-fields">
               {number('deduction', 'Excluded area / openings (sq ft)')}
+              {suggestion()}
               {number('waste', 'Waste allowance (%)')}
               <label>
                 Laying pattern
@@ -483,6 +511,7 @@ export function TradeWorkspaces({
             </label>
             <div className="trade-fields">
               {number('deduction', 'Excluded paint area / openings (sq ft)')}
+              {suggestion()}
               {number('coats', 'Finish coats')}
               {number('coverage', 'Paint coverage per gallon per coat (sq ft)')}
               {number('waste', 'Paint allowance (%)')}

@@ -124,6 +124,12 @@ export type TradeResult = {
   assumptions: string[];
   pieces: SlabPiece[];
   slabCount: number;
+  /** A deduction the design can derive; never applied on the user's behalf. */
+  suggestedDeduction: {
+    area: number;
+    label: string;
+    ambiguous: boolean;
+  } | null;
 };
 const savedSchema = z.object({
   designFingerprint: z.string(),
@@ -293,16 +299,93 @@ export function roomTakeoff(d: Design) {
     });
     return sum + Math.hypot(x, y, z) / 288;
   }, 0);
-  const openings = d.items
+  const openingItems = d.items.filter(
+    (i) =>
+      (i.kind === 'door' || i.kind === 'window') &&
+      !i.opening &&
+      i.wall &&
+      d.room.walls[i.wall],
+  );
+  const openings = openingItems.reduce(
+    (s, i) => s + (i.width * i.height) / 144,
+    0,
+  );
+  const openingsBySide = openingItems.reduce<Record<string, number>>((acc, i) => {
+    const side = i.wall as string;
+    acc[side] = (acc[side] ?? 0) + (i.width * i.height) / 144;
+    return acc;
+  }, {});
+  // Anything resting on the floor hides the floor under it. Wall-hung units do
+  // not, so elevation decides rather than kind.
+  const floorObstruction = d.items
     .filter(
       (i) =>
-        (i.kind === 'door' || i.kind === 'window') &&
-        !i.opening &&
-        i.wall &&
-        d.room.walls[i.wall],
+        !i.hidden &&
+        i.elevation === 0 &&
+        i.kind !== 'door' &&
+        i.kind !== 'window' &&
+        i.kind !== 'countertop',
     )
-    .reduce((s, i) => s + (i.width * i.height) / 144, 0);
-  return { floor, ceiling, walls, openings };
+    .reduce((s, i) => s + (i.width * i.depth) / 144, 0);
+  return {
+    floor,
+    ceiling,
+    walls,
+    openings,
+    openingsBySide,
+    floorObstruction,
+  };
+}
+
+/**
+ * What the design already knows that would otherwise be measured by hand.
+ *
+ * Painting: modelled doors and windows on the selected walls, which nobody
+ * paints. Flooring and floor tile: the footprint of everything standing on the
+ * floor. Neither is applied automatically - whether flooring runs under the
+ * cabinets is a real job decision, and the entered deduction stays the number
+ * the estimate uses.
+ *
+ * `ambiguous` marks a polygonal room where a selected side has more than one
+ * wall segment, because an opening records which side it is on and not which
+ * segment, so the total would be attributed to all of them.
+ */
+export function suggestedDeduction(
+  d: Design,
+  trade: Trade,
+  s: Pick<TradeInput, 'wallIndices' | 'areaSource' | 'tileApplication'>,
+): { area: number; label: string; ambiguous: boolean } | null {
+  const room = roomTakeoff(d);
+  if (trade === 'painting') {
+    const edges = room.walls.filter(
+      (w) => s.wallIndices === null || s.wallIndices.includes(w.index),
+    );
+    const sides = roomEdges(d.room)
+      .filter((e) => d.room.walls[e.side] && edges.some((w) => w.index === e.index))
+      .map((e) => e.side);
+    const chosen = new Set(sides);
+    const area = [...chosen].reduce(
+      (n, side) => n + (room.openingsBySide[side] ?? 0),
+      0,
+    );
+    if (area <= 0) return null;
+    return {
+      area,
+      label: 'modelled doors and windows on the selected walls',
+      ambiguous: sides.length !== chosen.size,
+    };
+  }
+  if (
+    (trade === 'flooring' || (trade === 'tile' && s.tileApplication === 'floor')) &&
+    s.areaSource === 'room' &&
+    room.floorObstruction > 0
+  )
+    return {
+      area: room.floorObstruction,
+      label: 'floor covered by items standing on it',
+      ambiguous: false,
+    };
+  return null;
 }
 export function packSlabs(d: Design, s: TradeInput) {
   const width = s.slabWidth - 2 * s.edgeTrim,
@@ -437,6 +520,20 @@ export function estimateTrade(
         ? room.floor
         : s.zones.reduce((n, z) => n + (z.length * z.width) / 144, 0);
   if (s.deduction > grossArea) issues.push('Deductions exceed measured area.');
+  const suggestion = suggestedDeduction(d, trade, s);
+  if (suggestion) {
+    const rounded = Math.round(suggestion.area * 100) / 100;
+    assumptions.push(
+      `The design can account for ${rounded} sq ft of ${suggestion.label}. ` +
+        (Math.abs(s.deduction - suggestion.area) < 0.01
+          ? 'The entered deduction matches it.'
+          : `The entered deduction is ${s.deduction} sq ft, so this estimate does not use that figure.`),
+    );
+    if (suggestion.ambiguous)
+      issues.push(
+        'A selected side has more than one wall segment, so the suggested opening deduction covers every segment on that side. Check it before applying.',
+      );
+  }
   const netArea = Math.max(
     0,
     grossArea - (trade === 'countertops' ? 0 : s.deduction),
@@ -563,6 +660,7 @@ export function estimateTrade(
     assumptions,
     pieces,
     slabCount,
+    suggestedDeduction: suggestion,
   };
 }
 export function combinedTradeTotal(d: Design, v: Trades) {

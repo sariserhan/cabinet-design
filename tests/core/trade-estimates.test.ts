@@ -190,3 +190,82 @@ test('complete backup carries trade settings; restored copies require recalculat
     tradeCsv(d, 'flooring', v.trades.flooring.input).includes("'=SUM(1,2)"),
   );
 });
+
+test('the design derives the deductions it can, without applying them', () => {
+  const d = room();
+  const base = fromObject('custom_cabinet');
+  d.items = [
+    // Two floor-standing cabinets, 36x24in each, so 12 sq ft together.
+    { ...base, id: 'c1', width: 36, depth: 24, elevation: 0, x: 0, y: 0 },
+    { ...base, id: 'c2', width: 36, depth: 24, elevation: 0, x: 40, y: 0 },
+    // A wall cabinet hangs above the floor and hides none of it.
+    { ...base, id: 'c3', width: 36, depth: 24, elevation: 54, x: 0, y: 40 },
+  ];
+  const s = emptyTrades(d.id).trades.flooring.input;
+  const r = estimateTrade(d, 'flooring', s);
+  assert.ok(r.suggestedDeduction, 'expected a floor suggestion');
+  assert.equal(r.suggestedDeduction.area, 12);
+
+  // Offered, never applied: the estimate still uses the entered deduction.
+  assert.equal(r.netArea, 100);
+  assert.equal(
+    estimateTrade(d, 'flooring', { ...s, deduction: 12 }).netArea,
+    88,
+  );
+  assert.ok(
+    r.assumptions.some((a) => a.includes('does not use that figure')),
+    'the estimate should say the suggestion was not used',
+  );
+});
+
+test('paint suggestions count only openings on the selected walls', () => {
+  const d = room();
+  const door = fromObject('door'),
+    window_ = fromObject('window');
+  d.items = [
+    { ...door, id: 'd1', wall: 'north', width: 36, height: 80, elevation: 0 },
+    { ...window_, id: 'w1', wall: 'south', width: 36, height: 48, elevation: 36 },
+  ];
+  const s = emptyTrades(d.id).trades.painting.input;
+  const all = estimateTrade(d, 'painting', { ...s, wallIndices: null });
+  assert.ok(all.suggestedDeduction);
+  // 36x80 = 20 sq ft, 36x48 = 12 sq ft.
+  assert.equal(all.suggestedDeduction.area, 32);
+
+  const northOnly = roomTakeoff(d).walls.find((w) => w.index === 0);
+  assert.ok(northOnly);
+  const one = estimateTrade(d, 'painting', {
+    ...s,
+    wallIndices: [northOnly.index],
+  });
+  assert.ok(one.suggestedDeduction);
+  assert.ok(
+    one.suggestedDeduction.area < all.suggestedDeduction.area,
+    'selecting one wall must not carry the other wall openings',
+  );
+});
+
+test('a room with no openings or floor items offers no suggestion', () => {
+  const d = room();
+  assert.equal(
+    estimateTrade(d, 'painting', emptyTrades(d.id).trades.painting.input)
+      .suggestedDeduction,
+    null,
+  );
+  assert.equal(
+    estimateTrade(d, 'flooring', emptyTrades(d.id).trades.flooring.input)
+      .suggestedDeduction,
+    null,
+  );
+});
+
+test('countertops never offer a floor or opening deduction', () => {
+  const d = room();
+  const base = fromObject('custom_cabinet');
+  d.items = [{ ...base, id: 'c1', width: 36, depth: 24, elevation: 0 }];
+  assert.equal(
+    estimateTrade(d, 'countertops', emptyTrades(d.id).trades.countertops.input)
+      .suggestedDeduction,
+    null,
+  );
+});

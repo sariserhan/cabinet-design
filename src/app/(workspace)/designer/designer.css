@@ -3017,6 +3017,18 @@ body:has(.is-presenting) .demo-banner {
   gap: 12px;
   margin: 14px 0;
 }
+.trade-suggestion {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 3px solid #6a9c93;
+  background: #f2f7f6;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.trade-suggestion button {
+  font: inherit;
+}
 .trade-content label {
   font-size: 13px;
 }

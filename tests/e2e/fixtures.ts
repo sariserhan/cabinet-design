@@ -24,10 +24,12 @@ export const test = base.extend<
       await use(page);
       await context.close();
     },
-    // Sign-in has its own budget rather than borrowing the first test's 120s:
-    // its staged waits can exceed that on a cold or loaded dev server, and the
-    // failure then looks like whichever test happened to run first.
-    { scope: 'worker', timeout: 300_000 },
+    // Sign-in gets its own budget rather than borrowing the first test's 120s,
+    // because its staged waits can exceed that on a cold dev server and the
+    // failure then looks like whichever test happened to run first. Kept close
+    // to that figure on purpose: a longer one does not rescue a genuinely stuck
+    // sign-in, it only makes the run take that much longer to report it.
+    { scope: 'worker', timeout: 150_000 },
   ],
   designer: async ({ signedIn }, use) => {
     await signedIn.setViewportSize({ width: 1280, height: 900 });
