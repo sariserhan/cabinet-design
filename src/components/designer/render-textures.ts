@@ -1,4 +1,19 @@
 import * as THREE from 'three';
+
+/**
+ * How many samples a texture may use at a grazing angle.
+ *
+ * Textures are built before there is a renderer to ask, so this starts at the
+ * value every device supports and the Render view raises it to the device
+ * maximum once one exists.
+ */
+let anisotropy = 4;
+export function setTextureAnisotropy(maximum: number) {
+  anisotropy = Math.max(4, Math.min(16, Math.floor(maximum)));
+}
+export function textureAnisotropy() {
+  return anisotropy;
+}
 /** Deterministic material maps generated locally; no external image service. */
 export function materialTexture(
   kind:
@@ -183,7 +198,7 @@ export function materialTexture(
   const map = new THREE.CanvasTexture(canvas);
   map.colorSpace = THREE.SRGBColorSpace;
   map.wrapS = map.wrapT = THREE.RepeatWrapping;
-  map.anisotropy = 4;
+  map.anisotropy = anisotropy;
   return map;
 }
 
@@ -230,6 +245,6 @@ export function surfaceDetail(kind: 'paint' | 'wood' | 'stone' | 'metal') {
   const map = new THREE.CanvasTexture(canvas);
   map.colorSpace = THREE.NoColorSpace;
   map.wrapS = map.wrapT = THREE.RepeatWrapping;
-  map.anisotropy = 4;
+  map.anisotropy = anisotropy;
   return map;
 }

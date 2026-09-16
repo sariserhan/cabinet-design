@@ -129,17 +129,16 @@ function Editor({ ownerId }: { ownerId: string }) {
     const keys = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') setPresenting(false);
       // The conventional key for "how does this work", but not while someone
-      // is typing a project name or a note.
+      // is typing a project name or a note. A checkbox or a button holds
+      // focus without taking text, and the guide should still open from
+      // there - only fields that would swallow the character are excluded.
       const target = e.target as HTMLElement | null;
-      if (
-        e.key === '?' &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !(
-          target?.isContentEditable ||
-          ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName ?? '')
-        )
-      ) {
+      const typing =
+        target?.isContentEditable ||
+        target?.matches?.(
+          'textarea, select, input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=reset]):not([type=range]):not([type=file]):not([type=color])',
+        );
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !typing) {
         e.preventDefault();
         setShowHelp(true);
       }

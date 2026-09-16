@@ -58,6 +58,61 @@ test('the Render view builds a WebGL scene without falling back to an error', as
   expect(pageErrors).toEqual([]);
 });
 
+test('high quality shadows and room reflections do not black out the room', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  // A furnished room, so there are worktops, glazing and steel fronts in
+  // shot: those are the materials the probe is handed to, and an empty
+  // design would hide the failure this test exists for.
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(6000);
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  const canvas = page.locator('.render-stage canvas');
+  await expect(canvas).toBeVisible({ timeout: 60_000 });
+
+  /** Share of the canvas that is essentially black. */
+  const blackness = () =>
+    page.evaluate(() => {
+      const src = document.querySelector<HTMLCanvasElement>(
+        '.render-stage canvas',
+      );
+      if (!src) return 100;
+      const off = document.createElement('canvas');
+      off.width = src.width;
+      off.height = src.height;
+      const ctx = off.getContext('2d');
+      if (!ctx) return 100;
+      ctx.drawImage(src, 0, 0);
+      const { data } = ctx.getImageData(0, 0, off.width, off.height);
+      let black = 0;
+      for (let i = 0; i < data.length; i += 4)
+        if (
+          (data[i] ?? 0) < 24 &&
+          (data[i + 1] ?? 0) < 24 &&
+          (data[i + 2] ?? 0) < 24
+        )
+          black++;
+      return (100 * black) / (data.length / 4);
+    });
+
+  await expect.poll(blackness, { timeout: 60_000 }).toBeLessThan(15);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByLabel('High quality shadows').check();
+
+  // The room probe becomes these materials' environment map, replacing the
+  // scene environment. A capture that comes back unusable therefore does not
+  // cost a reflection, it costs all environment light: worktops, glass and
+  // steel go black. The view has to stay lit with the setting on.
+  await expect.poll(blackness, { timeout: 90_000 }).toBeLessThan(15);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {
@@ -447,6 +502,10 @@ test('Help opens a guide over the workspace and closes again', async ({
   await expect(guide).toBeHidden();
 
   // The conventional shortcut reopens it without reaching for the button.
+  // Focus is deliberately dropped first: this page is shared with the tests
+  // that ran before it, and the shortcut is meant to stay out of the way
+  // while someone is typing in a field one of them left focused.
+  await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
   await page.keyboard.press('?');
   await expect(guide).toBeVisible();
   await guide.getByRole('button', { name: 'Close help' }).click();

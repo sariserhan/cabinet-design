@@ -32,6 +32,24 @@ export function HelpGuide({
   onClose: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const close = useRef(onClose);
+  close.current = onClose;
+  // The dialog closes itself on Escape, and the caller has to hear about it:
+  // if it keeps thinking the guide is open, the next request to open it
+  // changes no state, no effect runs, and the guide never comes back. The
+  // native event is listened for directly rather than through React, so this
+  // holds however the browser closed it.
+  useEffect(() => {
+    const node = dialog.current;
+    if (!node) return;
+    const closed = () => close.current();
+    node.addEventListener('close', closed);
+    node.addEventListener('cancel', closed);
+    return () => {
+      node.removeEventListener('close', closed);
+      node.removeEventListener('cancel', closed);
+    };
+  }, []);
   useEffect(() => {
     const node = dialog.current;
     if (!node) return;
@@ -43,9 +61,6 @@ export function HelpGuide({
       ref={dialog}
       className="help-guide"
       aria-labelledby="help-guide-title"
-      // Escape and the close button both arrive here, so the button that
-      // opened the guide always ends up in the right state.
-      onClose={onClose}
       onClick={(event) => {
         if (event.target === dialog.current) onClose();
       }}

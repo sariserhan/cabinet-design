@@ -66,6 +66,35 @@ export type BuildContext = Palette & {
   openingRef: { current: number };
 };
 
+/**
+ * Did the room probe actually capture the room?
+ *
+ * A material's own `envMap` replaces the scene environment for that
+ * material, so handing it an empty capture is not a missing reflection - it
+ * is no environment light at all, and every worktop, glass pane and steel
+ * front renders black. Any non-zero colour sample means the capture worked;
+ * a read that fails counts as failure, and the materials keep the scene
+ * environment they already had, which is the good result rather than a
+ * broken one.
+ */
+function probeCaptured(
+  renderer: THREE.WebGLRenderer,
+  cube: THREE.WebGLCubeRenderTarget,
+) {
+  const pixels = new Uint8Array(4 * 8 * 8);
+  for (let face = 0; face < 6; face++) {
+    try {
+      renderer.readRenderTargetPixels(cube, 0, 0, 8, 8, pixels, face);
+    } catch {
+      return false;
+    }
+    // Alpha comes back as an opaque 1.0 even from a capture that holds no
+    // colour at all, so only the colour channels count as evidence.
+    for (let i = 0; i < pixels.length; i++)
+      if (i % 4 !== 3 && pixels[i] !== 0) return true;
+  }
+  return false;
+}
 export function buildKitchenScene(context: BuildContext) {
   const {
     renderer,
@@ -916,8 +945,12 @@ export function buildKitchenScene(context: BuildContext) {
   }
   let roomReflection: THREE.WebGLRenderTarget | undefined;
   if (quality) {
+    // Byte, not half-float. The room is a lit interior rather than a sky, so
+    // the extra range buys very little here, and a half-float cube comes
+    // back unusable as PMREM input on software WebGL - which turned every
+    // worktop, glass pane and steel front in the view black.
     const cube = new THREE.WebGLCubeRenderTarget(128, {
-      type: THREE.HalfFloatType,
+      type: THREE.UnsignedByteType,
     });
     const probe = new THREE.CubeCamera(0.5, size * 10, cube);
     const location = walkEntry(design) ?? [
@@ -927,20 +960,22 @@ export function buildKitchenScene(context: BuildContext) {
     ];
     probe.position.set(...location);
     probe.update(renderer, scene);
-    const generator = new THREE.PMREMGenerator(renderer);
-    roomReflection = generator.fromCubemap(cube.texture);
-    generator.dispose();
-    cube.dispose();
-    for (const m of [
-      steel,
-      hardware,
-      glass,
-      windowGlass,
-      ...stoneMaterials.values(),
-    ]) {
-      m.envMap = roomReflection.texture;
-      m.envMapIntensity = 0.75;
+    if (probeCaptured(renderer, cube)) {
+      const generator = new THREE.PMREMGenerator(renderer);
+      roomReflection = generator.fromCubemap(cube.texture);
+      generator.dispose();
+      for (const m of [
+        steel,
+        hardware,
+        glass,
+        windowGlass,
+        ...stoneMaterials.values(),
+      ]) {
+        m.envMap = roomReflection.texture;
+        m.envMapIntensity = 0.75;
+      }
     }
+    cube.dispose();
   }
 
   // movingFronts is animated per frame by the caller's opening tween.

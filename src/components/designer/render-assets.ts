@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { textureAnisotropy } from './render-textures';
 export type AssetMaterial = {
   color: THREE.Texture;
   rough: THREE.Texture;
@@ -37,7 +38,7 @@ export function loadRenderAssets() {
         color.colorSpace = THREE.SRGBColorSpace;
         for (const t of [color, rough, normal]) {
           t.wrapS = t.wrapT = THREE.RepeatWrapping;
-          t.anisotropy = 4;
+          t.anisotropy = textureAnisotropy();
         }
         return { color, rough, normal, inches };
       }

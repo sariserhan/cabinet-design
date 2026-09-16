@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { setTextureAnisotropy } from './render-textures';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
@@ -334,6 +335,9 @@ export default function RenderView({
     }
     setError('');
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    // Grazing angles are most of a kitchen view - the floor, the worktops -
+    // and that is exactly where a low anisotropy limit smears a texture.
+    setTextureAnisotropy(renderer.capabilities.getMaxAnisotropy());
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = quality ? THREE.VSMShadowMap : THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -505,7 +509,18 @@ export default function RenderView({
         selectedIds,
         openingRef,
       });
-    const composer = new EffectComposer(renderer);
+    // EffectComposer's own render target has no multisampling, so the
+    // renderer's antialias flag stops meaning anything the moment a pass
+    // runs - and one always does. Without this every cabinet edge, window
+    // bar and worktop line in the view is a visible staircase.
+    const drawing = renderer.getDrawingBufferSize(new THREE.Vector2());
+    const composer = new EffectComposer(
+      renderer,
+      new THREE.WebGLRenderTarget(drawing.x, drawing.y, {
+        type: THREE.HalfFloatType,
+        samples: 4,
+      }),
+    );
     const ao = quality ? new SSAOPass(scene, camera, 512, 512) : null;
     const output = new OutputPass();
     const balancePass = new ShaderPass({
