@@ -60,6 +60,13 @@ export default defineSchema({
     part: v.number(),
     content: v.string(),
   }).index('by_sharedId_and_part', ['sharedId', 'part']),
+  // Overflow storage for designs larger than a single Convex document. Keyed by
+  // the owning projects / projectBackups / reviewSnapshots row id.
+  designChunks: defineTable({
+    parentId: v.string(),
+    part: v.number(),
+    content: v.string(),
+  }).index('by_parentId_and_part', ['parentId', 'part']),
   projects: defineTable({
     clientName: v.optional(v.string()),
     workflowStatus: v.optional(projectStage),

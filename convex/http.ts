@@ -9,19 +9,48 @@ import type { Id } from './_generated/dataModel';
 const http = httpRouter();
 auth.addHttpRoutes(http);
 function headers(request: Request) {
-  const origin = request.headers.get('origin');
-  const allowed = process.env.SITE_URL;
-  return {
-    'Access-Control-Allow-Origin':
-      origin === allowed ? origin : (allowed ?? 'http://localhost:3000'),
+  const base = {
     'Access-Control-Allow-Headers': 'Authorization, Content-Type',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Cache-Control': 'private, no-store',
     'X-Content-Type-Options': 'nosniff',
   };
+  const allowed = process.env.SITE_URL;
+  // An unconfigured deployment has no trusted origin. Omit the header entirely
+  // rather than falling back to a development origin, so CORS denies the call.
+  if (!allowed) return base;
+  const origin = request.headers.get('origin');
+  return {
+    ...base,
+    'Access-Control-Allow-Origin': origin === allowed ? origin : allowed,
+  };
+}
+// Fail loudly as well as closed: a missing SITE_URL is a deployment fault, not
+// a client error, and is otherwise only visible as an opaque CORS failure.
+function misconfigured(request: Request) {
+  return process.env.SITE_URL
+    ? null
+    : new Response('SITE_URL is not configured on this Convex deployment', {
+        status: 503,
+        headers: headers(request),
+      });
+}
+// Worker routes are server-to-server and share one credential convention:
+// secret and lease in headers, job identity in the query string.
+function workerRequest(request: Request) {
+  const url = new URL(request.url);
+  return {
+    url,
+    args: {
+      secret: request.headers.get('X-Worker-Secret') ?? '',
+      jobId: url.searchParams.get('jobId') as Id<'jobs'>,
+      leaseToken: request.headers.get('X-Worker-Lease') ?? '',
+    },
+  };
 }
 const preflight = httpAction(
   async (_ctx, req) =>
+    misconfigured(req) ??
     new Response(null, { status: 204, headers: headers(req) }),
 );
 http.route({ path: '/upload', method: 'OPTIONS', handler: preflight });
@@ -30,6 +59,8 @@ http.route({
   path: '/upload',
   method: 'POST',
   handler: httpAction(async (ctx, req) => {
+    const fault = misconfigured(req);
+    if (fault) return fault;
     try {
       const ownerId = await getAuthUserId(ctx);
       if (!ownerId)
@@ -79,6 +110,8 @@ http.route({
   path: '/files',
   method: 'GET',
   handler: httpAction(async (ctx, req) => {
+    const fault = misconfigured(req);
+    if (fault) return fault;
     try {
       const ownerId = await getAuthUserId(ctx);
       if (!ownerId)
@@ -118,11 +151,7 @@ http.route({
   method: 'POST',
   handler: httpAction(async (ctx, req) => {
     try {
-      const args = (await req.json()) as {
-        secret: string;
-        jobId: Id<'jobs'>;
-        leaseToken: string;
-      };
+      const { args } = workerRequest(req);
       const storageId = await ctx.runQuery(internal.worker.source, args);
       const blob = await ctx.storage.get(storageId);
       if (!blob) return new Response('Not found', { status: 404 });
@@ -142,11 +171,8 @@ http.route({
   method: 'POST',
   handler: httpAction(async (ctx, req) => {
     try {
-      const u = new URL(req.url);
-      const secret = req.headers.get('X-Worker-Secret') ?? '';
-      const jobId = u.searchParams.get('jobId') as Id<'jobs'>;
-      const leaseToken = req.headers.get('X-Worker-Lease') ?? '';
-      await ctx.runQuery(internal.worker.source, { secret, jobId, leaseToken });
+      const { url, args } = workerRequest(req);
+      await ctx.runQuery(internal.worker.source, args);
       const bytes = new Uint8Array(await req.arrayBuffer());
       if (
         bytes.length > 10000000 ||
@@ -160,11 +186,9 @@ http.route({
         new Blob([bytes], { type: 'image/png' }),
       );
       await ctx.runMutation(internal.worker.image, {
-        secret,
-        jobId,
-        leaseToken,
+        ...args,
         storageId,
-        pageNumber: Number(u.searchParams.get('pageNumber')),
+        pageNumber: Number(url.searchParams.get('pageNumber')),
       });
       return new Response('OK');
     } catch {

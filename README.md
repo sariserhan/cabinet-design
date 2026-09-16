@@ -1,10 +1,20 @@
-# Catalog Compiler
+# Cabinet Design
 
-An internal Next.js/Convex application for converting manufacturer PDFs into source-linked catalogs. The first milestone is a 32-page Fabuwood Allure subset. **The review application and draft import work; a trustworthy compiled catalog has not yet been established.** Live model extraction and human benchmark verification remain required before publication or full-book processing.
+One repository, two products that share a catalog, an account and a Convex backend.
+
+| | **Catalog Compiler** | **Kitchen Studio** |
+| --- | --- | --- |
+| What it does | Turns manufacturer PDFs into source-linked, reviewable catalog records | Plans a kitchen from those records, then prices, presents and hands it off |
+| Routes | `/documents` `/catalog` `/review` `/rules` `/versions` `/benchmarks` `/readiness` | `/designer` `/projects` `/selections` `/client-review` `/installer` |
+| Code | `convex/` `src/catalog/` `src/ingestion/` `tools/` | `src/designer/` `src/components/designer/` |
+| Status | **Draft import works. No trustworthy compiled catalog exists yet.** | Working demo; outputs are coordination drafts, not approvals |
+| Guide | [catalog status](docs/catalog-status.md) · [architecture](docs/application.md) · [semantic core](docs/semantic-core.md) | [kitchen studio](docs/kitchen-studio.md) · [rendering](docs/rendering.md) · [trade workspaces](docs/trade-workspaces.md) |
+
+The two meet at one boundary: Kitchen Studio places catalog records that have known width, depth and height. Draft records stay visibly unverified until a human approves them, and cannot be ordered against.
 
 ## Run locally
 
-Requires Node.js 24 and Python 3. The current workspace has a configured Convex development deployment; private credentials are in ignored `.env.local`.
+Requires Node.js 24 and Python 3. Private credentials live in the ignored `.env.local`; see [.env.example](.env.example).
 
 ```sh
 npm ci
@@ -12,39 +22,51 @@ python3 -m pip install --target .local/pdf-tools -r tools/requirements-benchmark
 npm run dev -- --port 3001
 ```
 
-In another terminal:
+In another terminal, for catalog ingestion only:
 
 ```sh
 npm run worker
 ```
 
-Open http://localhost:3001 and create an account. Use **Documents → Load Allure draft benchmark** to load the exact public PDF and draft annotations into your private workspace. This is explicitly a draft import, not a model extraction result. The worker must be running to process queued jobs.
+Open http://localhost:3001 and create an account. Note that Next 16 allows only one dev server per project directory.
 
-For a fresh deployment, run `npx convex dev`, configure Convex Auth with `npx @convex-dev/auth --skip-git-check --web-server-url http://localhost:3001`, and set matching `CATALOG_WORKER_SECRET` values locally and in Convex. See [.env.example](.env.example). `SITE_URL` in Convex must match the browser origin. Never commit the actual secrets.
+For a fresh deployment, run `npx convex dev`, configure Convex Auth with `npx @convex-dev/auth --skip-git-check --web-server-url http://localhost:3001`, and set matching `CATALOG_WORKER_SECRET` values locally and in Convex. `SITE_URL` must be set on the Convex deployment and match the browser origin — without it the HTTP routes refuse requests rather than falling back to a development origin. Never commit actual secrets.
 
-To run model extraction, configure `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `.env.local`, restart the worker, and choose that provider and a supported model ID in Documents. Model IDs and token prices are explicit configuration. No prices or successful extraction results are fabricated when configuration is absent.
+To run model extraction, configure `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `.env.local`, restart the worker, and choose that provider and a supported model ID in Documents. Model IDs and token prices are explicit configuration. No prices or extraction results are fabricated when configuration is absent.
 
-## Review and publication
+## Catalog Compiler
 
-- Review products, rules, footnotes, families/options/modifications, and difficult cases against individual field evidence. Private page images highlight the selected source region; printed labels remain separate from physical PDF positions.
-- Edit, approve, reject, mark ambiguity, resolve blockers, split, or merge records. Changes retain audit history and invalidate stale benchmark/publication results. Reprocessing preserves audited corrections.
-- Catalog filters include SKU, category, family, dimensions, confidence, and review status.
-- Versions shows publication failures, source reprocessing, audited non-catalog exclusions, geometry policies, diffs, immutable export, and creation of editable revisions.
-- Benchmarks compares an independent compiler candidate with a separately human-verified draft. Products, fields, dimensions, categories, rules, footnotes, source references, and executable difficult cases are measured separately.
+Use **Documents → Load Allure draft benchmark** to load the pinned public PDF and draft annotations into your private workspace. This is explicitly a draft import, not a model extraction result. The worker must be running to process queued jobs.
 
-A human must verify the development truth: 150–200 products, 30+ rules, 30+ footnotes, and difficult cases. The existing fixture contains **189 products, 58 footnotes, 32 rules, 8 cases, and 431 evidence snippets, all unverified**. Automated QA accounts cannot create human-verification attestations. Completing processing alone cannot authorize publication.
+- Review products, rules, footnotes, families/options/modifications and difficult cases against individual field evidence. Private page images highlight the selected source region; printed labels remain separate from physical PDF positions.
+- Edit, approve, reject, mark ambiguity, resolve blockers, split or merge records. Changes retain audit history and invalidate stale benchmark/publication results. Reprocessing preserves audited corrections.
+- Versions shows publication failures, source reprocessing, audited non-catalog exclusions, geometry policies, diffs, immutable export and creation of editable revisions.
+- Benchmarks compares an independent compiler candidate with a separately human-verified draft.
 
-The selected subset cannot stand in for the complete Allure catalog. Full-book processing is intentionally held behind Milestone 1. A separate random audit of 600 auto-approved decisions with zero critical errors is required before the final reliability claim. Current model output remains unreviewed; confidence is conservatively capped below the auto-approval threshold pending calibration.
+A human must verify the development truth: 150–200 products, 30+ rules, 30+ footnotes and difficult cases. The existing fixture contains **189 products, 58 footnotes, 32 rules, 8 cases and 431 evidence snippets, all unverified**. Automated QA accounts cannot create human-verification attestations, and completing processing alone cannot authorize publication.
+
+The selected subset cannot stand in for the complete Allure catalog. Full-book processing is held behind Milestone 1. A separate random audit of 600 auto-approved decisions with zero critical errors is required before the final reliability claim. Current model output remains unreviewed; confidence is capped below the auto-approval threshold pending calibration.
+
+Future product consumers use `src/catalog/api.ts` with an authenticated immutable published export, rather than reading mutable extraction records.
+
+## Kitchen Studio
+
+The entry point is `/designer`. Work through **Room → Cabinets → Design → Quote → Present**; approvals, orders, installation and aftercare live under Project tools. See the [kitchen studio guide](docs/kitchen-studio.md) for the full walkthrough and the [pilot worksheet](docs/pilot.md) for running a real project through it.
+
+Designs are stored as JSON per project: up to 400 objects and 6 MB, with anything above ~100 KB split across chunk rows so a large kitchen is not capped by Convex's single-document limit. Those bounds are defined once, as `MAX_DESIGN_ITEMS` and `MAX_DESIGN_TEXT` in [`src/designer/model.ts`](src/designer/model.ts), and reused by the schema, the file importer and the cloud store.
+
+Drawing packages, dealer CSVs and quotes are coordination drafts. Verify site measurements, appliance specifications, service locations, manufacturer options and source records before ordering or installation.
 
 ## Validation
 
 ```sh
-npm run check
+npm run check     # lint, TypeScript, semantic tests, backend tests, artifact integrity
 npm run build
+npm run test:e2e  # Playwright; see below
 ```
 
-Checks include semantic tests, backend ownership/concurrency/audit tests, mocked provider contract tests, TypeScript, lint, and draft-artifact integrity. These are software checks, not measured manufacturer-data accuracy.
+`npm run check` covers 251 semantic tests, 31 backend ownership/concurrency/audit tests, mocked provider contract tests, TypeScript, lint and draft-artifact integrity. These are software checks, not measured manufacturer-data accuracy.
+
+`npm run test:e2e` drives the signed-out surfaces — the installer workspace, the public catalog route and client-review token handling — against a running app. It attaches to a dev server already on port 3000, or starts one if none is up; set `E2E_BASE_URL` to test a deployment instead. The browser tests need Chromium's system libraries, which is a one-time `sudo npx playwright install-deps chromium`. Without them the two API-level tests still run and the four browser tests fail to launch.
 
 The static [review packet](tests/fixtures/fabuwood-allure/review-packet.html) and [verification protocol](tests/fixtures/fabuwood-allure/VERIFICATION.md) remain available. The app stores human decisions separately from those original AI draft files.
-
-See [implementation status](IMPLEMENTATION_STATUS.md), [application architecture](docs/application.md), and [semantic core](docs/semantic-core.md). Future product consumers use `src/catalog/api.ts` with an authenticated immutable published export, rather than reading mutable extraction records.

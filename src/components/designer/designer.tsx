@@ -1,32 +1,22 @@
 'use client';
-import { TradeWorkspaces } from './trade-workspaces';
-import { JobWorkspace } from './job-workspace';
+import { download } from './designer-widgets';
+import { DesignerInspector } from './designer-inspector';
+import { DesignerMoreTools } from './designer-tools';
+import type { History, WorkspaceStage } from './designer-state';
 import { sourceLink } from '@/designer/design-decisions';
-import {
-  SampleGallery,
-  SampleStory,
-  ObjectManager,
-  RoomPhoto,
-  SurfaceEditor,
-  ReadinessCheck,
-} from './studio-panels';
+import { SampleGallery } from './studio-panels';
 import { DesignerKeyboardSupport } from './keyboard-support';
 import { EverydayEditing } from './everyday-editing';
 import { ProfessionalOutput } from './professional-output';
-import { ProjectHub, openProjectTool } from './project-hub';
-import { PurchasingWorkspace } from './purchasing-workspace';
-import { FirstUseGuide } from './first-use-guide';
-import { ProjectWorkflow } from './project-workflow';
-import { DesignDecisions } from './design-decisions';
+import { openProjectTool } from './project-hub';
 import { MeasurementWizard } from './measurement-wizard';
-import { CloudProjects } from './cloud-projects';
-import { AlternativeLayouts, SupplierQuotes } from './business-tools';
+import { SupplierQuotes } from './business-tools';
 import { ElevationView } from './elevation-view';
 import { lockViolation } from '@/designer/studio-tools';
 import { KitchenActions } from './kitchen-actions';
-import { QuickInspector, FitAndOverhang } from './refinement-tools';
+import { QuickInspector } from './refinement-tools';
 import { placementBlock } from '@/designer/refinements';
-import { SmartPlacement, DesignRecovery, Showroom } from './experience-tools';
+import { Showroom } from './experience-tools';
 import { LightingComparison } from './demo-readiness';
 import { PresentationTour } from './presentation-tour';
 import type { CameraView } from './render-view';
@@ -40,15 +30,10 @@ import {
   Printer,
   Hand,
   MousePointer2,
-  FlipHorizontal2,
   FolderOpen,
   Download,
-  Upload,
   Undo2,
   Redo2,
-  RotateCw,
-  Trash2,
-  Copy,
   LayoutGrid,
   Box,
   Maximize,
@@ -62,16 +47,14 @@ import {
   canPlace,
   updateAssembly,
   fromObject,
-  objectOptions,
-  objectOptionPatch,
   isOpening,
   attachToWall,
   billKey,
   placementCollision,
-  mirrorCabinet,
   turnCabinet,
   csvBill,
   designSchema,
+  MAX_DESIGN_TEXT,
   findSpace,
   footprint,
   fromProduct,
@@ -86,33 +69,14 @@ import { Preview } from './preview';
 import { Library } from './library';
 import { ObjectsLibrary } from './objects';
 import { PrintPackage } from './print-package';
-import { AssemblyEditor } from './assembly-editor';
-import { DesignOptions, ItemOptions, QuotePanel } from './demo-options';
+import { QuotePanel } from './demo-options';
 import { SelectionTools, CompareOptions } from './workflow-tools';
 import { snapPlacement, duplicateOption } from '@/designer/editing';
-import { MachiningTools } from './machining-tools';
-import {
-  DemoWalkthrough,
-  StartGuide,
-  MaterialPresets,
-  ShortcutHelp,
-  ClientPresentation,
-} from './demo-tools';
-import {
-  assemblyMembers,
-  finishAssembly,
-  placementAt,
-} from '@/designer/editing';
+import { DemoWalkthrough, StartGuide, ClientPresentation } from './demo-tools';
+import { placementAt } from '@/designer/editing';
 import { polishedSample } from '@/designer/sample';
 import { normalizeOpenings, worldToLocal } from '@/designer/model';
-import {
-  ArchitectureOptions,
-  InstallationOptions,
-  PartitionOptions,
-  DrawingTools,
-  InstallationSheets,
-} from './advanced-options';
-import { RoomEditor } from './room-editor';
+import { InstallationSheets } from './advanced-options';
 import { roomEdges, rectangleInside } from '@/designer/room';
 
 const RenderView = dynamic(() => import('./render-view'), {
@@ -120,60 +84,6 @@ const RenderView = dynamic(() => import('./render-view'), {
   loading: () => <p>Loading renderer…</p>,
 });
 
-type History = {
-  past: Design[];
-  current: Design;
-  future: Design[];
-  error?: string;
-};
-function Numeric({
-  label,
-  value,
-  min = 0,
-  max = 600,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min?: number;
-  max?: number;
-  onChange: (n: number) => void;
-}) {
-  const [text, setText] = useState(String(value));
-  useEffect(() => setText(String(value)), [value]);
-  function submit() {
-    const next = Number(text);
-    if (text.trim() && Number.isFinite(next) && next >= min && next <= max)
-      onChange(next);
-    else setText(String(value));
-  }
-  return (
-    <label className="designer-numeric">
-      <span>{label}</span>
-      <input
-        type="number"
-        aria-label={label}
-        min={min}
-        max={max}
-        step="0.5"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onBlur={submit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') e.currentTarget.blur();
-        }}
-      />
-    </label>
-  );
-}
-function download(text: string, name: string, type: string) {
-  const url = URL.createObjectURL(new Blob([text], { type }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
 export function Designer() {
   const viewer = useQuery(api.workspace.viewer, {});
   if (!viewer) return <div className="page-body">Loading designer…</div>;
@@ -185,15 +95,15 @@ function Editor({ ownerId }: { ownerId: string }) {
     ? (JSON.parse(overviewRaw) as Overview)
     : undefined;
   const [libraryCollapsed, setLibraryCollapsed] = useState(false),
+    [canvasExpanded, setCanvasExpanded] = useState(false),
     [inspectorCollapsed, setInspectorCollapsed] = useState(false),
     [walkStep, setWalkStep] = useState<number | null>(null);
   const [before, setBefore] = useState<Design | null>(null);
   const [presentationCamera, setPresentationCamera] = useState<
     CameraView | undefined
   >();
-  const [workspaceStage, setWorkspaceStage] = useState<
-    'Room' | 'Cabinets' | 'Design' | 'Quote' | 'Present'
-  >('Design');
+  const [workspaceStage, setWorkspaceStage] =
+    useState<WorkspaceStage>('Design');
   const [showStart, setShowStart] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [inspectorTab, setInspectorTab] = useState('design'),
@@ -408,6 +318,19 @@ function Editor({ ownerId }: { ownerId: string }) {
       document.removeEventListener('visibilitychange', onHidden);
     };
   }, [design, storageKey]);
+  // The Quote stage hides the grid and presentation mode replaces it, so an
+  // enlarged canvas there would cover the window with nothing.
+  useEffect(() => {
+    if (workspaceStage === 'Quote' || presenting) setCanvasExpanded(false);
+  }, [workspaceStage, presenting]);
+  useEffect(() => {
+    if (!canvasExpanded) return;
+    const exit = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setCanvasExpanded(false);
+    };
+    window.addEventListener('keydown', exit);
+    return () => window.removeEventListener('keydown', exit);
+  }, [canvasExpanded]);
   function commit(
     change: (current: Design) => Design,
     protectPlacement = false,
@@ -718,7 +641,7 @@ function Editor({ ownerId }: { ownerId: string }) {
     const request = ++importRequest.current;
     const startedFrom = currentDesign.current;
     try {
-      if (imported.size > 500_000) throw Error('large');
+      if (imported.size > MAX_DESIGN_TEXT) throw Error('large');
       const parsed = parseDesign(await imported.text());
       if (request !== importRequest.current) return;
       if (currentDesign.current !== startedFrom) {
@@ -848,7 +771,7 @@ function Editor({ ownerId }: { ownerId: string }) {
   }
   return (
     <div
-      className={`designer-app ${libraryCollapsed ? 'library-collapsed' : ''} ${inspectorCollapsed ? 'inspector-collapsed' : ''} ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''} ${showroom ? 'has-showroom' : ''}`}
+      className={`designer-app ${libraryCollapsed ? 'library-collapsed' : ''} ${inspectorCollapsed ? 'inspector-collapsed' : ''} ${canvasExpanded ? 'canvas-expanded' : ''} ${mode === 'client' ? 'has-client-presentation' : ''} ${presenting ? 'is-presenting' : ''} ${showroom ? 'has-showroom' : ''}`}
     >
       <DesignerKeyboardSupport />
       {showroom && (
@@ -1159,312 +1082,34 @@ function Editor({ ownerId }: { ownerId: string }) {
           Skip to item controls
         </a>
       </nav>
-      <details className="workspace-more-tools">
-        <summary>
-          More tools{' '}
-          <span>Files, job checks, other trades &amp; project management</span>
-        </summary>
-        <p className="tools-intro">
-          Choose a section below. Your design stays open while you work.
-        </p>
-        <JobWorkspace
-          key={`job:${design.id}:${recordsEpoch}`}
-          design={design}
-          ownerId={ownerId}
-          onApply={(next) => commit(() => next)}
-          onLocate={(id) => {
-            setWorkspaceStage('Design');
-            setSelected(id);
-            setMode('2d');
-          }}
-        />
-        <TradeWorkspaces
-          key={`trades:${design.id}`}
-          design={design}
-          ownerId={ownerId}
-        />
-        <details className="studio-support">
-          <summary>
-            Project tools · approvals, orders, installation & aftercare
-          </summary>
-          <ProjectHub
-            key={`hub:${design.id}:${recordsEpoch}`}
-            selectedIds={
-              selection.length ? selection : selected ? [selected] : []
-            }
-            onApply={(next) => commit(() => next, true)}
-            onLocate={(id) => {
-              setWorkspaceStage('Design');
-              setSelected(id);
-              setMode('2d');
-              document
-                .getElementById('design-workspace')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            design={design}
-            ownerId={ownerId}
-            onSharedLoad={(next) => {
-              setHistory({ past: [], current: next, future: [] });
-              setSelected(null);
-              setSelection([]);
-              setBefore(next);
-              setRecordsEpoch((v) => v + 1);
-              setStatus('Shared project revision loaded locally.');
-            }}
-            onRestore={(next) => {
-              setHistory({ past: [], current: next, future: [] });
-              setSelected(null);
-              setSelection([]);
-              setBefore(next);
-              setStatus('Complete project restored as a separate local copy.');
-            }}
-          />
-          <FirstUseGuide
-            ownerId={ownerId}
-            design={design}
-            onDemo={() => walkthroughStep(0)}
-          />
-          <PurchasingWorkspace
-            key={`purchasing:${design.id}:${recordsEpoch}`}
-            ownerId={ownerId}
-            design={design}
-            onLocate={(id) => {
-              setWorkspaceStage('Design');
-              setSelected(id);
-              setMode('2d');
-              document
-                .querySelector('.canvas-panel-controls')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          />
-          <ProjectWorkflow
-            key={`workflow:${design.id}:${recordsEpoch}`}
-            design={design}
-            ownerId={ownerId}
-            onLocate={(id) => {
-              setWorkspaceStage('Design');
-              setSelected(id);
-              setMode('2d');
-              document
-                .querySelector('.canvas-panel-controls')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            onNavigate={(stage, target) => {
-              if (stage === 'Design') {
-                setMode('2d');
-                document
-                  .querySelector('.canvas-panel-controls')
-                  ?.scrollIntoView({ behavior: 'smooth' });
-                return;
-              }
-              const label =
-                target === 'selections'
-                  ? 'Design decisions · budget, checks & site handoff'
-                  : stage === 'Measure'
-                    ? 'Guided room measurements'
-                    : stage === 'Price'
-                      ? 'Supplier quotes'
-                      : stage === 'Present'
-                        ? 'Cloud projects & client reviews'
-                        : 'Design decisions · budget, checks & site handoff';
-              openProjectTool(label);
-              const section = Array.from(
-                document.querySelectorAll('details'),
-              ).find(
-                (d) =>
-                  d.querySelector(':scope > summary')?.textContent === label,
-              );
-              if (section) {
-                section.open = true;
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-              if (
-                target === 'selections' ||
-                stage === 'Install' ||
-                stage === 'Check'
-              )
-                setTimeout(() => {
-                  const name =
-                    target === 'selections'
-                      ? 'Client selections'
-                      : stage === 'Install'
-                        ? 'Installer handoff'
-                        : 'Explain checks';
-                  Array.from(
-                    section?.querySelectorAll<HTMLButtonElement>(
-                      '[role="tab"]',
-                    ) ?? [],
-                  )
-                    .find((b) => b.textContent === name)
-                    ?.click();
-                }, 100);
-            }}
-          />
-          <CloudProjects
-            onLocate={(id) => {
-              setWorkspaceStage('Design');
-              setSelected(id);
-              setMode('2d');
-            }}
-            key={`cloud:${design.id}`}
-            design={design}
-            ownerId={ownerId}
-            onOpen={(next) => {
-              setHistory((h) =>
-                h
-                  ? {
-                      past: [...h.past, h.current].slice(-60),
-                      current: next,
-                      future: [],
-                    }
-                  : { past: [], current: next, future: [] },
-              );
-              setSelected(null);
-              setBefore(next);
-            }}
-          />
-          <AlternativeLayouts
-            design={design}
-            onChange={(next) => commit(() => next, true)}
-          />
-          <DesignDecisions
-            design={design}
-            versionId={version?._id}
-            onChange={(next) => commit(() => next)}
-            onLocate={(id) => {
-              setWorkspaceStage('Design');
-              setSelected(id);
-              setMode('2d');
-            }}
-          />
-          <ShortcutHelp />
-        </details>
-        <details className="project-controls">
-          <summary>Project files & examples</summary>
-          <div className="designer-projectbar">
-            <span>Draft saves automatically in this browser</span>
-            <div className="designer-row">
-              <select
-                id="saved-designs"
-                aria-label="Saved designs"
-                value={openId}
-                onChange={(e) => setOpenId(e.target.value)}
-              >
-                <option value="">Choose a saved design</option>
-                {saved.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name} · {d.items.length} cabinets
-                  </option>
-                ))}
-              </select>
-              <button disabled={!openId} onClick={open}>
-                Open
-              </button>
-              <button
-                onClick={() => {
-                  commit(() => newDesign());
-                  setSelected(null);
-                  setStatus(
-                    'New room created. Undo restores the previous design.',
-                  );
-                }}
-              >
-                New room
-              </button>
-
-              <button
-                onClick={() => {
-                  commit(() => polishedSample());
-                  setSelected(null);
-                  setMode('render');
-                  setStatus(
-                    'Presentation kitchen loaded. Undo restores your previous design.',
-                  );
-                }}
-              >
-                Load presentation kitchen
-              </button>
-              <button disabled={!templateRaw} onClick={example}>
-                Load example kitchen
-              </button>
-              <button
-                onClick={() =>
-                  download(
-                    JSON.stringify(design, null, 2),
-                    `${design.name.replace(/[^a-z0-9-]/gi, '_')}.json`,
-                    'application/json',
-                  )
-                }
-              >
-                <Download size={14} /> Export
-              </button>
-              <button onClick={() => file.current?.click()}>
-                <Upload size={14} /> Import
-              </button>
-              <input
-                hidden
-                ref={file}
-                type="file"
-                accept=".json,application/json"
-                aria-label="Import design file"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) void importFile(f);
-                }}
-              />
-            </div>
-          </div>
-        </details>
-        <details className="studio-support">
-          <summary>Recovery & advanced placement</summary>
-          <DesignRecovery
-            key={`recovery-${design.id}`}
-            design={design}
-            ownerId={ownerId}
-            past={history.past}
-            onRestore={(next) => {
-              setHistory((h) =>
-                h
-                  ? {
-                      past: [...h.past, h.current].slice(-60),
-                      current: next,
-                      future: [],
-                    }
-                  : h,
-              );
-              setSelected(null);
-              setSelection([]);
-              setStatus(
-                'Design restored. Undo returns to the previous version.',
-              );
-            }}
-          />
-          <SmartPlacement
-            design={design}
-            selected={selected}
-            onChange={(next) => commit(() => next, true)}
-          />
-          <SampleStory
-            design={design}
-            onChange={(next) => commit(() => next)}
-          />
-          <ObjectManager
-            design={design}
-            onChange={(next) => commit(() => next)}
-            onSelect={(id) => {
-              setSelected(id);
-              setInspectorCollapsed(false);
-            }}
-          />
-          <ReadinessCheck
-            design={design}
-            onSelect={(id) => {
-              setSelected(id);
-              setMode('2d');
-            }}
-          />
-        </details>
-      </details>
+      <DesignerMoreTools
+        design={design}
+        ownerId={ownerId}
+        version={version}
+        templateRaw={templateRaw}
+        selected={selected}
+        setSelected={setSelected}
+        openId={openId}
+        setOpenId={setOpenId}
+        saved={saved}
+        past={history?.past ?? []}
+        setHistory={setHistory}
+        selection={selection}
+        setSelection={setSelection}
+        setInspectorCollapsed={setInspectorCollapsed}
+        setMode={setMode}
+        setBefore={setBefore}
+        setWorkspaceStage={setWorkspaceStage}
+        recordsEpoch={recordsEpoch}
+        setRecordsEpoch={setRecordsEpoch}
+        setStatus={setStatus}
+        commit={commit}
+        example={example}
+        open={open}
+        importFile={importFile}
+        walkthroughStep={walkthroughStep}
+        file={file}
+      />
       {(status || storageError || history.error) && (
         <div
           role="status"
@@ -1554,6 +1199,13 @@ function Editor({ ownerId }: { ownerId: string }) {
               {libraryCollapsed && inspectorCollapsed
                 ? 'Restore panels'
                 : 'Focus canvas'}
+            </button>
+            <button
+              aria-pressed={canvasExpanded}
+              onClick={() => setCanvasExpanded((v) => !v)}
+              title="Fill the window with the canvas. Press Escape to exit."
+            >
+              {canvasExpanded ? 'Exit full canvas' : 'Enlarge canvas'}
             </button>
           </div>
           <QuickInspector
@@ -1914,553 +1566,28 @@ function Editor({ ownerId }: { ownerId: string }) {
             </div>
           </section>
         </section>
-        <aside className="designer-inspector">
-          <h2>Properties</h2>
-          <RoomPhoto
-            key={design.id}
-            storageKey={`kitchen-photo:${ownerId}:${design.id}`}
-          />
-          <FitAndOverhang
-            key={selected}
-            design={design}
-            selected={selected}
-            onChange={(next) => commit(() => next)}
-          />
-          <SurfaceEditor
-            design={design}
-            selected={selected}
-            ids={selection}
-            onChange={(next) => commit(() => next)}
-          />
-          <div
-            id="designer-inspector"
-            tabIndex={-1}
-            role="tablist"
-            aria-label="Inspector sections"
-            className="inspector-tabs"
-          >
-            {['design', 'materials', 'installation', 'documents'].map((tab) => (
-              <button
-                key={tab}
-                role="tab"
-                aria-selected={inspectorTab === tab}
-                onClick={() => setInspectorTab(tab)}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </div>
-          <section hidden={inspectorTab !== 'design'}>
-            <h3>Room</h3>
-            <Numeric
-              label="Room width (in)"
-              min={36}
-              value={design.room.width}
-              onChange={(n) =>
-                commit((d) => ({ ...d, room: { ...d.room, width: n } }))
-              }
-            />
-            <Numeric
-              label="Room depth (in)"
-              min={36}
-              value={design.room.depth}
-              onChange={(n) =>
-                commit((d) => ({ ...d, room: { ...d.room, depth: n } }))
-              }
-            />
-            <Numeric
-              label="Ceiling height (in)"
-              min={36}
-              value={design.room.height}
-              onChange={(n) =>
-                commit((d) => ({ ...d, room: { ...d.room, height: n } }))
-              }
-            />
-            <ArchitectureOptions
-              design={design}
-              onChange={(next) => commit(() => next)}
-            />
-
-            <RoomEditor
-              room={design.room}
-              onChange={(outline) =>
-                commit((d) => ({
-                  ...d,
-                  room: { ...d.room, outline, curves: [] },
-                }))
-              }
-            />
-            <div className="designer-walls">
-              {(['north', 'east', 'south', 'west'] as const).map((wall) => (
-                <label key={wall}>
-                  <input
-                    type="checkbox"
-                    checked={design.room.walls[wall]}
-                    onChange={(e) =>
-                      commit((d) => ({
-                        ...d,
-                        room: {
-                          ...d.room,
-                          walls: { ...d.room.walls, [wall]: e.target.checked },
-                        },
-                      }))
-                    }
-                  />
-                  {wall.charAt(0).toUpperCase() + wall.slice(1)} wall
-                </label>
-              ))}
-            </div>
-          </section>
-          <section hidden={inspectorTab !== 'design'}>
-            <h3>Selected item</h3>
-            {item ? (
-              <>
-                <strong className="selected-sku">{item.sku}</strong>
-                {item.assemblyId && (
-                  <button
-                    onClick={() => {
-                      setSelection(assemblyMembers(design, item.id));
-                      setMoveTogether(true);
-                    }}
-                  >
-                    Select whole assembly / island
-                  </button>
-                )}
-                {item.assemblyId && selection.includes(item.id) && (
-                  <p>
-                    {assemblyMembers(design, item.id).length} assembly parts
-                    selected. Drag any member to move them together.
-                  </p>
-                )}
-                <p className="designer-muted">
-                  {item.width} W × {item.depth} D × {item.height} H (in)
-                </p>
-                <p className="designer-muted">
-                  Footprint: {footprint(item).width} × {footprint(item).depth}{' '}
-                  in · {item.rotation}°
-                </p>
-                {objectOptions.some((o) => o.kind === item.kind) && (
-                  <label className="designer-numeric">
-                    <span>Size / style preset</span>
-                    <select
-                      aria-label="Selected object preset"
-                      value=""
-                      onChange={(e) => {
-                        const option = objectOptions.find(
-                          (o) => o.id === e.target.value,
-                        );
-                        if (option)
-                          commit((d) => ({
-                            ...d,
-                            items: d.items.map((i) =>
-                              i.id === item.id
-                                ? { ...i, ...objectOptionPatch(i, option.id) }
-                                : i,
-                            ),
-                          }));
-                      }}
-                    >
-                      <option value="">Choose a preset…</option>
-                      {objectOptions
-                        .filter((o) => o.kind === item.kind)
-                        .map((o) => (
-                          <option value={o.id} key={o.id}>
-                            {o.name}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-                )}
-                {item.kind !== 'cabinet' && (
-                  <>
-                    <Numeric
-                      label="Object width (in)"
-                      min={1}
-                      value={item.width}
-                      onChange={(width) => updateItem(item.id, { width })}
-                    />
-                    <Numeric
-                      label="Object depth (in)"
-                      min={0.5}
-                      value={item.depth}
-                      onChange={(depth) => updateItem(item.id, { depth })}
-                    />
-                    <Numeric
-                      label="Object height (in)"
-                      min={0.5}
-                      value={item.height}
-                      onChange={(height) => updateItem(item.id, { height })}
-                    />
-                    {isOpening(item) && !item.opening && (
-                      <label className="designer-numeric">
-                        <span>Attach to wall</span>
-                        <select
-                          aria-label="Attach to wall"
-                          value={
-                            item.wallSegment ??
-                            roomEdges(design.room).find(
-                              (e) => e.side === (item.wall ?? 'north'),
-                            )?.index ??
-                            0
-                          }
-                          onChange={(e) => {
-                            const edge = roomEdges(design.room).find(
-                              (edge) => edge.index === Number(e.target.value),
-                            );
-                            if (edge)
-                              updateItem(
-                                item.id,
-                                attachToWall(
-                                  { ...item, wallSegment: edge.index },
-                                  design.room,
-                                  edge.side,
-                                ),
-                              );
-                          }}
-                        >
-                          {roomEdges(design.room).map((edge) => (
-                            <option
-                              key={edge.index}
-                              value={edge.index}
-                              disabled={
-                                !design.room.walls[edge.side] || edge.curved
-                              }
-                            >
-                              Wall {edge.index + 1} · {edge.side} ·{' '}
-                              {Number(edge.length.toFixed(1))}″
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    )}
-                    <p className="designer-muted">
-                      {isOpening(item)
-                        ? 'Position stays on the chosen wall. Elevation sets the window sill height. Flip left/right changes the door swing.'
-                        : 'Generic demo dimensions. Resize to match your chosen product.'}
-                    </p>
-                  </>
-                )}
-                <Numeric
-                  label="X position (in)"
-                  max={1200}
-                  value={item.x}
-                  onChange={(x) => updateItem(item.id, { x })}
-                />
-                <Numeric
-                  label="Y position (in)"
-                  max={1200}
-                  value={item.y}
-                  onChange={(y) => updateItem(item.id, { y })}
-                />
-                <Numeric
-                  label="Elevation (in)"
-                  value={item.elevation}
-                  onChange={(elevation) => updateItem(item.id, { elevation })}
-                />
-                {item.category === 'wall_cabinet' && (
-                  <p className="designer-muted">
-                    54″ is a starting mounting height; adjust for your room.
-                  </p>
-                )}
-                {['cabinet', 'custom_cabinet', 'island'].includes(
-                  item.kind,
-                ) && (
-                  <label className="designer-numeric">
-                    <span>Illustrative front</span>
-                    <select
-                      aria-label="Cabinet front style"
-                      value={item.frontStyle}
-                      onChange={(e) =>
-                        updateItem(item.id, {
-                          frontStyle: e.target.value as Cabinet['frontStyle'],
-                        })
-                      }
-                    >
-                      {['auto', 'single', 'double', 'drawers', 'glass'].map(
-                        (style) => (
-                          <option key={style}>{style}</option>
-                        ),
-                      )}
-                    </select>
-                  </label>
-                )}
-                <PartitionOptions
-                  design={design}
-                  item={item}
-                  onChange={(patch) => updateItem(item.id, patch)}
-                />
-
-                <ItemOptions
-                  item={item}
-                  onChange={(patch) => updateItem(item.id, patch)}
-                />
-                {!isOpening(item) && (
-                  <AssemblyEditor
-                    design={design}
-                    item={item}
-                    moveTogether={moveTogether}
-                    onMoveTogether={setMoveTogether}
-                    onChange={(next) => commit(() => next)}
-                  />
-                )}
-                <div className="designer-row">
-                  <button disabled={isOpening(item)} onClick={() => rotate(90)}>
-                    <RotateCw size={14} /> Rotate 90°
-                  </button>
-                  <button
-                    disabled={isOpening(item)}
-                    onClick={() => rotate(180)}
-                  >
-                    <RotateCw size={14} /> Turn 180°
-                  </button>
-                  <button
-                    aria-pressed={item.mirrored}
-                    onClick={() => updateItem(item.id, mirrorCabinet(item))}
-                  >
-                    <FlipHorizontal2 size={14} /> Flip left/right
-                  </button>
-                  <button
-                    aria-label="Duplicate cabinet"
-                    disabled={design.items.length >= 100}
-                    onClick={() => {
-                      const copy = { ...item, id: crypto.randomUUID() },
-                        space = findSpace(copy, design);
-                      if (!space) {
-                        setStatus('No free space for a duplicate.');
-                        return;
-                      }
-                      commit((d) => ({
-                        ...d,
-                        items: [...d.items, { ...copy, ...space }],
-                      }));
-                      setSelected(copy.id);
-                    }}
-                  >
-                    <Copy size={14} />
-                  </button>
-                  <button
-                    className="designer-danger"
-                    onClick={() => {
-                      commit((d) => ({
-                        ...d,
-                        items: d.items.filter((i) => i.id !== item.id),
-                      }));
-                      setSelected(null);
-                    }}
-                  >
-                    <Trash2 size={14} /> Delete
-                  </button>
-                </div>
-                {item.kind === 'cabinet' && (
-                  <p className="designer-muted">
-                    {item.mirrored ? 'Mirrored' : 'Standard'} illustrative
-                    front. The dot marks the handle side; confirm manufacturer
-                    handing separately.
-                  </p>
-                )}
-                {item.kind === 'cabinet' && (
-                  <Link className="designer-source" href={sourceLink(item)}>
-                    Inspect source · PDF {item.pageNumber}
-                  </Link>
-                )}
-              </>
-            ) : (
-              <p className="designer-muted">
-                Select a cabinet in the plan or product list to edit its
-                position.
-              </p>
-            )}
-          </section>
-          <section hidden={inspectorTab !== 'documents'}>
-            {' '}
-            <DrawingTools
-              design={design}
-              onChange={(next) => commit(() => next)}
-            />
-            <MachiningTools
-              design={design}
-              onChange={(next) => commit(() => next)}
-            />
-          </section>
-          <section hidden={inspectorTab !== 'materials'}>
-            {' '}
-            <DesignOptions
-              design={design}
-              onChange={(next) => commit(() => next)}
-            />
-          </section>
-          <section hidden={inspectorTab !== 'installation'}>
-            <h3>{item?.sku ?? 'Select an appliance'}</h3>
-            {item && (
-              <InstallationOptions
-                item={item}
-                onChange={(patch) => updateItem(item.id, patch)}
-              />
-            )}
-          </section>
-          <section hidden={inspectorTab !== 'materials'}>
-            {item?.assemblyId && (
-              <label>
-                Whole assembly finish
-                <select
-                  aria-label="Whole assembly finish"
-                  value=""
-                  onChange={(e) => {
-                    commit((d) =>
-                      finishAssembly(
-                        d,
-                        item.id,
-                        e.target.value as Design['finish'],
-                      ),
-                    );
-                    setSelection(assemblyMembers(design, item.id));
-                  }}
-                >
-                  <option value="" disabled>
-                    Choose for all cabinet parts
-                  </option>
-                  <option value="linen">Linen</option>
-                  <option value="oak">Oak</option>
-                  <option value="slate">Slate</option>
-                </select>
-              </label>
-            )}
-            <MaterialPresets
-              design={design}
-              onChange={(next) => commit(() => next)}
-            />
-            {item &&
-              [
-                'cabinet',
-                'custom_cabinet',
-                'corner',
-                'island',
-                'countertop',
-                'door',
-                'window',
-                'filler',
-                'trim',
-                'molding',
-                'toe_kick',
-              ].includes(item.kind) && (
-                <section>
-                  <h3>{item.sku} · individual materials</h3>
-                  {item.kind !== 'countertop' && (
-                    <label>
-                      Cabinet / island finish
-                      <select
-                        aria-label="Selected object finish"
-                        value={item.finish ?? ''}
-                        onChange={(e) =>
-                          updateItem(item.id, {
-                            finish: (e.target.value ||
-                              undefined) as Cabinet['finish'],
-                          })
-                        }
-                      >
-                        <option value="">Use kitchen finish</option>
-                        {(['linen', 'oak', 'slate'] as const).map((f) => (
-                          <option key={f} value={f}>
-                            {f}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  )}
-                  {['countertop', 'island'].includes(item.kind) && (
-                    <label>
-                      Countertop pattern
-                      <select
-                        aria-label="Selected countertop pattern"
-                        value={item.countertop ?? ''}
-                        onChange={(e) =>
-                          updateItem(item.id, {
-                            countertop: (e.target.value ||
-                              undefined) as Cabinet['countertop'],
-                          })
-                        }
-                      >
-                        <option value="">Use kitchen pattern</option>
-                        {(['quartz', 'marble', 'granite'] as const).map((f) => (
-                          <option key={f} value={f}>
-                            {f}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  )}
-                  <p>
-                    Overrides apply to this object only. Select Use kitchen to
-                    follow the global style again.
-                  </p>
-                </section>
-              )}
-            <h3>Preview finish</h3>
-            <div className="designer-finishes">
-              {(['linen', 'oak', 'slate'] as const).map((finish) => (
-                <button
-                  key={finish}
-                  aria-label={`${finish} finish`}
-                  aria-pressed={design.finish === finish}
-                  onClick={() => commit((d) => ({ ...d, finish }))}
-                >
-                  <i className={`swatch-${finish}`} />
-                  {finish}
-                </button>
-              ))}
-            </div>
-            <p className="designer-muted">
-              Illustrative finishes, not manufacturer availability.
-            </p>
-          </section>
-          <section
-            className="designer-checks"
-            hidden={
-              inspectorTab !== 'design' && inspectorTab !== 'installation'
-            }
-          >
-            <h3>Layout checks</h3>
-            <label>
-              <input
-                type="checkbox"
-                checked={showClearance}
-                onChange={(e) => {
-                  setShowClearance(e.target.checked);
-                  setMode('2d');
-                }}
-              />{' '}
-              Show clearance zones
-            </label>
-            {issues.length ? (
-              <ul>
-                {issues.map((issue) => (
-                  <li key={issue.id}>
-                    <button
-                      onClick={() => {
-                        setSelected(issue.itemIds[0] ?? null);
-                        setMode('2d');
-                        setShowClearance(true);
-                        setFitRevision((n) => n + 1);
-                      }}
-                    >
-                      {issue.message}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="layout-clear">
-                {design.items.length
-                  ? 'No overlaps or boundary issues.'
-                  : 'Add cabinets to check the layout.'}
-              </p>
-            )}
-            <p className="designer-muted">
-              Checks use design geometry and recorded service data. Field and
-              manufacturer review remain required.
-            </p>
-          </section>
-        </aside>
+        <DesignerInspector
+          design={design}
+          ownerId={ownerId}
+          item={item}
+          issues={issues}
+          selected={selected}
+          setSelected={setSelected}
+          selection={selection}
+          setSelection={setSelection}
+          inspectorTab={inspectorTab}
+          setInspectorTab={setInspectorTab}
+          moveTogether={moveTogether}
+          setMoveTogether={setMoveTogether}
+          showClearance={showClearance}
+          setShowClearance={setShowClearance}
+          setFitRevision={setFitRevision}
+          setMode={setMode}
+          setStatus={setStatus}
+          commit={commit}
+          updateItem={updateItem}
+          rotate={rotate}
+        />
       </div>
     </div>
   );

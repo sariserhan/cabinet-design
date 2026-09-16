@@ -8,6 +8,7 @@ Use the primary steps **Room → Cabinets → Design → Quote → Present**. Su
 
 - **Room:** record and verify the room survey.
 - **Cabinets:** choose a catalog and place products. Draft catalog records require verification before ordering.
+- **More canvas room:** above the workspace, **Hide library** and **Hide properties** widen the canvas one panel at a time, **Focus canvas** hides both, and **Enlarge canvas** fills the browser window with the workspace. The enlarged view keeps the toolbars, library and properties available, so it is for working rather than presenting; press Escape or **Exit full canvas** to return. The 2D plan, 3D preview and Render stages all grow to the new height.
 - **Design:** use **Quick edits · move, repeat & finish** to find items, move a selection by exact offsets, repeat a run with a gap, or change cabinet finishes. Linked items move together. Preview changes before applying; each application is one Undo step. New boundary/overlap/ceiling/sink conflicts block the edit.
 - **Quote:** select a supplier price list and review its coverage and validity.
 - **Present:** enter the drawing reference, revision, author and issue date in **Drawings & item list**. Export the drawing package, dealer CSV and matching design snapshot from the same unchanged design.
@@ -28,7 +29,7 @@ These source books warn of missing updates. Verify current specifications, finis
 
 Open **Trade workspaces · countertops, flooring, painting & tile** below the main kitchen steps. Each workspace calculates quantities and a separate estimate with your own rates. Flooring/tile round to boxes, painting calculates coats and gallons, and countertops provide rectangular slab packing and proposed splits with a cut-list export. Save each estimate before exporting; design or settings changes flag it for recalculation. Complete backups include these browser-local settings.
 
-See [TRADE_WORKSPACES.md](TRADE_WORKSPACES.md) for formulas, scope, exports and field-validation limits.
+See [trade workspaces](trade-workspaces.md) for formulas, scope, exports and field-validation limits.
 
 ## Connect from your laptop
 
@@ -317,7 +318,7 @@ Validation: 152 core and 16 backend tests, lint, TypeScript, benchmark artifact 
 
 These additions extend the earlier local-only demo scope:
 
-- **Cloud projects & client reviews:** choose **Save to cloud** once to connect a design to your signed-in account. Subsequent edits autosave after a short pause. Open cloud projects on another device using the same account. Local draft/export remain available. Conflicting edits pause cloud saving; **Reload cloud version** opens the current cloud design, while **Save separate cloud copy** preserves an alternative. Each account supports 50 cloud projects of up to 100 KB each, with the latest 20 prior revisions available in **Cloud backup history**. Restore saves a new revision.
+- **Cloud projects & client reviews:** choose **Save to cloud** once to connect a design to your signed-in account. Subsequent edits autosave after a short pause. Open cloud projects on another device using the same account. Local draft/export remain available. Conflicting edits pause cloud saving; **Reload cloud version** opens the current cloud design, while **Save separate cloud copy** preserves an alternative. Each account supports 50 cloud projects of up to 6 MB each (400 objects per design), with the latest 20 prior revisions available in **Cloud backup history**. Restore saves a new revision.
 - **Client review:** create a seven-day link after saving. It captures an immutable revision with plan, 3D preview, item dimensions and layout warnings. A recipient can comment or explicitly approve that revision without signing in. Entered names are self-reported; approval is a design review record. Owner feedback remains available after link revocation. Expiry invalidates open subscriptions. Links created on localhost require a hosted/reachable app address before external clients can use them; this change does not publish the frontend. No links or messages are sent automatically.
 - **Alternative layouts:** generate up to three distinct, feasible arrangements of existing cabinets. Locked items, appliances, openings and assemblies containing sinks remain fixed. Whole assemblies move together, including worktop overhangs; sizes, quantities and catalog source links stay intact. A constrained room may yield fewer alternatives or explain why none fit. Preview/apply supports Undo. These are deterministic geometry proposals, not installation certification.
 - **Supplier quotes:** download a JSON price request containing SKU, finish, dimensions and configuration; obtain supplier prices and fill the supplier name, source reference, USD currency and validity date. Import the completed list to your account. Exact matching avoids reusing a price after size, finish or configuration changes. Missing or expired prices block a final total and export. Installation/delivery are designer-entered charges; tax applies to discounted items. Quotes export as JSON with source and price-book revision. The existing illustrative demo quote remains separate. No real price list has been supplied or fabricated.
@@ -372,7 +373,7 @@ Validation: lint, TypeScript, 170 core tests, 25 backend tests, benchmark integr
 
 The new selection board is included in the shared design schema and cloud readback checks. The shared schema is deployed to the development backend; cloud readback checks still pause saves if expected fields are not preserved. Visual milestone history is local to the browser and backed up through its own export.
 
-See [PILOT.md](PILOT.md) for a real-project pilot worksheet and acceptance criteria. The implementation walkthrough used a synthetic room survey and supplier prices, with real review/approval activity only in the isolated QA account. No real room or actual supplier list was provided for a field pilot.
+See [the pilot worksheet](pilot.md) for a real-project pilot worksheet and acceptance criteria. The implementation walkthrough used a synthetic room survey and supplier prices, with real review/approval activity only in the isolated QA account. No real room or actual supplier list was provided for a field pilot.
 
 Validation for the guided workflow: lint, TypeScript, 178 core tests, 25 backend tests, benchmark integrity and production build pass. Playwright Chromium at `http://localhost:3000`, desktop 1440 × 1000 and mobile 390 × 844, verified stage navigation, captured milestone prices, live QA approval capture, changes-since-approval readiness, visual diffs, unsigned client favorites/reasons and return-file import, material preview/apply, per-finding installer conflicts with wall remapping, and reload persistence. Page identity, meaningful content, framework-overlay absence, console health and responsive layout passed. Browser plugin was unavailable; the existing local Playwright setup was used. A mobile checkbox overflow was reproduced, fixed and retested.
 
@@ -484,4 +485,4 @@ These are real-time material approximations, not measured manufacturer finishes 
 
 ### Final photo rendering
 
-Open Render → Export image → Preview photo render for a quick draft, or Render final photo for 32/64/128 samples. The completed image appears inline with Download photo PNG and, where available, Use photo in presentation. See [RENDERING.md](RENDERING.md) for lighting, camera lenses, room reflections, cancellation and device limits.
+Open Render → Export image → Preview photo render for a quick draft, or Render final photo for 32/64/128 samples. The completed image appears inline with Download photo PNG and, where available, Use photo in presentation. See [rendering](rendering.md) for lighting, camera lenses, room reflections, cancellation and device limits.

@@ -1,4 +1,5 @@
 import {
+  MAX_DESIGN_ITEMS,
   fromObject,
   footprint,
   itemPolygon,
@@ -40,7 +41,9 @@ export function fillWallRun(
   let next = structuredClone(design),
     offset = 0;
   const ids: string[] = [],
-    limit = Math.floor((100 - design.items.length) / (finish ? 4 : 1));
+    limit = Math.floor(
+      (MAX_DESIGN_ITEMS - design.items.length) / (finish ? 4 : 1),
+    );
   while (offset <= edge.length - 9 && ids.length < limit) {
     let added = false;
     for (const width of [36, 30, 24, 18, 15, 12, 9]) {
@@ -82,7 +85,7 @@ export function fillWallRun(
       'No usable cabinet space on this wall. Choose another wall or move existing objects.',
     );
   if (finish) next = completeRuns(next, ids);
-  if (next.items.length > 100)
+  if (next.items.length > MAX_DESIGN_ITEMS)
     throw Error(
       'This run exceeds the demo object limit. Try without finish parts.',
     );

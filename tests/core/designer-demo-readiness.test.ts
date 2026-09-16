@@ -5,6 +5,7 @@ import {
   fromObject,
   placementCollision,
   designSchema,
+  MAX_DESIGN_ITEMS,
 } from '../../src/designer/model';
 import {
   fillWallRun,
@@ -35,11 +36,11 @@ test('finished wall runs include tops and stay within the object limit', () => {
     next = fillWallRun(d, 0, true);
   assert.ok(next.items.some((i) => i.kind === 'countertop'));
   assert.ok(next.items.some((i) => i.details?.toeKick === 4));
-  assert.ok(next.items.length <= 100);
+  assert.ok(next.items.length <= MAX_DESIGN_ITEMS);
   assert.throws(() => fillWallRun(d, 99));
   const full = {
     ...d,
-    items: Array.from({ length: 100 }, () => fromObject('sink')),
+    items: Array.from({ length: MAX_DESIGN_ITEMS }, () => fromObject('sink')),
   };
   assert.throws(() => fillWallRun(full, 0));
 });

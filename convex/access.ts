@@ -4,6 +4,7 @@ import {
   customQuery,
 } from 'convex-helpers/server/customFunctions';
 import { getAuthUserId } from '@convex-dev/auth/server';
+import { sha256 } from '@noble/hashes/sha2.js';
 import { query, mutation } from './_generated/server';
 import type { QueryCtx, MutationCtx } from './_generated/server';
 import type { Id } from './_generated/dataModel';
@@ -53,8 +54,17 @@ export async function actorKind(
     )?.actorKind ?? 'human'
   );
 }
+function constantTimeEqual(left: string, right: string) {
+  // Compare fixed-length digests so neither the secret's length nor the
+  // position of its first wrong byte is observable through response timing.
+  const a = sha256(new TextEncoder().encode(left));
+  const b = sha256(new TextEncoder().encode(right));
+  let difference = 0;
+  for (let i = 0; i < a.length; i++) difference |= (a[i] ?? 0) ^ (b[i] ?? 0);
+  return difference === 0;
+}
 export function workerAuthorized(secret: string) {
   const configured = process.env.CATALOG_WORKER_SECRET;
-  if (!configured || secret !== configured)
+  if (!configured || !constantTimeEqual(secret, configured))
     throw new Error('Worker authorization failed');
 }

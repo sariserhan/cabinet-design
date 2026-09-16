@@ -40,6 +40,8 @@
     "src/**/*.tsx",
     "convex/**/*.ts",
     "tests/core/**/*.ts",
+    "tests/e2e/**/*.ts",
+    "playwright.config.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "tools/**/*.ts"

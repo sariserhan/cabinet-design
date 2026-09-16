@@ -40,4 +40,4 @@ Canonical JSON sorts object keys, preserves array order and rejects non-JSON val
 
 ## Validation completed
 
-See [implementation status](../IMPLEMENTATION_STATUS.md) for current test counts and [application architecture](application.md) for persistent state and worker boundaries. Software checks do not establish source accuracy. The draft import works; a real provider compilation against human-verified truth remains outstanding.
+See [implementation status](catalog-status.md) for current test counts and [application architecture](application.md) for persistent state and worker boundaries. Software checks do not establish source accuracy. The draft import works; a real provider compilation against human-verified truth remains outstanding.

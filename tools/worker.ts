@@ -31,6 +31,12 @@ type Job = {
   failedPages: number[];
   document: { sha256: string; manufacturer: string; series: string };
 };
+// Both worker HTTP routes share one credential convention: secret and lease in
+// headers, job identity in the query string.
+const workerHeaders = (leaseToken: string) => ({
+  'X-Worker-Secret': secret,
+  'X-Worker-Lease': leaseToken,
+});
 let stopping = false;
 process.on('SIGINT', () => {
   stopping = true;
@@ -57,10 +63,9 @@ async function processJob(job: Job, leaseToken: string) {
       throw new Error(
         'Configure the selected provider API key before compilation',
       );
-    const response = await fetch(site + '/worker/source', {
+    const response = await fetch(site + `/worker/source?jobId=${job._id}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(args),
+      headers: workerHeaders(leaseToken),
     });
     if (!response.ok) throw new Error('Source download failed');
     const bytes = Buffer.from(await response.arrayBuffer());
@@ -127,14 +132,7 @@ async function processJob(job: Job, leaseToken: string) {
         const png = await readFile(stem + '.png');
         const upload = await fetch(
           site + `/worker/image?jobId=${job._id}&pageNumber=${pageNumber}`,
-          {
-            method: 'POST',
-            headers: {
-              'X-Worker-Secret': secret,
-              'X-Worker-Lease': leaseToken,
-            },
-            body: png,
-          },
+          { method: 'POST', headers: workerHeaders(leaseToken), body: png },
         );
         if (!upload.ok) throw new Error('Page image upload failed');
         let records = drafts.filter(

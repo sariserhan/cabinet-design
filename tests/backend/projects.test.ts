@@ -2,7 +2,7 @@ import { test, expect, vi } from 'vitest';
 import { convexTest } from 'convex-test';
 import schema from '../../convex/schema';
 import { api } from '../../convex/_generated/api';
-import { newDesign } from '../../src/designer/model';
+import { newDesign, fromObject } from '../../src/designer/model';
 const modules = import.meta.glob('../../convex/**/*.{ts,js}');
 async function setup() {
   const t = convexTest(schema, modules);
@@ -527,4 +527,87 @@ test('cloud snapshots preserve household preferences and installer tasks through
   expect(restored.storageProfile).toEqual(design.storageProfile);
   expect(restored.siteTasks).toEqual(design.siteTasks);
   expect(restored.selectionBoard).toEqual(design.selectionBoard);
+});
+
+// A design larger than a single Convex document must round-trip through the
+// chunk table, including into backups and immutable review snapshots.
+test('designs larger than one document round-trip through chunked storage', async () => {
+  const s = await setup();
+  const big = {
+    ...newDesign(),
+    name: 'Large kitchen',
+    items: Array.from({ length: 300 }, () => ({
+      ...fromObject('custom_cabinet'),
+      id: crypto.randomUUID(),
+    })),
+  };
+  const designJson = JSON.stringify(big);
+  expect(new TextEncoder().encode(designJson).length).toBeGreaterThan(100_000);
+
+  const saved = await s.owner.mutation(api.projects.save, {
+    name: big.name,
+    designJson,
+  });
+  const loaded = await s.owner.query(api.projects.get, {
+    projectId: saved.projectId,
+  });
+  expect(JSON.parse(loaded.designJson).items).toHaveLength(300);
+  // The owning row holds the chunk marker, not the payload.
+  const inline = await s.t.run(
+    async (ctx) => (await ctx.db.get(saved.projectId))!.designJson,
+  );
+  expect(inline).toBe('');
+
+  // Saving again must snapshot the previous large design into a backup.
+  const second = await s.owner.mutation(api.projects.save, {
+    name: big.name,
+    designJson: JSON.stringify({ ...big, items: big.items.slice(0, 5) }),
+    projectId: saved.projectId,
+    expectedRevision: saved.revision,
+  });
+  expect(second.revision).toBe(saved.revision + 1);
+  const history = await s.owner.query(api.projects.history, {
+    projectId: saved.projectId,
+  });
+  const backup = await s.owner.query(api.projects.getBackup, {
+    backupId: history[0]!._id,
+  });
+  expect(JSON.parse(backup.designJson).items).toHaveLength(300);
+  // The smaller current design returns to the inline fast path.
+  expect(
+    JSON.parse(
+      (await s.owner.query(api.projects.get, { projectId: saved.projectId }))
+        .designJson,
+    ).items,
+  ).toHaveLength(5);
+
+  // Restoring the large backup and sharing it keeps the snapshot intact.
+  const restored = await s.owner.mutation(api.projects.save, {
+    name: big.name,
+    designJson: backup.designJson,
+    projectId: saved.projectId,
+    expectedRevision: second.revision,
+  });
+  const token = 'c'.repeat(64);
+  await s.owner.mutation(api.projects.createReview, {
+    projectId: saved.projectId,
+    token,
+    expiresInDays: 7,
+    expectedRevision: restored.revision,
+  });
+  const review = await s.t.query(api.projects.getReview, { token });
+  expect(JSON.parse(review!.designJson).items).toHaveLength(300);
+});
+
+test('designs above the hard ceiling are rejected rather than chunked', async () => {
+  const s = await setup();
+  await expect(
+    s.owner.mutation(api.projects.save, {
+      name: 'Too large',
+      designJson: JSON.stringify({
+        ...newDesign(),
+        name: 'x'.repeat(7_000_000),
+      }),
+    }),
+  ).rejects.toThrow('6 MB');
 });

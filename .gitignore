@@ -7,5 +7,7 @@ __pycache__/
 !.env.example
 
 .local/
+test-results/
+playwright-report/
 .next/
 *.tsbuildinfo

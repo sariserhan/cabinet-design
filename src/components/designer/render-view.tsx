@@ -6,11 +6,9 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import {
-  loadRenderAssets,
-  applyAssetMaterial,
-  type RenderAssets,
-} from './render-assets';
+import { loadRenderAssets, type RenderAssets } from './render-assets';
+import { box, createPalette } from './render-materials';
+import { RenderControls, type RenderActions } from './render-controls';
 import {
   faucetDetails,
   drainDetails,
@@ -25,7 +23,6 @@ import { PresentationScenes } from './presentation-scenes';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import {
   openingConflicts,
-  presentationViews,
   walkPosition,
   walkEntry,
   materialVariant,
@@ -33,13 +30,13 @@ import {
 } from '@/designer/render-planning';
 import { bestCamera } from '@/designer/experience';
 import { SurfaceEditor, type SurfaceTarget } from './experience-tools';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { applianceDetails, metalPull } from './render-details';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { apronHeight, closeupViews } from '@/designer/refinements';
-import { materialTexture, surfaceDetail } from './render-textures';
+import { materialTexture } from './render-textures';
 import { addWindowLighting } from './render-lighting';
 import { photoSnapshot, renderPhoto } from './photo-render';
+import { usePhotoExport } from './use-photo-export';
 import { wallPanels, partitionPanels } from '@/designer/model';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Design } from '@/designer/model';
@@ -160,24 +157,7 @@ export default function RenderView({
   const externalCamera = useRef(cameraView);
   externalCamera.current = cameraView;
   const host = useRef<HTMLDivElement>(null);
-  type View = NonNullable<Design['views']>[number];
-  const actions = useRef<{
-    expose: (value: number) => void;
-    balance: (value: [number, number, number]) => void;
-    meter: () => ReturnType<typeof imageBalance>;
-    lens: (value: number) => void;
-    snapshot: () => {
-      snapshot: ReturnType<typeof photoSnapshot>;
-      camera: THREE.PerspectiveCamera;
-      exposure: number;
-    };
-    walk: (forward: number, side: number, turn?: number) => void;
-    open: (amount: number) => void;
-    fit: () => void;
-    save: (width: number, captureOnly?: boolean) => void;
-    capture: () => Pick<View, 'position' | 'target'>;
-    load: (view: CameraView) => void;
-  } | null>(null);
+  const actions = useRef<RenderActions | null>(null);
   const [viewName, setViewName] = useState('Camera view'),
     [exportWidth, setExportWidth] = useState(1920),
     [viewId, setViewId] = useState('');
@@ -192,76 +172,28 @@ export default function RenderView({
   useEffect(() => {
     actions.current?.lens(lens);
   }, [lens]);
-  const [photoSamples, setPhotoSamples] = useState(64);
-  const [photoDenoise, setPhotoDenoise] = useState(true);
-  const [photoProgress, setPhotoProgress] = useState<number | null>(null);
-  const [photoMessage, setPhotoMessage] = useState('');
-  const [photoResult, setPhotoResult] = useState<{
-    url: string;
-    name: string;
-    designVersion: string;
-  } | null>(null);
-  const photoJob = useRef<AbortController | null>(null);
-  useEffect(
-    () => () => {
-      photoJob.current?.abort();
-      photoJob.current = null;
-    },
-    [],
-  );
-  async function startPhoto(preview = false) {
-    if (!actions.current || photoJob.current) return;
-    const job = new AbortController();
-    photoJob.current = job;
-    setPhotoProgress(0);
-    setPhotoResult(null);
-    setPhotoMessage('Preparing geometry and lighting…');
-    const name = `${design.name.replace(/[^a-z0-9-]/gi, '-').slice(0, 80) || 'kitchen'}-${preview ? 'photo-preview' : 'photo'}.png`;
-    try {
-      const captured = actions.current.snapshot();
-      const samples = preview ? 8 : photoSamples;
-      const url = await renderPhoto(captured.snapshot, captured.camera, {
-        width: preview ? 640 : exportWidth,
-        samples,
-        exposure: captured.exposure,
-        denoise: photoDenoise,
-        environment: assets ? environmentKind : 'studio',
-        whiteBalance,
-        autoBalance,
-        adaptive,
-        onStatus: setPhotoMessage,
-        signal: job.signal,
-        onProgress: (n) => {
-          if (photoJob.current === job) {
-            setPhotoProgress(n / samples);
-            setPhotoMessage(`Rendering ${Math.round((n / samples) * 100)}%`);
-          }
-        },
-      });
-      if (photoJob.current === job) {
-        setPhotoResult({ url, name, designVersion });
-        setPhotoMessage(
-          preview
-            ? 'Preview ready. Final quality uses more samples to reduce noise.'
-            : 'Photo render ready.',
-        );
-      }
-    } catch (e) {
-      if (photoJob.current === job)
-        setPhotoMessage(
-          job.signal.aborted
-            ? 'Photo render cancelled.'
-            : e instanceof Error
-              ? e.message
-              : 'Photo render failed.',
-        );
-    } finally {
-      if (photoJob.current === job) {
-        photoJob.current = null;
-        setPhotoProgress(null);
-      }
-    }
-  }
+  const {
+    photoSamples,
+    setPhotoSamples,
+    photoDenoise,
+    setPhotoDenoise,
+    photoProgress,
+    photoMessage,
+    photoResult,
+    photoJob,
+    startPhoto,
+  } = usePhotoExport({
+    design,
+    // Read at export time, once `settings` below has been assembled.
+    describe: () => designVersion,
+    actions,
+    exportWidth,
+    assets,
+    environmentKind,
+    whiteBalance,
+    autoBalance,
+    adaptive,
+  });
   const [exposure, setExposure] = useState(1);
   const exposureRef = useRef(exposure);
   exposureRef.current = exposure;
@@ -548,208 +480,21 @@ export default function RenderView({
     );
     fillLight.position.set(size, size, -size);
     scene.add(fillLight);
-    const textures = [
-      materialTexture('wood'),
-      materialTexture(design.appearance?.countertop ?? 'quartz'),
-      materialTexture(
-        design.appearance?.flooring === 'walnut'
-          ? 'walnut'
-          : design.appearance?.flooring === 'tile'
-            ? 'tile'
-            : design.appearance?.flooring === 'slate'
-              ? 'slate'
-              : 'floor',
-      ),
-    ];
-
-    const detailMaps = {
-      paint: surfaceDetail('paint'),
-      wood: surfaceDetail('wood'),
-      stone: surfaceDetail('stone'),
-      metal: surfaceDetail('metal'),
-    };
-    textures.push(...Object.values(detailMaps));
-    const materials: THREE.Material[] = [];
-    const material = (color: string, metalness = 0, roughness = 0.65) => {
-      const m = new THREE.MeshPhysicalMaterial({ color, metalness, roughness });
-      materials.push(m);
-      return m;
-    };
-    const finishMaterials = new Map<
-      string,
-      { finish: THREE.MeshStandardMaterial; inset: THREE.MeshStandardMaterial }
-    >();
-    const finishFor = (name: Design['finish']) => {
-      const cached = finishMaterials.get(name);
-      if (cached) return cached;
-      const finish = material(
-        { linen: '#ece7dc', oak: '#ffffff', slate: '#414d57' }[name],
-      );
-      const inset = material(
-        { linen: '#ece7dc', oak: '#ffffff', slate: '#414d57' }[name],
-      );
-      for (const surface of [finish, inset]) {
-        surface.roughness = name === 'oak' ? 0.48 : 0.36;
-        surface.clearcoat = name === 'oak' ? 0.18 : 0.3;
-        surface.clearcoatRoughness = 0.32;
-        surface.roughnessMap = detailMaps[name === 'oak' ? 'wood' : 'paint'];
-        surface.bumpMap = surface.roughnessMap;
-        surface.bumpScale = name === 'oak' ? 0.025 : 0.006;
-      }
-      if (name === 'oak') {
-        finish.map = textures[0] ?? null;
-        inset.map = textures[0] ?? null;
-        for (const m of [finish, inset]) {
-          m.userData.woodGrain = true;
-          if (assets && scanned) applyAssetMaterial(m, assets.wood, textures);
-        }
-      }
-      const pair = { finish, inset };
-      finishMaterials.set(name, pair);
-      return pair;
-    };
-    const stoneMaterials = new Map<string, THREE.MeshStandardMaterial>();
-    const stoneFor = (name: 'quartz' | 'marble' | 'granite') => {
-      const cached = stoneMaterials.get(name);
-      if (cached) return cached;
-      const m = material('#ffffff', 0, 0.23);
-      m.clearcoat = 0.45;
-      m.clearcoatRoughness = 0.16;
-      const texture = materialTexture(name);
-      textures.push(texture);
-      m.map = texture;
-      m.userData.textureInches = [72, 36];
-      m.bumpMap = detailMaps.stone;
-      m.roughnessMap = detailMaps.stone;
-      m.bumpScale = name === 'granite' ? 0.035 : 0.012;
-      m.roughness = name === 'granite' ? 0.32 : 0.2;
-      if (name === 'marble' && assets && scanned)
-        applyAssetMaterial(m, assets.stone, textures);
-      stoneMaterials.set(name, m);
-      return m;
-    };
-    const steel = material('#a9b0b3', 0.75, 0.25),
-      dark = material('#20282d', 0.25, 0.26),
-      wall = material('#f4f0e8'),
-      glass = material('#203138', 0.48, 0.12);
-    const hardware = material(
-      design.appearance?.hardware === 'brass'
-        ? '#b99a5e'
-        : design.appearance?.hardware === 'black'
-          ? '#24282a'
-          : '#b9c0c3',
-      0.8,
-      0.28,
-    );
-    const windowGlass = new THREE.MeshPhysicalMaterial({
-      color: '#d5e8e9',
-      roughness: 0.06,
-      transmission: 0.78,
-      thickness: 0.4,
-      ior: 1.5,
-      envMapIntensity: 1.2,
-    });
-    materials.push(windowGlass);
-    const brushed = materialTexture('metal');
-    textures.push(brushed);
-    steel.color.set('#ffffff');
-    steel.map = brushed;
-    steel.bumpMap = detailMaps.metal;
-    steel.roughnessMap = detailMaps.metal;
-    steel.metalness = 0.95;
-    steel.roughness = 0.32;
-    steel.bumpScale = 0.008;
-    const floorMaterial = material('#ffffff', 0, 0.52);
-    const woodFloor = !['tile', 'slate'].includes(
-      design.appearance?.flooring ?? 'oak',
-    );
-    floorMaterial.roughnessMap = woodFloor ? detailMaps.wood : detailMaps.stone;
-    floorMaterial.bumpMap = floorMaterial.roughnessMap;
-    floorMaterial.bumpScale = 0.035;
-    floorMaterial.clearcoat = woodFloor ? 0.15 : 0.05;
-    floorMaterial.clearcoatRoughness = 0.4;
-    floorMaterial.map = textures[2] ?? null;
-    if (assets && scanned) {
-      if (design.appearance?.flooring === 'tile')
-        applyAssetMaterial(floorMaterial, assets.tile, textures);
-      else if (woodFloor)
-        applyAssetMaterial(
-          floorMaterial,
-          design.appearance?.flooring === 'walnut' ? assets.grain : assets.wood,
-          textures,
-        );
-    }
-
-    const box = (
-      parent: THREE.Object3D,
-      w: number,
-      h: number,
-      d: number,
-      x: number,
-      y: number,
-      z: number,
-      m: THREE.Material,
-    ) => {
-      const mesh = new THREE.Mesh(
-        new RoundedBoxGeometry(
-          Math.max(0.01, w),
-          Math.max(0.01, h),
-          Math.max(0.01, d),
-          2,
-          Math.min(
-            0.1,
-            Math.max(0.01, w) / 5,
-            Math.max(0.01, h) / 5,
-            Math.max(0.01, d) / 5,
-          ),
-        ),
-        m,
-      );
-      if (m instanceof THREE.MeshStandardMaterial && m.userData.woodGrain) {
-        const uv = mesh.geometry.getAttribute('uv'),
-          normal = mesh.geometry.getAttribute('normal');
-        for (let i = 0; i < uv.count; i++) {
-          const vertical = Math.abs(normal.getY(i)) < 0.5;
-          const scaleX = Math.abs(normal.getX(i)) > 0.5 ? d : w;
-          const u = uv.getX(i),
-            v = uv.getY(i);
-          if (vertical && w > h * 3 && h < 4) {
-            // Rails and shelf edges run across the cabinet; stiles run upright.
-            uv.setXY(
-              i,
-              (v * h) / (m.userData.textureInches?.[0] ?? 24),
-              (u * scaleX) / (m.userData.textureInches?.[1] ?? 36),
-            );
-          } else
-            uv.setXY(
-              i,
-              (u * scaleX) / (m.userData.textureInches?.[0] ?? 24),
-              (v * (vertical ? h : d)) / (m.userData.textureInches?.[1] ?? 36),
-            );
-        }
-      }
-      const textureInches = m.userData.textureInches as
-        [number, number] | undefined;
-      if (textureInches && !m.userData.woodGrain) {
-        const uv = mesh.geometry.getAttribute('uv'),
-          pos = mesh.geometry.getAttribute('position'),
-          normal = mesh.geometry.getAttribute('normal');
-        for (let i = 0; i < uv.count; i++) {
-          const nx = Math.abs(normal.getX(i)),
-            ny = Math.abs(normal.getY(i));
-          uv.setXY(
-            i,
-            (nx > 0.7 ? pos.getZ(i) + z : pos.getX(i) + x) / textureInches[0],
-            (ny > 0.7 ? pos.getZ(i) + z : pos.getY(i) + y) / textureInches[1],
-          );
-        }
-      }
-      mesh.position.set(x, y, z);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      parent.add(mesh);
-      return mesh;
-    };
+    const {
+      textures,
+      stoneMaterials,
+      materials,
+      material,
+      finishFor,
+      stoneFor,
+      steel,
+      dark,
+      wall,
+      glass,
+      hardware,
+      windowGlass,
+      floorMaterial,
+    } = createPalette({ design, assets, scanned });
     const shape = new THREE.Shape(
       roomOutline(design.room).map((p) => new THREE.Vector2(p.x, -p.y)),
     );
@@ -2132,390 +1877,56 @@ export default function RenderView({
             {opening ? 'Close doors & drawers' : 'Open doors & drawers'}
           </button>
         </div>
-        <div className="designer-row render-controls">
-          <details className="render-menu">
-            <summary>Camera & walk</summary>
-            <div className="render-menu-content designer-row">
-              <label>
-                Camera lens
-                <select
-                  aria-label="Camera focal length"
-                  value={lens}
-                  onChange={(e) => setLens(Number(e.target.value))}
-                >
-                  {![28, 35, 45, 60].includes(lens) && (
-                    <option value={lens}>{lens} mm · saved</option>
-                  )}
-                  <option value={28}>28 mm · wide room</option>
-                  <option value={35}>35 mm · interior</option>
-                  <option value={45}>45 mm · natural</option>
-                  <option value={60}>60 mm · detail</option>
-                </select>
-              </label>{' '}
-              <select
-                aria-label="Presentation camera angle"
-                defaultValue=""
-                onChange={(e) => {
-                  const view = presentationViews(design).find(
-                    (v) => v.id === e.target.value,
-                  );
-                  if (view) {
-                    setWalking(false);
-                    actions.current?.load(view);
-                    onCamera?.(view);
-                  }
-                }}
-              >
-                <option value="">Choose presentation angle</option>
-                {presentationViews(design).map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={walking}
-                  onChange={(e) => setWalking(e.target.checked)}
-                />{' '}
-                Eye-level walkthrough
-              </label>
-              <button
-                onClick={() => {
-                  actions.current?.fit();
-                  const view = actions.current?.capture();
-                  if (view) onCamera?.(view);
-                }}
-              >
-                Reset camera
-              </button>
-            </div>
-          </details>
-          <details className="render-menu">
-            <summary>Lighting & scene</summary>
-            <div className="render-menu-content designer-row">
-              <label>
-                Environment{' '}
-                <select
-                  aria-label="Render environment"
-                  value={environmentKind}
-                  onChange={(e) =>
-                    setEnvironmentKind(
-                      e.target.value as RenderSettings['environment'],
-                    )
-                  }
-                >
-                  <option value="garden">Garden HDR daylight</option>
-                  <option value="studio">Studio</option>
-                </select>
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={scanned}
-                  onChange={(e) => setScanned(e.target.checked)}
-                />{' '}
-                Detailed PBR materials
-              </label>
-              <button
-                onClick={() => {
-                  const measured = actions.current?.meter();
-                  if (measured) {
-                    setExposure(
-                      Math.max(0.25, Math.min(4, exposure * measured.exposure)),
-                    );
-                    setWhiteBalance(
-                      whiteBalance.map((v, i) =>
-                        Math.max(
-                          0.5,
-                          Math.min(2, v * (measured.whiteBalance[i] ?? 1)),
-                        ),
-                      ) as [number, number, number],
-                    );
-                  }
-                }}
-              >
-                Auto balance view
-              </button>
-              <button
-                onClick={() => {
-                  setWhiteBalance([1, 1, 1]);
-                  setExposure(1);
-                }}
-              >
-                Reset image balance
-              </button>
-              <small>
-                Illustrative CC0 materials and garden panorama from Poly Haven /
-                ambientCG.{' '}
-                <a
-                  href="/render-assets/CREDITS.md"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Asset credits
-                </a>
-              </small>
-              <label>
-                Lighting
-                <select
-                  aria-label="Render lighting"
-                  value={design.appearance?.lighting ?? 'daylight'}
-                  onChange={(e) =>
-                    setLightingOverride(
-                      e.target.value as RenderSettings['lighting'],
-                    )
-                  }
-                >
-                  <option value="daylight">Daylight</option>
-                  <option value="warm">Warm evening</option>
-                  <option value="studio">Studio</option>
-                </select>
-              </label>{' '}
-              <label>
-                Exposure · {exposure.toFixed(2)}
-                <input
-                  aria-label="Render exposure"
-                  type="range"
-                  min="0.5"
-                  max="1.8"
-                  step="0.05"
-                  value={exposure}
-                  onChange={(e) => setExposure(Number(e.target.value))}
-                />
-              </label>
-              <button type="button" onClick={() => setExposure(1)}>
-                Reset exposure
-              </button>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={quality}
-                  aria-label="High quality shadows"
-                  onChange={(e) => setQuality(e.target.checked)}
-                />{' '}
-                High quality shadows & room reflections
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showCeiling}
-                  onChange={(e) => setShowCeiling(e.target.checked)}
-                />{' '}
-                Show ceiling
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={cutaway}
-                  onChange={(e) => setCutaway(e.target.checked)}
-                />{' '}
-                Cutaway walls
-              </label>
-            </div>
-          </details>
-          <details className="render-menu">
-            <summary>Cabinet fronts</summary>
-            <div className="render-menu-content designer-row">
-              {' '}
-              <label>
-                Front opening (%)
-                <input
-                  aria-label="Front opening (%)"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={opening}
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
-                    setOpening(value);
-                    actions.current?.open(value);
-                  }}
-                />
-              </label>
-              <button
-                onClick={() => {
-                  setOpening(opening ? 0 : 100);
-                  actions.current?.open(opening ? 0 : 100);
-                }}
-              >
-                {opening ? 'Close fronts' : 'Open fronts'}
-              </button>{' '}
-              <label>
-                <input
-                  type="checkbox"
-                  checked={interiors}
-                  onChange={(e) => setInteriors(e.target.checked)}
-                />{' '}
-                Show interiors
-              </label>
-            </div>
-          </details>
-          <details className="render-menu">
-            <summary>Compare materials</summary>
-            <div className="render-menu-content designer-row">
-              <p>
-                Compare finishes from the same camera. Preview changes are
-                temporary until applied.
-              </p>
-              <select
-                aria-label="Material preview"
-                value={variant}
-                onChange={(e) => setVariant(e.target.value)}
-              >
-                <option value="original">Original design</option>
-                <option value="oak">Warm oak / quartz</option>
-                <option value="white">Soft white / quartz</option>
-                <option value="dark">Dark slate / marble</option>
-              </select>
-              <button
-                disabled={variant === 'original'}
-                onClick={() => setVariant('original')}
-              >
-                Show original
-              </button>
-              <button
-                disabled={variant === 'original'}
-                onClick={() => {
-                  onChange(design);
-                  setVariant('original');
-                }}
-              >
-                Apply preview materials
-              </button>
-            </div>
-          </details>
-          <details className="render-menu">
-            <summary>Export image</summary>
-            <div className="render-menu-content designer-row">
-              {' '}
-              {onCapture && (
-                <button
-                  disabled={!!error || assetsLoading}
-                  onClick={() => actions.current?.save(1920, true)}
-                >
-                  Capture presentation view
-                </button>
-              )}
-              <label>
-                PNG width
-                <select
-                  aria-label="Render export width"
-                  value={exportWidth}
-                  onChange={(e) => setExportWidth(Number(e.target.value))}
-                >
-                  <option value={1280}>1280 px · web</option>
-                  <option value={1920}>1920 px</option>
-                  <option value={3840}>3840 px</option>
-                </select>
-              </label>
-              <button
-                onClick={() => actions.current?.save(exportWidth)}
-                disabled={!!error || assetsLoading}
-              >
-                Download PNG
-              </button>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={photoDenoise}
-                  onChange={(e) => setPhotoDenoise(e.target.checked)}
-                />{' '}
-                Reduce photo noise
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={autoBalance}
-                  onChange={(e) => setAutoBalance(e.target.checked)}
-                />{' '}
-                Automatic photo exposure and white balance
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={adaptive}
-                  onChange={(e) => setAdaptive(e.target.checked)}
-                />{' '}
-                Refine noisy regions
-              </label>
-              <label>
-                Photo quality
-                <select
-                  aria-label="Photo quality"
-                  value={photoSamples}
-                  onChange={(e) => setPhotoSamples(Number(e.target.value))}
-                >
-                  <option value={32}>32 samples · quicker</option>
-                  <option value={64}>64 samples · balanced</option>
-                  <option value={128}>128 samples · cleaner</option>
-                </select>
-              </label>
-              <button
-                disabled={photoProgress !== null || !!error || assetsLoading}
-                onClick={() => void startPhoto(true)}
-              >
-                Preview photo render
-              </button>
-              <button
-                disabled={photoProgress !== null || !!error || assetsLoading}
-                onClick={() => void startPhoto()}
-              >
-                Render final photo
-              </button>
-              {photoProgress !== null && (
-                <>
-                  <progress
-                    aria-label="Photo render progress"
-                    max={1}
-                    value={photoProgress}
-                  />
-                  <button onClick={() => photoJob.current?.abort()}>
-                    Cancel photo render
-                  </button>
-                </>
-              )}
-              <p role="status">{photoMessage}</p>
-              <p>
-                Photo rendering traces bounced light and kitchen reflections. It
-                can take several minutes. Use Show ceiling for an enclosed
-                interior; the current camera and cutaway settings are captured.
-              </p>
-              {photoResult && (
-                <div>
-                  {photoResult.designVersion !== designVersion && (
-                    <p>
-                      Design changed. Render a new photo before adding it to
-                      this presentation.
-                    </p>
-                  )}
-                  <a href={photoResult.url} download={photoResult.name}>
-                    Download photo PNG
-                  </a>
-                  {onCapture && (
-                    <button
-                      disabled={photoResult.designVersion !== designVersion}
-                      onClick={() => onCapture(photoResult.url)}
-                    >
-                      Use photo in presentation
-                    </button>
-                  )}
-                  <img
-                    src={photoResult.url}
-                    alt="Completed kitchen photo render"
-                    style={{
-                      display: 'block',
-                      maxWidth: '100%',
-                      height: 'auto',
-                      marginTop: 12,
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          </details>
-        </div>
+        <RenderControls
+          actions={actions}
+          photoJob={photoJob}
+          design={design}
+          designVersion={designVersion}
+          assetsLoading={assetsLoading}
+          error={error}
+          startPhoto={startPhoto}
+          onChange={onChange}
+          onCamera={onCamera}
+          onCapture={onCapture}
+          adaptive={adaptive}
+          setAdaptive={setAdaptive}
+          autoBalance={autoBalance}
+          setAutoBalance={setAutoBalance}
+          cutaway={cutaway}
+          setCutaway={setCutaway}
+          environmentKind={environmentKind}
+          setEnvironmentKind={setEnvironmentKind}
+          exportWidth={exportWidth}
+          setExportWidth={setExportWidth}
+          exposure={exposure}
+          setExposure={setExposure}
+          interiors={interiors}
+          setInteriors={setInteriors}
+          lens={lens}
+          setLens={setLens}
+          setLightingOverride={setLightingOverride}
+          opening={opening}
+          setOpening={setOpening}
+          photoDenoise={photoDenoise}
+          setPhotoDenoise={setPhotoDenoise}
+          photoMessage={photoMessage}
+          photoProgress={photoProgress}
+          photoResult={photoResult}
+          photoSamples={photoSamples}
+          setPhotoSamples={setPhotoSamples}
+          quality={quality}
+          setQuality={setQuality}
+          scanned={scanned}
+          setScanned={setScanned}
+          showCeiling={showCeiling}
+          setShowCeiling={setShowCeiling}
+          variant={variant}
+          setVariant={setVariant}
+          walking={walking}
+          setWalking={setWalking}
+          whiteBalance={whiteBalance}
+          setWhiteBalance={setWhiteBalance}
+        />
         {walking && (
           <div className="walk-controls designer-row">
             <label>

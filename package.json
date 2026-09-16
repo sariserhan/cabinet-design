@@ -1,19 +1,20 @@
 {
-  "name": "catalog-compiler",
+  "name": "cabinet-design",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "tsx --test tests/core/*.test.ts",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.core.json --noEmit",
-    "lint": "eslint src convex tools/worker.ts tests/core",
+    "lint": "eslint src convex tools/worker.ts tests/core tests/e2e playwright.config.ts",
     "check:benchmark": "python3 tools/check_benchmark_packet.py",
     "check": "npm run lint && npm run typecheck && npm test && npm run test:backend && npm run check:benchmark",
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
     "worker": "tsx --env-file=.env.local tools/worker.ts",
-    "test:backend": "vitest run"
+    "test:backend": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",
@@ -35,7 +36,6 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "read-excel-file": "9.3.10",
-    "shadcn": "^4.21.0",
     "sonner": "^2.0.8",
     "tailwindcss": "^4.3.3",
     "three": "^0.186.0",
@@ -54,6 +54,7 @@
     "eslint": "^10.10.0",
     "jsqr": "^1.4.0",
     "prettier": "^3.9.6",
+    "shadcn": "^4.21.0",
     "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.70.0",

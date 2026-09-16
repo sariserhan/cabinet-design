@@ -1,6 +1,6 @@
 # Catalog Compiler V1 — Fabuwood Allure Benchmark
 
-> Implementation starts with a benchmark and semantic model, followed by a 20–40-page vertical slice. The accepted requirements in [benchmark-first-requirements.md](docs/benchmark-first-requirements.md) are normative and supersede any conflicting illustrative schema or workflow below. See [semantic-model.md](docs/semantic-model.md) and [benchmark plan](tests/fixtures/fabuwood-allure/README.md).
+> Implementation starts with a benchmark and semantic model, followed by a 20–40-page vertical slice. The accepted requirements in [benchmark-first-requirements.md](benchmark-first-requirements.md) are normative and supersede any conflicting illustrative schema or workflow below. See [semantic-model.md](semantic-model.md) and [benchmark plan](../tests/fixtures/fabuwood-allure/README.md).
 
 ## 1. Mission
 
@@ -1940,7 +1940,7 @@ The mini-catalog declares its subset coverage explicitly and cannot stand in for
 Maintain:
 
 ```text
-IMPLEMENTATION_STATUS.md
+docs/catalog-status.md
 ```
 
 Sections:

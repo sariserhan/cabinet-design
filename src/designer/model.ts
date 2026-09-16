@@ -133,6 +133,13 @@ export const itemSchema = z.object({
   demoPrice: z.number().finite().min(0).max(1000000).optional(),
   pageNumber: z.number().int().positive(),
 });
+// One bound for how large a design may get, shared by the schema, the file
+// parser and the cloud store so the ceiling cannot drift between layers.
+// 400 items covers a large kitchen with headroom while keeping the pairwise
+// placement checks and the 3D scene interactive.
+export const MAX_DESIGN_ITEMS = 400;
+// Serialised designs are chunked above ~100 KB; 6 MB is the hard stop.
+export const MAX_DESIGN_TEXT = 6_000_000;
 export const designSchema = z
   .object({
     format: z.literal('kitchen-studio-v1'),
@@ -283,7 +290,7 @@ export const designSchema = z
       )
       .max(20)
       .optional(),
-    items: z.array(itemSchema).max(100),
+    items: z.array(itemSchema).max(MAX_DESIGN_ITEMS),
   })
   .superRefine((design, ctx) => {
     if (
@@ -634,7 +641,7 @@ export function findSpace(
   return null;
 }
 export function parseDesign(text: string): Design {
-  if (text.length > 500_000) throw Error('Design file is too large.');
+  if (text.length > MAX_DESIGN_TEXT) throw Error('Design file is too large.');
   const design = designSchema.parse(JSON.parse(text));
   return {
     ...design,

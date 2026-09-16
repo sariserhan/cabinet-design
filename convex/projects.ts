@@ -7,6 +7,12 @@ import { internal } from './_generated/api';
 import type { QueryCtx, MutationCtx } from './_generated/server';
 import type { Id } from './_generated/dataModel';
 import { projectStage } from './schema';
+import {
+  assertDesignSize,
+  clearDesign,
+  loadDesign,
+  storeDesign,
+} from './designBlob';
 import { parseDesign } from '../src/designer/model';
 
 const summary = {
@@ -90,7 +96,7 @@ export const get = ownedQuery({
       name,
       revision,
       updatedAt,
-      designJson,
+      designJson: await loadDesign(ctx, _id, designJson),
       clientName: clientName ?? '',
       workflowStatus: workflowStatus ?? 'draft',
       metadataRevision: metadataRevision ?? 0,
@@ -109,8 +115,7 @@ export const save = ownedMutation({
     const name = args.name.trim();
     if (!name || name.length > 120)
       throw Error('Project name required (max 120 characters)');
-    if (new TextEncoder().encode(args.designJson).length > 100_000)
-      throw Error('Cloud designs are limited to 100 KB');
+    assertDesignSize(args.designJson);
     const designJson = JSON.stringify(parseDesign(args.designJson));
     const now = Date.now();
     if (!args.projectId) {
@@ -126,34 +131,44 @@ export const save = ownedMutation({
       const projectId = await ctx.db.insert('projects', {
         ownerId: ctx.userId,
         name,
-        designJson,
+        designJson: '',
         revision: 1,
         updatedAt: now,
+      });
+      await ctx.db.patch(projectId, {
+        designJson: await storeDesign(ctx, projectId, designJson),
       });
       return { projectId, revision: 1 };
     }
     const project = await ownedProject(ctx, args.projectId, ctx.userId);
     if (args.expectedRevision !== project.revision)
       throw Error('Project changed on another device. Reload before saving.');
-    if (name === project.name && designJson === project.designJson)
+    const previousJson = await loadDesign(ctx, project._id, project.designJson);
+    if (name === project.name && designJson === previousJson)
       return { projectId: project._id, revision: project.revision };
     const backups = await ctx.db
       .query('projectBackups')
       .withIndex('by_projectId', (q) => q.eq('projectId', project._id))
       .order('asc')
       .take(20);
-    if (backups.length >= 20 && backups[0]) await ctx.db.delete(backups[0]._id);
-    await ctx.db.insert('projectBackups', {
+    if (backups.length >= 20 && backups[0]) {
+      await clearDesign(ctx, backups[0]._id);
+      await ctx.db.delete(backups[0]._id);
+    }
+    const backupId = await ctx.db.insert('projectBackups', {
       ownerId: ctx.userId,
       projectId: project._id,
       name: project.name,
-      designJson: project.designJson,
+      designJson: '',
       revision: project.revision,
       createdAt: now,
     });
+    await ctx.db.patch(backupId, {
+      designJson: await storeDesign(ctx, backupId, previousJson),
+    });
     await ctx.db.patch(project._id, {
       name,
-      designJson,
+      designJson: await storeDesign(ctx, project._id, designJson),
       revision: project.revision + 1,
       ...(project.workflowStatus === 'approved' ||
       project.workflowStatus === 'ordered'
@@ -204,7 +219,7 @@ export const getBackup = ownedQuery({
     const row = await ctx.db.get(args.backupId);
     if (!row || row.ownerId !== ctx.userId) throw Error('Backup not found');
     return {
-      designJson: row.designJson,
+      designJson: await loadDesign(ctx, row._id, row.designJson),
       name: row.name,
       revision: row.revision,
     };
@@ -261,9 +276,16 @@ export const createReview = ownedMutation({
       createdAt: Date.now(),
       responseCount: 0,
     });
-    await ctx.db.insert('reviewSnapshots', {
+    const snapshotId = await ctx.db.insert('reviewSnapshots', {
       reviewId,
-      designJson: p.designJson,
+      designJson: '',
+    });
+    await ctx.db.patch(snapshotId, {
+      designJson: await storeDesign(
+        ctx,
+        snapshotId,
+        await loadDesign(ctx, p._id, p.designJson),
+      ),
     });
     if (!p.workflowStatus || p.workflowStatus === 'draft')
       await ctx.db.patch(p._id, {
@@ -357,7 +379,7 @@ export const getReview = query({
     if (!snapshot) return null;
     return {
       name: row.name,
-      designJson: snapshot.designJson,
+      designJson: await loadDesign(ctx, snapshot._id, snapshot.designJson),
       revision: row.revision,
       expiresAt: row.expiresAt,
       comments,
@@ -387,9 +409,9 @@ export const addReviewResponse = mutation({
         .unique();
       if (
         !snapshot ||
-        !parseDesign(snapshot.designJson).items.some(
-          (item) => item.id === args.itemId,
-        )
+        !parseDesign(
+          await loadDesign(ctx, snapshot._id, snapshot.designJson),
+        ).items.some((item) => item.id === args.itemId)
       )
         throw Error('Pinned item is not in this shared revision');
     }
