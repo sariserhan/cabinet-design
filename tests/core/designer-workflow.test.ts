@@ -41,6 +41,13 @@ import {
   drawingOptionsSchema,
 } from '../../src/designer/drawing-package';
 import { trimRunItems, applyTrimRuns } from '../../src/designer/trim-runs';
+import {
+  jobsFrom,
+  roomsInJob,
+  jobTotals,
+  jobItemList,
+} from '../../src/designer/job-rooms';
+import { quoteTotals } from '../../src/designer/quote';
 const drawingOptions = () =>
   drawingOptionsSchema.parse({
     company: 'Dealer',
@@ -717,4 +724,59 @@ test('trim follows a run, breaks at a gap and mitres at a corner', () => {
     parseDesign(JSON.stringify(twice)).items.length,
     twice.items.length,
   );
+});
+test('a job adds up the rooms it covers without merging them', () => {
+  const room = (name: string, jobId: string, skus: string[]) => {
+    const d = newDesign();
+    d.name = name;
+    d.job = { id: jobId, name: 'Oak House', room: name };
+    d.items = skus.map((sku, n) => ({
+      ...fromObject('custom_cabinet'),
+      id: `${name}-${n}`,
+      sku,
+      x: n * 30,
+      y: 0,
+      width: 30,
+      depth: 24,
+      height: 34.5,
+    }));
+    return d;
+  };
+  const kitchen = room('Kitchen', 'job-1', ['B30', 'B30', 'SB36']),
+    vanity = room('Ensuite vanity', 'job-1', ['B30']),
+    other = room('Someone else', 'job-2', ['B30']);
+  const saved = [kitchen, vanity, other];
+
+  assert.deepEqual(
+    jobsFrom(saved)
+      .map((j) => j.id)
+      .sort(),
+    ['job-1', 'job-2'],
+  );
+  const rooms = roomsInJob(saved, 'job-1');
+  assert.deepEqual(
+    rooms.map((r) => r.room),
+    ['Ensuite vanity', 'Kitchen'],
+  );
+  // Another job's room is not in this one's money.
+  const totals = jobTotals(rooms);
+  assert.equal(totals.rooms, 2);
+  assert.equal(totals.items, 4);
+  assert.equal(
+    totals.total,
+    quoteTotals(kitchen).total + quoteTotals(vanity).total,
+  );
+
+  // The same product in two rooms is one purchase line that names both.
+  const lines = jobItemList(rooms);
+  const b30 = lines.find((l) => l.sku === 'B30');
+  assert.ok(b30);
+  assert.equal(b30.quantity, 3);
+  assert.deepEqual(b30.rooms, ['Ensuite vanity', 'Kitchen']);
+  assert.equal(lines.find((l) => l.sku === 'SB36')?.quantity, 1);
+
+  // And a design still holds exactly one room, saved and restored as one.
+  const restored = parseDesign(JSON.stringify(kitchen));
+  assert.equal(restored.job?.room, 'Kitchen');
+  assert.equal(restored.room.width, kitchen.room.width);
 });

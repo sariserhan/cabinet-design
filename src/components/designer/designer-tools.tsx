@@ -18,6 +18,7 @@ import { ObjectManager, ReadinessCheck, SampleStory } from './studio-panels';
 import { TradeWorkspaces } from './trade-workspaces';
 import { download } from './designer-widgets';
 import type { History, ViewMode, WorkspaceStage } from './designer-state';
+import { JobRooms } from './job-rooms-panel';
 
 type Commit = (
   change: (current: Design) => Design,
@@ -266,6 +267,10 @@ export function DesignerMoreTools({
         <button className="shortcut-help-link" onClick={onHelp}>
           Controls &amp; keyboard help
         </button>
+      </details>
+      <details className="project-controls">
+        <summary>Rooms in this job</summary>
+        <JobRooms design={design} saved={saved} commit={commit} />
       </details>
       <details className="project-controls">
         <summary>Project files & examples</summary>

@@ -82,12 +82,16 @@ checked against the model on 2026-09-16.
       `src/designer/spacing.ts` measures the floor between facing runs and
       the three work-centre legs, against project settings that carry their
       own source line, surfaced in Layout checks.
-- [ ] **More than one room in a project.** `design.room` is a single room, so
-      a job that covers a kitchen, a vanity and a laundry needs three
-      unrelated designs with three quotes. The catalog already carries a
-      `vanity` category and the model already has a washing machine, so the
-      gap is structural rather than missing parts: rooms, per-room geometry
-      and a quote that adds up across them.
+- [x] **More than one room in a project.** Done on 2026-09-16, deliberately
+      not the way this entry imagined it. Making `design.room` plural would
+      mean threading a room through every piece of geometry, drawing,
+      estimate and export in the app - a migration with a long tail of
+      half-converted behaviour. A design still holds exactly one room;
+      several designs now share a *job*, so a kitchen, a vanity and a
+      laundry keep their own drawings and approvals while their quotes and
+      ordering list add up. Rooms in this job, in the project tools.
+      Remaining: rooms appear there only once saved, and switching room
+      still means opening that design.
 - [x] **Annotations and designer-placed dimensions.** Done on 2026-09-16:
       Note and Dimension tools above the plan, edited or removed in
       Properties, printed on the plan sheets. A dimension with nothing typed

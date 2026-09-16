@@ -300,7 +300,7 @@ test('a dimension and a note can be put on the plan and given words', async ({
   });
 
   // Back to selecting, so the tool does not stay armed for the next test.
-  await page.getByRole('button', { name: 'Select' }).click();
+  await page.getByRole('button', { name: 'Select', exact: true }).click();
   expect(pageErrors).toEqual([]);
 });
 
@@ -345,6 +345,39 @@ test('trim is added along the runs, once per run and not twice', async ({
   await page.getByRole('button', { name: 'Add to runs' }).click();
   await page.waitForTimeout(4000);
   await expect.poll(crowns, { timeout: 30_000 }).toEqual([84, 84, 84]);
+  expect(pageErrors).toEqual([]);
+});
+
+test('a design can be made a room of a job, and stays one', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  const panel = page.locator('.job-rooms');
+  await expect(panel).toContainText('A design holds one room');
+
+  await page.getByLabel('Job this room belongs to').selectOption('new');
+  await page.getByLabel('Job name').fill('Oak House');
+  await page.getByLabel('Room name').fill('Kitchen');
+
+  // The open design is a room of the job straight away, before it is saved.
+  await expect(panel).toContainText('Kitchen · open', { timeout: 20_000 });
+  await expect(panel).toContainText('1 room');
+
+  // And it is part of the design, so it survives the save and reload.
+  await page.reload();
+  await expect(page.getByLabel('Project name')).toBeVisible({
+    timeout: 60_000,
+  });
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await expect(page.getByLabel('Job name')).toHaveValue('Oak House', {
+    timeout: 30_000,
+  });
   expect(pageErrors).toEqual([]);
 });
 

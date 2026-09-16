@@ -170,6 +170,18 @@ export const designSchema = z
     siteTasks: siteTasksSchema.optional(),
     supplierBookId: z.string().max(100).optional(),
     /**
+     * The job this design is a room of, when a job covers more than one.
+     * A design still holds exactly one room; several designs sharing a job
+     * id are its rooms, and their quotes add up. See `job-rooms.ts`.
+     */
+    job: z
+      .object({
+        id: z.string().min(1).max(100),
+        name: z.string().trim().min(1).max(100),
+        room: z.string().trim().max(100).default(''),
+      })
+      .optional(),
+    /**
      * Notes and dimensions the designer put on the plan themselves, in room
      * inches. Separate from item notes: these belong to the drawing rather
      * than to any one cabinet.
