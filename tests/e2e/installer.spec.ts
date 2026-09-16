@@ -27,7 +27,7 @@ test('installer opens a handoff file and reports its contents', async ({
     buffer: Buffer.from(JSON.stringify(handoffPackage(design))),
   });
 
-  await expect(page.getByRole('status')).toHaveText('Handoff opened.');
+  await expect(page.getByRole('status').first()).toHaveText('Handoff opened.');
   await expect(
     page.getByRole('heading', { name: 'Site survey kitchen' }),
   ).toBeVisible();
@@ -47,7 +47,9 @@ test('installer rejects a file that is not a handoff, without crashing', async (
     buffer: Buffer.from('{"format":"something-else"}'),
   });
 
-  await expect(page.getByRole('status')).not.toHaveText('Handoff opened.');
+  await expect(page.getByRole('status').first()).not.toHaveText(
+    'Handoff opened.',
+  );
   await expect(
     page.getByRole('heading', { name: 'Installer workspace' }),
   ).toBeVisible();

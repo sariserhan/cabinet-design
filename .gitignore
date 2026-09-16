@@ -9,5 +9,6 @@ __pycache__/
 .local/
 test-results/
 playwright-report/
+tests/e2e/.auth/
 .next/
 *.tsbuildinfo

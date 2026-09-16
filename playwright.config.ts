@@ -8,12 +8,27 @@ const baseURL = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: 'tests/e2e',
+  // Signing in and building a WebGL scene on a cold dev server both take longer
+  // than the 30s default, which otherwise fires inside a single step.
+  timeout: 120_000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? 'line' : 'list',
   use: { baseURL, trace: 'on-first-retry' },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'public',
+      testIgnore: /.*\.auth\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    // Signed-in specs authenticate per test; see tests/e2e/sign-in.ts.
+    {
+      name: 'authenticated',
+      testMatch: /.*\.auth\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
   ...(process.env.E2E_BASE_URL
     ? {}
     : {

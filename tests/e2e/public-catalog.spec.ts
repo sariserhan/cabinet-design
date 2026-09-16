@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test';
 
 // The public catalog route serves the pinned source PDFs the designer links to.
 test('public catalog source serves a pinned PDF', async ({ request }) => {
-  const response = await request.get('/api/public-catalog-source?series=allure');
+  const response = await request.get(
+    '/api/public-catalog-source?series=allure',
+  );
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toBe('application/pdf');
   expect(response.headers()['x-content-type-options']).toBe('nosniff');

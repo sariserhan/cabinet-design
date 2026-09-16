@@ -1,4 +1,8 @@
 .designer-app {
+  /* Default stage heights, reused as the floor in the enlarged view so that
+     expanding can never leave less canvas than the normal layout. */
+  --stage-height: 490px;
+  --render-stage-height: 570px;
   --studio-ink: #20333f;
   --studio-muted: #667883;
   --studio-line: #dce4e8;
@@ -225,7 +229,7 @@
 }
 .plan-scroll {
   width: 100%;
-  height: 490px;
+  height: var(--stage-height);
   overflow: auto;
   scrollbar-width: thin;
 }
@@ -723,7 +727,7 @@
   background: #e9edf0;
 }
 .render-stage {
-  height: 570px;
+  height: var(--render-stage-height);
   min-height: 350px;
   width: 100%;
 }
@@ -3369,11 +3373,15 @@ body:has(.canvas-expanded) {
 /* The active stage absorbs the remaining height; the floor keeps it usable when
    the tool rows above it wrap on a short window. */
 .designer-app.canvas-expanded .plan-scroll,
-.designer-app.canvas-expanded .preview-stage,
+.designer-app.canvas-expanded .preview-stage {
+  flex: 1;
+  height: auto;
+  min-height: var(--stage-height);
+}
 .designer-app.canvas-expanded .render-stage {
   flex: 1;
   height: auto;
-  min-height: 320px;
+  min-height: var(--render-stage-height);
 }
 .designer-app.canvas-expanded .elevation-view svg {
   max-height: none;
