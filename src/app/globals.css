@@ -480,3 +480,12 @@ h3 {
 }
 .demo-example:hover { background: var(--muted); }
 .demo-example:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.catalog-tools > summary { cursor: pointer; padding: 12px; font-size: 13px; }
+.catalog-tools[open] > summary { font-weight: 600; }
+@media (max-width: 720px) {
+  .sidebar nav { flex-wrap: wrap; overflow: visible; }
+  .catalog-tools { width: 100%; }
+  .catalog-tools > summary { padding: 8px; }
+  .catalog-tools[open] { display: flex; flex-wrap: wrap; gap: 4px; }
+}

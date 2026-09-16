@@ -50,16 +50,35 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
           Kitchen Studio
         </Link>
         <nav aria-label="Main navigation">
-          {navigation.map(([href, label, Icon]) => (
+          {navigation.slice(0, 3).map(([href, label, Icon]) => (
             <Link
               key={href}
               href={href}
               className={cn('nav-link', pathname === href && 'active')}
+              aria-current={pathname === href ? 'page' : undefined}
             >
               <Icon aria-hidden="true" />
               <span>{label}</span>
             </Link>
           ))}
+          <details
+            className="catalog-tools"
+            key={pathname}
+            open={navigation.slice(3).some(([href]) => href === pathname)}
+          >
+            <summary>Catalog management</summary>
+            {navigation.slice(3).map(([href, label, Icon]) => (
+              <Link
+                key={href}
+                href={href}
+                className={cn('nav-link', pathname === href && 'active')}
+                aria-current={pathname === href ? 'page' : undefined}
+              >
+                <Icon aria-hidden="true" />
+                <span>{label}</span>
+              </Link>
+            ))}
+          </details>
         </nav>
         <div className="sidebar-account">
           <span>{viewer?.name ?? 'Reviewer'}</span>

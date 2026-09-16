@@ -1392,3 +1392,67 @@ body:has(.is-presenting) .sidebar,body:has(.is-presenting) .demo-banner { displa
 }
 
 .job-workspace {margin:12px 0}.job-workspace label{display:flex;flex-direction:column;gap:5px;margin:8px 0}.job-workspace input,.job-workspace textarea,.job-workspace select{max-width:100%;min-width:0;padding:8px}.job-workspace textarea{min-height:70px}.job-card{padding:14px;border:1px solid #cbd8d2;border-radius:8px;margin:10px 0;background:#fafcfb;overflow-wrap:anywhere}.job-card button{margin:4px}.job-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}.job-options svg{width:100%;height:180px}.job-options img{max-width:100%;height:auto}.job-table{overflow:auto;max-height:360px}.job-table table{width:100%;border-collapse:collapse}.job-table td,.job-table th{padding:8px;border:1px solid #ccd8d1;text-align:left;overflow-wrap:anywhere;max-width:300px}.job-workspace [aria-pressed=true]{background:#17584b;color:white}.job-workspace figure{margin:0}.job-workspace li{overflow-wrap:anywhere}
+
+/* Keep optional workflows behind a single, plainly labelled entry point. */
+.workspace-more-tools {
+  margin: 8px 20px 12px;
+  border: 1px solid var(--studio-line);
+  border-radius: 8px;
+  background: white;
+}
+.workspace-more-tools > summary,
+.canvas-edit-tools > summary {
+  cursor: pointer;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.workspace-more-tools > summary span,
+.canvas-edit-tools > summary span {
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #52636a;
+}
+.tools-intro {
+  margin: 0 12px 12px;
+  color: #52636a;
+  font-size: 13px;
+}
+.canvas-edit-tools {
+  border: 1px solid var(--studio-line);
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 8px;
+}
+.canvas-edit-tools[open] {
+  padding-bottom: 8px;
+}
+.is-presenting .workspace-more-tools {
+  display: none;
+}
+@media (max-width: 700px) {
+  .workspace-more-tools {
+    margin: 8px 12px;
+  }
+  .workspace-more-tools > summary span,
+  .canvas-edit-tools > summary span {
+    display: block;
+    margin: 4px 0 0 16px;
+  }
+  .canvas-panel-controls button {
+    min-height: 40px;
+  }
+}
+@media print {
+  .workspace-more-tools,
+  .canvas-edit-tools {
+    display: none;
+  }
+}
+
+@media (max-width:700px) {
+  .designer-center { order: 0; }
+  .designer-library-column { order: 1; }
+  .designer-inspector { order: 2; }
+}

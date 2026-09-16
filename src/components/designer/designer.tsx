@@ -262,8 +262,15 @@ function Editor({ ownerId }: { ownerId: string }) {
   const [lastSession, setLastSession] = useState<Design | null>(null);
   const [savedAt, setSavedAt] = useState('');
   const file = useRef<HTMLInputElement>(null);
+  const pendingDraft = useRef<(() => void) | null>(null);
+  const importRequest = useRef(0);
+  const currentDesign = useRef<Design | undefined>(undefined);
   const storageKey = `kitchen-studio:${ownerId}`;
   useEffect(() => {
+    if (window.matchMedia('(max-width: 700px)').matches) {
+      setLibraryCollapsed(true);
+      setInspectorCollapsed(true);
+    }
     let initial = newDesign();
     try {
       const draft = localStorage.getItem(storageKey + ':draft');
@@ -287,7 +294,16 @@ function Editor({ ownerId }: { ownerId: string }) {
         const list: unknown = JSON.parse(raw);
         if (!Array.isArray(list) || list.length > 20)
           throw Error('Invalid saved designs');
-        setSaved(list.map((d) => designSchema.parse(d)));
+        setSaved(
+          Array.from(
+            new Map(
+              list.map((d) => {
+                const parsed = designSchema.parse(d);
+                return [parsed.id, parsed] as const;
+              }),
+            ).values(),
+          ),
+        );
       }
     } catch {
       setStorageError(
@@ -344,6 +360,15 @@ function Editor({ ownerId }: { ownerId: string }) {
   }, [before, storageKey]);
   const [recordsEpoch, setRecordsEpoch] = useState(0);
   const design = history?.current;
+  currentDesign.current = design;
+  useEffect(
+    () => () => {
+      pendingDraft.current?.();
+      pendingDraft.current = null;
+      importRequest.current++;
+    },
+    [],
+  );
   useEffect(() => setSelection([]), [design?.id]);
   useEffect(() => {
     if (!design) return;
@@ -360,6 +385,7 @@ function Editor({ ownerId }: { ownerId: string }) {
           }
         }
         localStorage.setItem(storageKey + ':draft', JSON.stringify(design));
+        pendingDraft.current = null;
         setSaveState('saved');
         setSavedAt(new Date().toLocaleTimeString());
       } catch {
@@ -369,11 +395,17 @@ function Editor({ ownerId }: { ownerId: string }) {
         );
       }
     };
+    pendingDraft.current = persist;
+    const onHidden = () => {
+      if (document.visibilityState === 'hidden') pendingDraft.current?.();
+    };
     const timer = setTimeout(persist, 350);
+    document.addEventListener('visibilitychange', onHidden);
     window.addEventListener('pagehide', persist);
     return () => {
       clearTimeout(timer);
       window.removeEventListener('pagehide', persist);
+      document.removeEventListener('visibilitychange', onHidden);
     };
   }, [design, storageKey]);
   function commit(
@@ -683,9 +715,18 @@ function Editor({ ownerId }: { ownerId: string }) {
     }
   }
   async function importFile(imported: File) {
+    const request = ++importRequest.current;
+    const startedFrom = currentDesign.current;
     try {
       if (imported.size > 500_000) throw Error('large');
       const parsed = parseDesign(await imported.text());
+      if (request !== importRequest.current) return;
+      if (currentDesign.current !== startedFrom) {
+        setStatus(
+          'The design changed while the file was loading. Import again when you are ready.',
+        );
+        return;
+      }
       commit(() => ({ ...parsed, id: crypto.randomUUID() }));
       setSelected(null);
       setStatus('Design imported. Save to keep a named copy.');
@@ -694,7 +735,8 @@ function Editor({ ownerId }: { ownerId: string }) {
         'Could not import: choose a valid Kitchen Studio JSON file (up to 500 KB and 100 cabinets).',
       );
     } finally {
-      if (file.current) file.current.value = '';
+      if (file.current && request === importRequest.current)
+        file.current.value = '';
     }
   }
   if (!design || !history)
@@ -944,6 +986,7 @@ function Editor({ ownerId }: { ownerId: string }) {
             onClick={() => {
               const files =
                 document.querySelector<HTMLDetailsElement>('.project-controls');
+              openProjectTool('Project files & examples');
               if (files) files.open = true;
               document.getElementById('saved-designs')?.focus();
             }}
@@ -967,6 +1010,12 @@ function Editor({ ownerId }: { ownerId: string }) {
                     setLibraryCollapsed(false);
                     setLibraryTab('cabinets');
                     setMode('2d');
+                    if (window.matchMedia('(max-width: 700px)').matches)
+                      requestAnimationFrame(() =>
+                        document
+                          .querySelector('.designer-library-column')
+                          ?.scrollIntoView({ behavior: 'smooth' }),
+                      );
                   }
                   if (stage === 'Design' || stage === 'Room') {
                     setMode('2d');
@@ -1052,22 +1101,27 @@ function Editor({ ownerId }: { ownerId: string }) {
           ownerId={ownerId}
         />
       </section>
-      <JobWorkspace
-        key={`job:${design.id}:${recordsEpoch}`}
-        design={design}
-        ownerId={ownerId}
-        onApply={(next) => commit(() => next)}
-        onLocate={(id) => {
-          setWorkspaceStage('Design');
-          setSelected(id);
-          setMode('2d');
-        }}
-      />
-      <TradeWorkspaces
-        key={`trades:${design.id}`}
-        design={design}
-        ownerId={ownerId}
-      />
+      <div className="save-status" role="status">
+        <span>
+          {saveState === 'saving'
+            ? 'Saving changes…'
+            : saveState === 'error'
+              ? 'Changes not saved'
+              : `Saved in this browser · ${savedAt}`}
+        </span>
+        {lastSession && (
+          <button
+            onClick={() => {
+              commit(() => structuredClone(lastSession));
+              setStatus(
+                'Restored the design from the start of this session. Undo is available.',
+              );
+            }}
+          >
+            Restore last session
+          </button>
+        )}
+      </div>
       <nav className="designer-skip-links" aria-label="Designer shortcuts">
         <a
           href="#project-dashboard"
@@ -1105,301 +1159,311 @@ function Editor({ ownerId }: { ownerId: string }) {
           Skip to item controls
         </a>
       </nav>
-      <details className="studio-support">
+      <details className="workspace-more-tools">
         <summary>
-          Project tools · approvals, orders, installation & aftercare
+          More tools{' '}
+          <span>Files, job checks, other trades &amp; project management</span>
         </summary>
-        <ProjectHub
-          key={`hub:${design.id}:${recordsEpoch}`}
-          selectedIds={
-            selection.length ? selection : selected ? [selected] : []
-          }
-          onApply={(next) => commit(() => next, true)}
+        <p className="tools-intro">
+          Choose a section below. Your design stays open while you work.
+        </p>
+        <JobWorkspace
+          key={`job:${design.id}:${recordsEpoch}`}
+          design={design}
+          ownerId={ownerId}
+          onApply={(next) => commit(() => next)}
           onLocate={(id) => {
             setWorkspaceStage('Design');
             setSelected(id);
             setMode('2d');
-            document
-              .getElementById('design-workspace')
-              ?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          design={design}
-          ownerId={ownerId}
-          onSharedLoad={(next) => {
-            setHistory({ past: [], current: next, future: [] });
-            setSelected(null);
-            setSelection([]);
-            setBefore(next);
-            setRecordsEpoch((v) => v + 1);
-            setStatus('Shared project revision loaded locally.');
-          }}
-          onRestore={(next) => {
-            setHistory({ past: [], current: next, future: [] });
-            setSelected(null);
-            setSelection([]);
-            setBefore(next);
-            setStatus('Complete project restored as a separate local copy.');
           }}
         />
-        <FirstUseGuide
-          ownerId={ownerId}
+        <TradeWorkspaces
+          key={`trades:${design.id}`}
           design={design}
-          onDemo={() => walkthroughStep(0)}
+          ownerId={ownerId}
         />
-        <PurchasingWorkspace
-          key={`purchasing:${design.id}:${recordsEpoch}`}
-          ownerId={ownerId}
-          design={design}
-          onLocate={(id) => {
-            setWorkspaceStage('Design');
-            setSelected(id);
-            setMode('2d');
-            document
-              .querySelector('.canvas-panel-controls')
-              ?.scrollIntoView({ behavior: 'smooth' });
-          }}
-        />
-        <ProjectWorkflow
-          key={`workflow:${design.id}:${recordsEpoch}`}
-          design={design}
-          ownerId={ownerId}
-          onLocate={(id) => {
-            setWorkspaceStage('Design');
-            setSelected(id);
-            setMode('2d');
-            document
-              .querySelector('.canvas-panel-controls')
-              ?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          onNavigate={(stage, target) => {
-            if (stage === 'Design') {
+        <details className="studio-support">
+          <summary>
+            Project tools · approvals, orders, installation & aftercare
+          </summary>
+          <ProjectHub
+            key={`hub:${design.id}:${recordsEpoch}`}
+            selectedIds={
+              selection.length ? selection : selected ? [selected] : []
+            }
+            onApply={(next) => commit(() => next, true)}
+            onLocate={(id) => {
+              setWorkspaceStage('Design');
+              setSelected(id);
+              setMode('2d');
+              document
+                .getElementById('design-workspace')
+                ?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            design={design}
+            ownerId={ownerId}
+            onSharedLoad={(next) => {
+              setHistory({ past: [], current: next, future: [] });
+              setSelected(null);
+              setSelection([]);
+              setBefore(next);
+              setRecordsEpoch((v) => v + 1);
+              setStatus('Shared project revision loaded locally.');
+            }}
+            onRestore={(next) => {
+              setHistory({ past: [], current: next, future: [] });
+              setSelected(null);
+              setSelection([]);
+              setBefore(next);
+              setStatus('Complete project restored as a separate local copy.');
+            }}
+          />
+          <FirstUseGuide
+            ownerId={ownerId}
+            design={design}
+            onDemo={() => walkthroughStep(0)}
+          />
+          <PurchasingWorkspace
+            key={`purchasing:${design.id}:${recordsEpoch}`}
+            ownerId={ownerId}
+            design={design}
+            onLocate={(id) => {
+              setWorkspaceStage('Design');
+              setSelected(id);
               setMode('2d');
               document
                 .querySelector('.canvas-panel-controls')
                 ?.scrollIntoView({ behavior: 'smooth' });
-              return;
-            }
-            const label =
-              target === 'selections'
-                ? 'Design decisions · budget, checks & site handoff'
-                : stage === 'Measure'
-                  ? 'Guided room measurements'
-                  : stage === 'Price'
-                    ? 'Supplier quotes'
-                    : stage === 'Present'
-                      ? 'Cloud projects & client reviews'
-                      : 'Design decisions · budget, checks & site handoff';
-            openProjectTool(label);
-            const section = Array.from(
-              document.querySelectorAll('details'),
-            ).find(
-              (d) => d.querySelector(':scope > summary')?.textContent === label,
-            );
-            if (section) {
-              section.open = true;
-              section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-            if (
-              target === 'selections' ||
-              stage === 'Install' ||
-              stage === 'Check'
-            )
-              setTimeout(() => {
-                const name =
-                  target === 'selections'
-                    ? 'Client selections'
-                    : stage === 'Install'
-                      ? 'Installer handoff'
-                      : 'Explain checks';
-                Array.from(
-                  section?.querySelectorAll<HTMLButtonElement>(
-                    '[role="tab"]',
-                  ) ?? [],
-                )
-                  .find((b) => b.textContent === name)
-                  ?.click();
-              }, 100);
-          }}
-        />
-        <CloudProjects
-          onLocate={(id) => {
-            setWorkspaceStage('Design');
-            setSelected(id);
-            setMode('2d');
-          }}
-          key={`cloud:${design.id}`}
-          design={design}
-          ownerId={ownerId}
-          onOpen={(next) => {
-            setHistory((h) =>
-              h
-                ? {
-                    past: [...h.past, h.current].slice(-60),
-                    current: next,
-                    future: [],
-                  }
-                : { past: [], current: next, future: [] },
-            );
-            setSelected(null);
-            setBefore(next);
-          }}
-        />
-        <AlternativeLayouts
-          design={design}
-          onChange={(next) => commit(() => next, true)}
-        />
-        <DesignDecisions
-          design={design}
-          versionId={version?._id}
-          onChange={(next) => commit(() => next)}
-          onLocate={(id) => {
-            setWorkspaceStage('Design');
-            setSelected(id);
-            setMode('2d');
-          }}
-        />
-        <ShortcutHelp />
-      </details>
-      <details className="project-controls">
-        <summary>Project files & examples</summary>
-        <div className="designer-projectbar">
-          <span>Draft saves automatically in this browser</span>
-          <div className="designer-row">
-            <select
-              id="saved-designs"
-              aria-label="Saved designs"
-              value={openId}
-              onChange={(e) => setOpenId(e.target.value)}
-            >
-              <option value="">Choose a saved design</option>
-              {saved.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} · {d.items.length} cabinets
-                </option>
-              ))}
-            </select>
-            <button disabled={!openId} onClick={open}>
-              Open
-            </button>
-            <button
-              onClick={() => {
-                commit(() => newDesign());
-                setSelected(null);
-                setStatus(
-                  'New room created. Undo restores the previous design.',
-                );
-              }}
-            >
-              New room
-            </button>
-
-            <button
-              onClick={() => {
-                commit(() => polishedSample());
-                setSelected(null);
-                setMode('render');
-                setStatus(
-                  'Presentation kitchen loaded. Undo restores your previous design.',
-                );
-              }}
-            >
-              Load presentation kitchen
-            </button>
-            <button disabled={!templateRaw} onClick={example}>
-              Load example kitchen
-            </button>
-            <button
-              onClick={() =>
-                download(
-                  JSON.stringify(design, null, 2),
-                  `${design.name.replace(/[^a-z0-9-]/gi, '_')}.json`,
-                  'application/json',
-                )
+            }}
+          />
+          <ProjectWorkflow
+            key={`workflow:${design.id}:${recordsEpoch}`}
+            design={design}
+            ownerId={ownerId}
+            onLocate={(id) => {
+              setWorkspaceStage('Design');
+              setSelected(id);
+              setMode('2d');
+              document
+                .querySelector('.canvas-panel-controls')
+                ?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            onNavigate={(stage, target) => {
+              if (stage === 'Design') {
+                setMode('2d');
+                document
+                  .querySelector('.canvas-panel-controls')
+                  ?.scrollIntoView({ behavior: 'smooth' });
+                return;
               }
-            >
-              <Download size={14} /> Export
-            </button>
-            <button onClick={() => file.current?.click()}>
-              <Upload size={14} /> Import
-            </button>
-            <input
-              hidden
-              ref={file}
-              type="file"
-              accept=".json,application/json"
-              aria-label="Import design file"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void importFile(f);
-              }}
-            />
+              const label =
+                target === 'selections'
+                  ? 'Design decisions · budget, checks & site handoff'
+                  : stage === 'Measure'
+                    ? 'Guided room measurements'
+                    : stage === 'Price'
+                      ? 'Supplier quotes'
+                      : stage === 'Present'
+                        ? 'Cloud projects & client reviews'
+                        : 'Design decisions · budget, checks & site handoff';
+              openProjectTool(label);
+              const section = Array.from(
+                document.querySelectorAll('details'),
+              ).find(
+                (d) =>
+                  d.querySelector(':scope > summary')?.textContent === label,
+              );
+              if (section) {
+                section.open = true;
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+              if (
+                target === 'selections' ||
+                stage === 'Install' ||
+                stage === 'Check'
+              )
+                setTimeout(() => {
+                  const name =
+                    target === 'selections'
+                      ? 'Client selections'
+                      : stage === 'Install'
+                        ? 'Installer handoff'
+                        : 'Explain checks';
+                  Array.from(
+                    section?.querySelectorAll<HTMLButtonElement>(
+                      '[role="tab"]',
+                    ) ?? [],
+                  )
+                    .find((b) => b.textContent === name)
+                    ?.click();
+                }, 100);
+            }}
+          />
+          <CloudProjects
+            onLocate={(id) => {
+              setWorkspaceStage('Design');
+              setSelected(id);
+              setMode('2d');
+            }}
+            key={`cloud:${design.id}`}
+            design={design}
+            ownerId={ownerId}
+            onOpen={(next) => {
+              setHistory((h) =>
+                h
+                  ? {
+                      past: [...h.past, h.current].slice(-60),
+                      current: next,
+                      future: [],
+                    }
+                  : { past: [], current: next, future: [] },
+              );
+              setSelected(null);
+              setBefore(next);
+            }}
+          />
+          <AlternativeLayouts
+            design={design}
+            onChange={(next) => commit(() => next, true)}
+          />
+          <DesignDecisions
+            design={design}
+            versionId={version?._id}
+            onChange={(next) => commit(() => next)}
+            onLocate={(id) => {
+              setWorkspaceStage('Design');
+              setSelected(id);
+              setMode('2d');
+            }}
+          />
+          <ShortcutHelp />
+        </details>
+        <details className="project-controls">
+          <summary>Project files & examples</summary>
+          <div className="designer-projectbar">
+            <span>Draft saves automatically in this browser</span>
+            <div className="designer-row">
+              <select
+                id="saved-designs"
+                aria-label="Saved designs"
+                value={openId}
+                onChange={(e) => setOpenId(e.target.value)}
+              >
+                <option value="">Choose a saved design</option>
+                {saved.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name} · {d.items.length} cabinets
+                  </option>
+                ))}
+              </select>
+              <button disabled={!openId} onClick={open}>
+                Open
+              </button>
+              <button
+                onClick={() => {
+                  commit(() => newDesign());
+                  setSelected(null);
+                  setStatus(
+                    'New room created. Undo restores the previous design.',
+                  );
+                }}
+              >
+                New room
+              </button>
+
+              <button
+                onClick={() => {
+                  commit(() => polishedSample());
+                  setSelected(null);
+                  setMode('render');
+                  setStatus(
+                    'Presentation kitchen loaded. Undo restores your previous design.',
+                  );
+                }}
+              >
+                Load presentation kitchen
+              </button>
+              <button disabled={!templateRaw} onClick={example}>
+                Load example kitchen
+              </button>
+              <button
+                onClick={() =>
+                  download(
+                    JSON.stringify(design, null, 2),
+                    `${design.name.replace(/[^a-z0-9-]/gi, '_')}.json`,
+                    'application/json',
+                  )
+                }
+              >
+                <Download size={14} /> Export
+              </button>
+              <button onClick={() => file.current?.click()}>
+                <Upload size={14} /> Import
+              </button>
+              <input
+                hidden
+                ref={file}
+                type="file"
+                accept=".json,application/json"
+                aria-label="Import design file"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) void importFile(f);
+                }}
+              />
+            </div>
           </div>
-        </div>
-      </details>
-      <div className="save-status" role="status">
-        <span>
-          {saveState === 'saving'
-            ? 'Saving changes…'
-            : saveState === 'error'
-              ? 'Changes not saved'
-              : `Saved in this browser · ${savedAt}`}
-        </span>
-        {lastSession && (
-          <button
-            onClick={() => {
-              commit(() => structuredClone(lastSession));
+        </details>
+        <details className="studio-support">
+          <summary>Recovery & advanced placement</summary>
+          <DesignRecovery
+            key={`recovery-${design.id}`}
+            design={design}
+            ownerId={ownerId}
+            past={history.past}
+            onRestore={(next) => {
+              setHistory((h) =>
+                h
+                  ? {
+                      past: [...h.past, h.current].slice(-60),
+                      current: next,
+                      future: [],
+                    }
+                  : h,
+              );
+              setSelected(null);
+              setSelection([]);
               setStatus(
-                'Restored the design from the start of this session. Undo is available.',
+                'Design restored. Undo returns to the previous version.',
               );
             }}
-          >
-            Restore last session
-          </button>
-        )}
-      </div>
-      <details className="studio-support">
-        <summary>Recovery & advanced placement</summary>
-        <DesignRecovery
-          key={`recovery-${design.id}`}
-          design={design}
-          ownerId={ownerId}
-          past={history.past}
-          onRestore={(next) => {
-            setHistory((h) =>
-              h
-                ? {
-                    past: [...h.past, h.current].slice(-60),
-                    current: next,
-                    future: [],
-                  }
-                : h,
-            );
-            setSelected(null);
-            setSelection([]);
-            setStatus('Design restored. Undo returns to the previous version.');
-          }}
-        />
-        <SmartPlacement
-          design={design}
-          selected={selected}
-          onChange={(next) => commit(() => next, true)}
-        />
-        <SampleStory design={design} onChange={(next) => commit(() => next)} />
-        <ObjectManager
-          design={design}
-          onChange={(next) => commit(() => next)}
-          onSelect={(id) => {
-            setSelected(id);
-            setInspectorCollapsed(false);
-          }}
-        />
-        <ReadinessCheck
-          design={design}
-          onSelect={(id) => {
-            setSelected(id);
-            setMode('2d');
-          }}
-        />
+          />
+          <SmartPlacement
+            design={design}
+            selected={selected}
+            onChange={(next) => commit(() => next, true)}
+          />
+          <SampleStory
+            design={design}
+            onChange={(next) => commit(() => next)}
+          />
+          <ObjectManager
+            design={design}
+            onChange={(next) => commit(() => next)}
+            onSelect={(id) => {
+              setSelected(id);
+              setInspectorCollapsed(false);
+            }}
+          />
+          <ReadinessCheck
+            design={design}
+            onSelect={(id) => {
+              setSelected(id);
+              setMode('2d');
+            }}
+          />
+        </details>
       </details>
       {(status || storageError || history.error) && (
         <div
@@ -1459,7 +1523,18 @@ function Editor({ ownerId }: { ownerId: string }) {
           <div className="canvas-panel-controls designer-row">
             <button
               aria-pressed={!libraryCollapsed}
-              onClick={() => setLibraryCollapsed((v) => !v)}
+              onClick={() => {
+                setLibraryCollapsed((v) => !v);
+                if (
+                  libraryCollapsed &&
+                  window.matchMedia('(max-width: 700px)').matches
+                )
+                  requestAnimationFrame(() =>
+                    document
+                      .querySelector('.designer-library-column')
+                      ?.scrollIntoView({ behavior: 'smooth' }),
+                  );
+              }}
             >
               {libraryCollapsed ? 'Show library' : 'Hide library'}
             </button>
@@ -1481,21 +1556,6 @@ function Editor({ ownerId }: { ownerId: string }) {
                 : 'Focus canvas'}
             </button>
           </div>
-          {mode === '2d' && (
-            <EverydayEditing
-              key={`quick:${design.id}`}
-              design={design}
-              selectedIds={
-                selection.length ? selection : selected ? [selected] : []
-              }
-              onApply={(next) => commit(() => next, true)}
-              onLocate={(id) => {
-                setWorkspaceStage('Design');
-                setSelected(id);
-                setSelection([]);
-              }}
-            />
-          )}
           <QuickInspector
             design={design}
             item={item}
@@ -1622,19 +1682,43 @@ function Editor({ ownerId }: { ownerId: string }) {
             </div>
           </div>
           {mode === '2d' && (
-            <KitchenActions
-              key={design.id}
-              design={design}
-              ids={selection.length ? selection : selected ? [selected] : []}
-              onChange={(next) => commit(() => next)}
-            />
-          )}
-          {mode === '2d' && (
-            <PlacementAssist
-              design={design}
-              selected={selected}
-              onChange={(next) => commit(() => next)}
-            />
+            <details className="canvas-edit-tools">
+              <summary>
+                Editing tools <span>Arrange, repeat &amp; place items</span>
+              </summary>
+              {mode === '2d' && (
+                <EverydayEditing
+                  key={`quick:${design.id}`}
+                  design={design}
+                  selectedIds={
+                    selection.length ? selection : selected ? [selected] : []
+                  }
+                  onApply={(next) => commit(() => next, true)}
+                  onLocate={(id) => {
+                    setWorkspaceStage('Design');
+                    setSelected(id);
+                    setSelection([]);
+                  }}
+                />
+              )}
+              {mode === '2d' && (
+                <KitchenActions
+                  key={design.id}
+                  design={design}
+                  ids={
+                    selection.length ? selection : selected ? [selected] : []
+                  }
+                  onChange={(next) => commit(() => next)}
+                />
+              )}
+              {mode === '2d' && (
+                <PlacementAssist
+                  design={design}
+                  selected={selected}
+                  onChange={(next) => commit(() => next)}
+                />
+              )}
+            </details>
           )}
           {mode === 'compare' ? (
             <CompareOptions
