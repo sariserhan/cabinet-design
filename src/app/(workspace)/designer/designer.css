@@ -3349,7 +3349,8 @@ body:has(.canvas-expanded) {
 .designer-app.canvas-expanded > .save-status,
 .designer-app.canvas-expanded > .designer-skip-links,
 .designer-app.canvas-expanded > .workspace-more-tools,
-.designer-app.canvas-expanded .designer-bill {
+.designer-app.canvas-expanded .designer-bill,
+.designer-app.canvas-expanded .lighting-comparison {
   display: none !important;
 }
 .designer-app.canvas-expanded > .designer-grid {
@@ -3385,6 +3386,20 @@ body:has(.canvas-expanded) {
 }
 .designer-app.canvas-expanded .elevation-view svg {
   max-height: none;
+}
+/* The Render view stacks a tall column of controls above its stage, which in a
+   full-window layout would push the canvas off screen. Lift the stage above its
+   own controls so the enlarged view opens on the image, and let the controls
+   scroll underneath it. */
+.designer-app.canvas-expanded .designer-render,
+.designer-app.canvas-expanded .designer-render > fieldset {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.designer-app.canvas-expanded .designer-render > fieldset > .render-stage {
+  order: -1;
 }
 @media (max-width: 900px) {
   .designer-app.canvas-expanded > .designer-grid {
