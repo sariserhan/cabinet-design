@@ -201,14 +201,23 @@ export function surfaceDetail(kind: 'paint' | 'wood' | 'stone' | 'metal') {
     for (let x = 0; x < 256; x++) {
       seed = (seed * 1664525 + 1013904223) >>> 0;
       const noise = seed / 4294967296;
-      const grain = Math.sin(
-        (x / 256) * Math.PI * 64 + Math.sin((y / 256) * Math.PI * 2),
-      );
+      // A single high-frequency sine gives evenly spaced bands, which read as
+      // corduroy rather than timber. Real grain wanders along the board and its
+      // bands vary in width, so sum incommensurate frequencies over a wandering
+      // coordinate: no two bands then land at the same spacing within a tile.
+      const wander =
+        Math.sin((y / 256) * Math.PI * 2) * 0.06 +
+        Math.sin((y / 256) * Math.PI * 6.3 + 1.1) * 0.02;
+      const t = x / 256 + wander;
+      const grain =
+        Math.sin(t * Math.PI * 17.9) * 0.55 +
+        Math.sin(t * Math.PI * 41.3 + 1.7) * 0.28 +
+        Math.sin(t * Math.PI * 7.1 + 0.4) * 0.17;
       const value =
         kind === 'metal'
           ? 190 + brush * 45
           : kind === 'wood'
-            ? 190 + grain * 20 + noise * 20
+            ? 190 + grain * 26 + noise * 16
             : kind === 'paint'
               ? 215 + noise * 25
               : 230 + noise * 15;

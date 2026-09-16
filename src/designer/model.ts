@@ -238,6 +238,7 @@ export const designSchema = z
         outlets: z.boolean().optional(),
         faucet: z.enum(['steel', 'brass', 'black']).optional(),
         handleStyle: z.enum(['bar', 'knob', 'none']).optional(),
+        doorStyle: z.enum(['shaker', 'slab', 'raised']).optional(),
         staging: z.boolean().optional(),
         countertop: z.enum(['quartz', 'marble', 'granite']),
         lighting: z.enum(['daylight', 'warm', 'studio']),

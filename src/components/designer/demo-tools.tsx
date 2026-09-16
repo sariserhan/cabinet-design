@@ -108,6 +108,22 @@ export function MaterialPresets({
         </svg>
       </div>
       <label>
+        Door style
+        <select
+          aria-label="Door style"
+          value={design.appearance?.doorStyle ?? 'shaker'}
+          onChange={(e) =>
+            appearance({
+              doorStyle: e.target.value as 'shaker' | 'slab' | 'raised',
+            })
+          }
+        >
+          <option value="shaker">Shaker (recessed panel)</option>
+          <option value="slab">Slab (flat overlay)</option>
+          <option value="raised">Raised panel</option>
+        </select>
+      </label>
+      <label>
         Handle style
         <select
           aria-label="Handle style"

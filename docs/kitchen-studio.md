@@ -56,6 +56,8 @@ Open http://localhost:4001/designer. Keep the SSH terminal open. If you already 
 
 Edits automatically save a draft in this browser, separately for each signed-in account. Save design keeps named copies (up to 20). JSON export is the portable backup; browser storage does not sync to other devices and can be removed by clearing site data. Designs support up to 100 items and polygonal rooms with outer dimensions from 36 to 600 inches.
 
+Under **Properties · Materials**, **Door style** switches every front between shaker (recessed panel), slab (flat overlay) and raised panel. The choice is illustrative geometry only: it does not select a manufacturer door program, and it never changes catalog dimensions.
+
 This is the agreed kitchen-planning demo, not full 2020 Design parity. The 3D view shows dimensionally sized cabinet boxes with illustrative fronts and finishes. It does not provide photorealistic manufacturer models, manufacturer-specific appliance meshes, live manufacturer pricing, or automated code/clearance/compatibility certification. Layout checks cover geometry; catalog review remains available in the existing screens. Catalog dimensions are not silently resized or invented. No new AI API credits are required to use the designer.
 
 ## Run on the server

@@ -7,7 +7,7 @@ import {
   drainDetails,
   cloneDecorativeModel,
 } from './render-fixtures';
-import { applianceDetails, metalPull } from './render-details';
+import { applianceDetails, doorFace, metalPull } from './render-details';
 import { materialTexture } from './render-textures';
 import { box, createPalette } from './render-materials';
 import { backsplashRuns, walkEntry } from '@/designer/render-planning';
@@ -502,36 +502,18 @@ export function buildKitchenScene(context: BuildContext) {
               ph = (frontHeight - toe) / rows - 0.125,
               x = -w / 2 + ((col + 0.5) * w) / columns,
               y = toe + ((row + 0.5) * (frontHeight - toe)) / rows;
-            b(pw, ph, 0.75, x, y, d / 2, inset);
-            b(
-              Math.max(0.2, pw - 4),
-              Math.max(0.2, ph - 4),
-              0.2,
+            doorFace(
+              b,
+              design.appearance?.doorStyle ?? 'shaker',
+              pw,
+              ph,
               x,
               y,
-              d / 2 + 0.3,
+              d / 2,
+              finish,
+              inset,
               style === 'glass' ? glass : inset,
             );
-            for (const sign of [-1, 1]) {
-              b(
-                1.8,
-                ph,
-                0.3,
-                x + sign * (pw / 2 - 0.9),
-                y,
-                d / 2 + 0.55,
-                finish,
-              );
-              b(
-                Math.max(0.2, pw - 3.6),
-                1.8,
-                0.3,
-                x,
-                y + sign * (ph / 2 - 0.9),
-                d / 2 + 0.55,
-                finish,
-              );
-            }
             const hx =
               style === 'drawers'
                 ? x

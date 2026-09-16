@@ -83,3 +83,26 @@ test('enlarging the canvas keeps the tools and grows the stage', async ({
   await page.keyboard.press('Escape');
   await expect(page.locator('.designer-app.canvas-expanded')).toHaveCount(0);
 });
+
+test('each door style rebuilds the scene and keeps it drawing', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  await expect(page.locator('.render-stage canvas')).toBeVisible({
+    timeout: 60_000,
+  });
+  // The styling controls live on the inspector's Materials tab.
+  await page.getByRole('tab', { name: 'Materials' }).click();
+  const style = page.getByLabel('Door style');
+  await expect(style).toBeVisible({ timeout: 30_000 });
+  for (const option of ['slab', 'raised', 'shaker']) {
+    await style.selectOption(option);
+    // A door builder that throws leaves the stage blank or raises its alert.
+    await expect(page.locator('.designer-render [role="alert"]')).toHaveCount(0);
+    await expect
+      .poll(() => canvasColours(page, '.render-stage'), { timeout: 60_000 })
+      .toBeGreaterThan(3);
+  }
+  expect(pageErrors).toEqual([]);
+});

@@ -185,3 +185,77 @@ export function applianceDetails(
       b(0.3, 0.4, 8, x, h + 1, z, dark);
     }
 }
+
+export type DoorStyle = 'shaker' | 'slab' | 'raised';
+
+/**
+ * Builds one cabinet front face at the origin of the door's own plane.
+ *
+ * Real doors read as real mostly through the shoulder where the frame meets the
+ * panel: a hard 90-degree step looks printed on, while a small chamfer catches a
+ * highlight along its whole length. Shaker and raised therefore carry an
+ * explicit bevel ring rather than relying on the edge rounding `box()` already
+ * applies, which at 0.1in is too tight to read at room distance.
+ *
+ * Stiles run the full height and rails fit between them, matching cope-and-stick
+ * construction, so each piece keeps its own grain direction.
+ */
+export function doorFace(
+  b: DetailBox,
+  style: DoorStyle,
+  pw: number,
+  ph: number,
+  x: number,
+  y: number,
+  face: number,
+  finish: THREE.Material,
+  inset: THREE.Material,
+  panelMaterial: THREE.Material,
+) {
+  if (style === 'slab') {
+    // One flat overlay panel; the only relief is the eased outer edge.
+    b(pw, ph, 0.75, x, y, face, panelMaterial);
+    return;
+  }
+  const stile = Math.min(2.25, pw / 3),
+    rail = Math.min(2.25, ph / 3),
+    openW = Math.max(0.2, pw - 2 * stile),
+    openH = Math.max(0.2, ph - 2 * rail);
+  // Backing slab: the door body the frame and panel sit on.
+  b(pw, ph, 0.75, x, y, face, inset);
+  if (style === 'raised') {
+    // Field stands proud of the frame and is chamfered back down to it.
+    b(openW, openH, 0.45, x, y, face + 0.6, panelMaterial);
+    b(openW + 0.9, openH + 0.9, 0.22, x, y, face + 0.46, panelMaterial);
+  } else {
+    // Flat panel recessed behind the frame face.
+    b(openW, openH, 0.2, x, y, face + 0.3, panelMaterial);
+  }
+  for (const sign of [-1, 1]) {
+    // Stiles: full height, upright grain.
+    b(stile, ph, 0.3, x + sign * (pw / 2 - stile / 2), y, face + 0.55, finish);
+    // Rails: between the stiles, grain running across.
+    b(openW, rail, 0.3, x, y + sign * (ph / 2 - rail / 2), face + 0.55, finish);
+  }
+  // Chamfer ring around the opening, stepped back so it reads as a profile.
+  for (const sign of [-1, 1]) {
+    b(
+      0.35,
+      openH + 0.7,
+      0.16,
+      x + sign * (openW / 2 + 0.17),
+      y,
+      face + 0.46,
+      finish,
+    );
+    b(
+      openW + 0.7,
+      0.35,
+      0.16,
+      x,
+      y + sign * (openH / 2 + 0.17),
+      face + 0.46,
+      finish,
+    );
+  }
+}
