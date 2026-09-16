@@ -100,10 +100,11 @@ checked against the model on 2026-09-16.
 - [x] **Soffits and bulkheads.** Done on 2026-09-16: a `soffit` kind with a
       96 x 13 x 12 preset at 84 inches, treated as architecture rather than
       furniture everywhere the other structural kinds are.
-- [ ] **A plan and elevation DXF.** The DXF writer already exists for
-      machining parts. Pointing it at the plan and the elevations would give
-      a contractor or an architect something they can open, which today they
-      cannot.
+- [x] **A plan and elevation DXF.** Done on 2026-09-16, and the entry was
+      half wrong when it was written: a plan DXF already existed and was
+      already exposed. What was missing was elevations, which the export now
+      includes - one frame per straight wall, curved walls named as skipped -
+      along with the designer's own notes and dimensions.
 
 ## Catalog — on hold
 

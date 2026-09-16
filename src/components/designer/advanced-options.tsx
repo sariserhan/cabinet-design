@@ -11,6 +11,7 @@ import {
 import {
   panelParts,
   planDxf,
+  planAndElevationsDxf,
   installationSchedule,
   shopDefaults,
 } from '@/designer/fabrication';
@@ -445,6 +446,17 @@ export function DrawingTools({
           }
         >
           Layout DXF
+        </button>
+        <button
+          onClick={() =>
+            saveFile(
+              planAndElevationsDxf(design),
+              'kitchen-plan-and-elevations-mm.dxf',
+              'application/dxf',
+            )
+          }
+        >
+          Plan &amp; elevations DXF
         </button>
         <button
           disabled={!parts.length}

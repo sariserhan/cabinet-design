@@ -34,6 +34,8 @@ import {
   annotationLength,
   newAnnotation,
 } from '../../src/designer/annotations';
+import { planAndElevationsDxf, planDxf } from '../../src/designer/fabrication';
+import { roomEdges } from '../../src/designer/room';
 import {
   drawingPackageHtml,
   drawingOptionsSchema,
@@ -581,4 +583,64 @@ test('annotations measure themselves, defer to typed text and reach the drawing'
   d.items = [{ ...fromObject('custom_cabinet'), id: 'c1', x: 0, y: 0 }];
   const html = drawingPackageHtml(d, drawingOptions());
   assert.ok(html.includes('Verify riser before install'));
+});
+test('the drawing DXF carries the plan, every straight elevation and the notes', () => {
+  const d = newDesign();
+  d.room = {
+    width: 144,
+    depth: 120,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  d.items = [
+    {
+      ...fromObject('custom_cabinet'),
+      id: 'base',
+      sku: 'B24',
+      x: 12,
+      y: 0,
+      width: 24,
+      depth: 24,
+      height: 34.5,
+    },
+    {
+      ...fromObject('custom_cabinet'),
+      id: 'wall',
+      sku: 'W3030',
+      x: 12,
+      y: 0,
+      width: 30,
+      depth: 12,
+      height: 30,
+      elevation: 54,
+    },
+  ];
+  d.annotations = [
+    { ...newAnnotation('note', { x: 30, y: 60 }), text: 'Verify riser' },
+  ];
+  const dxf = planAndElevationsDxf(d);
+
+  // A real DXF, with one elevation frame per straight wall.
+  assert.ok(dxf.startsWith('0\nSECTION'));
+  assert.ok(dxf.trimEnd().endsWith('EOF'));
+  const walls = roomEdges(d.room).filter((e) => !e.curved).length;
+  assert.equal([...dxf.matchAll(/WALL \d+ ELEVATION/g)].length, walls);
+
+  // Both items appear in the plan and again in an elevation, and the note
+  // travels with the drawing.
+  assert.ok(dxf.includes('B24'));
+  assert.ok(dxf.includes('W3030'));
+  assert.ok(dxf.includes('Verify riser'));
+
+  // It is a millimetre file, and says so in the header, so the numbers in
+  // it have to be millimetres: a 96 inch room is 2438.4, not 96.
+  assert.ok(dxf.includes('2438.400'));
+  d.annotations = [
+    newAnnotation('dimension', { x: 0, y: 60 }, { x: 36, y: 60 }),
+  ];
+  assert.ok(planAndElevationsDxf(d).includes('914 mm'));
+
+  // The plan-only export stays what it was.
+  assert.ok(!planDxf(d).includes('WALL 1 ELEVATION'));
 });

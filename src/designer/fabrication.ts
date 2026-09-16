@@ -1,6 +1,8 @@
 import type { Design } from './model';
 import { itemPolygon } from './model';
-import { roomOutline } from './room';
+import { roomOutline, roomEdges } from './room';
+import { elevationRows } from './studio-tools';
+import { annotationLength } from './annotations';
 export const shopDefaults = { thickness: 0.75, back: 0.25, gap: 0.125 };
 export type PanelPart = {
   itemId: string;
@@ -231,7 +233,11 @@ export function text(x: number, y: number, label: string) {
   ];
 }
 export function planDxf(design: Design) {
-  return dxfFile([
+  return dxfFile(planEntities(design));
+}
+/** The plan itself, shared by the plan-only and the full drawing. */
+function planEntities(design: Design) {
+  return [
     ...text(
       0,
       design.room.depth + 12,
@@ -251,7 +257,87 @@ export function planDxf(design: Design) {
       ),
       ...text(item.x, design.room.depth - item.y, `${index + 1} ${item.sku}`),
     ]),
-  ]);
+    // What the designer marked by hand travels with the drawing. The file
+    // is in millimetres, so an unlabelled dimension is written in them: an
+    // inch label would lose its inch mark to the text sanitiser anyway.
+    ...(design.annotations ?? []).flatMap((a) => {
+      const label =
+        a.text ||
+        (a.kind === 'dimension'
+          ? `${(annotationLength(a) * 25.4).toFixed(0)} mm`
+          : '');
+      if (a.kind === 'note')
+        return label
+          ? text(a.x, design.room.depth - a.y, label)
+          : ([] as string[]);
+      return [
+        ...polyline(
+          [
+            { x: a.x, y: design.room.depth - a.y },
+            { x: a.x2 ?? a.x, y: design.room.depth - (a.y2 ?? a.y) },
+          ],
+          'DIMENSION',
+        ),
+        ...text(
+          ((a.x2 ?? a.x) + a.x) / 2,
+          design.room.depth - ((a.y2 ?? a.y) + a.y) / 2,
+          label,
+        ),
+      ];
+    }),
+  ];
+}
+/**
+ * The plan and every straight wall elevation in one drawing.
+ *
+ * Elevations are laid out below the plan, one under another, each labelled
+ * with its wall so a contractor opening the file can tell which is which.
+ * Curved walls have no flat projection and are listed as skipped rather
+ * than silently dropped.
+ */
+export function planAndElevationsDxf(design: Design) {
+  const entities = [...planEntities(design)];
+  const edges = roomEdges(design.room);
+  // Below the plan, with room for the label above each elevation.
+  let base = -36;
+  edges.forEach((edge, index) => {
+    if (edge.curved) {
+      entities.push(
+        ...text(0, base, `WALL ${index + 1}: curved, no flat elevation`),
+      );
+      base -= 24;
+      return;
+    }
+    entities.push(
+      ...text(0, base + design.room.height + 6, `WALL ${index + 1} ELEVATION`),
+      ...polyline(
+        [
+          { x: 0, y: base },
+          { x: edge.length, y: base },
+          { x: edge.length, y: base + design.room.height },
+          { x: 0, y: base + design.room.height },
+        ],
+        'ROOM',
+      ),
+    );
+    for (const row of elevationRows(design, index)) {
+      const bottom = base + row.item.elevation;
+      entities.push(
+        ...polyline(
+          [
+            { x: row.x, y: bottom },
+            { x: row.x + row.width, y: bottom },
+            { x: row.x + row.width, y: bottom + row.item.height },
+            { x: row.x, y: bottom + row.item.height },
+          ],
+          row.item.kind.toUpperCase(),
+        ),
+        ...text(row.x, bottom + row.item.height + 1, row.item.sku),
+      );
+    }
+    base -= design.room.height + 36;
+  });
+  return dxfFile(entities);
 }
 export function partsDxf(design: Design) {
   let y = 0;
