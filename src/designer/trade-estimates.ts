@@ -6,6 +6,7 @@ import {
 import { sha256 } from '@noble/hashes/sha2.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import type { Design } from './model';
+import { pieceWidths } from './seams';
 import {
   area,
   roomOutline,
@@ -393,11 +394,21 @@ export function packSlabs(d: Design, s: TradeInput) {
   const parts = d.items
     .filter((i) => i.kind === 'countertop')
     .flatMap((i) => {
-      const count = s.splits.find((p) => p.id === i.id)?.count ?? 1;
-      return Array.from({ length: count }, (_, n) => ({
+      // Seams placed on the top win over the old equal-split setting: the
+      // design knows where the joins are and can draw them, where a count
+      // of pieces in the trade settings could only price them. The setting
+      // still answers for tops that carry no seams of their own, so saved
+      // estimates keep their numbers.
+      const widths = pieceWidths(i);
+      const split = s.splits.find((p) => p.id === i.id)?.count ?? 1;
+      const cuts =
+        widths.length > 1
+          ? widths
+          : Array.from({ length: split }, () => i.width / split);
+      return cuts.map((width, n) => ({
         id: `${i.id}:${n}`,
-        label: `${i.sku} · ${i.id.slice(0, 6)} · part ${n + 1}/${count}`,
-        width: i.width / count,
+        label: `${i.sku} · ${i.id.slice(0, 6)} · part ${n + 1}/${cuts.length}`,
+        width,
         depth: i.depth,
       }));
     })

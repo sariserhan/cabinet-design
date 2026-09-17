@@ -463,6 +463,159 @@ test('selecting an item outlines it without rebuilding the scene', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('a phone opens on the drawing, with the panels a tap away', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(4000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = false)),
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(1500);
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  await page.waitForTimeout(2000);
+  await page.evaluate(() => window.scrollTo(0, 0));
+
+  const seen = () =>
+    page.evaluate(() => {
+      const box = document
+        .querySelector('.plan-scroll')
+        ?.getBoundingClientRect();
+      return box
+        ? Math.round(
+            Math.max(
+              0,
+              Math.min(innerHeight, box.bottom) - Math.max(0, box.top),
+            ),
+          )
+        : 0;
+    });
+  // Measured before this layout existed: 111 pixels of drawing at this
+  // width, under a library that stood above it. The library and the
+  // properties are now sheets, and what is left is the drawing.
+  expect(await seen()).toBeGreaterThan(350);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    ),
+    'the page must never scroll sideways',
+  ).toBe(0);
+
+  // The panels start out of the way and come back over the drawing.
+  await expect(page.locator('.designer-library-column')).toBeHidden();
+  await page.getByRole('button', { name: 'Library', exact: true }).click();
+  const library = page.locator('.designer-library-column');
+  await expect(library).toBeVisible();
+  expect(await library.evaluate((el) => getComputedStyle(el).position)).toBe(
+    'fixed',
+  );
+  // And one panel at a time, because two would be the whole screen.
+  await page.getByRole('button', { name: 'Properties', exact: true }).click();
+  await expect(library).toBeHidden();
+  await expect(page.locator('.designer-inspector')).toBeVisible();
+  expect(pageErrors).toEqual([]);
+});
+
+test('a lighting plan adds up its load and says what it needs', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  // A run of wall cabinets over a run of bases, which is what an
+  // under-cabinet strip follows.
+  await page
+    .getByLabel('Import design file')
+    .setInputFiles('tests/fixtures/designs/lighting-room.json');
+  await page.waitForTimeout(3000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+
+  await page.getByRole('button', { name: 'Add circuit' }).click();
+  const load = page.locator('[data-testid="circuit-load"]').first();
+  await expect(load).toContainText('0 fittings');
+  // A circuit with nothing on it, and no switch, is worth saying.
+  await expect(page.locator('.lighting-warnings')).toContainText('no fittings');
+
+  await page.getByRole('button', { name: /Add under-cabinet runs/ }).click();
+  // Three cabinets in one run, 88 inches of 4.4W/ft tape: 32W, which needs
+  // a 40W driver at the 80% a continuous load is held to.
+  await expect(load).toContainText('1 fitting ·');
+  await expect(load).toContainText('32W');
+  await expect(load).toContainText('driver 40W');
+  await expect(page.locator('.lighting-warnings')).toContainText(
+    'no switch position',
+  );
+
+  await page
+    .getByLabel(/Switch wall for/)
+    .first()
+    .selectOption('north');
+  await expect(page.locator('.lighting-warnings')).toHaveCount(0);
+  await expect(page.locator('.lighting-schedule')).toContainText(
+    'north wall, 36"',
+  );
+  expect(pageErrors).toEqual([]);
+});
+
+test('a worktop is joined where the designer says, and the plan shows it', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page
+    .getByLabel('Import design file')
+    .setInputFiles('tests/fixtures/designs/worktop-room.json');
+  await page.waitForTimeout(3000);
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  await page.waitForTimeout(1000);
+
+  const seams = page.locator('[data-testid="plan-seam"]');
+  await expect(seams).toHaveCount(0);
+  const plan = await page.locator('.plan-svg').boundingBox();
+  if (!plan) throw Error('the plan is not on screen');
+  await page.mouse.click(
+    plan.x + plan.width * 0.45,
+    plan.y + plan.height * 0.2,
+  );
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+
+  // Three pieces of a 96 inch top: joins at 32 and 64, drawn on the plan
+  // rather than only counted on an invoice, which is where they used to
+  // live as a number of equal splits in the countertop trade settings.
+  await page.getByLabel('Worktop pieces').selectOption('3');
+  await expect(seams).toHaveCount(2);
+  const first = page.getByLabel('Seam 1 position');
+  await expect(first).toHaveValue('32');
+
+  // And each one can be moved to where the slab actually allows.
+  await first.fill('40');
+  await first.blur();
+  await page.waitForTimeout(600);
+  await expect(seams).toHaveCount(2);
+  await expect(page.getByLabel('Seam 1 position')).toHaveValue('40');
+
+  await page.getByLabel('Worktop pieces').selectOption('1');
+  await expect(seams).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {

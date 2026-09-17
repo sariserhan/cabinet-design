@@ -1,6 +1,7 @@
 import { selectionBoardSchema } from './selection-schema';
 import { storageProfileSchema, siteTasksSchema } from './decision-schema';
 import { surveySchema } from './measurement-schema';
+import { lightingPlanSchema } from './lighting-schema';
 import { installationIssues, profileFor } from './installation';
 import { z } from 'zod';
 import {
@@ -30,6 +31,16 @@ export const itemSchema = z.object({
         .optional(),
       waterfall: z.boolean().optional(),
       seating: z.enum(['none', 'north', 'south', 'east', 'west']).optional(),
+      /**
+       * Where this top is joined, in inches from its left edge.
+       *
+       * A seam is a fact about the kitchen, not a line on an invoice: the
+       * fabricator cuts to it and the client sees it. It used to live in
+       * the countertop trade settings as a number of equal pieces, which
+       * meant no drawing could show one. Positions rather than a count,
+       * because where a seam falls is the whole question.
+       */
+      seams: z.array(z.number().finite().min(0).max(600)).max(7).optional(),
     })
     .optional(),
   refrigeratorStyle: z
@@ -175,6 +186,8 @@ export const designSchema = z
   .object({
     format: z.literal('kitchen-studio-v1'),
     measurements: surveySchema.optional(),
+    /** Fittings, circuits and switches: see `lighting-schema.ts`. */
+    lighting: lightingPlanSchema.optional(),
     storageProfile: storageProfileSchema.optional(),
     selectionBoard: selectionBoardSchema.optional(),
     siteTasks: siteTasksSchema.optional(),

@@ -55,6 +55,7 @@ Open http://localhost:4001/designer. Keep the SSH terminal open. If you already 
    To work on several items at once, **Shift + drag** across empty floor in the 2D plan to sweep a band over them, or **Shift + click** items one at a time in either the 2D plan or the 3D view. Dragging any member then moves the whole selection, and the arrow keys, **R** and **Delete** apply to all of it: a turn rotates the selection about its own centre, so a run of cabinets stays a run. Items linked to a selected one - its countertop, a mounted sink, the rest of its assembly - come along, one locked member refuses the change for the whole group, and a move or turn that would push something out of the room is reported instead of applied. Click empty floor to clear the selection, or click a single member to reduce the selection to it. Wall openings are not swept up by a band; the room tools move those.
 
    The 3D view starts with **Items locked**, so orbiting a design cannot move it. Clicking still selects while locked, which is how finishes are changed, but dragging and the item shortcuts do nothing until you select **Items locked** to unlock. The choice is remembered per account in this browser. Individual items can also be locked from Properties, which refuses any change to their geometry from every route, including the keyboard. Use Rotate, Turn 180°, Flip left/right, Duplicate, or Delete in Properties. Flip left/right mirrors the illustrative door front and handle; it does not change catalog dimensions or establish manufacturer handing. Undo and Redo preserve editing history during the session.
+
 5. Switch to **3D preview**, rotate the view, and try the illustrative finishes. Both views use the same cabinet positions and dimensions. Drag the 3D view to orbit, or choose its Pan tool. Zoom buttons and Fit control the view.
 6. Watch **Layout checks** for overlapping cabinets, room boundary violations, and ceiling height conflicts. Wall cabinets start at an editable elevation of 54 inches. Vertically separated cabinets do not count as overlaps.
 7. Name the project and select **Save design**. Create a new room, select your saved design, and press **Open** to restore it.
@@ -100,6 +101,8 @@ Choose the **Objects** tab in the left library. Add Door, Window, Sink, Refriger
 - **Services on the drawing:** water, drain, electric, gas and vent recorded in the measurement survey are drawn on the plan as marked points - W, D, E, G, V - and carried into the floor plan sheet with a service schedule giving each one's position, height and survey note. A service on a curved wall has no straight run to measure an offset along, so it is left out rather than placed somewhere plausible. Positions are as surveyed; confirm on site before first fix.
 - **Handing and interiors:** a cabinet records which side it is hinged - left, right or a pair - separately from the mirrored front, which only flips the drawn picture. Drawer and rollout counts sit beside it. All three appear in the drawing configuration a supplier reads.
 - **Leaders, angles and layers:** dragging with the **Note** tool gives the note a leader to whatever it points at; clicking alone leaves it where it is. **Angle** takes three clicks - the corner, then a point along each side - and reads the opening rather than the reflex outside it, so a square corner says 90°. Every note, dimension and angle carries a layer: every drawing, or design, installation or client only, chosen in Properties. A drawing issue picks the layer it carries and which sheets it contains - floor plan, upper plan, elevations, schedules - so a client pack can be the plan alone rather than the whole set.
+- **Worktop seams:** select a countertop or island and choose how many pieces it is cut into under **Seams** in the surfaces panel. Equal joins are proposed, and each position can then be typed where the slab actually allows. Seams are drawn on the 2D plan as dashed lines across the top, listed with their piece widths on sheet **C01** of the drawing set, and used by the countertop slab packing instead of its own equal-splits setting. A seam passing within four inches of a sink or a hob is reported, because that is where support becomes the fabricator's question.
+- **Lighting plan:** under **Lighting plan** in the project tools. Add a circuit, then **Add under-cabinet runs** reads one strip off each run of wall cabinets — an inch in at each end, at the cabinet's own height — and puts them on the circuit. Each circuit shows its fittings, its load and the driver it needs: strips draw by the foot, fittings draw per fitting, and a driver is sized at 80% of its rating because a strip runs for hours. Switch wall and dimming are recorded per circuit, and the plan warns about a fitting on no circuit, a circuit with no fittings, a circuit with no switch position, a driver too small for its load, and line-voltage dimming. The schedule prints as **L01** in the drawing set. It is a first-fix layout of where the design wants light, not a certified electrical design: circuits, protection and compliance belong to the electrician.
 - **Plan & elevations DXF:** beside the existing Layout DXF, an export carrying the plan and one frame for every straight wall, with placed notes and dimensions. Millimetres, as the header declares; a curved wall has no flat projection and is named as skipped rather than dropped.
 - **Start from a DXF plan:** in the Room stage, **Start from a DXF plan** reads a room outline out of a drawing somebody else produced, in the units the file states, falling back to millimetres and saying so when it does not. The largest closed outline is taken as the room; where there is none, the extent of everything drawn becomes a rectangle and the import says that is a guess. An outline with more than 24 corners is simplified and says by how much, and a plan that reads as smaller than a metre or larger than the designer holds is refused rather than imported wrong. Nothing else in the file is read - furniture, text, hatching and title blocks belong to whoever drew them - and anything already placed stays where it is, which the layout checks will comment on if the new room no longer contains it.
 - **Units:** **Units** at the top of Properties switches the whole designer between inches and millimetres. Geometry is stored in inches whatever it says, so switching changes what is typed and read, never the design: a 144 inch room reads 3658 mm, and typing 4000 there stores 157.48 inches. Field labels carry the unit, the plan and the dimension overlay follow it, and a drawing issue starts in the project's unit rather than asking again. Millimetres are shown whole; inches keep their eighths. Trade estimates and the machining exports keep their own units, which they already stated.
@@ -137,7 +140,6 @@ Every rendered image - the live view, the PNG, the panorama and the path-traced 
 
 Rendering runs locally in the browser with no API key or paid service. WebGL2 is required; the 2D plan and SVG 3D preview remain available on unsupported devices. Models and finishes are illustrative, not photorealistic manufacturer assets.
 
-
 ## Expanded demo: materials, architecture, detailing, and quotes
 
 - **Architecture & materials** in Properties selects a flat ceiling or a slope along room width/depth. The main ceiling height is the near end; far-end ceiling height sets the other end. Render, wall elevations, and ceiling checks use that plane. **Show ceiling** in Render makes the plane visible.
@@ -153,7 +155,6 @@ Expanded validation: angled polygon containment and SAT object collisions; slope
 
 Pricing source note: Fabuwood describes live pricing and order management through its [EZ Pricing dealer portal](https://www.fabuwood.com/become-a-dealer). This demo has no dealer-account integration or verified configured quote, so all displayed prices use the explicit demo schedule rather than claiming to be manufacturer prices.
 
-
 ## Presentation kitchen, advanced architecture, and shop coordination
 
 **Load presentation kitchen** opens The Oak House: 24 objects with wood cabinetry, marble counters, a working island layout, window, range/hood, source-profile appliances, a curved perimeter, vaulted ceiling, and an interior partition doorway. It uses explicitly named custom/demo cabinets; it does not invent manufacturer catalog records. Loading is undoable and never overwrites a named saved design.
@@ -166,11 +167,11 @@ Pricing source note: Fabuwood describes live pricing and order management throug
 - **Custom cabinet panel exports:** add Custom cabinet objects, then choose carcass stock, applied-back thickness, and door/shelf gaps. CSV and panel DXF generate rectangular raw blanks with configurable butt/rabbet joints, edge-banding allowances and generic drilling templates, using full-height sides, applied backs and full-overlay slab doors. They include only explicitly defined custom cabinets. Manufacturer cabinet internals are not inferred. Drawer boxes/fronts, purchased storage hardware, hardware-specific screw patterns, decorative molding, toe-platform framing, tool compensation and CNC toolpaths remain excluded. Review the construction assumptions, material and machine requirements with the fabricator before cutting. These are shop-coordination exports, not a claim of universal fabrication readiness.
 
 Source profiles checked September 15, 2026:
+
 - [Bosch SHP65CM5N specification sheet, April 2025](https://media3.bosch-home.com/Documents/20595186_SHP65CM5N%20Spec%20Sheet.pdf), pp. 1–3: model/niche dimensions, electrical rating, water pressure and drain high-loop limits. The 24-inch front operating envelope is explicitly a demo assumption.
 - [GE GTS22KGNRWW specifications](https://products.geappliances.com/appliance/gea-compare/%26sku%3DGTS22KGNRWW): model dimensions, air gaps, open-door dimensions and electrical rating. Lateral door-swing geometry, optional ice-maker plumbing and installation-manual details still require review.
 
 Validation: 104 core + 15 backend tests; desktop/mobile browser flow for sample loading, host movement, opening offsets, curves, ridge changes, electrical mismatch warnings, reload persistence, PNG and PDF exports. The 13-page PDF supplement was generated. Independent DXF parsing confirmed millimeter units, 25 closed layout outlines and 88 closed custom-panel outlines in the sample export. No actual fabrication or physical installation has been validated.
-
 
 ## Demo workflow improvements
 
@@ -228,7 +229,6 @@ The live benchmark was rerun successfully against the expanded working catalog a
 - Openness, walkthrough and rendering quality are temporary view controls. Styling and saved cameras are included in design JSON.
 
 QA includes scene-content checks for high-quality output (not just canvas presence), 1920-pixel export, opening fronts, camera presets, keyboard and button walking, styling toggles, mobile layout, and pure tests for rotated backsplash runs, window cutouts, room-boundary walking and approximate open-front conflicts.
-
 
 ## Presentation polish and demo rehearsal
 
@@ -355,7 +355,6 @@ These additions extend the earlier local-only demo scope:
 The previously recorded 145 products with unresolved fields and human benchmark sign-off remain dependent on authoritative manufacturer answers and reviewers. This implementation adds the evidence workflow; it does not declare the catalog production-ready.
 
 Validation for these additions: lint, TypeScript, 156 core tests, 21 backend tests, benchmark artifact integrity and production build pass. Playwright used the isolated QA account at `http://localhost:3000` (Browser plugin unavailable), with desktop and 390-pixel mobile checks. Verified cloud save/autosave, second-browser open, conflict preservation/reload, backup restoration, alternative generation/apply/Undo, supplier request/import/quote export, unsigned client comments and explicit revision approval, live revocation, readiness submissions/source-review display, and responsive layout. Backend tests additionally cover scheduled expiry and account isolation. Supplier and manufacturer evidence used for QA was explicitly synthetic and did not approve catalog facts.
-
 
 ## Spreadsheet prices, branded quotes, and measured rooms
 

@@ -1,4 +1,13 @@
 'use client';
+import { equalSeams, seamsOf, setSeams } from '@/designer/seams';
+import {
+  fromDisplay,
+  roundDisplay,
+  stepFor,
+  toDisplay,
+  unitSuffix,
+  unitsOf,
+} from '@/designer/units';
 import { useEffect, useState } from 'react';
 import type { Design } from '@/designer/model';
 import { sampleKitchen, sampleStories } from '@/designer/demo-gallery';
@@ -334,6 +343,53 @@ export function SurfaceEditor({
             />
             Waterfall ends
           </label>
+          {/* Seams: a fabricator's question the design can now answer.
+              Equal pieces to start with, because that is what a fabricator
+              proposes, and each position is editable afterwards. */}
+          <label>
+            Seams
+            <select
+              aria-label="Worktop pieces"
+              value={(item.surface?.seams ?? []).length + 1}
+              onChange={(e) =>
+                onChange(
+                  setSeams(
+                    design,
+                    item.id,
+                    equalSeams(item, Number(e.target.value)),
+                  ),
+                )
+              }
+            >
+              {[1, 2, 3, 4].map((pieces) => (
+                <option key={pieces} value={pieces}>
+                  {pieces === 1 ? 'One piece, no seam' : `${pieces} pieces`}
+                </option>
+              ))}
+            </select>
+          </label>
+          {seamsOf(item).map((at, n) => (
+            <label key={`${item.id}:${n}`}>
+              Seam {n + 1} ({unitSuffix(unitsOf(design))})
+              <input
+                type="number"
+                aria-label={`Seam ${n + 1} position`}
+                step={stepFor(unitsOf(design))}
+                value={roundDisplay(
+                  toDisplay(at, unitsOf(design)),
+                  unitsOf(design),
+                )}
+                onChange={(e) => {
+                  const moved = seamsOf(item).map((value, index) =>
+                    index === n
+                      ? fromDisplay(Number(e.target.value), unitsOf(design))
+                      : value,
+                  );
+                  onChange(setSeams(design, item.id, moved));
+                }}
+              />
+            </label>
+          ))}
           <label>
             Island seating
             <select

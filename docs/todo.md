@@ -164,18 +164,27 @@ checked against the model on 2026-09-16.
 
 ## Design tool, still open
 
-- [ ] **Place the countertop seams, not just price them.** Trade estimates
-      count planned seams and charge for them, and the slab preview shows
-      the pieces, but nothing draws where a seam falls - which a fabricator
-      cares about and a client who finds one across an island cares about
-      more. The obstacle is where the split count lives: it is a trade
-      setting today, outside the design, so the plan cannot see it. Moving
-      it onto the countertop would make seams part of the design and let
-      every drawing show them, and that is a decision about the pricing
-      path rather than a change to make quietly.
-- [ ] **A lighting plan.** Lighting exists as render presets. There is no
-      way to place under-cabinet runs, switches or circuits, and nothing to
-      hand an electrician.
+- [x] **Place the countertop seams, not just price them.** Done on
+      2026-09-17, and the decision the entry was waiting on was made: the
+      seams live on the design. A top carries the positions it is joined
+      at, in inches from its left edge, so the plan draws them, the
+      fabricator's sheet lists the piece widths and the slab packing cuts
+      to them. The old equal-splits setting in the countertop trade
+      estimate still answers for tops that carry no seams of their own,
+      so saved estimates keep their numbers, but a design's own seams win.
+      Positions rather than a count, because a join through a sink is the
+      thing a designer is trying to avoid and a count cannot say where it
+      falls - the plan warns when one passes within four inches of a sink
+      or a hob, and leaves the decision to the fabricator.
+- [x] **A lighting plan.** Done on 2026-09-17: circuits with a switch wall
+      and a dimming flag, fittings that draw by the foot or by the fitting,
+      under-cabinet runs read off the wall cabinets themselves, drivers
+      sized at the 80% a continuous load is held to, and the warnings that
+      fall out of it - a fitting on no circuit, a circuit with no switch, a
+      driver too small. It prints as sheet L01 with the rest of the set.
+      What it is not, and says so on the sheet: a certified electrical
+      design. Placing fittings by hand on the plan, and drawing their
+      symbols on it, is the next piece.
 - [ ] **Two people in one design.** Shared projects handle conflicts
       between saves; they do not let two people work at once.
 - [ ] **The 800-item ceiling.** `MAX_DESIGN_ITEMS` is 800, which is

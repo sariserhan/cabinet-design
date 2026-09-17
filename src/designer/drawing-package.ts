@@ -14,6 +14,8 @@ import { measurementStatus } from './project-workflow';
 import { itemConfiguration } from './supplier-pricing';
 import { annotationLabel, onLayer } from './annotations';
 import { servicePoints } from './services';
+import { lightingSchedule, lightingWarnings } from './lighting-plan';
+import { seamConflicts, seamSchedule } from './seams';
 export const drawingOptionsSchema = z.object({
   company: z.string().trim().max(160),
   client: z.string().max(160),
@@ -408,6 +410,40 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
         .join(
           '',
         )}</tbody></table><p>Positions as surveyed and recorded in this design. Confirm on site before first fix; this drawing does not authorise any service alteration.</p>`,
+    });
+  const seams = seamSchedule(d, o.unit);
+  if (o.sheets.schedules && seams.length)
+    pages.push({
+      title: 'C01 · Worktop seams',
+      body: `<table><thead><tr><th>Mark / item ID</th><th>Top</th><th>Pieces</th><th>Piece widths</th><th>Seam at</th></tr></thead><tbody>${seams
+        .map(
+          (row) =>
+            `<tr><td>${escape(row.item.id)}</td><td>${escape(row.sku)}</td><td>${row.pieces}</td><td>${escape(row.widths)}</td><td>${escape(row.seams)}</td></tr>`,
+        )
+        .join('')}</tbody></table>${
+        seamConflicts(d, o.unit).length
+          ? `<ul>${seamConflicts(d, o.unit)
+              .map((w) => `<li>${escape(w)}</li>`)
+              .join('')}</ul>`
+          : ''
+      }<p>Seam positions are measured from the left edge of each top as drawn on the plan. The fabricator confirms support, vein matching and whether a join can be made where it is shown.</p>`,
+    });
+  const lighting = lightingSchedule(d, o.unit);
+  if (o.sheets.schedules && lighting.length)
+    pages.push({
+      title: 'L01 · Lighting schedule',
+      body: `<table><thead><tr><th>Circuit</th><th>Supply</th><th>Fittings</th><th>Run</th><th>Load</th><th>Driver</th><th>Control</th><th>Switch</th></tr></thead><tbody>${lighting
+        .map(
+          (l) =>
+            `<tr><td>${escape(l.name)}</td><td>${escape(l.voltage)}</td><td>${l.fittings}</td><td>${escape(l.run)}</td><td>${escape(l.load)}</td><td>${escape(l.driver)}</td><td>${escape(l.control)}</td><td>${escape(l.switch)}</td></tr>`,
+        )
+        .join('')}</tbody></table>${
+        lightingWarnings(d).length
+          ? `<ul>${lightingWarnings(d)
+              .map((w) => `<li>${escape(w)}</li>`)
+              .join('')}</ul>`
+          : ''
+      }<p>A first-fix layout of where the design wants light, with loads as the fittings claim them and drivers sized at 80% of their rating for a continuous load. It is not a certified electrical design: circuits, protection and compliance are the electrician's.</p>`,
     });
   if (o.sheets.schedules)
     pages.push({

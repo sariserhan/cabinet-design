@@ -10,6 +10,7 @@ import {
   localToWorld,
 } from '@/designer/model';
 import { roomOutline, roomEdges } from '@/designer/room';
+import { seamLines } from '@/designer/seams';
 import { resizeFromPoint } from '@/designer/studio-tools';
 import {
   snapPlacement,
@@ -927,6 +928,20 @@ export function PlanCanvas({
               {service.notes ? ` · ${service.notes}` : ''}
             </title>
           </g>
+        ))}
+        {/* Seams: where the worktop is joined, which the fabricator cuts
+            to and the client sees. A dashed line rather than a solid one,
+            because it is a join in a surface, not an edge of it. */}
+        {seamLines(design).map((seam) => (
+          <line
+            key={seam.id}
+            className="plan-seam"
+            data-testid="plan-seam"
+            x1={seam.a.x}
+            y1={seam.a.y}
+            x2={seam.b.x}
+            y2={seam.b.y}
+          />
         ))}
         {(design.annotations ?? []).map((original) => {
           // While one is being dragged it follows the pointer; the design

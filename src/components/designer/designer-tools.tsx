@@ -19,6 +19,7 @@ import { TradeWorkspaces } from './trade-workspaces';
 import { download } from './designer-widgets';
 import type { History, ViewMode, WorkspaceStage } from './designer-state';
 import { JobRooms } from './job-rooms-panel';
+import { LightingPlanPanel } from './lighting-plan-panel';
 
 type Commit = (
   change: (current: Design) => Design,
@@ -271,6 +272,10 @@ export function DesignerMoreTools({
       <details className="project-controls">
         <summary>Rooms in this job</summary>
         <JobRooms design={design} saved={saved} commit={commit} />
+      </details>
+      <details className="project-controls">
+        <summary>Lighting plan</summary>
+        <LightingPlanPanel design={design} commit={commit} />
       </details>
       <details className="project-controls">
         <summary>Project files & examples</summary>
