@@ -2091,6 +2091,37 @@ body:has(.is-presenting) .demo-banner {
   color: #855b12;
   border-color: #c59a42;
 }
+/* Saying the app is working, while the app is too busy to say anything.
+   The spin is a transform so the compositor runs it: it keeps turning
+   through a blocked main thread, which is the only moment it matters. */
+.working {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+  font-size: var(--text-sm);
+  color: var(--studio-muted);
+}
+.working-spinner {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border: 2px solid var(--studio-line);
+  border-top-color: var(--studio-accent);
+  border-radius: 50%;
+  will-change: transform;
+  animation: working-spin 0.8s linear infinite;
+}
+@keyframes working-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .working-spinner {
+    animation-duration: 2.4s;
+  }
+}
 .lighting-comparison {
   padding: 12px 16px;
   background: #f1f6f4;

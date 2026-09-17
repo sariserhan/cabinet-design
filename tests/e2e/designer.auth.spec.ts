@@ -382,6 +382,52 @@ test('a finish renders as the colour it is, not a filmic version of it', async (
   expect(pageErrors).toEqual([]);
 });
 
+test('a slow action says it is working before it blocks the page', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(5000);
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  await expect(page.locator('.render-stage canvas')).toBeVisible({
+    timeout: 90_000,
+  });
+  await page.waitForTimeout(5000);
+
+  // Comparing lighting builds three more WebGL scenes. Measured before
+  // this existed, that was 29 seconds of a page that answered nothing and
+  // read as a crash. The line has to reach the screen before the work
+  // starts, which means within a frame or two of the click rather than
+  // whenever the building finishes.
+  const started = Date.now();
+  await page
+    .getByRole('button', { name: 'Compare daytime, evening & task lighting' })
+    .click({ noWaitAfter: true });
+  const busy = page.locator('.working');
+  await expect(busy).toBeVisible({ timeout: 5000 });
+  expect(Date.now() - started).toBeLessThan(5000);
+  // Which view it is on depends on how fast the machine is; that it
+  // counts them is the point.
+  await expect(busy).toHaveText(/Building view \d of 3/);
+  // A screen reader hears it too, rather than watching a spinner.
+  await expect(busy).toHaveAttribute('role', 'status');
+
+  // And the views arrive one at a time rather than all at the end.
+  await expect
+    .poll(() => page.locator('.lighting-grid canvas').count(), {
+      timeout: 240_000,
+    })
+    .toBe(3);
+  await expect(busy).toHaveCount(0);
+  await page.getByRole('button', { name: 'Close lighting comparison' }).click();
+  await expect(page.locator('.lighting-grid')).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {

@@ -8,6 +8,7 @@ import type { UpdateView, ViewState } from './render-state';
 import { presentationViews } from '@/designer/render-planning';
 import { imageBalance } from '@/designer/image-quality';
 import { photoSnapshot } from './photo-render';
+import { Working, useWorking } from './working';
 import type { CameraView } from './render-view';
 
 type View = NonNullable<Design['views']>[number];
@@ -84,6 +85,10 @@ export function RenderControls({
   photoSamples,
   setPhotoSamples,
 }: RenderControlsProps) {
+  // Exporting a still or a panorama renders the scene again, at several
+  // times the size of the view, on the main thread: seconds of a page
+  // that answers nothing. It says what it is doing now.
+  const { working, run } = useWorking();
   // Destructured so the markup below still reads each field by name.
   const {
     variant,
@@ -387,18 +392,27 @@ export function RenderControls({
             </select>
           </label>
           <button
-            onClick={() => actions.current?.save(exportWidth)}
-            disabled={!!error || assetsLoading}
+            onClick={() =>
+              void run(`Rendering the ${exportWidth} px image…`, () =>
+                actions.current?.save(exportWidth),
+              )
+            }
+            disabled={!!error || assetsLoading || !!working}
           >
             Download PNG
           </button>
           <button
-            onClick={() => actions.current?.panorama(2048)}
-            disabled={!!error || assetsLoading}
+            onClick={() =>
+              void run('Rendering the panorama…', () =>
+                actions.current?.panorama(2048),
+              )
+            }
+            disabled={!!error || assetsLoading || !!working}
             title="An equirectangular image, taken standing in the open floor of the room"
           >
             Download 360 panorama
           </button>
+          {working && <Working label={working} />}
           {!showCeiling && (
             <small>
               A panorama looks overhead as well as around: turn the ceiling on

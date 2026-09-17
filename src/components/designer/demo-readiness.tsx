@@ -6,6 +6,7 @@ import { roomEdges } from '@/designer/room';
 import { fillWallRun, lightingVariants } from '@/designer/demo-readiness';
 import { presentationViews } from '@/designer/render-planning';
 import { MiniPlan } from './workflow-tools';
+import { Working, painted } from './working';
 import type { CameraView } from './render-view';
 const RenderView = dynamic(() => import('./render-view'), { ssr: false });
 export function WallRunBuilder({
@@ -101,7 +102,21 @@ export function WallRunBuilder({
   );
 }
 export function LightingComparison({ design }: { design: Design }) {
-  const [open, setOpen] = useState(false),
+  // Three WebGL views, built one at a time.
+  //
+  // Mounting all three in one commit blocked the main thread for 29
+  // seconds under software rendering, and a few on a GPU, with nothing on
+  // screen to say why: the page simply stopped, which reads as a crash.
+  // Each view now waits for a painted frame before the next one starts,
+  // so the first is there to look at while the rest build and the count
+  // says what is left.
+  //
+  // It is a trade, measured rather than assumed: one blocked stretch of
+  // 29 seconds becomes three of about 24, because the views already built
+  // are drawing while the next one builds. On a GPU, where drawing is
+  // most of nothing, the penalty goes with it; under software rendering
+  // it is real, and still better than a page that looks dead.
+  const [built, setBuilt] = useState(0),
     [camera, setCamera] = useState<CameraView>(
       design.views?.[0] ??
         presentationViews(design)[0] ?? {
@@ -109,6 +124,8 @@ export function LightingComparison({ design }: { design: Design }) {
           target: [90, 36, 60],
         },
     );
+  const variants = lightingVariants(design);
+  const open = built > 0;
   return (
     <section className="lighting-comparison">
       <h3>Compare lighting</h3>
@@ -116,14 +133,27 @@ export function LightingComparison({ design }: { design: Design }) {
         Three views of this kitchen using the same camera. Your saved lighting
         stays unchanged.
       </p>
-      <button onClick={() => setOpen(!open)}>
+      <button
+        onClick={() => {
+          if (open) return setBuilt(0);
+          void (async () => {
+            for (let n = 1; n <= variants.length; n++) {
+              setBuilt(n);
+              await painted();
+            }
+          })();
+        }}
+      >
         {open
           ? 'Close lighting comparison'
           : 'Compare daytime, evening & task lighting'}
       </button>
+      {open && built < variants.length && (
+        <Working label={`Building view ${built + 1} of ${variants.length}…`} />
+      )}
       {open && (
         <div className="lighting-grid">
-          {lightingVariants(design).map((v) => (
+          {variants.slice(0, built).map((v) => (
             <article key={v.name}>
               <h4>{v.name}</h4>
               <RenderView

@@ -6,6 +6,7 @@ import { MaterialSwatches } from './refinement-tools';
 import { RoomSetup } from './room-setup';
 import { isPreparedSample } from '@/designer/demo-gallery';
 import { zipFiles } from '@/designer/presentation-bundle';
+import { Working, useWorking } from './working';
 import { money, quoteTotals } from '@/designer/quote';
 import { MiniPlan } from './workflow-tools';
 const RenderView = dynamic(() => import('./render-view'), { ssr: false });
@@ -421,6 +422,9 @@ export function ClientPresentation({
   }
   const packageRef = useRef<HTMLElement>(null);
   const [bundleError, setBundleError] = useState('');
+  // Zipping the captured renders, the drawings and the quote is seconds of
+  // blocked main thread on a package with several views in it.
+  const { working, run } = useWorking();
   function downloadBundle() {
     try {
       const article = packageRef.current;
@@ -618,9 +622,13 @@ export function ClientPresentation({
             Clear captured views
           </button>
         </div>
-        <button disabled={!captures.length} onClick={downloadBundle}>
+        <button
+          disabled={!captures.length || !!working}
+          onClick={() => void run('Packing the presentation…', downloadBundle)}
+        >
           Download presentation package
         </button>
+        {working && <Working label={working} />}
         <p>
           ZIP includes a presentation you can open in a browser, render PNGs, a
           floor plan, demo quote and editable design. Extract it and open
