@@ -18,32 +18,72 @@ the day this was written all five already did - the counts were the only
 thing that had rotted - which is the argument for checking them now,
 while they are right, rather than after someone notices they are not.
 """
+import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
+def node() -> str:
+    """The node that is running this, not the one a PATH might offer.
+
+    A git hook can have almost nothing on its PATH - `npx` certainly was
+    not there when this failed on a push - so the runners are started
+    through the interpreter npm already told us about, by their files
+    rather than by their names.
+    """
+    return os.environ.get("npm_node_execpath") or shutil.which("node") or "node"
+
+
+COLOUR = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
+
+
 def run(command: list[str]) -> str:
-    done = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
-    return done.stdout + done.stderr
+    done = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        # A pre-push hook is handed the pushed refs on stdin; nothing here
+        # wants to read them, and a runner that tries would hang.
+        stdin=subprocess.DEVNULL,
+        env={**os.environ, "NO_COLOR": "1", "FORCE_COLOR": "0"},
+    )
+    # And strip what colours through anyway. This is the whole of why the
+    # check failed on a push and passed everywhere else: in a hook's
+    # environment vitest printed `Tests` and `31 passed` with escape
+    # sequences between them, and a pattern that reads the two as
+    # neighbours saw nothing at all.
+    return COLOUR.sub("", done.stdout + done.stderr)
 
 
 def core_count() -> int:
-    out = run(["npx", "tsx", "--test", *[str(p) for p in sorted((ROOT / "tests/core").glob("*.test.ts"))]])
+    out = run(
+        [
+            node(),
+            "node_modules/tsx/dist/cli.mjs",
+            "--test",
+            *[str(p) for p in sorted((ROOT / "tests/core").glob("*.test.ts"))],
+        ]
+    )
     found = re.search(r"^.\s*tests (\d+)$", out, re.M)
     if not found:
-        sys.exit("FAIL: could not read a test total from the core runner.")
+        sys.exit(
+            "FAIL: could not read a test total from the core runner.\n"
+            + out[-800:]
+        )
     return int(found.group(1))
 
 
 def backend_count() -> int:
-    out = run(["npx", "vitest", "run"])
+    out = run([node(), "node_modules/vitest/vitest.mjs", "run"])
     found = re.search(r"Tests\s+(\d+) passed", out)
     if not found:
-        sys.exit("FAIL: could not read a test total from vitest.")
+        sys.exit("FAIL: could not read a test total from vitest.\n" + out[-800:])
     return int(found.group(1))
 
 
