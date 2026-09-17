@@ -199,6 +199,111 @@ test('a 360 panorama is exported from inside the room, lit and level', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('an appliance front reflects the room and carries its brushed grain', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  // A room built for this measurement: a steel door to look at, and a run,
+  // a worktop and a window behind the camera for it to reflect. The design
+  // opens on its own saved view, square in front of the door.
+  await page
+    .getByLabel('Import design file')
+    .setInputFiles('tests/fixtures/designs/appliance-front.json');
+  await page.waitForTimeout(4000);
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  await expect(page.locator('.render-stage canvas')).toBeVisible({
+    timeout: 90_000,
+  });
+  // The scene environment starts as a neutral studio and becomes the garden
+  // once the HDR arrives, which is the environment this measurement is
+  // about. The export buttons are what the view disables until then.
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await expect(page.getByRole('button', { name: 'Download PNG' })).toBeEnabled({
+    timeout: 120_000,
+  });
+  await page.waitForTimeout(10_000);
+
+  /** Colour and grain over a clear patch of the door. */
+  const door = () =>
+    page.evaluate(() => {
+      const src = document.querySelector<HTMLCanvasElement>(
+        '.render-stage canvas',
+      );
+      if (!src) return null;
+      const off = document.createElement('canvas');
+      off.width = src.width;
+      off.height = src.height;
+      const ctx = off.getContext('2d');
+      if (!ctx) return null;
+      ctx.drawImage(src, 0, 0);
+      const w = Math.round(off.width * 0.3),
+        h = Math.round(off.height * 0.3);
+      const { data } = ctx.getImageData(
+        Math.round(off.width * 0.35),
+        Math.round(off.height * 0.55),
+        w,
+        h,
+      );
+      const channels = [0, 0, 0];
+      const lum: number[] = [];
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i] ?? 0,
+          g = data[i + 1] ?? 0,
+          b = data[i + 2] ?? 0;
+        channels[0] = (channels[0] ?? 0) + r;
+        channels[1] = (channels[1] ?? 0) + g;
+        channels[2] = (channels[2] ?? 0) + b;
+        lum.push(0.2126 * r + 0.7152 * g + 0.0722 * b);
+      }
+      const count = data.length / 4;
+      const mean = channels.reduce((a, b) => a + b, 0) / 3 / count;
+      let across = 0,
+        along = 0,
+        n = 0;
+      for (let y = 1; y < h; y++)
+        for (let x = 1; x < w; x++) {
+          along += Math.abs((lum[y * w + x] ?? 0) - (lum[y * w + x - 1] ?? 0));
+          across += Math.abs(
+            (lum[y * w + x] ?? 0) - (lum[(y - 1) * w + x] ?? 0),
+          );
+          n++;
+        }
+      return {
+        mean,
+        // How far the three channels sit apart, as a share of the level.
+        tint:
+          (Math.max(...channels) - Math.min(...channels)) /
+          count /
+          Math.max(1, mean),
+        along: along / n,
+        across: across / n,
+      };
+    });
+
+  const measured = await expect
+    .poll(async () => (await door())?.mean ?? 0, { timeout: 120_000 })
+    .toBeGreaterThan(20)
+    .then(door);
+  if (!measured) throw Error('the door was not drawn');
+
+  // Steel is its reflection, and what it reflects here is a room: grey.
+  // Reflecting the garden environment instead - which is what an appliance
+  // did before the room was captured - tints it sky and soil.
+  expect(measured.tint).toBeLessThan(0.06);
+  // Brushed rather than polished: a grain that runs across the panel, so
+  // the image changes far faster up the door than along it. A painted
+  // panel changes at the same rate both ways.
+  expect(measured.across).toBeGreaterThan(0.5);
+  expect(measured.across).toBeGreaterThan(measured.along * 2.5);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {

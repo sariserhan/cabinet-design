@@ -10,6 +10,7 @@ import {
 import { applianceDetails, doorFace, metalPull } from './render-details';
 import { materialTexture } from './render-textures';
 import { box, createPalette } from './render-materials';
+import { equirectangularFromCube } from './render-probe';
 import { backsplashRuns, walkEntry } from '@/designer/render-planning';
 import { apronHeight } from '@/designer/refinements';
 import type { RenderSettings } from '@/designer/render-settings';
@@ -66,34 +67,52 @@ export type BuildContext = Palette & {
   openingRef: { current: number };
 };
 
+/** A half-float texel, as three writes into a PMREM target. */
+function halfFloat(bits: number) {
+  const sign = bits >> 15 ? -1 : 1,
+    exponent = (bits >> 10) & 0x1f,
+    fraction = bits & 0x3ff;
+  if (exponent === 0) return sign * 2 ** -14 * (fraction / 1024);
+  if (exponent === 31) return fraction ? NaN : sign * Infinity;
+  return sign * 2 ** (exponent - 15) * (1 + fraction / 1024);
+}
+
 /**
- * Did the room probe actually capture the room?
+ * Is this reflection worth wearing?
  *
  * A material's own `envMap` replaces the scene environment for that
- * material, so handing it an empty capture is not a missing reflection - it
- * is no environment light at all, and every worktop, glass pane and steel
- * front renders black. Any non-zero colour sample means the capture worked;
- * a read that fails counts as failure, and the materials keep the scene
- * environment they already had, which is the good result rather than a
- * broken one.
+ * material, so a bad probe is worse than none: it is what the surface
+ * shows instead of the room. Two ways one comes back bad, and both have
+ * happened here. Empty, which leaves every worktop, glass pane and steel
+ * front black. Flat - one colour over the whole capture - which a metal,
+ * having no diffuse term of its own, then wears as paint, and which is
+ * exactly what made the appliance fronts look like pale grey card. So this
+ * asks the finished reflection for light and for variation, and a design
+ * whose probe fails keeps the scene environment it already had.
  */
-function probeCaptured(
+function probeUsable(
   renderer: THREE.WebGLRenderer,
-  cube: THREE.WebGLCubeRenderTarget,
+  target: THREE.WebGLRenderTarget,
 ) {
-  const pixels = new Uint8Array(4 * 8 * 8);
-  for (let face = 0; face < 6; face++) {
-    try {
-      renderer.readRenderTargetPixels(cube, 0, 0, 8, 8, pixels, face);
-    } catch {
-      return false;
-    }
-    // Alpha comes back as an opaque 1.0 even from a capture that holds no
-    // colour at all, so only the colour channels count as evidence.
-    for (let i = 0; i < pixels.length; i++)
-      if (i % 4 !== 3 && pixels[i] !== 0) return true;
+  const width = Math.min(256, target.width),
+    height = 8,
+    y = Math.max(0, Math.floor(target.height / 2) - height);
+  const pixels = new Uint16Array(width * height * 4);
+  try {
+    renderer.readRenderTargetPixels(target, 0, y, width, height, pixels);
+  } catch {
+    return false;
   }
-  return false;
+  let low = Infinity,
+    high = -Infinity;
+  for (let i = 0; i < pixels.length; i++) {
+    if (i % 4 === 3) continue;
+    const value = halfFloat(pixels[i] ?? 0);
+    if (!Number.isFinite(value)) continue;
+    low = Math.min(low, value);
+    high = Math.max(high, value);
+  }
+  return high > 0.01 && high - low > 0.02;
 }
 export function buildKitchenScene(context: BuildContext) {
   const {
@@ -945,38 +964,60 @@ export function buildKitchenScene(context: BuildContext) {
     }
   }
   let roomReflection: THREE.WebGLRenderTarget | undefined;
-  if (quality) {
-    // Byte, not half-float. The room is a lit interior rather than a sky, so
-    // the extra range buys very little here, and a half-float cube comes
-    // back unusable as PMREM input on software WebGL - which turned every
-    // worktop, glass pane and steel front in the view black.
-    const cube = new THREE.WebGLCubeRenderTarget(128, {
-      type: THREE.UnsignedByteType,
-    });
-    const probe = new THREE.CubeCamera(0.5, size * 10, cube);
+  {
+    // Every reflective surface in a kitchen reflects the kitchen. Without
+    // this the environment is the one outside the windows, so an appliance
+    // door shows blurred garden at a third of the light it stands in - and
+    // a metal, having no diffuse term, has nothing else to show. The room
+    // is captured once per build, for every view rather than only the high
+    // quality one, because it is what makes steel look like steel.
     const location = walkEntry(design) ?? [
       design.room.width / 2,
       design.room.height * 0.7,
       design.room.depth / 2,
     ];
-    probe.position.set(...location);
-    probe.update(renderer, scene);
-    if (probeCaptured(renderer, cube)) {
-      const generator = new THREE.PMREMGenerator(renderer);
-      roomReflection = generator.fromCubemap(cube.texture);
-      generator.dispose();
-      for (const m of [
-        steel,
-        hardware,
-        glass,
-        windowGlass,
-        ...stoneMaterials.values(),
-      ]) {
-        m.envMap = roomReflection.texture;
-        m.envMapIntensity = 0.75;
-      }
-    }
+    const cube = new THREE.WebGLCubeRenderTarget(quality ? 256 : 128, {
+      type: THREE.UnsignedByteType,
+    });
+    const capture = new THREE.CubeCamera(0.5, size * 10, cube);
+    capture.position.set(...location);
+    capture.update(renderer, scene);
+    // By way of one equirectangular strip, which looks like a detour and
+    // is not. Measured on software WebGL, of PMREM's three inputs only
+    // this one survives: fromCubemap of this capture returns a single flat
+    // colour, which a metal then wears as paint and which is exactly how
+    // the appliance fronts came to look like pale grey card; fromScene,
+    // and any half-float input, come back black. An equirectangular byte
+    // texture is the input the garden environment already takes here, and
+    // it is the one that works.
+    const strip = new THREE.WebGLRenderTarget(
+      quality ? 1024 : 512,
+      quality ? 512 : 256,
+      { type: THREE.UnsignedByteType },
+    );
+    equirectangularFromCube(renderer, cube.texture, strip);
+    strip.texture.mapping = THREE.EquirectangularReflectionMapping;
+    const generator = new THREE.PMREMGenerator(renderer);
+    const probe = generator.fromEquirectangular(strip.texture);
+    generator.dispose();
+    strip.dispose();
     cube.dispose();
+    if (probeUsable(renderer, probe)) {
+      roomReflection = probe;
+      for (const [m, intensity] of [
+        // A metal is its reflection, so it takes the room at full strength
+        // rather than the third that suits surfaces which also take direct
+        // light on a diffuse term of their own.
+        [steel, 1],
+        [hardware, 1],
+        [glass, 0.75],
+        [windowGlass, 0.75],
+        ...[...stoneMaterials.values()].map((m) => [m, 0.75] as const),
+      ] as const) {
+        m.envMap = probe.texture;
+        m.envMapIntensity = intensity;
+      }
+    } else probe.dispose();
   }
 
   // movingFronts is animated per frame by the caller's opening tween.

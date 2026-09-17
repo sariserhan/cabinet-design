@@ -84,3 +84,17 @@ export function parsePresentationScenes(raw: string, id: string) {
     throw Error('Scene settings belong to a different design.');
   return v;
 }
+
+/**
+ * How much of the environment lights the room.
+ *
+ * Held well below one so that the sun and the lamps lead on everything with
+ * a diffuse term; a task-lit scene leans on its own fittings further still.
+ * Metals have no diffuse term at all, so they undo this with an
+ * `envMapIntensity` of its reciprocal rather than being left in the dark.
+ */
+export function environmentIntensity(
+  profile: RenderSettings['lightingProfile'] | undefined,
+) {
+  return profile === 'task' ? 0.2 : 0.35;
+}

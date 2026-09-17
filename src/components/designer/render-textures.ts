@@ -228,9 +228,16 @@ export function surfaceDetail(kind: 'paint' | 'wood' | 'stone' | 'metal') {
         Math.sin(t * Math.PI * 17.9) * 0.55 +
         Math.sin(t * Math.PI * 41.3 + 1.7) * 0.28 +
         Math.sin(t * Math.PI * 7.1 + 0.4) * 0.17;
+      // Brushing is a field of fine parallel grooves, each polished to its
+      // own depth: the panel is one roughness at a distance and a stack of
+      // light and dark lines close up. A narrow band around one value - what
+      // this was - is a smooth panel with a whisper of texture, which is why
+      // steel read as paint. The line's own roughness carries most of the
+      // range, and a little per-pixel noise keeps the lines from being
+      // ruled.
       const value =
         kind === 'metal'
-          ? 190 + brush * 45
+          ? 118 + brush * 104 + noise * 22
           : kind === 'wood'
             ? 190 + grain * 26 + noise * 16
             : kind === 'paint'

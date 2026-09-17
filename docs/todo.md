@@ -63,10 +63,26 @@ started. What is left is ranked by how much it changes the picture.
       perfect 90 degrees, so no edge ever catches a highlight, and that alone
       reads as computer graphics. A 1-2 mm chamfer on fronts is the largest
       single realism gain available, and the most geometry work.
-- [ ] **Look again at the appliance and worktop materials on a real GPU.**
-      Steel currently reflects the room probe as a flat pale grey rather than
-      reading as brushed metal. Judging this needs hardware rendering, which
-      is not available in the environment these notes were written in.
+- [x] **Appliance and worktop materials.** Done on 2026-09-17, and the
+      diagnosis was not what the note said. The room probe was built only for the high quality
+      view, and there it came back as one flat colour, because PMREM's
+      `fromCubemap` returns a flat colour on software WebGL; steel, which
+      has no diffuse term, wore that colour as paint. Every view now
+      captures the room and routes it through an equirectangular strip,
+      which is the PMREM input that works, and the brushing carries a real
+      range of roughness instead of a whisper. Left over: nothing nearby
+      appears in a reflection, because there is one distant probe and no
+      screen-space reflections - a bowl on a worktop casts no image in it.
+      That is the next step for reflective surfaces, and its own piece of
+      work.
+- [ ] **Look at the render on a real GPU.** Still unmeasured, and this
+      account cannot: `/dev/dri/renderD128` is `root:render` and the account
+      is not in the group, so headless Chromium falls back to SwiftShader
+      whatever flags it is given. One command grants it -
+      `sudo usermod -aG render $USER`, then a new login - and then the
+      material work above, the refinement gate below and the probe's cost
+      per scene build can all be judged on hardware rather than argued
+      about.
 - [ ] **Check the refinement gate on real hardware.** A still view refines
       itself only where a frame is cheap, decided by timing one attempt. That
       back-off is what software rendering hits; nobody has yet watched it

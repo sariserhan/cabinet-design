@@ -18,9 +18,11 @@ import {
   type ViewState,
 } from './render-state';
 import { buildKitchenScene } from './render-scene';
+import { equirectangularFromCube } from './render-probe';
 import { RenderControls, type RenderActions } from './render-controls';
 import { imageBalance } from '@/designer/image-quality';
 import {
+  environmentIntensity,
   type RenderSettings,
   type PresentationScene,
 } from '@/designer/render-settings';
@@ -399,8 +401,9 @@ export default function RenderView({
           ? pmrem.fromEquirectangular(assets.sky)
           : pmrem.fromScene(environmentScene, 0.04);
     scene.environment = environment.texture;
-    scene.environmentIntensity =
-      design.appearance?.lightingProfile === 'task' ? 0.2 : 0.35;
+    scene.environmentIntensity = environmentIntensity(
+      design.appearance?.lightingProfile,
+    );
     environmentScene.dispose();
     pmrem.dispose();
     const lighting = design.appearance?.lighting ?? 'daylight';
@@ -1177,38 +1180,6 @@ export default function RenderView({
           { type: THREE.UnsignedByteType },
         );
         const capture = new THREE.CubeCamera(0.5, 4000, cube);
-        const quad = new THREE.Mesh(
-          new THREE.PlaneGeometry(2, 2),
-          new THREE.ShaderMaterial({
-            uniforms: {
-              tCube: { value: cube.texture },
-              whiteBalance: {
-                value: new THREE.Vector3(...whiteBalanceRef.current),
-              },
-            },
-            vertexShader:
-              'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
-            // The two includes are what the composer's balance and output
-            // passes do to every other frame: the same white balance, the
-            // same ACES curve at the same exposure, the same sRGB write.
-            // Without them a panorama comes out dark and flat, because
-            // three applies neither when a render goes to a target.
-            fragmentShader: `
-              uniform samplerCube tCube;
-              uniform vec3 whiteBalance;
-              varying vec2 vUv;
-              void main(){
-                float lon = (vUv.x - 0.5) * 6.2831853;
-                float lat = (vUv.y - 0.5) * 3.1415927;
-                vec3 dir = vec3(cos(lat) * sin(lon), sin(lat), -cos(lat) * cos(lon));
-                gl_FragColor = vec4(textureCube(tCube, dir).rgb * whiteBalance, 1.0);
-                #include <tonemapping_fragment>
-                #include <colorspace_fragment>
-              }`,
-          }),
-        );
-        const flat = new THREE.Scene().add(quad);
-        const flatCamera = new THREE.Camera();
         const oldSize = renderer.getSize(new THREE.Vector2()),
           oldRatio = renderer.getPixelRatio();
         try {
@@ -1224,7 +1195,12 @@ export default function RenderView({
           // tone maps and encodes it the way it does the view on screen.
           renderer.setPixelRatio(1);
           renderer.setSize(width, height, false);
-          renderer.render(flat, flatCamera);
+          equirectangularFromCube(
+            renderer,
+            cube.texture,
+            null,
+            whiteBalanceRef.current,
+          );
           const link = document.createElement('a');
           link.download = `${design.name.replace(/[^a-z0-9-]/gi, '-').slice(0, 80) || 'kitchen'}-360.png`;
           link.href = renderer.domElement.toDataURL('image/png');
@@ -1232,8 +1208,6 @@ export default function RenderView({
         } catch {
           setError('Panorama export failed. Try reopening Render.');
         } finally {
-          quad.geometry.dispose();
-          (quad.material as THREE.Material).dispose();
           cube.dispose();
           renderer.setPixelRatio(oldRatio);
           renderer.setSize(oldSize.x, oldSize.y, false);

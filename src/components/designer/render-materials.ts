@@ -5,6 +5,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { applyAssetMaterial, type RenderAssets } from './render-assets';
 import { materialTexture, surfaceDetail } from './render-textures';
 import type { Design } from '@/designer/model';
+import { environmentIntensity } from '@/designer/render-settings';
 
 /**
  * Adds a rounded box to `parent` and rewrites its UVs so wood grain runs along
@@ -161,8 +162,13 @@ export function createPalette({
     const cached = stoneMaterials.get(name);
     if (cached) return cached;
     const m = material('#ffffff', 0, 0.23);
-    m.clearcoat = 0.45;
-    m.clearcoatRoughness = 0.16;
+    // Polished, honed or flamed is the choice a client makes in the
+    // showroom by running a hand over the slab, and it is a coat of lacquer
+    // in a renderer: quartz and marble leave the factory polished, granite
+    // is usually honed. The polish is what carries the room at a grazing
+    // angle, which is how a worktop is seen from standing height.
+    m.clearcoat = name === 'granite' ? 0.35 : 0.7;
+    m.clearcoatRoughness = name === 'granite' ? 0.24 : 0.06;
     const texture = materialTexture(name);
     textures.push(texture);
     m.map = texture;
@@ -189,6 +195,9 @@ export function createPalette({
     0.8,
     0.28,
   );
+  // Pulls and knobs are metal too, and dim for the same reason.
+  hardware.envMapIntensity =
+    1 / environmentIntensity(design.appearance?.lightingProfile);
   const windowGlass = new THREE.MeshPhysicalMaterial({
     color: '#d5e8e9',
     roughness: 0.06,
@@ -204,9 +213,21 @@ export function createPalette({
   steel.map = brushed;
   steel.bumpMap = detailMaps.metal;
   steel.roughnessMap = detailMaps.metal;
-  steel.metalness = 0.95;
-  steel.roughness = 0.32;
-  steel.bumpScale = 0.008;
+  steel.metalness = 1;
+  steel.roughness = 0.2;
+  steel.bumpScale = 0.02;
+  // A metal has no diffuse term: every photon it shows is the environment,
+  // which this scene deliberately dims to a third so that the lamps and the
+  // sun lead on the surfaces that do have one. Left at the default, steel is
+  // lit at a third of the room it stands in and reads as dark smoked glass.
+  // The factor puts it back at parity with the room.
+  steel.envMapIntensity =
+    1 / environmentIntensity(design.appearance?.lightingProfile);
+  // Brushed, not polished: the highlight is drawn out along the grain rather
+  // than round. The grain runs across the panel, which is how appliance
+  // fronts are finished, and U runs across a box face.
+  steel.anisotropy = 0.7;
+  steel.anisotropyRotation = 0;
   const floorMaterial = material('#ffffff', 0, 0.52);
   const woodFloor = !['tile', 'slate'].includes(
     design.appearance?.flooring ?? 'oak',

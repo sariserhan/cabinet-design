@@ -131,6 +131,8 @@ Choose **Render** beside **3D preview** for the WebGL view. It uses the current 
 
 **Download 360 panorama** writes a 2048x1024 equirectangular PNG - the format a phone viewer, a VR headset or a web panorama player expects - so a client can look around the kitchen rather than at one framed view of it. It is taken from standing height in the most open floor of the room, not from wherever the orbit camera is parked, and falls back to the camera's own position only where nothing in the room is standable. It carries the exposure, white balance and tone curve of the view on screen. The image looks overhead as well as around, so turn **Show ceiling** on first unless an open roof is wanted; the panel says so while the ceiling is off.
 
+Reflections come from the room itself. Every build of the scene captures it once from standing height and hands that to the reflective materials - appliance fronts, pulls, glass and stone - so a steel door shows the kitchen it stands in rather than the garden outside the windows. Metals take it at full strength, because a metal has no other source of light; polished surfaces at three quarters. Appliance fronts are brushed rather than polished, with the grain running across the panel. One limit worth knowing: the capture is a single distant probe, so a nearby object does not appear in a surface next to it - a bowl on a worktop casts no reflection in it.
+
 Rendering runs locally in the browser with no API key or paid service. WebGL2 is required; the 2D plan and SVG 3D preview remain available on unsupported devices. Models and finishes are illustrative, not photorealistic manufacturer assets.
 
 
