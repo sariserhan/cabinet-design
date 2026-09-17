@@ -19,6 +19,7 @@ import {
 } from './render-state';
 import { buildKitchenScene } from './render-scene';
 import { equirectangularFromCube } from './render-probe';
+import { toneCurve } from './render-tone';
 import { RenderControls, type RenderActions } from './render-controls';
 import { imageBalance } from '@/designer/image-quality';
 import {
@@ -381,7 +382,7 @@ export default function RenderView({
     setTextureAnisotropy(renderer.capabilities.getMaxAnisotropy());
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = quality ? THREE.VSMShadowMap : THREE.PCFShadowMap;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMapping = toneCurve;
     renderer.toneMappingExposure = exposureRef.current;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.setAttribute('aria-label', 'Rendered kitchen');

@@ -304,6 +304,84 @@ test('an appliance front reflects the room and carries its brushed grain', async
   expect(pageErrors).toEqual([]);
 });
 
+test('a finish renders as the colour it is, not a filmic version of it', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  // Three fronts side by side under one light: cream, oak and navy.
+  await page
+    .getByLabel('Import design file')
+    .setInputFiles('tests/fixtures/designs/finish-swatches.json');
+  await page.waitForTimeout(4000);
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  await expect(page.locator('.render-stage canvas')).toBeVisible({
+    timeout: 90_000,
+  });
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await expect(page.getByRole('button', { name: 'Download PNG' })).toBeEnabled({
+    timeout: 120_000,
+  });
+  await page.waitForTimeout(10_000);
+
+  /** The average colour of a small patch, as a share of the canvas. */
+  const patch = (fx: number, fy: number) =>
+    page.evaluate(
+      ([x, y]) => {
+        const src = document.querySelector<HTMLCanvasElement>(
+          '.render-stage canvas',
+        );
+        if (!src || x === undefined || y === undefined) return null;
+        const off = document.createElement('canvas');
+        off.width = src.width;
+        off.height = src.height;
+        const ctx = off.getContext('2d');
+        if (!ctx) return null;
+        ctx.drawImage(src, 0, 0);
+        const w = Math.round(off.width * 0.04),
+          h = Math.round(off.height * 0.04);
+        const { data } = ctx.getImageData(
+          Math.round(off.width * x - w / 2),
+          Math.round(off.height * y - h / 2),
+          w,
+          h,
+        );
+        const rgb = [0, 0, 0];
+        for (let i = 0; i < data.length; i += 4) {
+          rgb[0] = (rgb[0] ?? 0) + (data[i] ?? 0);
+          rgb[1] = (rgb[1] ?? 0) + (data[i + 1] ?? 0);
+          rgb[2] = (rgb[2] ?? 0) + (data[i + 2] ?? 0);
+        }
+        const n = data.length / 4;
+        return rgb.map((c) => (c ?? 0) / n) as [number, number, number];
+      },
+      [fx, fy],
+    );
+
+  await expect
+    .poll(async () => (await patch(0.2, 0.3))?.[0] ?? 0)
+    .toBeGreaterThan(100);
+  const cream = await patch(0.2, 0.3);
+  const navy = await patch(0.8, 0.3);
+  if (!cream || !navy) throw Error('the fronts were not drawn');
+
+  // Linen is a warm off-white and has to stay one. A filmic curve pulls
+  // the warmth out of it: measured on this scene, ACES Filmic left 9 of the
+  // 16 points between red and blue that the finish is painted with, and
+  // AgX 11, where the curve this uses leaves 29.
+  expect(cream[0] - cream[2]).toBeGreaterThan(20);
+  // Slate is a dark navy. The same curves lift it towards grey-blue -
+  // to 90 and 103 average - which is not the door the client picked.
+  expect((navy[0] + navy[1] + navy[2]) / 3).toBeLessThan(85);
+  expect(navy[2]).toBeGreaterThan(navy[0]);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {

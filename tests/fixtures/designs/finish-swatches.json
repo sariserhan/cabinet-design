@@ -1,0 +1,146 @@
+{
+  "format": "kitchen-studio-v1",
+  "id": "ea4eda68-4096-4c06-8460-47c6fc369a88",
+  "name": "Finish swatches",
+  "room": {
+    "width": 144,
+    "depth": 180,
+    "height": 96,
+    "outline": [],
+    "walls": {
+      "north": true,
+      "east": true,
+      "south": true,
+      "west": true
+    }
+  },
+  "finish": "linen",
+  "items": [
+    {
+      "id": "ed6c25f0-578d-47e8-bd39-01426463c119",
+      "recordId": "demo-custom_cabinet",
+      "versionId": "demo-objects",
+      "sku": "Custom cabinet",
+      "category": "room_object",
+      "assemblyId": null,
+      "frontStyle": "single",
+      "wallSegment": null,
+      "kind": "custom_cabinet",
+      "wall": null,
+      "width": 36,
+      "depth": 24,
+      "height": 84,
+      "elevation": 0,
+      "pageNumber": 1,
+      "rotation": 0,
+      "mirrored": false,
+      "x": 18,
+      "y": 0,
+      "finish": "linen",
+      "details": {
+        "shelves": 2,
+        "toeKick": 4,
+        "molding": false,
+        "interior": "shelves"
+      }
+    },
+    {
+      "id": "3b30956f-22cf-4860-b8c5-a5fdb970773f",
+      "recordId": "demo-custom_cabinet",
+      "versionId": "demo-objects",
+      "sku": "Custom cabinet",
+      "category": "room_object",
+      "assemblyId": null,
+      "frontStyle": "single",
+      "wallSegment": null,
+      "kind": "custom_cabinet",
+      "wall": null,
+      "width": 36,
+      "depth": 24,
+      "height": 84,
+      "elevation": 0,
+      "pageNumber": 1,
+      "rotation": 0,
+      "mirrored": false,
+      "x": 54,
+      "y": 0,
+      "finish": "oak",
+      "details": {
+        "shelves": 2,
+        "toeKick": 4,
+        "molding": false,
+        "interior": "shelves"
+      }
+    },
+    {
+      "id": "66600e62-53a5-4fb2-ab5b-64e6e12f4fe4",
+      "recordId": "demo-custom_cabinet",
+      "versionId": "demo-objects",
+      "sku": "Custom cabinet",
+      "category": "room_object",
+      "assemblyId": null,
+      "frontStyle": "single",
+      "wallSegment": null,
+      "kind": "custom_cabinet",
+      "wall": null,
+      "width": 36,
+      "depth": 24,
+      "height": 84,
+      "elevation": 0,
+      "pageNumber": 1,
+      "rotation": 0,
+      "mirrored": false,
+      "x": 90,
+      "y": 0,
+      "finish": "slate",
+      "details": {
+        "shelves": 2,
+        "toeKick": 4,
+        "molding": false,
+        "interior": "shelves"
+      }
+    },
+    {
+      "id": "f14d9cbb-6467-4665-87da-86c8de352b98",
+      "recordId": "demo-window",
+      "versionId": "demo-objects",
+      "sku": "Window",
+      "category": "room_object",
+      "assemblyId": null,
+      "frontStyle": "auto",
+      "wallSegment": 2,
+      "kind": "window",
+      "wall": "south",
+      "width": 72,
+      "depth": 4,
+      "height": 44,
+      "elevation": 46,
+      "pageNumber": 1,
+      "rotation": 0,
+      "mirrored": false,
+      "x": 36,
+      "y": 0
+    }
+  ],
+  "appearance": {
+    "countertop": "quartz",
+    "lighting": "daylight",
+    "hardware": "steel"
+  },
+  "views": [
+    {
+      "id": "swatches",
+      "name": "Finish swatches",
+      "position": [
+        72,
+        42,
+        150
+      ],
+      "target": [
+        72,
+        42,
+        24
+      ]
+    }
+  ]
+}

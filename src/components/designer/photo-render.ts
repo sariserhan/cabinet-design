@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { toneCurve } from './render-tone';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import { imageBalance, noisyRegions } from '@/designer/image-quality';
 import { loadRenderAssets } from './render-assets';
@@ -134,7 +135,7 @@ export async function renderPhoto(
       Math.max(1, Math.round(options.width / camera.aspect)),
       false,
     );
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMapping = toneCurve;
     renderer.toneMappingExposure = options.exposure;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     const gradient = new GradientEquirectTexture(128);

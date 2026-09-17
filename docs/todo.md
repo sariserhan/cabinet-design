@@ -53,12 +53,16 @@ sample accumulation on a settled view, GTAO and supersampled stills are all
 done. Hard edge steps in the reference frame are down 56% from where the day
 started. What is left is ranked by how much it changes the picture.
 
-- [ ] **Reconsider the tone curve.** Both paths use ACES Filmic, which warms
-      whites and desaturates strong colour - awkward for a product where a
-      client is judging a door finish. Three 0.186 also has `AgX` (gentler
-      highlight roll-off) and `Neutral` (Khronos PBR neutral, built to keep
-      material colour). Worth rendering the same kitchen three ways and
-      choosing deliberately.
+- [x] **The tone curve.** Done on 2026-09-17: Khronos PBR Neutral, in both
+      paths, from one constant so they cannot drift apart. Rendered three
+      ways as the entry asked, against three fronts side by side under one
+      light. Cream `#ece7dc` is painted with 16 points between red and blue
+      and rendered with 29 under Neutral, 11 under AgX and 9 under ACES
+      Filmic; navy `#414d57` rendered at an average of 80 under Neutral, 98
+      under ACES and 109 under AgX, which is a different door. Highlights
+      turned out not to be the trade: the scene clipped 0.01% of its pixels
+      under all three, so the roll-off a filmic curve is chosen for had
+      nothing to do here. A test now holds the choice in place.
 - [ ] **Bevel the door and drawer edges.** Every edge in the scene is a
       perfect 90 degrees, so no edge ever catches a highlight, and that alone
       reads as computer graphics. A 1-2 mm chamfer on fronts is the largest

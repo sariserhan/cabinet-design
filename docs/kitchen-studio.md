@@ -133,6 +133,8 @@ Choose **Render** beside **3D preview** for the WebGL view. It uses the current 
 
 Reflections come from the room itself. Every build of the scene captures it once from standing height and hands that to the reflective materials - appliance fronts, pulls, glass and stone - so a steel door shows the kitchen it stands in rather than the garden outside the windows. Metals take it at full strength, because a metal has no other source of light; polished surfaces at three quarters. Appliance fronts are brushed rather than polished, with the grain running across the panel. One limit worth knowing: the capture is a single distant probe, so a nearby object does not appear in a surface next to it - a bowl on a worktop casts no reflection in it.
 
+Every rendered image - the live view, the PNG, the panorama and the path-traced photo - uses the Khronos PBR Neutral tone curve rather than a filmic one, so a finish renders close to the colour it is. Measured on three fronts side by side, ACES Filmic lifted a navy door towards grey-blue and took most of the warmth out of a cream one; the scene clipped 0.01% of its pixels either way, so the gentler highlight roll-off a filmic curve is chosen for had nothing to do in a kitchen lit like a kitchen.
+
 Rendering runs locally in the browser with no API key or paid service. WebGL2 is required; the 2D plan and SVG 3D preview remain available on unsupported devices. Models and finishes are illustrative, not photorealistic manufacturer assets.
 
 

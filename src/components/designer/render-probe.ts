@@ -28,9 +28,9 @@ export function equirectangularFromCube(
       vertexShader:
         'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
       // The two includes are what the composer's balance and output passes
-      // do to every other frame: the same white balance, the same ACES curve
-      // at the same exposure, the same sRGB write. Three applies none of
-      // them when a render goes to a target, which is what keeps a
+      // do to every other frame: the same white balance, the same tone
+      // curve at the same exposure, the same sRGB write. Three applies none
+      // of them when a render goes to a target, which is what keeps a
       // reflection linear and an export looking like the screen.
       fragmentShader: `
         uniform samplerCube tCube;
