@@ -63,6 +63,24 @@ started. What is left is ranked by how much it changes the picture.
       turned out not to be the trade: the scene clipped 0.01% of its pixels
       under all three, so the roll-off a filmic curve is chosen for had
       nothing to do here. A test now holds the choice in place.
+- [ ] **Rebuild the scene when the design changes, not when the selection
+      does.** Measured on 2026-09-17, with the whole Playwright suite
+      instrumented: 50 scene builds, 170 seconds of build time in a
+      15.3 minute run, so about 2.1 seconds each under software rendering.
+      Most of those builds are not design edits. The effect that owns the
+      renderer lists `selected` and `selectedIds` among its dependencies,
+      so clicking a cabinet tears down the WebGL context, every texture,
+      the sky PMREM and the room probe, and makes them all again to draw a
+      selection outline. Splitting the effect - context and assets once,
+      scene per design, outline per selection - is the one change with real
+      leverage on how the view feels while someone works.
+      A correction while measuring this: I said earlier that the room
+      probe cost about five minutes of that run. It does not. It is 36.4
+      seconds, 21% of build time and 4% of the run, and it does not care
+      about its own resolution - a 32 pixel capture and a 128 pixel one
+      cost the same 360 ms, because the cost is six traversals of the
+      scene rather than the pixels they land on. There is no cheap cut
+      inside the probe; the cut is fewer builds.
 - [ ] **Bevel the door and drawer edges.** Every edge in the scene is a
       perfect 90 degrees, so no edge ever catches a highlight, and that alone
       reads as computer graphics. A 1-2 mm chamfer on fronts is the largest
@@ -107,7 +125,7 @@ checked against the model on 2026-09-16.
       mean threading a room through every piece of geometry, drawing,
       estimate and export in the app - a migration with a long tail of
       half-converted behaviour. A design still holds exactly one room;
-      several designs now share a *job*, so a kitchen, a vanity and a
+      several designs now share a _job_, so a kitchen, a vanity and a
       laundry keep their own drawings and approvals while their quotes and
       ordering list add up. Rooms in this job, in the project tools.
       Remaining: rooms appear there only once saved, and switching room
