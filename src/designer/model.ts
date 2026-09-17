@@ -195,12 +195,25 @@ export const designSchema = z
       .array(
         z.object({
           id: z.string().min(1).max(100),
-          kind: z.enum(['note', 'dimension']),
+          kind: z.enum(['note', 'dimension', 'angle']),
           x: z.number().finite().min(-600).max(1200),
           y: z.number().finite().min(-600).max(1200),
-          /** The far end of a dimension; unused by a note. */
+          /**
+           * The far end of a dimension, the point a note's leader points
+           * at, or the first ray of an angle measured at (x, y).
+           */
           x2: z.number().finite().min(-600).max(1200).optional(),
           y2: z.number().finite().min(-600).max(1200).optional(),
+          /** The second ray of an angle; unused by the others. */
+          x3: z.number().finite().min(-600).max(1200).optional(),
+          y3: z.number().finite().min(-600).max(1200).optional(),
+          /**
+           * Which drawing this belongs to. A set is read by different
+           * people, and an installer's note is noise on a client's plan.
+           */
+          layer: z
+            .enum(['all', 'design', 'installation', 'client'])
+            .default('all'),
           text: z.string().trim().max(200).default(''),
         }),
       )

@@ -693,6 +693,29 @@ export function DesignerInspector({
                     }))
                   }
                 />
+                <select
+                  aria-label={`${a.kind} layer`}
+                  value={a.layer ?? 'all'}
+                  onChange={(e) =>
+                    commit((d) => ({
+                      ...d,
+                      annotations: (d.annotations ?? []).map((other) =>
+                        other.id === a.id
+                          ? {
+                              ...other,
+                              layer: e.target
+                                .value as typeof other.layer,
+                            }
+                          : other,
+                      ),
+                    }))
+                  }
+                >
+                  <option value="all">Every drawing</option>
+                  <option value="design">Design only</option>
+                  <option value="installation">Installation only</option>
+                  <option value="client">Client only</option>
+                </select>
                 <button
                   aria-label={`Remove ${a.kind}`}
                   onClick={() =>

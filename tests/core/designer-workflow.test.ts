@@ -32,6 +32,8 @@ import { panelParts } from '../../src/designer/fabrication';
 import {
   annotationLabel,
   annotationLength,
+  annotationAngle,
+  onLayer,
   newAnnotation,
 } from '../../src/designer/annotations';
 import { planAndElevationsDxf, planDxf } from '../../src/designer/fabrication';
@@ -1041,4 +1043,68 @@ test('a DXF plan gives up its room, and says what it could not', () => {
   assert.equal(next.items.length, 1);
   assert.equal(next.items[0]?.x, 4);
   assert.ok(designSchema.safeParse(next).success);
+});
+test('leaders, angles and layers reach the drawing they belong to', () => {
+  const d = newDesign();
+  d.room = {
+    width: 144,
+    depth: 120,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  d.items = [{ ...fromObject('custom_cabinet'), id: 'c', x: 0, y: 0 }];
+
+  // A right angle between two runs reads 90, not 270: the opening, not
+  // the reflex outside it.
+  const corner = newAnnotation(
+    'angle',
+    { x: 20, y: 20 },
+    { x: 60, y: 20 },
+    { x: 20, y: 60 },
+  );
+  assert.equal(annotationAngle(corner), 90);
+  assert.equal(annotationLabel(corner), '90°');
+  const shallow = newAnnotation(
+    'angle',
+    { x: 0, y: 0 },
+    { x: 10, y: 0 },
+    { x: 10, y: 10 },
+  );
+  assert.equal(annotationAngle(shallow), 45);
+
+  // A note with a second point is a note on a leader; the label is still
+  // the words, and the leader is drawn to what it points at.
+  const leader = {
+    ...newAnnotation('note', { x: 10, y: 10 }, { x: 40, y: 30 }),
+    text: 'Verify riser',
+  };
+  assert.equal(annotationLabel(leader), 'Verify riser');
+  assert.equal(leader.x2, 40);
+
+  // Layers decide which issue carries which note.
+  const installOnly = { ...leader, layer: 'installation' as const };
+  assert.ok(onLayer(installOnly, 'installation'));
+  assert.ok(onLayer(installOnly, 'all'));
+  assert.ok(!onLayer(installOnly, 'client'));
+  assert.ok(onLayer(corner, 'client'));
+
+  d.annotations = [corner, installOnly];
+  const everything = drawingPackageHtml(d, drawingOptions());
+  assert.ok(everything.includes('Verify riser'));
+  const clientIssue = drawingPackageHtml(d, {
+    ...drawingOptions(),
+    layer: 'client',
+  });
+  assert.ok(!clientIssue.includes('Verify riser'));
+
+  // A set is composed: the plan alone is a valid issue.
+  const planOnly = drawingPackageHtml(d, {
+    ...drawingOptions(),
+    sheets: { plan: true, upper: false, elevations: false, schedules: false },
+  });
+  assert.ok(planOnly.includes('P01 · Floor plan'));
+  assert.ok(!planOnly.includes('W01 · Wall schedule'));
+  assert.ok(everything.includes('W01 · Wall schedule'));
+  assert.ok(parseDesign(JSON.stringify(d)).annotations?.length === 2);
 });

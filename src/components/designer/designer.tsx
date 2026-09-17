@@ -35,6 +35,7 @@ import {
   MousePointer2,
   MessageSquare,
   Ruler,
+  Triangle,
   FolderOpen,
   Download,
   Undo2,
@@ -125,7 +126,9 @@ function Editor({ ownerId }: { ownerId: string }) {
   >();
   const [workspaceStage, setWorkspaceStage] =
     useState<WorkspaceStage>('Design');
-  const [annotate, setAnnotate] = useState<'note' | 'dimension' | null>(null);
+  const [annotate, setAnnotate] = useState<
+    'note' | 'dimension' | 'angle' | null
+  >(null);
   // Sizes drawn on the views, and which of the three to draw. Off by
   // default: a plan with three numbers on every cabinet is unreadable.
   const [dimensions, setDimensions] = useState<{
@@ -1593,6 +1596,18 @@ function Editor({ ownerId }: { ownerId: string }) {
                 >
                   <Ruler size={16} />
                 </button>
+                <button
+                  className="tool"
+                  aria-label="Angle"
+                  aria-pressed={annotate === 'angle'}
+                  title="Click the corner, then a point along each side"
+                  onClick={() => {
+                    setPanMode(false);
+                    setAnnotate(annotate === 'angle' ? null : 'angle');
+                  }}
+                >
+                  <Triangle size={16} />
+                </button>
               </div>
             )}
             {mode === '2d' && (
@@ -1776,8 +1791,8 @@ function Editor({ ownerId }: { ownerId: string }) {
                 }
               }}
               onMoveAnnotation={moveAnnotation}
-              onAnnotate={(from, to) => {
-                const note = newAnnotation(annotate ?? 'note', from, to);
+              onAnnotate={(from, to, third) => {
+                const note = newAnnotation(annotate ?? 'note', from, to, third);
                 commit((d) => ({
                   ...d,
                   annotations: [...(d.annotations ?? []), note],
@@ -1785,7 +1800,9 @@ function Editor({ ownerId }: { ownerId: string }) {
                 setStatus(
                   annotate === 'note'
                     ? 'Note placed. Give it words in Properties.'
-                    : 'Dimension placed. Undo removes it.',
+                    : annotate === 'angle'
+                      ? 'Angle measured. Undo removes it.'
+                      : 'Dimension placed. Undo removes it.',
                 );
               }}
               onMoveMany={(ids, dx, dy) =>

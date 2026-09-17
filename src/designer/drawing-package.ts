@@ -12,7 +12,7 @@ import { roomOutline, roomEdges, ceilingAt } from './room';
 import { canonical } from './installer-handoff';
 import { measurementStatus } from './project-workflow';
 import { itemConfiguration } from './supplier-pricing';
-import { annotationLabel } from './annotations';
+import { annotationLabel, onLayer } from './annotations';
 export const drawingOptionsSchema = z.object({
   company: z.string().trim().max(160),
   client: z.string().max(160),
@@ -33,6 +33,17 @@ export const drawingOptionsSchema = z.object({
     'Installation coordination',
   ]),
   unit: z.enum(['in', 'mm']),
+  /** Which annotations this issue carries; see `annotations.ts`. */
+  layer: z.enum(['all', 'design', 'installation', 'client']).default('all'),
+  /** Which sheets to issue. A set is composed, not fixed. */
+  sheets: z
+    .object({
+      plan: z.boolean().default(true),
+      upper: z.boolean().default(true),
+      elevations: z.boolean().default(true),
+      schedules: z.boolean().default(true),
+    })
+    .default({ plan: true, upper: true, elevations: true, schedules: true }),
   scale: z.union([
     z.literal(20),
     z.literal(24),
@@ -43,7 +54,13 @@ export const drawingOptionsSchema = z.object({
   ]),
   notes: z.string().max(3000),
 });
-export type DrawingOptions = z.infer<typeof drawingOptionsSchema>;
+/**
+ * What a caller passes. The defaulted fields - the annotation layer and
+ * which sheets to issue - may be left out, which is what `z.input` means
+ * here; `drawingOptionsSchema.parse` fills them in.
+ */
+export type DrawingOptions = z.input<typeof drawingOptionsSchema>;
+export type DrawingIssue = z.infer<typeof drawingOptionsSchema>;
 const escape = (v: unknown) =>
   String(v ?? '').replace(
     /[&<>"']/g,
@@ -225,6 +242,8 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
         : r.item.elevation >= 40,
     );
     if (!subset.length && layer === 'Upper items') continue;
+    // A set is composed: a client pack may want the plan alone.
+    if (layer === 'Upper items' ? !o.sheets.upper : !o.sheets.plan) continue;
     const points = [...outline, ...subset.flatMap((r) => itemPolygon(r.item))],
       minX = Math.min(...points.map((p) => p.x)),
       minY = Math.min(...points.map((p) => p.y)),
@@ -263,9 +282,23 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
     }
     // What the designer marked by hand belongs on the sheet: a drawing that
     // silently drops its own notes is worse than one without them.
-    for (const a of d.annotations ?? []) {
-      const label = annotationLabel(a);
+    for (const a of (d.annotations ?? []).filter((a) => onLayer(a, o.layer))) {
+      const label = annotationLabel(a, o.unit === 'mm' ? 'mm' : 'in');
+      if (a.kind === 'angle') {
+        const ax = a.x2 ?? a.x,
+          ay = a.y2 ?? a.y,
+          bx = a.x3 ?? a.x,
+          by = a.y3 ?? a.y;
+        body +=
+          line(ax, ay, a.x, a.y) +
+          line(a.x, a.y, bx, by) +
+          text(a.x, a.y - font * 0.5, label);
+        continue;
+      }
       if (a.kind === 'note') {
+        // A leader, where the note points at something.
+        if (a.x2 !== undefined && a.y2 !== undefined)
+          body += line(a.x, a.y, a.x2, a.y2);
         body += `<circle cx="${round(a.x)}" cy="${round(a.y)}" r="${round(font * 0.35)}" fill="#172e34"/>`;
         if (label)
           body += text(a.x + font * 0.7, a.y + font * 0.35, label, 'start');
@@ -295,7 +328,9 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
       body: `<p>${layer === 'Floor and low items' ? 'Items below 40 inches above floor' : 'Items at or above 40 inches above floor'}. Overall dimensions show the depicted extent; wall lengths are in the wall schedule.</p><div class="drawing">${svg(minX, minY, maxX - minX, maxY - minY, body)}</div>`,
     });
   }
-  for (const edge of edges.filter((e) => d.room.walls[e.side] && !e.curved)) {
+  for (const edge of o.sheets.elevations
+    ? edges.filter((e) => d.room.walls[e.side] && !e.curved)
+    : []) {
     const dx = (edge.b.x - edge.a.x) / edge.length,
       dy = (edge.b.y - edge.a.y) / edge.length;
     const projected = rows.flatMap((r) => {
@@ -343,11 +378,15 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
       body: `<p>Projected widths shown inside items where space allows. Heights, elevations and product dimensions are in the placement schedule. Adjacent items can appear on two wall projections.</p><div class="drawing">${svg(0, 0, edge.length, height, body)}</div>`,
     });
   }
-  pages.push({
-    title: 'W01 · Wall schedule',
-    body: `<table><thead><tr><th>Wall</th><th>Start X / Y</th><th>End X / Y</th><th>Length</th><th>Drawing coverage</th></tr></thead><tbody>${edges.map((e) => `<tr><td>W${e.index + 1}</td><td>${length(e.a.x)} / ${length(e.a.y)}</td><td>${length(e.b.x)} / ${length(e.b.y)}</td><td>${length(e.length)}</td><td>${e.curved ? 'Curved: sampled length; no straight elevation' : !d.room.walls[e.side] ? 'Disabled wall' : 'Straight wall; elevation included when adjacent items exist'}</td></tr>`).join('')}</tbody></table><p>Internal partitions and freestanding islands are located by the floor plan and placement schedule. Curved-wall coordinates are retained in the accompanying design JSON.</p>`,
-  });
-  for (const [page, part] of chunks(rows, 6).entries())
+  if (o.sheets.schedules)
+    pages.push({
+      title: 'W01 · Wall schedule',
+      body: `<table><thead><tr><th>Wall</th><th>Start X / Y</th><th>End X / Y</th><th>Length</th><th>Drawing coverage</th></tr></thead><tbody>${edges.map((e) => `<tr><td>W${e.index + 1}</td><td>${length(e.a.x)} / ${length(e.a.y)}</td><td>${length(e.b.x)} / ${length(e.b.y)}</td><td>${length(e.length)}</td><td>${e.curved ? 'Curved: sampled length; no straight elevation' : !d.room.walls[e.side] ? 'Disabled wall' : 'Straight wall; elevation included when adjacent items exist'}</td></tr>`).join('')}</tbody></table><p>Internal partitions and freestanding islands are located by the floor plan and placement schedule. Curved-wall coordinates are retained in the accompanying design JSON.</p>`,
+    });
+  for (const [page, part] of (o.sheets.schedules
+    ? chunks(rows, 6)
+    : []
+  ).entries())
     pages.push({
       title: `S${String(page + 1).padStart(2, '0')} · Placement schedule`,
       body: `<table><thead><tr><th>Mark / item ID</th><th>SKU / type</th><th>W × D × H</th><th>X / Y / elevation</th><th>Rotation</th><th>Material / configuration</th><th>Source</th></tr></thead><tbody>${part

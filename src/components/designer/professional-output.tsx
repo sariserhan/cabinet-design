@@ -125,6 +125,56 @@ export function ProfessionalOutput({
           </select>
         </label>
         <label>
+          Notes shown
+          <select
+            aria-label="Annotation layer"
+            value={options.layer ?? 'all'}
+            onChange={(e) =>
+              setOptions({
+                ...options,
+                layer: e.target.value as DrawingOptions['layer'],
+              })
+            }
+          >
+            <option value="all">Every note</option>
+            <option value="design">Design notes</option>
+            <option value="installation">Installation notes</option>
+            <option value="client">Client notes</option>
+          </select>
+        </label>
+        <fieldset className="sheet-choice">
+          <legend>Sheets in this issue</legend>
+          {(
+            [
+              ['plan', 'Floor plan'],
+              ['upper', 'Upper plan'],
+              ['elevations', 'Elevations'],
+              ['schedules', 'Schedules'],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key}>
+              <input
+                type="checkbox"
+                checked={options.sheets?.[key] ?? true}
+                onChange={(e) =>
+                  setOptions({
+                    ...options,
+                    sheets: {
+                      plan: true,
+                      upper: true,
+                      elevations: true,
+                      schedules: true,
+                      ...options.sheets,
+                      [key]: e.target.checked,
+                    },
+                  })
+                }
+              />{' '}
+              {label}
+            </label>
+          ))}
+        </fieldset>
+        <label>
           Dimensions
           <select
             aria-label="Drawing units"

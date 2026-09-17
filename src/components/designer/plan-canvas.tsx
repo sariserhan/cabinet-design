@@ -53,13 +53,14 @@ type Props = {
   /** Sizes drawn on every item, and which of them to draw. */
   dimensions: { on: boolean; axes: DimensionAxes };
   /** Placing a note or a dimension instead of selecting and panning. */
-  annotate: 'note' | 'dimension' | null;
+  annotate: 'note' | 'dimension' | 'angle' | null;
   selectedAnnotation: string | null;
   onSelectAnnotation: (id: string | null) => void;
   onMoveAnnotation: (id: string, dx: number, dy: number) => void;
   onAnnotate: (
     from: { x: number; y: number },
     to?: { x: number; y: number },
+    third?: { x: number; y: number },
   ) => void;
   showClearance: boolean;
   onDropItem: (item: DropItem, point: { x: number; y: number }) => void;
@@ -189,6 +190,8 @@ export function PlanCanvas({
     x: number;
     y: number;
   } | null>(null);
+  // The points of an angle so far: vertex, then first ray.
+  const [angle, setAngle] = useState<{ x: number; y: number }[]>([]);
   // A dimension being dragged out, in plan inches.
   const [measure, setMeasure] = useState<{
     x0: number;
@@ -284,8 +287,18 @@ export function PlanCanvas({
       const p = coordinates(event);
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
-      if (annotate === 'note') onAnnotate(p);
-      else setMeasure({ x0: p.x, y0: p.y, x: p.x, y: p.y });
+      if (annotate === 'angle') {
+        // Vertex, then one ray, then the other.
+        const so_far = [...angle, p];
+        if (so_far.length === 3) {
+          const [vertex, first, second] = so_far;
+          if (vertex && first && second) onAnnotate(vertex, first, second);
+          setAngle([]);
+        } else setAngle(so_far);
+        return;
+      }
+      // A note is a click for a plain one, or a drag for one on a leader.
+      setMeasure({ x0: p.x, y0: p.y, x: p.x, y: p.y });
       return;
     }
     // Shift and drag across empty floor sweeps up everything the band
@@ -380,8 +393,11 @@ export function PlanCanvas({
       const from = { x: measure.x0, y: measure.y0 },
         to = { x: measure.x, y: measure.y };
       setMeasure(null);
-      // A click rather than a drag leaves nothing to measure.
-      if (Math.hypot(to.x - from.x, to.y - from.y) > 1) onAnnotate(from, to);
+      const dragged = Math.hypot(to.x - from.x, to.y - from.y) > 1;
+      // A dimension needs two points; a note is happy with one, and takes
+      // a leader when it was dragged to something worth pointing at.
+      if (dragged) onAnnotate(from, to);
+      else if (annotate === 'note') onAnnotate(from);
       return;
     }
     // A press on empty floor that never became a pan is a click on nothing,
@@ -962,6 +978,15 @@ export function PlanCanvas({
                 onPointerDown={grab}
                 onKeyDown={key}
               >
+                {a.x2 !== undefined && a.y2 !== undefined && (
+                  <path
+                    d={`M${a.x} ${a.y} L${a.x2} ${a.y2}`}
+                    fill="none"
+                    stroke={chosen ? '#087984' : '#a8621b'}
+                    strokeWidth=".5"
+                    markerEnd=""
+                  />
+                )}
                 <circle
                   cx={a.x}
                   cy={a.y}
@@ -983,6 +1008,61 @@ export function PlanCanvas({
                 </text>
               </g>
             );
+          if (a.kind === 'angle') {
+            const ax = a.x2 ?? a.x,
+              ay = a.y2 ?? a.y,
+              bx = a.x3 ?? a.x,
+              by = a.y3 ?? a.y;
+            const reach = 10,
+              one = Math.hypot(ax - a.x, ay - a.y) || 1,
+              two = Math.hypot(bx - a.x, by - a.y) || 1;
+            const arcA = {
+                x: a.x + ((ax - a.x) / one) * reach,
+                y: a.y + ((ay - a.y) / one) * reach,
+              },
+              arcB = {
+                x: a.x + ((bx - a.x) / two) * reach,
+                y: a.y + ((by - a.y) / two) * reach,
+              };
+            return (
+              <g
+                key={a.id}
+                className="plan-annotation"
+                data-testid="plan-angle"
+                role="button"
+                tabIndex={0}
+                aria-label={`Angle: ${label}`}
+                aria-pressed={chosen}
+                onPointerDown={grab}
+                onKeyDown={key}
+              >
+                <path
+                  d={`M${ax} ${ay} L${a.x} ${a.y} L${bx} ${by}`}
+                  fill="none"
+                  stroke={chosen ? '#087984' : '#7a4713'}
+                  strokeWidth={chosen ? 0.9 : 0.5}
+                />
+                <path
+                  d={`M${arcA.x} ${arcA.y} A${reach} ${reach} 0 0 1 ${arcB.x} ${arcB.y}`}
+                  fill="none"
+                  stroke={chosen ? '#087984' : '#7a4713'}
+                  strokeWidth=".4"
+                />
+                <text
+                  x={(arcA.x + arcB.x) / 2}
+                  y={(arcA.y + arcB.y) / 2 - 1.5}
+                  textAnchor="middle"
+                  fontSize="3.4"
+                  fill="#7a4713"
+                  stroke="white"
+                  strokeWidth="0.9"
+                  paintOrder="stroke"
+                >
+                  {label}
+                </text>
+              </g>
+            );
+          }
           const x2 = a.x2 ?? a.x,
             y2 = a.y2 ?? a.y,
             midX = (a.x + x2) / 2,
@@ -1032,6 +1112,16 @@ export function PlanCanvas({
             </g>
           );
         })}
+        {angle.map((point, index) => (
+          <circle
+            key={`angle-point-${index}`}
+            cx={point.x}
+            cy={point.y}
+            r={1.6}
+            fill="#a8621b"
+            pointerEvents="none"
+          />
+        ))}
         {measure && (
           <g pointerEvents="none">
             <path

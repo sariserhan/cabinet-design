@@ -3763,3 +3763,25 @@ body:has(.canvas-expanded) {
 .plan-import [role='alert'] {
   color: #96542c;
 }
+
+.sheet-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  border: 1px solid var(--studio-line);
+  border-radius: 5px;
+  padding: var(--space-1) var(--space-3) var(--space-2);
+  margin: 0;
+}
+.sheet-choice legend {
+  font-size: var(--text-sm);
+  color: var(--studio-muted);
+  padding: 0 var(--space-1);
+}
+.sheet-choice label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+}

@@ -557,6 +557,66 @@ test('a room can be imported from an architect DXF', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('a note can point at something, and a corner can be measured', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(240_000);
+  await page.getByRole('button', { name: /2D plan/i }).click();
+  const at = async (x: number, y: number) => {
+    const point = await page.evaluate(
+      ([ux, uy]) => {
+        const svg = document.querySelector<SVGSVGElement>('.plan-svg');
+        const matrix = svg?.getScreenCTM();
+        if (!svg || !matrix || ux === undefined || uy === undefined)
+          return null;
+        const p = svg.createSVGPoint();
+        p.x = ux;
+        p.y = uy;
+        const t = p.matrixTransform(matrix);
+        return { x: t.x, y: t.y };
+      },
+      [x, y],
+    );
+    return point ?? { x: 0, y: 0 };
+  };
+
+  // Dragging a note gives it a leader to what it points at.
+  await page.getByRole('button', { name: 'Note', exact: true }).click();
+  const from = await at(20, 20),
+    to = await at(60, 50);
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  for (let step = 1; step <= 6; step++)
+    await page.mouse.move(
+      from.x + ((to.x - from.x) * step) / 6,
+      from.y + ((to.y - from.y) * step) / 6,
+    );
+  await page.mouse.up();
+  await expect(page.locator('[data-testid="plan-note"] path')).toHaveCount(1, {
+    timeout: 20_000,
+  });
+
+  // Three clicks - corner, then a point along each side - measure it.
+  await page.getByRole('button', { name: 'Angle', exact: true }).click();
+  for (const [x, y] of [
+    [30, 90],
+    [80, 90],
+    [30, 130],
+  ] as const) {
+    const point = await at(x, y);
+    await page.mouse.click(point.x, point.y);
+    await page.waitForTimeout(400);
+  }
+  const angle = page.locator('[data-testid="plan-angle"]');
+  await expect(angle).toHaveCount(1, { timeout: 20_000 });
+  // The opening, not the reflex outside it.
+  await expect(angle).toHaveText('90°');
+
+  await page.getByRole('button', { name: 'Select', exact: true }).click();
+  expect(pageErrors).toEqual([]);
+});
+
 test('each door style rebuilds the scene and keeps it drawing', async ({
   designer: page,
   pageErrors,
