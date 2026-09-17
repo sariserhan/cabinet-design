@@ -580,7 +580,19 @@ export default function RenderView({
       renderer,
       new THREE.WebGLRenderTarget(drawing.x, drawing.y, {
         type: THREE.HalfFloatType,
-        samples: 4,
+        // Eight samples where the device has them to give.
+        //
+        // Four is enough for a cabinet edge standing still. It is not
+        // enough for the thing that was reported: a bright steel edge or
+        // a brass pull, a pixel or two wide against a dark cabinet,
+        // glittering while the camera moves. Measured on hardware, that
+        // is exactly where the instability sits - on thin metal
+        // silhouettes, not on the broad panels - and while the camera
+        // moves the sample count is the only antialiasing there is,
+        // because the accumulation pass only runs once the view settles.
+        // Software rendering pays for samples in time it does not have,
+        // so it keeps four.
+        samples: Math.min(8, Math.max(4, renderer.capabilities.maxSamples)),
       }),
     );
     // Ground contact is what stops cabinets looking like they float. GTAO

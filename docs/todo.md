@@ -121,14 +121,22 @@ started. What is left is ranked by how much it changes the picture.
       screen-space reflections - a bowl on a worktop casts no image in it.
       That is the next step for reflective surfaces, and its own piece of
       work.
-- [ ] **Look at the render on a real GPU.** Still unmeasured, and this
-      account cannot: `/dev/dri/renderD128` is `root:render` and the account
-      is not in the group, so headless Chromium falls back to SwiftShader
-      whatever flags it is given. One command grants it -
-      `sudo usermod -aG render $USER`, then a new login - and then the
-      material work above, the refinement gate below and the probe's cost
-      per scene build can all be judged on hardware rather than argued
-      about.
+- [x] **Look at the render on a real GPU.** Unblocked on 2026-09-17. The
+      account is in the `render` group and Mesa's EGL and Intel Vulkan
+      driver are installed, so headless Chromium reaches the Intel UHD
+      instead of falling back to SwiftShader. Run the browser suite on it
+      with `sg render -c "npx playwright test --project=gpu"`; the project
+      is in `playwright.config.ts` and passes `--use-angle=vulkan`. All 29
+      signed-in tests pass on hardware, in 3.9 minutes against 20 on
+      software, which makes it the faster way to run them as well as the
+      only way to see what hardware sees.
+      First thing it showed: the glitter reported on appliance edges is
+      not the broad steel panels - captured frames of a moving camera put
+      the instability on thin metal silhouettes, the pulls, the tap and
+      the edge of the dishwasher, where a highlight a pixel wide lands
+      somewhere different each frame. Three material theories were tested
+      against that and all three were wrong, which is recorded in the
+      commits rather than in the material.
 - [ ] **Check the refinement gate on real hardware.** A still view refines
       itself only where a frame is cheap, decided by timing one attempt. That
       back-off is what software rendering hits; nobody has yet watched it
