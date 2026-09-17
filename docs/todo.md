@@ -111,6 +111,27 @@ checked against the model on 2026-09-16.
       includes - one frame per straight wall, curved walls named as skipped -
       along with the designer's own notes and dimensions.
 
+## Design tool, still open
+
+- [ ] **Place the countertop seams, not just price them.** Trade estimates
+      count planned seams and charge for them, and the slab preview shows
+      the pieces, but nothing draws where a seam falls - which a fabricator
+      cares about and a client who finds one across an island cares about
+      more. The obstacle is where the split count lives: it is a trade
+      setting today, outside the design, so the plan cannot see it. Moving
+      it onto the countertop would make seams part of the design and let
+      every drawing show them, and that is a decision about the pricing
+      path rather than a change to make quietly.
+- [ ] **A lighting plan.** Lighting exists as render presets. There is no
+      way to place under-cabinet runs, switches or circuits, and nothing to
+      hand an electrician.
+- [ ] **Two people in one design.** Shared projects handle conflicts
+      between saves; they do not let two people work at once.
+- [ ] **The 800-item ceiling.** `MAX_DESIGN_ITEMS` is 800, which is
+      comfortable for a kitchen and not for a large or commercial job.
+      Raising it means checking the design checks, the chunked storage and
+      the render scene at that size rather than changing the number.
+
 ## Catalog — on hold
 
 Held at the owner's request on 2026-09-16. Recorded so the findings are not

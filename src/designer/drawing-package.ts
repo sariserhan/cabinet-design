@@ -13,6 +13,7 @@ import { canonical } from './installer-handoff';
 import { measurementStatus } from './project-workflow';
 import { itemConfiguration } from './supplier-pricing';
 import { annotationLabel, onLayer } from './annotations';
+import { servicePoints } from './services';
 export const drawingOptionsSchema = z.object({
   company: z.string().trim().max(160),
   client: z.string().max(160),
@@ -85,6 +86,15 @@ export function drawingConfiguration(item: Cabinet) {
     if (item.details.molding) labels.push('Molding');
     if (item.details.corner)
       labels.push(item.details.corner.replaceAll('_', ' '));
+    // Ordering attributes, said plainly: a supplier reads these.
+    if (item.details.hinge && item.details.hinge !== 'unspecified')
+      labels.push(
+        item.details.hinge === 'pair'
+          ? 'Pair of doors'
+          : `Hinged ${item.details.hinge}`,
+      );
+    if (item.details.drawers) labels.push(`${item.details.drawers} drawers`);
+    if (item.details.rollouts) labels.push(`${item.details.rollouts} rollouts`);
   }
   if (item.sinkStyle) labels.push(`${item.sinkStyle} sink`);
   if (item.refrigeratorStyle)
@@ -280,6 +290,14 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
       if (tx !== cx || ty !== cy) body += line(cx, cy, tx, ty);
       body += text(tx, ty, mark);
     }
+    // The surveyed services, which the drawings never carried although the
+    // survey has always recorded them. Floor plan only: they are located
+    // in plan and their heights are in the schedule.
+    if (layer === 'Floor and low items')
+      for (const service of servicePoints(d)) {
+        body += `<circle cx="${round(service.x)}" cy="${round(service.y)}" r="${round(font * 0.45)}" fill="#ffffff" stroke="#172e34"/>`;
+        body += text(service.x, service.y + font * 0.3, service.mark);
+      }
     // What the designer marked by hand belongs on the sheet: a drawing that
     // silently drops its own notes is worse than one without them.
     for (const a of (d.annotations ?? []).filter((a) => onLayer(a, o.layer))) {
@@ -378,6 +396,19 @@ export function drawingPackageHtml(d: Design, input: DrawingOptions) {
       body: `<p>Projected widths shown inside items where space allows. Heights, elevations and product dimensions are in the placement schedule. Adjacent items can appear on two wall projections.</p><div class="drawing">${svg(0, 0, edge.length, height, body)}</div>`,
     });
   }
+  const services = servicePoints(d);
+  if (o.sheets.schedules && services.length)
+    pages.push({
+      title: 'U01 · Service schedule',
+      body: `<table><thead><tr><th>Mark</th><th>Service</th><th>Plan X / Y</th><th>Height</th><th>Survey note</th></tr></thead><tbody>${services
+        .map(
+          (s) =>
+            `<tr><td>${s.mark}</td><td>${escape(s.kind)}</td><td>${length(s.x)} / ${length(s.y)}</td><td>${length(s.height)}</td><td>${escape(s.notes || '—')}</td></tr>`,
+        )
+        .join(
+          '',
+        )}</tbody></table><p>Positions as surveyed and recorded in this design. Confirm on site before first fix; this drawing does not authorise any service alteration.</p>`,
+    });
   if (o.sheets.schedules)
     pages.push({
       title: 'W01 · Wall schedule',

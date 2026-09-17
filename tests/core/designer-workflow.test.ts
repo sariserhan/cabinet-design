@@ -63,6 +63,8 @@ import {
 } from '../../src/designer/units';
 import { readPlanDxf, applyImportedPlan } from '../../src/designer/plan-import';
 import { designSchema } from '../../src/designer/model';
+import { servicePoints } from '../../src/designer/services';
+import { drawingConfiguration } from '../../src/designer/drawing-package';
 const drawingOptions = () =>
   drawingOptionsSchema.parse({
     company: 'Dealer',
@@ -1107,4 +1109,88 @@ test('leaders, angles and layers reach the drawing they belong to', () => {
   assert.ok(!planOnly.includes('W01 · Wall schedule'));
   assert.ok(everything.includes('W01 · Wall schedule'));
   assert.ok(parseDesign(JSON.stringify(d)).annotations?.length === 2);
+});
+test('surveyed services become points on the plan, and handing reaches the sheet', () => {
+  const d = newDesign();
+  d.room = {
+    width: 144,
+    depth: 120,
+    height: 96,
+    outline: [],
+    walls: { north: true, south: true, east: true, west: true },
+  };
+  d.measurements = {
+    measuredBy: 'Surveyor',
+    measuredAt: '2026-09-16',
+    originalUnit: 'in',
+    north: 144,
+    south: 144,
+    east: 120,
+    west: 120,
+    height: 96,
+    confirmed: true,
+    notes: '',
+    openings: [],
+    utilities: [
+      {
+        id: 'u1',
+        kind: 'drain',
+        wall: 'north',
+        offset: 36,
+        height: 18,
+        notes: 'Existing waste',
+      },
+      {
+        id: 'u2',
+        kind: 'gas',
+        wall: 'east',
+        offset: 24,
+        height: 30,
+        notes: '',
+      },
+    ],
+  };
+
+  const points = servicePoints(d);
+  assert.equal(points.length, 2);
+  const drain = points.find((p) => p.id === 'u1');
+  assert.ok(drain);
+  // 36 inches along the north wall, which runs left to right at y = 0.
+  assert.equal(drain.x, 36);
+  assert.equal(drain.y, 0);
+  assert.equal(drain.mark, 'D');
+  assert.equal(drain.height, 18);
+
+  // A curved wall has no straight run to measure an offset along, so the
+  // service on it is left out rather than placed somewhere plausible.
+  d.room.curves = [{ wall: 0, bow: 24 }];
+  const curved = servicePoints(d);
+  assert.equal(curved.length, 1);
+  assert.equal(curved[0]?.id, 'u2');
+  delete d.room.curves;
+
+  // They reach the sheets, with their heights in a schedule.
+  d.items = [{ ...fromObject('custom_cabinet'), id: 'c', x: 0, y: 40 }];
+  const html = drawingPackageHtml(d, drawingOptions());
+  assert.ok(html.includes('U01 · Service schedule'));
+  assert.ok(html.includes('Existing waste'));
+
+  // Handing is an ordering attribute, and says so on the drawing.
+  const hinged = {
+    ...fromObject('custom_cabinet'),
+    id: 'h',
+    x: 0,
+    y: 0,
+    details: {
+      shelves: 1,
+      toeKick: 4,
+      molding: false,
+      interior: 'shelves' as const,
+      hinge: 'right' as const,
+      drawers: 3,
+    },
+  };
+  const labels = drawingConfiguration(hinged);
+  assert.ok(labels.includes('Hinged right'));
+  assert.ok(labels.includes('3 drawers'));
 });

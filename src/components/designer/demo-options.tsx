@@ -255,6 +255,42 @@ export function ItemOptions({
               <option value="lazy_susan">Lazy Susan</option>
             </select>
           </label>
+          <label className="designer-numeric">
+            <span>Hinged</span>
+            <select
+              aria-label="Door hinge side"
+              value={details.hinge ?? 'unspecified'}
+              onChange={(e) =>
+                onChange({
+                  details: {
+                    ...details,
+                    hinge: e.target.value as NonNullable<typeof details.hinge>,
+                  },
+                })
+              }
+            >
+              <option value="unspecified">Not specified</option>
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+              <option value="pair">Pair of doors</option>
+            </select>
+          </label>
+          <OptionNumber
+            label="Drawers in front"
+            max={6}
+            value={details.drawers ?? 0}
+            onChange={(drawers: number) =>
+              onChange({ details: { ...details, drawers } })
+            }
+          />
+          <OptionNumber
+            label="Rollouts behind the door"
+            max={6}
+            value={details.rollouts ?? 0}
+            onChange={(rollouts: number) =>
+              onChange({ details: { ...details, rollouts } })
+            }
+          />
           <label>
             <input
               type="checkbox"

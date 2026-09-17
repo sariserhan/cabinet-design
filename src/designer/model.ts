@@ -96,6 +96,16 @@ export const itemSchema = z.object({
       molding: z.boolean(),
       interior: z.enum(['shelves', 'pullouts', 'lazy_susan']),
       corner: z.enum(['diagonal', 'blind_left', 'blind_right']).optional(),
+      /**
+       * Which side the door is hinged. An ordering attribute in its own
+       * right: `mirrored` flips the drawn front, which is a picture, and
+       * this is what a supplier is told.
+       */
+      hinge: z.enum(['left', 'right', 'pair', 'unspecified']).optional(),
+      /** Drawers in the front, where it is a drawer bank. */
+      drawers: z.number().int().min(0).max(6).optional(),
+      /** Rollouts behind the door, which are ordered separately. */
+      rollouts: z.number().int().min(0).max(6).optional(),
     })
     .optional(),
   clearance: z

@@ -24,6 +24,7 @@ import { placementFeedback } from '@/designer/demo-readiness';
 import { annotationLabel } from '@/designer/annotations';
 import { lengthLabel, unitsOf } from '@/designer/units';
 import { itemDimensionText } from '@/designer/dimension-overlay';
+import { servicePoints } from '@/designer/services';
 import type { DimensionAxes } from '@/designer/dimension-overlay';
 import { ObjectPlan } from './objects';
 import type { Cabinet, Design } from '@/designer/model';
@@ -904,6 +905,29 @@ export function PlanCanvas({
             Add a cabinet from the library to begin
           </text>
         )}
+        {servicePoints(design).map((service) => (
+          <g
+            key={`service-${service.id}`}
+            className="plan-service"
+            data-testid="plan-service"
+            pointerEvents="none"
+          >
+            <circle cx={service.x} cy={service.y} r={2.6} fill="#2d6fa8" />
+            <text
+              x={service.x}
+              y={service.y + 1.2}
+              textAnchor="middle"
+              fontSize="3"
+              fill="white"
+            >
+              {service.mark}
+            </text>
+            <title>
+              {service.kind} at {service.height}&quot; above floor
+              {service.notes ? ` · ${service.notes}` : ''}
+            </title>
+          </g>
+        ))}
         {(design.annotations ?? []).map((original) => {
           // While one is being dragged it follows the pointer; the design
           // only hears about it when the drag ends.
