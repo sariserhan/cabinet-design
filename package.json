@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "check": "npm run lint && npm run typecheck && npm test && npm run test:backend && npm run check:benchmark",
+    "check": "npm run lint && npm run typecheck && npm test && npm run test:backend && npm run check:benchmark && npm run check:numbers",
     "check:benchmark": "python3 tools/check_benchmark_packet.py",
     "dev": "next dev --hostname 127.0.0.1",
     "hooks:install": "git config core.hooksPath .githooks",
@@ -16,7 +16,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.core.json --noEmit",
     "verify": "npm run check && npm run build",
-    "worker": "tsx --env-file=.env.local tools/worker.ts"
+    "worker": "tsx --env-file=.env.local tools/worker.ts",
+    "check:numbers": "python3 tools/check_documented_numbers.py"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",

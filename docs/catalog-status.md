@@ -44,7 +44,7 @@ Not measured. Software tests, draft self-comparisons and imported annotation cou
 
 ## Benchmark Results
 
-71 core behavior tests and 10 backend/provider contract tests pass, together with lint and TypeScript. The production build succeeds. The artifact integrity check passes for all 32 selected pages and 431 evidence snippets. The real human-verified benchmark has not run and publication remains blocked.
+298 core behavior tests and 31 backend/provider contract tests pass, together with lint and TypeScript. The production build succeeds. The artifact integrity check passes for all 32 selected pages and 431 evidence snippets. The real human-verified benchmark has not run and publication remains blocked.
 
 ## Architecture Decisions
 

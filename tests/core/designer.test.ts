@@ -311,11 +311,21 @@ test('design checks scale with item count rather than quadratically', () => {
       y: 12 + Math.floor(i / 20) * 28,
     })),
   });
+  // The best of three rounds rather than one, because noise only ever
+  // adds time: a busy machine cannot make this run faster than it is, so
+  // the fastest round is the least contaminated estimate of the work.
+  // Measured once as a single round, this test failed twice in one day on
+  // a machine that was also running a browser suite - a flake that says
+  // nothing about whether the checks are still linear.
   const time = (design: ReturnType<typeof build>) => {
     warnings(design);
-    const started = performance.now();
-    for (let i = 0; i < 5; i++) warnings(design);
-    return (performance.now() - started) / 5;
+    let best = Infinity;
+    for (let round = 0; round < 3; round++) {
+      const started = performance.now();
+      for (let i = 0; i < 5; i++) warnings(design);
+      best = Math.min(best, (performance.now() - started) / 5);
+    }
+    return best;
   };
   // Derived from the ceiling rather than fixed, so raising MAX_DESIGN_ITEMS
   // keeps comparing four times the items instead of silently changing the ratio.

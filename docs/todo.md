@@ -63,19 +63,30 @@ started. What is left is ranked by how much it changes the picture.
       turned out not to be the trade: the scene clipped 0.01% of its pixels
       under all three, so the roll-off a filmic curve is chosen for had
       nothing to do here. A test now holds the choice in place.
-- [ ] **Rebuild the scene when the design changes, not when the selection
-      does.** Measured on 2026-09-17, with the whole Playwright suite
-      instrumented: 50 scene builds, 170 seconds of build time in a
-      15.3 minute run, so about 2.1 seconds each under software rendering.
-      Most of those builds are not design edits. The effect that owns the
-      renderer lists `selected` and `selectedIds` among its dependencies,
-      so clicking a cabinet tears down the WebGL context, every texture,
-      the sky PMREM and the room probe, and makes them all again to draw a
-      selection outline. Splitting the effect - context and assets once,
-      scene per design, outline per selection - is the one change with real
-      leverage on how the view feels while someone works.
-      A correction while measuring this: I said earlier that the room
-      probe cost about five minutes of that run. It does not. It is 36.4
+- [ ] **Finish splitting the render effect.** Half of this is done as of
+      2026-09-17: a click used to tear down the WebGL context, every
+      texture, the sky PMREM and the room probe to draw one wire box, and
+      now draws the box on the scene already there - one rebuild per click
+      and about eleven seconds became none and about a third of a second.
+      What is left is the other half of the same split. The effect that
+      owns the renderer is 994 lines with ten dependencies, and eight of
+      them - a design edit, an asset arriving, the environment, the
+      cutaway, the ceiling, interiors - genuinely need a new scene but not
+      a new WebGL context, a new set of textures or a new sky. Two need
+      neither: `walking` only changes what the camera obeys, and `quality`
+      only changes the passes and the probe size. Context and assets once,
+      scene per design, passes per quality, camera per mode would leave
+      the 2.1 second scene build where it is and take everything around it
+      off the frequent path.
+      The difficulty is the closure rather than the idea: the actions the
+      controls call, the animation loop, the resize observer and the
+      pointer handlers all close over the renderer, the composer and the
+      scene, so each has to read a ref instead, and disposal has to learn
+      which resource belongs to which lifetime. A leak or a stale
+      reference shows up as a black view, which the browser tests catch.
+      Call it a day's work with the suite as the net.
+      A correction recorded while measuring this: the room probe does not
+      cost the five minutes of a run I once attributed to it. It is 36.4
       seconds, 21% of build time and 4% of the run, and it does not care
       about its own resolution - a 32 pixel capture and a 128 pixel one
       cost the same 360 ms, because the cost is six traversals of the
@@ -187,10 +198,20 @@ checked against the model on 2026-09-16.
       symbols on it, is the next piece.
 - [ ] **Two people in one design.** Shared projects handle conflicts
       between saves; they do not let two people work at once.
-- [ ] **The 800-item ceiling.** `MAX_DESIGN_ITEMS` is 800, which is
-      comfortable for a kitchen and not for a large or commercial job.
-      Raising it means checking the design checks, the chunked storage and
-      the render scene at that size rather than changing the number.
+- [ ] **The 800-item ceiling, which is not the ceiling that binds.**
+      Measured on 2026-09-17, generating rooms of plain cabinets rather
+      than arguing from the constant: at 400 items a design is 127 KB and
+      its checks take 31 ms; at 800, the current `MAX_DESIGN_ITEMS`, it is
+      254 KB and 43 ms; at 1600 it is 509 KB and 110 ms. The item count is
+      not what stops it. Three other limits are, in the order they bite:
+      `parseDesign` refuses any design over 500 KB, which 1600 plain
+      cabinets already exceed, so raising the count without raising that
+      produces designs the app will not read back; the room maximum is 600
+      inches a side, which is the real limit on a commercial job; and the
+      drawing set throws at 1:100 on A3 once the extent is that large, so
+      a bigger job has no sheet to print on. Raising the item ceiling
+      alone would buy nothing - the work is the storage limit, a larger
+      room, and a sheet size or scale beyond A3 at 1:100.
 
 ## Catalog — on hold
 
@@ -229,14 +250,14 @@ rather than a width, which is exactly the point - a script cannot settle it.
 
 ## Documentation accuracy
 
-- [ ] **Correct the stale test counts.** [README](../README.md) says 252
-      semantic tests, [catalog status](catalog-status.md) says 71 core and 10
-      backend, [kitchen studio](kitchen-studio.md) says 111 and 15, and the
-      [CI workflow](../.github/workflows/ci.yml) comment says 252. The run
-      today is 275 core and 31 backend. In a repository whose rule is to state
-      only what was actually run, these are the exact claim that should not
-      drift — so correct them and add a check that fails when they do, rather
-      than correcting them by hand again next month.
+- [x] **Correct the stale test counts.** Done on 2026-09-17, both halves.
+      The four current claims now say 298 core, 31 backend and 35 browser,
+      and `npm run check` ends with `tools/check_test_counts.py`, which
+      fails when they drift again. The counts come from the runners rather
+      than from counting `test(` in the files: `approval.test.ts` declares
+      ten tests in a loop, so a static count is wrong by exactly the amount
+      nobody notices. Records of what ran on a particular day are left
+      alone and marked as such, because they were true when written.
 
 ## Engineering
 

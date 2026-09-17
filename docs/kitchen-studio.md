@@ -77,7 +77,7 @@ npm run dev -- --port 3000
 
 ## Validation
 
-- `npm run check`: lint, TypeScript, 111 core tests, 15 backend tests, and benchmark artifact integrity.
+- `npm run check`: lint, TypeScript, 298 core tests, 31 backend tests, and benchmark artifact integrity. `npm run test:e2e` runs 35 browser tests separately.
 - `npm run build`: production build.
 - Playwright Chromium, desktop 1536×1024 and mobile 390×844: example loading, cabinet addition, pointer dragging, keyboard movement, rotation, duplication/deletion, undo/redo, zoom/fit, room resizing, overlap/boundary warnings, 3D view rotation, finish selection, saving/opening, reload restoration, JSON export/import, and invalid import rejection. No browser runtime errors or horizontal page overflow.
 - Browser plugin was unavailable, so local Playwright was used. Tests used the isolated QA account's own catalog; no real-user review status was changed.
@@ -116,7 +116,7 @@ Choose the **Objects** tab in the left library. Add Door, Window, Sink, Refriger
 
 All object types support save/reload and JSON import/export. Layout checks cover object intersections, disabled attachment walls, sink support, and conservative door-swing clearance. They do not certify installation clearances or plumbing/electrical requirements.
 
-Object QA: all nine types, resizing, door swing, wall attachment and sill elevation, island sink, countertop cutouts, save/reload, JSON export/import, and 2D/3D desktop/mobile views passed. The complete suite now contains 119 automated tests.
+Object QA: all nine types, resizing, door swing, wall attachment and sill elevation, island sink, countertop cutouts, save/reload, JSON export/import, and 2D/3D desktop/mobile views passed. The suite contained 119 automated tests when that work was done.
 
 ## Custom rooms, assemblies, and print packages
 
@@ -184,7 +184,7 @@ Validation: 104 core + 15 backend tests; desktop/mobile browser flow for sample 
 - **Manufacturing:** Documents → Joinery, drilling & sheet nesting configures butt/rabbet joints, band thickness, generic hinge-cup and shelf-pin patterns, sheet dimensions, kerf and rotation. Manufacturing CSV distinguishes finished dimensions from raw cut dimensions in millimeters. Drilling/joint DXF contains bore circles and rabbet outlines with depth layers; nested-sheet DXF contains placement outlines. The JSON report records machining details in inches, with explicitly named millimeter parameters.
 - Nesting separates materials and thicknesses, preserves part orientation unless rotation is enabled, and lists oversized parts. It is a simple packing estimate, not an optimal cutting solver. Generic drilling templates require shop/hardware review; hinge mounting screws, handle holes, drawer-slide patterns and machine toolpaths are not generated.
 
-Validation for this update: 111 core and 15 backend tests passed, along with lint, TypeScript, benchmark artifact integrity and the production build. Automated geometry, assembly alignment, drop payload, clearance, alternative-copy, machining and nesting tests; browser checks for all four inspector tabs, saved cameras, presentation, a verified 3840-pixel PNG, library drop, live drag dimensions and placement, clearance overlays, comparison, manufacturing downloads, reload persistence and mobile layout. Independent DXF parsing verified millimeter units and 918 bore circles matching the sample manufacturing report.
+Validation for that update, as it stood on the day: 111 core and 15 backend tests passed, along with lint, TypeScript, benchmark artifact integrity and the production build. Automated geometry, assembly alignment, drop payload, clearance, alternative-copy, machining and nesting tests; browser checks for all four inspector tabs, saved cameras, presentation, a verified 3840-pixel PNG, library drop, live drag dimensions and placement, clearance overlays, comparison, manufacturing downloads, reload persistence and mobile layout. Independent DXF parsing verified millimeter units and 918 bore circles matching the sample manufacturing report.
 
 ## Client demo and presentation flow
 
