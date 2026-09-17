@@ -390,7 +390,24 @@ export default function RenderView({
       return;
     }
     setError('');
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    // Draw more pixels than the screen has, where the device can afford
+    // it. Extra samples fix the edges of shapes; they do nothing for a
+    // highlight that lands inside one pixel and moves to the next as the
+    // camera turns, which is what makes thin metal - a tap, a pull, the
+    // edge of an appliance - glitter. Shading each pixel more than once
+    // is the only thing that does, and rendering at twice the density is
+    // the cheap way to buy it. Gated on a device with samples to spare,
+    // which is a real GPU: software rendering reports four and keeps its
+    // one pixel per pixel.
+    renderer.setPixelRatio(
+      Math.min(
+        2,
+        Math.max(
+          devicePixelRatio,
+          renderer.capabilities.maxSamples >= 8 ? 2 : 1,
+        ),
+      ),
+    );
     // Grazing angles are most of a kitchen view - the floor, the worktops -
     // and that is exactly where a low anisotropy limit smears a texture.
     setTextureAnisotropy(renderer.capabilities.getMaxAnisotropy());
@@ -437,6 +454,13 @@ export default function RenderView({
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, size * 30);
     camera.setFocalLength(lensRef.current);
     const controls = new OrbitControls(camera, renderer.domElement);
+    // The wheel zooms towards the pointer rather than towards whatever
+    // the camera happens to be orbiting. Zooming at the middle of the
+    // screen means the thing you are leaning in to look at slides out of
+    // frame on the way, and you orbit a point you never chose; going to
+    // the cursor moves the orbit point with you, so the next drag turns
+    // around what you just zoomed into.
+    controls.zoomToCursor = true;
     controls.maxPolarAngle = Math.PI / 2;
     controls.minDistance = 15;
     controls.maxDistance = size * 6;

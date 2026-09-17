@@ -69,7 +69,7 @@ npm run build
 npm run test:e2e  # Playwright; see below
 ```
 
-`npm run check` covers 301 semantic tests, 31 backend ownership/concurrency/audit tests, mocked provider contract tests, TypeScript, lint and draft-artifact integrity. `npm run test:e2e` adds 35 browser tests, which CI does not yet run. These are software checks, not measured manufacturer-data accuracy.
+`npm run check` covers 301 semantic tests, 31 backend ownership/concurrency/audit tests, mocked provider contract tests, TypeScript, lint and draft-artifact integrity. `npm run test:e2e` adds 36 browser tests, which CI does not yet run. These are software checks, not measured manufacturer-data accuracy.
 
 CI runs `npm run check` and the production build on every push and pull request ([.github/workflows/ci.yml](.github/workflows/ci.yml)). This repository is public, so GitHub-hosted runners do not consume the account's included minutes. The browser specs are not run there: they need a live Convex deployment to sign in against, which would mean putting deployment credentials in CI for a public repository.
 

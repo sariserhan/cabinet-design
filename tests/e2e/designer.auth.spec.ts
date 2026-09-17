@@ -616,6 +616,107 @@ test('a worktop is joined where the designer says, and the plan shows it', async
   expect(pageErrors).toEqual([]);
 });
 
+test('the wheel zooms towards the pointer, not the middle of the screen', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(5000);
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  const canvas = page.locator('.render-stage canvas');
+  await expect(canvas).toBeVisible({ timeout: 90_000 });
+  await page.waitForTimeout(10_000);
+
+  /** How much a patch of the view changed, as an average per channel. */
+  const change = (before: string, after: string, fx: number, fy: number) =>
+    page.evaluate(
+      ([a, b, x, y]) =>
+        new Promise<number>((resolve, reject) => {
+          const load = (src: string) =>
+            new Promise<HTMLImageElement>((ok, bad) => {
+              const img = new Image();
+              img.onload = () => ok(img);
+              img.onerror = () => bad(Error('decode'));
+              img.src = src as string;
+            });
+          void Promise.all([load(a as string), load(b as string)])
+            .then(([one, two]) => {
+              const patch = (img: HTMLImageElement) => {
+                const off = document.createElement('canvas');
+                off.width = off.height = 44;
+                const ctx = off.getContext('2d');
+                if (!ctx) throw Error('no 2d context');
+                ctx.drawImage(
+                  img,
+                  Math.round(img.width * (x as number)) - 22,
+                  Math.round(img.height * (y as number)) - 22,
+                  44,
+                  44,
+                  0,
+                  0,
+                  44,
+                  44,
+                );
+                return ctx.getImageData(0, 0, 44, 44).data;
+              };
+              const first = patch(one),
+                second = patch(two);
+              let sum = 0;
+              for (let i = 0; i < first.length; i++)
+                if (i % 4 !== 3)
+                  sum += Math.abs((first[i] ?? 0) - (second[i] ?? 0));
+              resolve(sum / ((first.length / 4) * 3));
+            })
+            .catch(reject);
+        }),
+      [before, after, fx, fy] as const,
+    );
+  const shot = () =>
+    page.evaluate(() => {
+      const src = document.querySelector<HTMLCanvasElement>(
+        '.render-stage canvas',
+      );
+      return src ? src.toDataURL('image/png') : '';
+    });
+
+  const box = await canvas.boundingBox();
+  if (!box) throw Error('the canvas is not on screen');
+  const px = 0.25,
+    py = 0.55;
+  const before = await shot();
+  // Dispatched on the canvas, which is what OrbitControls listens on.
+  await page.evaluate(
+    ([x, y]) => {
+      document.querySelector('.render-stage canvas')?.dispatchEvent(
+        new WheelEvent('wheel', {
+          deltaY: -240,
+          clientX: x,
+          clientY: y,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    },
+    [box.x + box.width * px, box.y + box.height * py] as const,
+  );
+  await page.waitForTimeout(4000);
+  const after = await shot();
+
+  // Zooming at the middle of the screen slides whatever you are leaning
+  // in to look at out of frame. Measured with the anchor at the middle:
+  // the patch under the pointer changed three times as much as the
+  // middle did. Towards the pointer, that is the other way round.
+  const atPointer = await change(before, after, px, py);
+  const atCentre = await change(before, after, 0.5, 0.5);
+  expect(atCentre).toBeGreaterThan(8);
+  expect(atPointer).toBeLessThan(atCentre / 2);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {

@@ -130,6 +130,17 @@ started. What is left is ranked by how much it changes the picture.
       signed-in tests pass on hardware, in 3.9 minutes against 20 on
       software, which makes it the faster way to run them as well as the
       only way to see what hardware sees.
+      What it measured, once there was an instrument for it: a view that
+      has settled has accumulated jittered samples, so it is a
+      supersampled reference for the very same camera, and the distance
+      between it and the single-sample frame is exactly the aliasing a
+      person sees while moving. That is 0.16% of pixels before and 0.10%
+      after drawing at twice the pixel density - the first thing tried
+      that moved the number, against three material theories and an
+      eightfold multisample that did not. It is not zero. The rest is
+      thin bright geometry against dark, which wants either a temporal
+      pass that survives motion or more density than an integrated GPU
+      should be asked for.
       First thing it showed: the glitter reported on appliance edges is
       not the broad steel panels - captured frames of a moving camera put
       the instability on thin metal silhouettes, the pulls, the tap and
