@@ -46,6 +46,8 @@ import {
   Plus,
   Minus,
   CircleQuestionMark,
+  Package,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import type { Overview } from '@/lib/workspace-types';
@@ -145,6 +147,27 @@ function Editor({ ownerId }: { ownerId: string }) {
     [presenting, setPresenting] = useState(false),
     [selection, setSelection] = useState<string[]>([]),
     [showClearance, setShowClearance] = useState(false);
+  // A phone opens on the drawing, not on the library.
+  //
+  // In one column the library sits above the canvas and the properties
+  // below it - 471 and 1545 pixels of them at 390 wide, measured - so the
+  // drawing starts about twelve hundred pixels down a page nobody scrolls
+  // that far. Both start out of the way, and the bar at the foot of the
+  // screen brings either one back over the drawing.
+  useEffect(() => {
+    const phone = window.matchMedia('(max-width: 600px)');
+    const fold = () => {
+      if (!phone.matches) return;
+      setLibraryCollapsed(true);
+      setInspectorCollapsed(true);
+    };
+    fold();
+    // Also when a window is dragged narrow, because that is the same room
+    // for the drawing as a phone has. Widening again is left alone: the
+    // panels are the person's to reopen.
+    phone.addEventListener('change', fold);
+    return () => phone.removeEventListener('change', fold);
+  }, []);
   useEffect(() => {
     const keys = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') setPresenting(false);
@@ -1408,6 +1431,26 @@ function Editor({ ownerId }: { ownerId: string }) {
           {storageError || history.error || status}
         </div>
       )}
+      <nav className="phone-panels" aria-label="Panels">
+        <button
+          aria-pressed={!libraryCollapsed}
+          onClick={() => {
+            setLibraryCollapsed((v) => !v);
+            setInspectorCollapsed(true);
+          }}
+        >
+          <Package size={15} /> Library
+        </button>
+        <button
+          aria-pressed={!inspectorCollapsed}
+          onClick={() => {
+            setInspectorCollapsed((v) => !v);
+            setLibraryCollapsed(true);
+          }}
+        >
+          <SlidersHorizontal size={15} /> Properties
+        </button>
+      </nav>
       <div className="designer-grid" hidden={workspaceStage === 'Quote'}>
         <div className="designer-library-column">
           {overview && version && (

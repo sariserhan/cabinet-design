@@ -460,6 +460,54 @@ h3 {
   }
 }
 
+/* On a phone the shell has to earn its height: the workspace nav becomes
+   one scrolling row of links rather than a stacked menu, and the demo
+   banner says its piece on one line. Measured at 390 wide, the two of
+   them took 204 pixels off the top of the drawing. */
+@media (max-width: 600px) {
+  .sidebar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+  }
+  .sidebar h1,
+  .sidebar .sidebar-account,
+  .sidebar details {
+    display: none;
+  }
+  .sidebar .brand {
+    margin: 0;
+    font-size: 13px;
+  }
+  /* The label stays; the paragraph explaining it does not fit a phone. */
+  .demo-banner strong ~ * {
+    display: none;
+  }
+  .sidebar nav {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+  .sidebar nav::-webkit-scrollbar {
+    display: none;
+  }
+  .demo-banner {
+    padding: 4px 12px;
+    font-size: 11px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .demo-banner span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .demo-banner {
   display: flex;
   flex-wrap: wrap;
