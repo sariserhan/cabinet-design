@@ -60,10 +60,18 @@ export function applianceDetails(
   const { width: w, height: h, depth: d } = item;
   const face = d / 2 - 0.1;
   if (item.kind === 'refrigerator') {
-    // Open carcass with shelves, so doors reveal an interior rather than a solid block.
-    b(w, h, 1, 0, h / 2, -d / 2, steel);
+    // Open carcass with shelves, so doors reveal an interior rather than a
+    // solid block. The back and the two rails are held between the sides
+    // rather than flush with them: three boxes whose outer faces landed on
+    // exactly the same plane gave the depth buffer nothing to choose
+    // between, and the edge of the appliance flickered as the camera
+    // moved. A carcass is built that way in any case - the sides are the
+    // outside of it. They run a fifth of an inch into the sides rather
+    // than stopping flush against them, so the ends are buried in solid
+    // material instead of sharing its plane.
     for (const x of [-w / 2 + 0.5, w / 2 - 0.5]) b(1, h, d, x, h / 2, 0, steel);
-    for (const y of [1, h - 1]) b(w, 1, d, 0, y, 0, steel);
+    b(w - 1.6, h, 1, 0, h / 2, -d / 2, steel);
+    for (const y of [1, h - 1]) b(w - 1.6, 1, d, 0, y, 0, steel);
     for (const y of [h * 0.25, h * 0.48, h * 0.7])
       b(w - 3, 0.5, d - 4, 0, y, -1, steel);
     const door = (
@@ -75,10 +83,13 @@ export function applianceDetails(
       drawer = false,
     ) => {
       const start = group.children.length;
-      b(width - 0.15, height - 0.15, 0.25, x, y, face - 0.62, dark);
+      // The seal sits clear behind the door, and the display is sunk into
+      // its face rather than resting a hundredth of an inch inside it.
+      // Both were close enough to fight for the same depth.
+      b(width - 0.15, height - 0.15, 0.25, x, y, face - 0.78, dark);
       b(width, height, 1, x, y, face, steel);
       if (!drawer && height > 35 && width > 15) {
-        b(3.5, 5, 0.12, x, y + height * 0.16, face + 0.55, glass);
+        b(3.5, 5, 0.2, x, y + height * 0.16, face + 0.52, glass);
         b(2, 0.12, 0.15, x, y + height * 0.16 + 1, face + 0.65, steel);
       }
       metalPull(
@@ -181,8 +192,13 @@ export function applianceDetails(
       );
       burner.position.set(x, h + 0.6, z);
       group.add(burner);
+      // The two bars of a trivet cross, and a cast one is a single
+      // piece; two boxes at one height are not, and where they cross
+      // their tops and bottoms land on the same plane and sparkle. The
+      // cross bar sits a twentieth of an inch lower, which is how a
+      // fabricated grate is made anyway.
       b(8, 0.4, 0.3, x, h + 1, z, dark);
-      b(0.3, 0.4, 8, x, h + 1, z, dark);
+      b(0.3, 0.4, 8, x, h + 0.95, z, dark);
     }
 }
 
