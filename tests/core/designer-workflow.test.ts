@@ -5,6 +5,7 @@ import {
   walkEntry,
   materialVariant,
   openingConflicts,
+  panoramaViewpoint,
 } from '../../src/designer/render-planning';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -329,6 +330,48 @@ test('walk navigation avoids rotated solids while leaving partition doorways pas
     },
   ];
   assert.equal(walkEntry(d), null);
+});
+test('a panorama stands in the open floor of the room, not in the cabinets', () => {
+  const d = newDesign();
+  const centre = panoramaViewpoint(d);
+  assert.ok(centre);
+  // An empty room: the open middle, at standing height.
+  assert.ok(Math.abs(centre[0] - d.room.width / 2) < 8);
+  assert.ok(Math.abs(centre[2] - d.room.depth / 2) < 8);
+  assert.equal(centre[1], 64);
+
+  // An island in the middle pushes the viewpoint off it, and it stays
+  // somewhere a walker could stand.
+  d.items = [
+    {
+      ...fromObject('island'),
+      x: d.room.width / 2 - 36,
+      y: d.room.depth / 2 - 24,
+      width: 72,
+      depth: 48,
+    },
+  ];
+  const beside = panoramaViewpoint(d);
+  assert.ok(beside);
+  assert.ok(walkPosition(d, beside[0], beside[2]));
+  assert.ok(
+    Math.hypot(beside[0] - d.room.width / 2, beside[2] - d.room.depth / 2) >
+      24,
+  );
+
+  // A room filled wall to wall has nowhere to stand, and says so rather
+  // than returning a point inside the cabinets.
+  d.items = [
+    {
+      ...fromObject('custom_cabinet'),
+      x: 0,
+      y: 0,
+      width: d.room.width,
+      depth: d.room.depth,
+      height: 90,
+    },
+  ];
+  assert.equal(panoramaViewpoint(d), null);
 });
 test('material previews preserve layout, camera and lighting without mutating the original', () => {
   const d = newDesign();

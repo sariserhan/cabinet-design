@@ -28,6 +28,8 @@ export type RenderActions = {
   fit: () => void;
   /** Draw one more frame, for a setting the scene does not rebuild for. */
   refresh: () => void;
+  /** An equirectangular 360 image, from standing height inside the room. */
+  panorama: (width: number) => void;
   save: (width: number, captureOnly?: boolean) => void;
   capture: () => Pick<View, 'position' | 'target'>;
   load: (view: CameraView) => void;
@@ -390,6 +392,19 @@ export function RenderControls({
           >
             Download PNG
           </button>
+          <button
+            onClick={() => actions.current?.panorama(2048)}
+            disabled={!!error || assetsLoading}
+            title="An equirectangular image, taken standing in the open floor of the room"
+          >
+            Download 360 panorama
+          </button>
+          {!showCeiling && (
+            <small>
+              A panorama looks overhead as well as around: turn the ceiling on
+              first, or the room is open to the sky.
+            </small>
+          )}
           <label>
             <input
               type="checkbox"

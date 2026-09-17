@@ -113,6 +113,92 @@ test('high quality shadows and room reflections do not black out the room', asyn
   expect(pageErrors).toEqual([]);
 });
 
+test('a 360 panorama is exported from inside the room, lit and level', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(6000);
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  await expect(page.locator('.render-stage canvas')).toBeVisible({
+    timeout: 90_000,
+  });
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  const download = page.waitForEvent('download', { timeout: 240_000 });
+  await page.getByRole('button', { name: 'Download 360 panorama' }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/-360\.png$/);
+  const path = test.info().outputPath('panorama.png');
+  await file.saveAs(path);
+
+  // Measured in the browser, because that is the only decoder here: the
+  // image goes back in as a data URL and is read off a 2D canvas.
+  const { readFile } = await import('node:fs/promises');
+  const url = `data:image/png;base64,${(await readFile(path)).toString('base64')}`;
+  const image = await page.evaluate(
+    (src) =>
+      new Promise<{
+        width: number;
+        height: number;
+        dark: number;
+        bands: number[];
+      }>((resolve, reject) => {
+        const img = new Image();
+        img.onerror = () => reject(Error('panorama did not decode'));
+        img.onload = () => {
+          const off = document.createElement('canvas');
+          off.width = img.width;
+          off.height = img.height;
+          const ctx = off.getContext('2d');
+          if (!ctx) return reject(Error('no 2d context'));
+          ctx.drawImage(img, 0, 0);
+          const { data } = ctx.getImageData(0, 0, off.width, off.height);
+          let dark = 0;
+          const bands = [0, 0, 0],
+            counts = [0, 0, 0];
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i] ?? 0,
+              g = data[i + 1] ?? 0,
+              b = data[i + 2] ?? 0;
+            if (r < 24 && g < 24 && b < 24) dark++;
+            const row = Math.floor(i / 4 / off.width);
+            const band =
+              row < off.height / 3 ? 0 : row < (2 * off.height) / 3 ? 1 : 2;
+            bands[band] = (bands[band] ?? 0) + (r + g + b) / 3;
+            counts[band] = (counts[band] ?? 0) + 1;
+          }
+          resolve({
+            width: off.width,
+            height: off.height,
+            dark: (100 * dark) / (data.length / 4),
+            bands: bands.map((sum, i) => sum / (counts[i] || 1)),
+          });
+        };
+        img.src = src;
+      }),
+    url,
+  );
+
+  // Two to one is what a panorama viewer expects of an equirectangular
+  // image; anything else is shown with the horizon bent.
+  expect(image.width).toBe(2048);
+  expect(image.height).toBe(1024);
+  // Tone mapped like the view on screen rather than written out linear,
+  // which is the failure this catches: a linear write comes out near black.
+  expect(image.dark).toBeLessThan(15);
+  expect(image.bands[1] ?? 0).toBeGreaterThan(40);
+  // Standing on the floor of the room, so the ground under the camera is
+  // in shot and darker than the room at eye level.
+  expect(image.bands[2] ?? 0).toBeLessThan(image.bands[1] ?? 0);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {
@@ -479,6 +565,11 @@ test('a project can be worked in millimetres', async ({
   test.setTimeout(240_000);
   await page.getByRole('button', { name: /2D plan/i }).click();
   const width = page.getByLabel(/Room width/);
+  // A known room to convert, since the whole file shares one page and
+  // whatever ran last leaves its own kitchen behind.
+  await width.fill('144');
+  await width.blur();
+  await expect(width).toHaveValue('144', { timeout: 20_000 });
   await page.getByLabel('Units', { exact: true }).selectOption('mm');
 
   // The field and its label change together: 144 inches is 3658 mm.
@@ -563,28 +654,20 @@ test('a note can point at something, and a corner can be measured', async ({
 }) => {
   test.setTimeout(240_000);
   await page.getByRole('button', { name: /2D plan/i }).click();
-  const at = async (x: number, y: number) => {
-    const point = await page.evaluate(
-      ([ux, uy]) => {
-        const svg = document.querySelector<SVGSVGElement>('.plan-svg');
-        const matrix = svg?.getScreenCTM();
-        if (!svg || !matrix || ux === undefined || uy === undefined)
-          return null;
-        const p = svg.createSVGPoint();
-        p.x = ux;
-        p.y = uy;
-        const t = p.matrixTransform(matrix);
-        return { x: t.x, y: t.y };
-      },
-      [x, y],
-    );
-    return point ?? { x: 0, y: 0 };
+  // Points as a share of the drawing rather than in room inches: whatever
+  // ran before this leaves its own room and zoom behind, and the plan scales
+  // both axes alike, so a right angle on the screen is a right angle in the
+  // room.
+  const at = async (fx: number, fy: number) => {
+    const box = await page.locator('.plan-svg').boundingBox();
+    if (!box) throw Error('the plan is not on screen');
+    return { x: box.x + box.width * fx, y: box.y + box.height * fy };
   };
 
   // Dragging a note gives it a leader to what it points at.
   await page.getByRole('button', { name: 'Note', exact: true }).click();
-  const from = await at(20, 20),
-    to = await at(60, 50);
+  const from = await at(0.25, 0.3),
+    to = await at(0.45, 0.45);
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   for (let step = 1; step <= 6; step++)
@@ -600,9 +683,9 @@ test('a note can point at something, and a corner can be measured', async ({
   // Three clicks - corner, then a point along each side - measure it.
   await page.getByRole('button', { name: 'Angle', exact: true }).click();
   for (const [x, y] of [
-    [30, 90],
-    [80, 90],
-    [30, 130],
+    [0.3, 0.55],
+    [0.5, 0.55],
+    [0.3, 0.75],
   ] as const) {
     const point = await at(x, y);
     await page.mouse.click(point.x, point.y);

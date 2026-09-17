@@ -129,6 +129,8 @@ Validation also covers custom outline entry/drawing, invalid outline rejection, 
 
 Choose **Render** beside **3D preview** for the WebGL view. It uses the current room outline, openings, cabinet dimensions, assemblies, and finish, with lighting and shadows. Drag to orbit, right-drag to pan, and scroll to zoom (two fingers pan/zoom on touch screens). **Reset camera** fits the room; **Cutaway walls** hides walls facing away from the room interior so the layout stays visible. **Download PNG** exports the current camera view at the canvas resolution.
 
+**Download 360 panorama** writes a 2048x1024 equirectangular PNG - the format a phone viewer, a VR headset or a web panorama player expects - so a client can look around the kitchen rather than at one framed view of it. It is taken from standing height in the most open floor of the room, not from wherever the orbit camera is parked, and falls back to the camera's own position only where nothing in the room is standable. It carries the exposure, white balance and tone curve of the view on screen. The image looks overhead as well as around, so turn **Show ceiling** on first unless an open roof is wanted; the panel says so while the ceiling is off.
+
 Rendering runs locally in the browser with no API key or paid service. WebGL2 is required; the 2D plan and SVG 3D preview remain available on unsupported devices. Models and finishes are illustrative, not photorealistic manufacturer assets.
 
 

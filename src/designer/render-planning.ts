@@ -90,6 +90,62 @@ function nearPolygon(
     return Math.hypot(x - a.x - t * dx, z - a.y - t * dy) < radius;
   });
 }
+/**
+ * What stands in the way of a person at eye height.
+ *
+ * Doors and windows are holes rather than obstacles, and anything wholly
+ * above the head or below the knee is walked under or over.
+ */
+function* blockerPolygons(design: Design, eye: number) {
+  for (const item of design.items) {
+    if (
+      ['door', 'window'].includes(item.kind) ||
+      item.elevation > eye + 4 ||
+      item.elevation + item.height < 4
+    )
+      continue;
+    if (item.kind === 'partition') {
+      for (const panel of partitionPanels(item, design.items)) {
+        if (
+          item.elevation + panel.y > eye + 4 ||
+          item.elevation + panel.y + panel.height < 4
+        )
+          continue;
+        yield (
+          [
+            [panel.x, 0],
+            [panel.x + panel.width, 0],
+            [panel.x + panel.width, item.depth],
+            [panel.x, item.depth],
+          ] as const
+        ).map(([px, py]) => localToWorld(item, px, py));
+      }
+    } else yield itemPolygon(item);
+  }
+}
+
+/** How far a point is from the nearest edge of a ring. */
+function edgeDistance(
+  x: number,
+  z: number,
+  polygon: { x: number; y: number }[],
+) {
+  let best = Infinity;
+  for (let i = 0; i < polygon.length; i++) {
+    const a = polygon[i],
+      b = polygon[(i + 1) % polygon.length];
+    if (!a || !b) continue;
+    const dx = b.x - a.x,
+      dy = b.y - a.y;
+    const t = Math.max(
+      0,
+      Math.min(1, ((x - a.x) * dx + (z - a.y) * dy) / (dx * dx + dy * dy || 1)),
+    );
+    best = Math.min(best, Math.hypot(x - a.x - t * dx, z - a.y - t * dy));
+  }
+  return best;
+}
+
 export function walkPosition(design: Design, x: number, z: number) {
   const outline = roomOutline(design.room);
   if (
@@ -105,34 +161,54 @@ export function walkPosition(design: Design, x: number, z: number) {
     return null;
   const eye = Math.min(64, ceilingAt(design.room, x, z) - 6);
   if (eye < 36) return null;
-  for (const item of design.items) {
-    if (
-      ['door', 'window'].includes(item.kind) ||
-      item.elevation > eye + 4 ||
-      item.elevation + item.height < 4
-    )
-      continue;
-    if (item.kind === 'partition') {
-      for (const panel of partitionPanels(item, design.items)) {
-        if (
-          item.elevation + panel.y > eye + 4 ||
-          item.elevation + panel.y + panel.height < 4
-        )
-          continue;
-        const polygon = (
-          [
-            [panel.x, 0],
-            [panel.x + panel.width, 0],
-            [panel.x + panel.width, item.depth],
-            [panel.x, item.depth],
-          ] as const
-        ).map(([px, py]) => localToWorld(item, px, py));
-        if (nearPolygon(x, z, polygon)) return null;
-      }
-    } else if (nearPolygon(x, z, itemPolygon(item))) return null;
-  }
+  for (const polygon of blockerPolygons(design, eye))
+    if (nearPolygon(x, z, polygon)) return null;
   return [x, eye, z] as [number, number, number];
 }
+
+/**
+ * Where to stand for a 360 panorama.
+ *
+ * A panorama is worth looking at from inside the kitchen, not from the
+ * orbit camera's seat out in the garden, so this hunts for the most open
+ * floor a person could actually stand on: the spot with the most clear
+ * space around it, and the one nearest the middle of the room where two
+ * are equally open. Past five feet of clearance more space stops
+ * improving the picture, so ties there fall to the centre.
+ *
+ * Null where nothing in the room is standable - a plan with no walls yet,
+ * or a room packed wall to wall - and the caller then keeps its own camera.
+ */
+export function panoramaViewpoint(design: Design) {
+  const { width: w, depth: d } = design.room;
+  const step = Math.max(4, Math.min(w, d) / 20);
+  const cx = w / 2,
+    cz = d / 2;
+  let best: {
+    point: [number, number, number];
+    open: number;
+    pull: number;
+  } | null = null;
+  const outline = roomOutline(design.room);
+  for (let x = step; x < w; x += step)
+    for (let z = step; z < d; z += step) {
+      const point = walkPosition(design, x, z);
+      if (!point) continue;
+      let clear = edgeDistance(x, z, outline);
+      for (const polygon of blockerPolygons(design, point[1]))
+        clear = Math.min(clear, edgeDistance(x, z, polygon));
+      const open = Math.min(clear, 60),
+        pull = Math.hypot(x - cx, z - cz);
+      if (
+        !best ||
+        open > best.open + 0.5 ||
+        (open > best.open - 0.5 && pull < best.pull)
+      )
+        best = { point, open, pull };
+    }
+  return best?.point ?? null;
+}
+
 export function walkEntry(design: Design) {
   const preferred = presentationViews(design)[0]?.position ?? [
     design.room.width / 2,
