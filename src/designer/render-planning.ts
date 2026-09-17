@@ -362,3 +362,33 @@ export function openingConflicts(
     );
   });
 }
+
+/**
+ * How near and how far the camera clips, for the distance it is at.
+ *
+ * A depth buffer does not spread its precision evenly: it is dense at
+ * the near plane and thins out with the square of the distance, so what
+ * matters is not how far you can see but how near you are allowed to.
+ * At a near plane of a tenth of an inch - what this used to be - a view
+ * from a thousand inches away cannot separate two surfaces less than
+ * half an inch apart, and a door panel, its frame, a worktop on its
+ * cabinet and a backsplash on its wall are all closer together than
+ * that. They flicker against each other, and only when zoomed out,
+ * which is the report that led here.
+ *
+ * So the near plane follows the camera out. At arm's length it stays
+ * where it was, and by the time the whole room is in shot it is a couple
+ * of inches, which is still far closer than anything the camera can see
+ * from there. The far plane is pulled in to the scene as well, since
+ * nothing beyond it is geometry - the sky is a background.
+ */
+export function depthPlanes(distance: number, size: number) {
+  const safe = Math.max(1, distance);
+  return {
+    // A five-hundredth of the distance: at 15 inches that is the old
+    // tenth of an inch, at 1000 it is two inches, and the nearest thing
+    // the camera can see from there is hundreds of inches away.
+    near: Math.min(6, Math.max(0.1, safe / 500)),
+    far: safe + Math.max(size, 1) * 6,
+  };
+}

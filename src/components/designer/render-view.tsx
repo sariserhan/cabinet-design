@@ -35,6 +35,7 @@ import {
   walkEntry,
   materialVariant,
   panoramaViewpoint,
+  depthPlanes,
 } from '@/designer/render-planning';
 import { bestCamera } from '@/designer/experience';
 import { SurfaceEditor, type SurfaceTarget } from './experience-tools';
@@ -1012,6 +1013,23 @@ export default function RenderView({
     // not asked again.
     const canRefine = () => refineAllowed.current;
     const render = () => {
+      // The depth buffer's precision falls with the square of the
+      // distance, so the near plane has to travel with the camera or a
+      // zoomed-out view cannot tell a door panel from its frame. Applied
+      // here rather than on a control event, because the camera is also
+      // moved by tweens, presets, walking and the saved views.
+      const planes = depthPlanes(
+        camera.position.distanceTo(controls.target),
+        size,
+      );
+      if (
+        Math.abs(camera.near - planes.near) > camera.near * 0.05 ||
+        Math.abs(camera.far - planes.far) > camera.far * 0.05
+      ) {
+        camera.near = planes.near;
+        camera.far = planes.far;
+        camera.updateProjectionMatrix();
+      }
       if (settling) {
         settling = false;
         settlePass.enabled = false;

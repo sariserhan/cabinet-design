@@ -77,7 +77,7 @@ npm run dev -- --port 3000
 
 ## Validation
 
-- `npm run check`: lint, TypeScript, 300 core tests, 31 backend tests, and benchmark artifact integrity. `npm run test:e2e` runs 35 browser tests separately.
+- `npm run check`: lint, TypeScript, 301 core tests, 31 backend tests, and benchmark artifact integrity. `npm run test:e2e` runs 35 browser tests separately.
 - `npm run build`: production build.
 - Playwright Chromium, desktop 1536×1024 and mobile 390×844: example loading, cabinet addition, pointer dragging, keyboard movement, rotation, duplication/deletion, undo/redo, zoom/fit, room resizing, overlap/boundary warnings, 3D view rotation, finish selection, saving/opening, reload restoration, JSON export/import, and invalid import rejection. No browser runtime errors or horizontal page overflow.
 - Browser plugin was unavailable, so local Playwright was used. Tests used the isolated QA account's own catalog; no real-user review status was changed.

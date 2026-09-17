@@ -6,6 +6,7 @@ import {
   materialVariant,
   openingConflicts,
   panoramaViewpoint,
+  depthPlanes,
 } from '../../src/designer/render-planning';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -355,8 +356,7 @@ test('a panorama stands in the open floor of the room, not in the cabinets', () 
   assert.ok(beside);
   assert.ok(walkPosition(d, beside[0], beside[2]));
   assert.ok(
-    Math.hypot(beside[0] - d.room.width / 2, beside[2] - d.room.depth / 2) >
-      24,
+    Math.hypot(beside[0] - d.room.width / 2, beside[2] - d.room.depth / 2) > 24,
   );
 
   // A room filled wall to wall has nowhere to stand, and says so rather
@@ -1236,4 +1236,29 @@ test('surveyed services become points on the plan, and handing reaches the sheet
   const labels = drawingConfiguration(hinged);
   assert.ok(labels.includes('Hinged right'));
   assert.ok(labels.includes('3 drawers'));
+});
+
+test('the near plane follows the camera out, so distance keeps its precision', () => {
+  // The smallest gap a 24-bit depth buffer can resolve at a given
+  // distance, which is what decides whether two surfaces flicker.
+  const resolution = (distance: number, near: number) =>
+    distance ** 2 / near / 2 ** 24;
+
+  // Up close nothing changes: a tenth of an inch, as before.
+  assert.equal(depthPlanes(15, 240).near, 0.1);
+  assert.equal(depthPlanes(50, 240).near, 0.1);
+
+  // Zoomed out to take in the room, the old tenth of an inch could not
+  // separate a door panel from its frame; the new near plane resolves a
+  // hundredth of that.
+  const far = depthPlanes(1000, 240);
+  assert.equal(far.near, 2);
+  assert.ok(resolution(1000, 0.1) > 0.5);
+  assert.ok(resolution(1000, far.near) < 0.05);
+
+  // The near plane never approaches anything the camera could see: at
+  // its largest it is six inches, against a camera hundreds away.
+  assert.equal(depthPlanes(100000, 240).near, 6);
+  // And the far plane always contains the room it is looking at.
+  assert.ok(depthPlanes(1000, 240).far > 1000 + 240);
 });
