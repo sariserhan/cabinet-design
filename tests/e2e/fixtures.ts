@@ -20,7 +20,15 @@ export const test = base.extend<
       // parallelIndex, not workerIndex: the latter increments when a worker is
       // replaced, so a single restart would sign up a brand new account through
       // the slow creation path instead of reusing the one for this slot.
-      await signInToDesigner(page, workerInfo.parallelIndex);
+      //
+      // The project name is in the slot as well, because two projects
+      // running at once - the software one and the GPU one - would
+      // otherwise share an account, and Convex Auth rotates a refresh
+      // token on every sign-in: whichever signed in second invalidated
+      // the first, and both sat waiting for a session that had just been
+      // taken away from them.
+      const slot = `${workerInfo.project.name}-${workerInfo.parallelIndex}`;
+      await signInToDesigner(page, slot);
       await use(page);
       await context.close();
     },

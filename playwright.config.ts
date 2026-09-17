@@ -29,20 +29,28 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
     // The same signed-in specs on the real GPU rather than SwiftShader,
-    // for the faults that only hardware shows: specular glitter, the
-    // refinement gate, anything temporal. Opt in with
-    // `npx playwright test --project=gpu`, and run it through
+    // for the faults only hardware shows: specular glitter, the
+    // refinement gate, anything temporal. Asked for explicitly, because
+    // it doubles the signed-in work and a plain `playwright test` should
+    // not pay for it:
+    //
+    //   sg render -c "E2E_GPU=1 npx playwright test --project=gpu"
+    //
     // `sg render` so the process can open the render node.
-    {
-      name: 'gpu',
-      testMatch: /.*\.auth\.spec\.ts/,
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: {
-          args: ['--use-angle=vulkan', '--ignore-gpu-blocklist'],
-        },
-      },
-    },
+    ...(process.env.E2E_GPU
+      ? [
+          {
+            name: 'gpu',
+            testMatch: /.*\.auth\.spec\.ts/,
+            use: {
+              ...devices['Desktop Chrome'],
+              launchOptions: {
+                args: ['--use-angle=vulkan', '--ignore-gpu-blocklist'],
+              },
+            },
+          },
+        ]
+      : []),
   ],
   ...(process.env.E2E_BASE_URL
     ? {}

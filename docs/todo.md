@@ -125,8 +125,10 @@ started. What is left is ranked by how much it changes the picture.
       account is in the `render` group and Mesa's EGL and Intel Vulkan
       driver are installed, so headless Chromium reaches the Intel UHD
       instead of falling back to SwiftShader. Run the browser suite on it
-      with `sg render -c "npx playwright test --project=gpu"`; the project
-      is in `playwright.config.ts` and passes `--use-angle=vulkan`. All 29
+      with `sg render -c "E2E_GPU=1 npx playwright test --project=gpu"`;
+      the project is in `playwright.config.ts`, appears only when that
+      variable is set - a plain run should not pay for twice the
+      signed-in work - and passes `--use-angle=vulkan`. All 29
       signed-in tests pass on hardware, in 3.9 minutes against 20 on
       software, which makes it the faster way to run them as well as the
       only way to see what hardware sees.

@@ -9,10 +9,10 @@ const PASSWORD = process.env.E2E_PASSWORD ?? 'e2e-automation-pw-1';
  * signing into the same account race and the loser is bounced back to the
  * sign-in screen. Separate identities remove the race entirely.
  */
-function emailFor(worker: number) {
+function emailFor(worker: number | string) {
   const base = process.env.E2E_EMAIL ?? 'e2e-automation@example.test';
   const [name, domain] = base.split('@');
-  return `${name}+w${worker}@${domain}`;
+  return `${name}+w${String(worker).replace(/[^a-z0-9-]/gi, '')}@${domain}`;
 }
 
 /**
@@ -20,7 +20,7 @@ function emailFor(worker: number) {
  * Called once per worker by the `signedIn` fixture; see fixtures.ts for why a
  * saved storageState is not used.
  */
-export async function signInToDesigner(page: Page, worker = 0) {
+export async function signInToDesigner(page: Page, worker: number | string = 0) {
   const EMAIL = emailFor(worker);
   await page.goto('/designer');
   // The shell renders this as soon as auth resolves, well before the designer
