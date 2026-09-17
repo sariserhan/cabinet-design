@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { fromObject, type Cabinet } from '../../src/designer/model';
 import {
   applianceDetails,
+  doorFace,
   type DetailBox,
 } from '../../src/components/designer/render-details';
 
@@ -125,4 +126,27 @@ test('no two appliance surfaces fight for the same depth', () => {
       );
     }
   }
+});
+
+test('no two door front surfaces fight for the same depth', () => {
+  for (const style of ['slab', 'shaker', 'raised'] as const)
+    for (const [w, h] of [
+      [20, 30],
+      [15, 40],
+      [24, 12],
+    ] as const) {
+      const boxes: Box[] = [];
+      const b = ((bw, bh, bd, x, y, z) => {
+        boxes.push({ w: bw, h: bh, d: bd, x, y, z });
+        return new THREE.Mesh();
+      }) as DetailBox;
+      const material = new THREE.MeshBasicMaterial();
+      doorFace(b, style, w, h, 0, 0, 0, material, material, material);
+      const clashes = fighting(boxes);
+      assert.deepEqual(
+        clashes,
+        [],
+        `${style} ${w}x${h} has surfaces on the same plane: ${clashes.join('; ')}`,
+      );
+    }
 });

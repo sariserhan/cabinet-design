@@ -253,11 +253,15 @@ export function doorFace(
     // Rails: between the stiles, grain running across.
     b(openW, rail, 0.3, x, y + sign * (ph / 2 - rail / 2), face + 0.55, finish);
   }
-  // Chamfer ring around the opening, stepped back so it reads as a profile.
+  // Chamfer ring around the opening, stepped back so it reads as a
+  // profile. The uprights stop where the horizontals begin rather than
+  // running the full height: overlapped at the corners, the two pieces
+  // put their faces on one plane, and four corners of every door then
+  // flickered between them as the camera moved. A mitre has no overlap.
   for (const sign of [-1, 1]) {
     b(
       0.35,
-      openH + 0.7,
+      Math.max(0.05, openH),
       0.16,
       x + sign * (openW / 2 + 0.17),
       y,
