@@ -21,21 +21,33 @@ export const box = (
   z: number,
   m: THREE.Material,
 ) => {
-  const mesh = new THREE.Mesh(
-    new RoundedBoxGeometry(
-      Math.max(0.01, w),
-      Math.max(0.01, h),
-      Math.max(0.01, d),
-      2,
-      Math.min(
-        0.1,
-        Math.max(0.01, w) / 5,
-        Math.max(0.01, h) / 5,
-        Math.max(0.01, d) / 5,
-      ),
+  const geometry = new RoundedBoxGeometry(
+    Math.max(0.01, w),
+    Math.max(0.01, h),
+    Math.max(0.01, d),
+    2,
+    Math.min(
+      0.1,
+      Math.max(0.01, w) / 5,
+      Math.max(0.01, h) / 5,
+      Math.max(0.01, d) / 5,
     ),
-    m,
   );
+  return finishBox(parent, geometry, m, x, y, z, w, h, d);
+};
+
+const finishBox = (
+  parent: THREE.Object3D,
+  geometry: THREE.BufferGeometry,
+  m: THREE.Material,
+  x: number,
+  y: number,
+  z: number,
+  w: number,
+  h: number,
+  d: number,
+) => {
+  const mesh = new THREE.Mesh(geometry, m);
   if (m instanceof THREE.MeshStandardMaterial && m.userData.woodGrain) {
     const uv = mesh.geometry.getAttribute('uv'),
       normal = mesh.geometry.getAttribute('normal');
@@ -139,8 +151,13 @@ export function createPalette({
     );
     for (const surface of [finish, inset]) {
       surface.roughness = name === 'oak' ? 0.48 : 0.36;
-      surface.clearcoat = name === 'oak' ? 0.18 : 0.3;
-      surface.clearcoatRoughness = 0.32;
+      // A painted door is sprayed with a satin lacquer, not chalk: it has
+      // a coat, and the coat has a sheen that shows the room faintly. The
+      // old 0.32 was closer to chalk, which is the exception rather than
+      // the finish most kitchens are ordered in. Oak here is oiled rather
+      // than lacquered, so it keeps a softer coat.
+      surface.clearcoat = name === 'oak' ? 0.25 : 0.5;
+      surface.clearcoatRoughness = name === 'oak' ? 0.22 : 0.14;
       surface.roughnessMap = detailMaps[name === 'oak' ? 'wood' : 'paint'];
       surface.bumpMap = surface.roughnessMap;
       surface.bumpScale = name === 'oak' ? 0.025 : 0.006;

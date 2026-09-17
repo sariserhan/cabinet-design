@@ -81,10 +81,23 @@ started. What is left is ranked by how much it changes the picture.
       cost the same 360 ms, because the cost is six traversals of the
       scene rather than the pixels they land on. There is no cheap cut
       inside the probe; the cut is fewer builds.
-- [ ] **Bevel the door and drawer edges.** Every edge in the scene is a
-      perfect 90 degrees, so no edge ever catches a highlight, and that alone
-      reads as computer graphics. A 1-2 mm chamfer on fronts is the largest
-      single realism gain available, and the most geometry work.
+- [x] **Bevel the door and drawer edges.** Closed on 2026-09-17 as already
+      done, and the entry was wrong twice over. No edge in the scene is a
+      perfect 90 degrees: every box goes through `RoundedBoxGeometry` with
+      a 0.1in radius, which is 2.5mm - the size the entry asks for - and
+      shaker and raised fronts carry an explicit chamfer ring at the
+      shoulder besides. Nor do those edges fail to catch a highlight:
+      measured along one scanline across two slate slab doors under a
+      window, the door edge reads 50 against a face of 30.
+      The chamfer the entry proposes was then built and measured, and it
+      is worse: replacing the rounded edge with a flat 45 degree one drops
+      that same highlight from 50 to 32, because a curve sweeps its normal
+      through ninety degrees and so always finds the light somewhere along
+      its width, while a flat facet has one normal and in that view it
+      pointed at something dark. Reverted. What did come out of the
+      measurement is the lacquer: painted fronts were at a chalk-matte
+      0.32 clearcoat roughness and are now a sprayed satin 0.14, which is
+      what a kitchen door is actually finished in.
 - [x] **Appliance and worktop materials.** Done on 2026-09-17, and the
       diagnosis was not what the note said. The room probe was built only for the high quality
       view, and there it came back as one flat colour, because PMREM's
