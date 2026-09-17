@@ -61,8 +61,6 @@ export type BuildContext = Palette & {
   interiors: boolean;
   showCeiling: boolean;
   quality: boolean;
-  selected?: string | null | undefined;
-  selectedIds?: string[] | undefined;
   /** Read at build time and again per frame, so it stays a ref. */
   openingRef: { current: number };
 };
@@ -114,6 +112,40 @@ function probeUsable(
   }
   return high > 0.01 && high - low > 0.02;
 }
+/**
+ * Draws the selection outline, and nothing else.
+ *
+ * Selecting a cabinet used to rebuild the scene, because `selected` was an
+ * input to the build: a click tore down the WebGL context, every texture,
+ * the sky environment and the room probe - about two seconds of software
+ * rendering - to add one wire box. The box is now added and removed on the
+ * scene that is already there.
+ *
+ * The boxes are `Line` objects, which is also how the photo renderer knows
+ * to leave them out of a picture.
+ */
+export function highlightSelection(
+  scene: THREE.Scene,
+  itemGroups: THREE.Group[],
+  ids: string[],
+  previous: THREE.BoxHelper[] = [],
+) {
+  for (const outline of previous) {
+    scene.remove(outline);
+    outline.geometry.dispose();
+    (outline.material as THREE.Material).dispose();
+  }
+  const outlines: THREE.BoxHelper[] = [];
+  for (const id of new Set(ids)) {
+    const target = itemGroups.find((g) => g.userData.itemId === id);
+    if (!target) continue;
+    const outline = new THREE.BoxHelper(target, 0x087984);
+    scene.add(outline);
+    outlines.push(outline);
+  }
+  return outlines;
+}
+
 export function buildKitchenScene(context: BuildContext) {
   const {
     renderer,
@@ -124,8 +156,6 @@ export function buildKitchenScene(context: BuildContext) {
     interiors,
     showCeiling,
     quality,
-    selected,
-    selectedIds,
     openingRef,
     textures,
     stoneMaterials,
@@ -626,8 +656,7 @@ export function buildKitchenScene(context: BuildContext) {
             for (const part of parts) pivot.attach(part);
             movingFronts.push({
               id: item.id,
-              apply: (amount) => {
-                const value = !selected || selected === item.id ? amount : 0;
+              apply: (value) => {
                 if (style === 'drawers')
                   pivot.position.z = value * Math.max(1, d - 4) * 0.75;
                 else
@@ -713,11 +742,7 @@ export function buildKitchenScene(context: BuildContext) {
         b(w, 0.6, d, 0, h - 0.3, 0, finish);
     } else {
       applianceDetails(group, item, b, steel, dark, glass, (apply) =>
-        movingFronts.push({
-          id: item.id,
-          apply: (amount) =>
-            apply(!selected || selected === item.id ? amount : 0),
-        }),
+        movingFronts.push({ id: item.id, apply }),
       );
     }
   }
@@ -950,17 +975,6 @@ export function buildKitchenScene(context: BuildContext) {
         );
         scene.add(leaf);
       }
-    }
-  }
-  for (const id of new Set([
-    ...(selectedIds ?? []),
-    ...(selected ? [selected] : []),
-  ])) {
-    const target = itemGroups.find((g) => g.userData.itemId === id);
-    if (target) {
-      const outline = new THREE.BoxHelper(target, 0x087984);
-      scene.add(outline);
-      materials.push(outline.material as THREE.Material);
     }
   }
   let roomReflection: THREE.WebGLRenderTarget | undefined;

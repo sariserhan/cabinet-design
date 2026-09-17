@@ -428,6 +428,41 @@ test('a slow action says it is working before it blocks the page', async ({
   expect(pageErrors).toEqual([]);
 });
 
+test('selecting an item outlines it without rebuilding the scene', async ({
+  designer: page,
+  pageErrors,
+}) => {
+  test.setTimeout(300_000);
+  await page.evaluate(() =>
+    document.querySelectorAll('details').forEach((d) => (d.open = true)),
+  );
+  await page.getByRole('button', { name: 'Load presentation kitchen' }).click();
+  await page.waitForTimeout(5000);
+  await page.getByRole('button', { name: 'Render', exact: true }).click();
+  const canvas = page.locator('.render-stage canvas');
+  await expect(canvas).toBeVisible({ timeout: 90_000 });
+  await page.waitForTimeout(15_000);
+
+  // A mark on the canvas element itself. Rebuilding the scene makes a new
+  // renderer and therefore a new canvas, so the mark surviving is the
+  // evidence that clicking an item did not tear the view down and build
+  // it again - which it used to, at about two seconds a click.
+  await page.evaluate(() => {
+    const el = document.querySelector('.render-stage canvas');
+    if (el) (el as HTMLCanvasElement).dataset.mark = 'kept';
+  });
+  const before = (await canvas.screenshot()).toString('base64');
+  const box = await canvas.boundingBox();
+  if (!box) throw Error('the canvas is not on screen');
+  await page.mouse.click(box.x + box.width * 0.35, box.y + box.height * 0.62);
+  await page.waitForTimeout(6000);
+
+  await expect(canvas).toHaveAttribute('data-mark', 'kept');
+  // And the click did something: the selection outline is drawn.
+  expect((await canvas.screenshot()).toString('base64')).not.toBe(before);
+  expect(pageErrors).toEqual([]);
+});
+
 test('enlarging the canvas keeps the tools and grows the stage', async ({
   designer: page,
 }) => {

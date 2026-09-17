@@ -17,7 +17,7 @@ import {
   type UpdateView,
   type ViewState,
 } from './render-state';
-import { buildKitchenScene } from './render-scene';
+import { buildKitchenScene, highlightSelection } from './render-scene';
 import { equirectangularFromCube } from './render-probe';
 import { toneCurve } from './render-tone';
 import { RenderControls, type RenderActions } from './render-controls';
@@ -209,6 +209,19 @@ export default function RenderView({
   const dimensionsRef = useRef(dimensions);
   dimensionsRef.current = dimensions;
   const refineAllowed = useRef(true);
+  // The selection is read rather than depended on: it changes on every
+  // click, and rebuilding the scene for it cost two seconds a click.
+  const selectionRef = useRef<string[]>([]);
+  selectionRef.current = [
+    ...(selectedIds ?? []),
+    ...(selected ? [selected] : []),
+  ];
+  const highlighted = useRef<{
+    scene: THREE.Scene;
+    itemGroups: THREE.Group[];
+    outlines: THREE.BoxHelper[];
+    render: () => void;
+  } | null>(null);
   const pendingCamera = useRef<CameraView | null>(null);
   const externalCamera = useRef(cameraView);
   externalCamera.current = cameraView;
@@ -555,8 +568,6 @@ export default function RenderView({
         interiors,
         showCeiling,
         quality,
-        selected,
-        selectedIds,
         openingRef,
       });
     // EffectComposer's own render target has no multisampling, so the
@@ -722,7 +733,15 @@ export default function RenderView({
         const distance = targetOpening - currentOpening;
         currentOpening +=
           Math.sign(distance) * Math.min(Math.abs(distance), elapsed * 150);
-        for (const front of movingFronts) front.apply(currentOpening / 100);
+        // Which fronts open is a selection question, answered per frame
+        // from the ref rather than baked into the scene: one selected item
+        // opens alone, and with nothing selected the whole kitchen does.
+        const only = selectionRef.current;
+        for (const front of movingFronts)
+          front.apply(
+            (!only.length || only.includes(front.id) ? 1 : 0) *
+              (currentOpening / 100),
+          );
         render();
       }
       // Nothing has changed for a moment, so spend the idle frames refining
@@ -1249,9 +1268,18 @@ export default function RenderView({
         }
       },
     };
+    // Whatever is selected now gets its outline on the scene just built,
+    // and the effect below keeps it in step from here on.
+    highlighted.current = {
+      scene,
+      itemGroups,
+      outlines: highlightSelection(scene, itemGroups, selectionRef.current),
+      render,
+    };
     sceneReady.current?.();
     sceneReady.current = null;
     return () => {
+      highlighted.current = null;
       photoJob.current?.abort();
       roomReflection?.dispose();
       cameraState.current = {
@@ -1305,6 +1333,9 @@ export default function RenderView({
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
+    // Selection is deliberately absent: it is read from a ref, and the
+    // effect below draws it, so clicking an item no longer rebuilds the
+    // renderer, the textures, the environment and the room probe.
   }, [
     design,
     assets,
@@ -1314,11 +1345,21 @@ export default function RenderView({
     cutaway,
     interiors,
     showCeiling,
-    selected,
-    selectedIds,
     quality,
     walking,
   ]);
+
+  useEffect(() => {
+    const live = highlighted.current;
+    if (!live) return;
+    live.outlines = highlightSelection(
+      live.scene,
+      live.itemGroups,
+      [...(selectedIds ?? []), ...(selected ? [selected] : [])],
+      live.outlines,
+    );
+    live.render();
+  }, [selected, selectedIds]);
   return (
     <div className="designer-render">
       {assetsLoading && (
