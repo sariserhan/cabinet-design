@@ -7,17 +7,30 @@ import type { Units } from './units';
  * Which of the three dimensions to show.
  *
  * Separate flags rather than one switch because a plan crowded with three
- * numbers per cabinet is unreadable, and the axis somebody is checking is
- * usually one of them: widths while laying out a run, heights while
- * working out what clears a window.
+ * numbers per cabinet is unreadable, and the one somebody is checking is
+ * usually a single dimension: widths while laying out a run, heights
+ * while working out what clears a window.
+ *
+ * Width, depth and height rather than x, y and z. A cabinet has the
+ * first three whichever way it is turned; the axes belong to the room,
+ * and naming the switches after them asked the designer to do the
+ * translation every time.
  */
-export type DimensionAxes = { x: boolean; y: boolean; z: boolean };
+export type DimensionAxes = {
+  width: boolean;
+  depth: boolean;
+  height: boolean;
+};
 
-export const allAxes: DimensionAxes = { x: true, y: true, z: true };
+export const allAxes: DimensionAxes = {
+  width: true,
+  depth: true,
+  height: true,
+};
 
-/** Is any axis switched on? */
+/** Is any dimension switched on? */
 export function anyAxis(axes: DimensionAxes) {
-  return axes.x || axes.y || axes.z;
+  return axes.width || axes.depth || axes.height;
 }
 
 /**
@@ -37,12 +50,12 @@ export function itemDimensionText(
 ) {
   const size = (value: number) => lengthLabel(value, units);
   if (!anyAxis(axes)) return '';
-  if (axes.x && axes.y && axes.z)
+  if (axes.width && axes.depth && axes.height)
     return `${size(item.width)} × ${size(item.depth)} × ${size(item.height)}`;
   return [
-    axes.x ? `W ${size(item.width)}` : '',
-    axes.y ? `D ${size(item.depth)}` : '',
-    axes.z ? `H ${size(item.height)}` : '',
+    axes.width ? `W ${size(item.width)}` : '',
+    axes.depth ? `D ${size(item.depth)}` : '',
+    axes.height ? `H ${size(item.height)}` : '',
   ]
     .filter(Boolean)
     .join(' · ');
@@ -75,9 +88,9 @@ export function designDimensionSummary(
   const units = design.units ?? 'in';
   const say = (w: number, d: number, h: number) =>
     [
-      axes.x ? `W ${lengthLabel(w, units)}` : '',
-      axes.y ? `D ${lengthLabel(d, units)}` : '',
-      axes.z ? `H ${lengthLabel(h, units)}` : '',
+      axes.width ? `W ${lengthLabel(w, units)}` : '',
+      axes.depth ? `D ${lengthLabel(d, units)}` : '',
+      axes.height ? `H ${lengthLabel(h, units)}` : '',
     ]
       .filter(Boolean)
       .join(' · ');

@@ -1015,7 +1015,7 @@ test('a design can be made a room of a job, and stays one', async ({
   expect(pageErrors).toEqual([]);
 });
 
-test('dimensions can be shown in every view, one axis at a time', async ({
+test('dimensions can be shown in every view, one size at a time', async ({
   designer: page,
   pageErrors,
 }) => {
@@ -1042,12 +1042,12 @@ test('dimensions can be shown in every view, one axis at a time', async ({
 
   // One axis at a time: with only Z left, each number says which way it is
   // measured, because 34-1/2" alone does not.
-  await page.getByLabel('Show X dimensions').uncheck();
-  await page.getByLabel('Show Y dimensions').uncheck();
+  await page.getByLabel('Show width dimensions').uncheck();
+  await page.getByLabel('Show depth dimensions').uncheck();
   await expect(planLabels.first()).toHaveText(/^H \d/, { timeout: 20_000 });
   await expect(summary).toHaveText(/^Room H 108"/);
-  await page.getByLabel('Show X dimensions').check();
-  await page.getByLabel('Show Y dimensions').check();
+  await page.getByLabel('Show width dimensions').check();
+  await page.getByLabel('Show depth dimensions').check();
 
   await page.getByRole('button', { name: /3D preview/i }).click();
   await expect

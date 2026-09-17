@@ -840,7 +840,7 @@ test('a job adds up the rooms it covers without merging them', () => {
   assert.equal(restored.job?.room, 'Kitchen');
   assert.equal(restored.room.width, kitchen.room.width);
 });
-test('dimension labels name the axis unless all three are shown', () => {
+test('dimension labels name the size unless all three are shown', () => {
   const item = {
     ...fromObject('custom_cabinet'),
     id: 'b',
@@ -851,14 +851,17 @@ test('dimension labels name the axis unless all three are shown', () => {
   assert.equal(itemDimensionText(item, allAxes), '24" × 24" × 34-1/2"');
   // One number on its own has to say which way it is measured.
   assert.equal(
-    itemDimensionText(item, { x: false, y: false, z: true }),
+    itemDimensionText(item, { width: false, depth: false, height: true }),
     'H 34-1/2"',
   );
   assert.equal(
-    itemDimensionText(item, { x: true, y: false, z: true }),
+    itemDimensionText(item, { width: true, depth: false, height: true }),
     'W 24" · H 34-1/2"',
   );
-  assert.equal(itemDimensionText(item, { x: false, y: false, z: false }), '');
+  assert.equal(
+    itemDimensionText(item, { width: false, depth: false, height: false }),
+    '',
+  );
 
   const d = newDesign();
   d.room = {
@@ -881,7 +884,8 @@ test('dimension labels name the axis unless all three are shown', () => {
   assert.equal(summary.extent.width, 84);
   assert.equal(summary.extent.height, 84);
   assert.equal(
-    designDimensionSummary(d, { x: true, y: false, z: false }).items,
+    designDimensionSummary(d, { width: true, depth: false, height: false })
+      .items,
     'W 84"',
   );
 });
